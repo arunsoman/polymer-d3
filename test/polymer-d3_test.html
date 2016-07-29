@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html>
+  <head>
+    <title>polymer-d3 test</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../polymer-d3.html">
+  </head>
+  <body>
+
+    <test-fixture id="basic">
+      <template>
+        <polymer-d3></polymer-d3>
+      </template>
+    </test-fixture>
+
+    <script>
+      suite('polymer-d3', function() {
+
+        test('instantiating the element works', function() {
+          var element = fixture('basic');
+          assert.equal(element.is, 'polymer-d3');
+        });
+
+      });
+    </script>
+  </body>
+</html>
