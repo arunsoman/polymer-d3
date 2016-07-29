@@ -1,0 +1,41 @@
+    <dom-module id='pie-chart'>
+        <div class='mandatory'>
+
+        </div>
+
+        <span>Settings</span>
+        <div class='optional'>
+
+        </div>
+    </dom-module>
+
+    <dom-module id='display-input' inputs='inputs'>
+        <template is='dom-repeat' items={{inputs}}>
+            <paper-dropdown-menu >
+            </paper-dropdown-menu>
+        </template>
+    </dom-module>
+
+
+    <dom-module id='display-settinigs' settings='settings'>
+        <template is='dom-repeat' items={{settings}}>
+            <template is="dom-if" if="{{isDropDown(item.type)}}">
+                <paper-dropdown-menu >
+                </paper-dropdown-menu>
+            </template>
+
+            <template is="dom-if" if="{{isNumber(item.type)}}">
+                <paper-input label=[[item.txt]] type=Number></paper-input>
+            </template>   
+        </template>
+
+        <script type="text/javascript">
+            isDropDown:function(name){
+                return name == 'dropDown';
+            },
+            isNumber:function(argument) {
+                return argument == 'Number';
+            }
+
+        </script>
+    </dom-module>
