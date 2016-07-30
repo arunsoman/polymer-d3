@@ -4,7 +4,8 @@ Polymer({
         title: '',
         inputs: {
             notify: true,
-            type: [{
+            type: Array,
+            value: [{
                 input: 'slice',
                 txt: '',
                 selectedValue: Array,
@@ -20,7 +21,8 @@ Polymer({
         },
         settings: {
             notify: true,
-            type: [{
+            type: Array,
+            value: [{
                 input: 'displayTxt',
                 txt: '',
                 uitype: 'dropDown',
