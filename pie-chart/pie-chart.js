@@ -1,41 +1,47 @@
 Polymer({
-    id: 'pie-chart',
+    is: 'pie-chart',
     properties: {
         title: '',
-        inputs: [{
-            input: 'slice',
-            txt: '',
-            selectedValue: Array,
-            selectedName: Array,
-            type: 'single-value'
-        }, {
-            input: 'sliceSize',
-            txt: '',
-            selectedValue: Array,
-            selectedName: Array,
-            type: 'single-value'
-        }],
-        settings: [{
-            input: 'displayTxt',
-            txt: '',
-            type: 'dropDown',
-            selectedValue: Array,
-            selectedName: Array,
-            options: [{
-                key: 'None',
-                value: 0
+        inputs: {
+            notify: true,
+            type: [{
+                input: 'slice',
+                txt: '',
+                selectedValue: Array,
+                selectedName: Array,
+                uitype: 'single-value'
             }, {
-                key: 'inside',
-                value: 1
-            }, {
-                key: 'outside',
-                value: 2
+                input: 'sliceSize',
+                txt: '',
+                selectedValue: Array,
+                selectedName: Array,
+                uitype: 'single-value'
             }]
-        }, {
-            input: 'innerRadius',
-            txt: '',
-            type: Number,
-            selectedValue: 0
-        }]
+        },
+        settings: {
+            notify: true,
+            type: [{
+                input: 'displayTxt',
+                txt: '',
+                uitype: 'dropDown',
+                selectedValue: Array,
+                selectedName: Array,
+                options: [{
+                    key: 'None',
+                    value: 0
+                }, {
+                    key: 'inside',
+                    value: 1
+                }, {
+                    key: 'outside',
+                    value: 2
+                }]
+            }, {
+                input: 'innerRadius',
+                txt: '',
+                uitype: Number,
+                selectedValue: 0
+            }]
+        }
     }
 });

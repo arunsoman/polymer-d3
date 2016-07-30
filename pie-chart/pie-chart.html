@@ -1,41 +1,18 @@
-    <dom-module id='pie-chart'>
+<link href="../display-component/display-component.html" rel="import">
+<dom-module id='pie-chart'>
+    <template>
+    <span>pie:"{{ inputs }}"</span>
         <div class='mandatory'>
-            <display-input inputs="{{inputs}}"></display-input>
+        <display-component settings="{{inputs}}"></display-component>
         </div>
 
         <span>Settings</span>
         <div class='optional'>
-        <display-settinigs  settings="{{settings}}"></display-settinigs>
+            <display-component settings="{{settings}}"></display-component>
         </div>
-    </dom-module>
+    </template>
 
-    <dom-module id='display-input' inputs='inputs'>
-        <template is='dom-repeat' items="{{inputs}}">
-            <paper-dropdown-menu >
-            </paper-dropdown-menu>
-        </template>
-    </dom-module>
+</dom-module>
+<script src='pie-chart.js'></script>
 
 
-    <dom-module id='display-settinigs' settings='settings'>
-        <template is='dom-repeat' items="{{settings}}">
-            <template is="dom-if" if="{{isDropDown(item.type)}}">
-                <paper-dropdown-menu >
-                </paper-dropdown-menu>
-            </template>
-
-            <template is="dom-if" if="{{isNumber(item.type)}}">
-                <paper-input label=[[item.txt]] type=Number></paper-input>
-            </template>   
-        </template>
-
-        <script type="text/javascript">
-            isDropDown:function(name){
-                return name == 'dropDown';
-            },
-            isNumber:function(argument) {
-                return argument == 'Number';
-            }
-
-        </script>
-    </dom-module>
