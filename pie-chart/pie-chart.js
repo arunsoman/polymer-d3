@@ -1,45 +1,41 @@
-polymer({
-    id: 'pie',
+Polymer({
+    id: 'pie-chart',
     properties: {
         title: '',
         inputs: [{
             input: 'slice',
             txt: '',
-            index: Array,
-            name: [],
+            selectedValue: Array,
+            selectedName: Array,
             type: 'single-value'
         }, {
             input: 'sliceSize',
             txt: '',
-            index: Array,
-            name: [],
+            selectedValue: Array,
+            selectedName: Array,
             type: 'single-value'
         }],
-        settings: {
-            displayTxt: {
-                txt: '',
-                type: 'dropDown',
-                selectedValue: 0,
-                options: [{
-                    key: 'None',
-                    value: 0
-                }, {
-                    key: 'inside',
-                    value: 1
-                }, {
-                    key: 'outside',
-                    value: 2
-                }]
-            },
-            innerRadius: {
-                txt: '',
-                type: Number,
+        settings: [{
+            input: 'displayTxt',
+            txt: '',
+            type: 'dropDown',
+            selectedValue: Array,
+            selectedName: Array,
+            options: [{
+                key: 'None',
                 value: 0
-            },
-            mouseOver: {
-                txt: '',
-                type: Object
-            }
-        }
+            }, {
+                key: 'inside',
+                value: 1
+            }, {
+                key: 'outside',
+                value: 2
+            }]
+        }, {
+            input: 'innerRadius',
+            txt: '',
+            type: Number,
+            selectedValue: 0
+        }]
     }
 });

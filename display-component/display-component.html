@@ -1,0 +1,33 @@
+<dom-module id='display-component' attributes="settings external">
+    <template is='dom-repeat' items="{{settings}}">
+        <template is="dom-if" if="{{isDropDown(item.type)}}">
+            <span>show drop down</span>
+        </template>
+
+        <template is="dom-if" if="{{isNumber(item.type)}}">
+            <span>show input</span>
+        </template> 
+
+        <template is="dom-if" if="{{isSingleValue(item.type)}}">
+            <span>show drop down with external</span>
+        </template>   
+    </template>
+
+    <script type="text/javascript">
+        Polymer({
+            id : 'display-component',
+
+            isDropDown:function(name){
+                return name == 'dropDown';
+            },
+            isSingleValue:function(name){
+                return name == 'single-value';
+            },
+
+            isNumber:function(argument) {
+                return argument == 'Number';
+            }
+    });
+
+    </script>
+</dom-module>
