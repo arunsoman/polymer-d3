@@ -43,38 +43,79 @@ Polymer({
                 txt: 'Inner radius',
                 uitype: 'Number',
                 selectedValue: 0
+            },
+            {
+                input: 'height',
+                txt: 'Height of the chart',
+                uitype: 'Number',
+                selectedValue: 300,
+                notify: true,
+                observer: '_heightChanged'
+            },
+            {
+                input: 'width',
+                txt: 'Width of the chart',
+                uitype: 'Number',
+                selectedValue: 300,
+                notify: true,
+                observer: '_widthChanged'
             }]
         },
         hideSettings: true,
         data: String,
-        
+        external:Array
+    },
+    _getHeight(){
+        return this.settings[2].selectedValue;
+    },
+    _getWidth(){
+        return this.settings[3].selectedValue;
+    },
+    _heightChanged: function(){
+          this.svg.attr('height', height);
+    },
+    _widthChanged: function(){
+        this.svg.attr('width', width);
     },
    
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
         this.draw();
     },
+    attached: function(){
+        console.log("svg computed");
+        var me = this;
+        me.svg = d3.select('#chart')
+          .append('svg')
+          .append('g')
+          .attr('transform', 'translate(' + (me._getWidth() / 2) + 
+            ',' + (me._getHeight() / 2) + ')');
+
+        me.tooltip = d3.select('#chart')
+          .append('div')
+          .attr('class', 'tooltip')        
+          .append('div')
+          .attr('class', me.inputs[0].selectedName)
+          .append('div')
+          .attr('class', me.inputs[1].selectedName)
+          .append('div')
+          .attr('class', 'percent');
+
+    },
+
     draw: function(){
         'use strict';
+        var me = this;
         var sliceHeader = this.inputs[0].selectedName;
         var sliceSizeHeader = this.inputs[1].selectedName;
-        var width = 360;
-        var height = 360;
-        var radius = Math.min(width, height) / 2;
+        var radius = Math.min(me._getWidth(), me._getHeight()) / 2;
         var donutWidth = 75;
         var legendRectSize = 18;
         var legendSpacing = 4;
 
         var color = d3.scaleOrdinal(d3.schemeCategory20b);
 
-        var svg = d3.select('#chart')
-          .append('svg')
-          .attr('width', width)
-          .attr('height', height)
-          .append('g')
-          .attr('transform', 'translate(' + (width / 2) + 
-            ',' + (height / 2) + ')');
-
+      
         var arc = d3.arc()
           .innerRadius(radius - donutWidth)
           .outerRadius(radius);
@@ -85,19 +126,7 @@ Polymer({
             })
           .sort(null);
 
-        var tooltip = d3.select('#chart')
-          .append('div')
-          .attr('class', 'tooltip');
         
-        tooltip.append('div')
-          .attr('class', sliceHeader);
-
-        tooltip.append('div')
-          .attr('class', sliceSizeHeader);
-
-        tooltip.append('div')
-          .attr('class', 'percent');
-
         var dataset = [];
         d3.csvParse(this.data, function(d) {
             d[sliceSizeHeader] = +d[sliceSizeHeader];
@@ -105,7 +134,7 @@ Polymer({
             dataset.push(d);
         });
 
-          var path = svg.selectAll('path')
+          var path = me.svg.selectAll('path')
             .data(pie(dataset))
             .enter()
             .append('path')
@@ -120,14 +149,14 @@ Polymer({
               return (!d.enabled) ? d[sliceSizeHeader] : 0;                       // UPDATED
             }));
             var percent = Math.round(1000 * d.data[sliceSizeHeader] / total) / 10;
-            tooltip.select('.label').html(d.data[sliceHeader]);
-            tooltip.select('.count').html(d.data[sliceSizeHeader]); 
-            tooltip.select('.percent').html(percent + '%'); 
-            tooltip.style('display', 'block');
+            me.tooltip.select('.label').html(d.data[sliceHeader]);
+            me.tooltip.select('.count').html(d.data[sliceSizeHeader]); 
+            me.tooltip.select('.percent').html(percent + '%'); 
+            me.tooltip.style('display', 'block');
           });
           
           path.on('mouseout', function() {
-            tooltip.style('display', 'none');
+            me.tooltip.style('display', 'none');
           });
 
           /* OPTIONAL 
@@ -137,7 +166,7 @@ Polymer({
           });
           */
             
-          var legend = svg.selectAll('.legend')
+          var legend = me.svg.selectAll('.legend')
             .data(color.domain())
             .enter()
             .append('g')

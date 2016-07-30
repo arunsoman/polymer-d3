@@ -14,13 +14,13 @@
             </template>
 
             <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                <paper-input label="[[item.txt]]" tyoe='[[item.uitype]]'></paper-input>
+                <paper-input label="[[item.txt]]" tyoe='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
             </template> 
 
             <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
                 <paper-dropdown-menu label='[[ item.txt ]]'>
                     <paper-listbox class="dropdown-content">
-                        <template is="dom-repeat" items="[[externals]]" >
+                        <template is="dom-repeat" items="[[external]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
                     </paper-listbox>

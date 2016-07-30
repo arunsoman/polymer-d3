@@ -42,12 +42,12 @@
 
     <template>
         <div class='mandatory'>
-        <display-component settings="{{inputs}}" external=[[external]]></display-component>
+        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
         </div>
 
         <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
         <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external=[[external]]></display-component>
+            <display-component settings="{{settings}}" external='[[external]]'></display-component>
         </div>
         <div id="chart"></div>
     </template>
