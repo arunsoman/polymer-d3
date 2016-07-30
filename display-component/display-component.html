@@ -1,17 +1,30 @@
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <dom-module id='display-component' >
     <template>
-    <span>llk:{{input}}</span>
         <template is='dom-repeat' items="{{settings}}">
             <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                <span>show drop down</span>
+                <paper-dropdown-menu label='[[ item.txt ]]'>
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="[[item.options]]" >
+                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
             </template>
 
             <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                <span>show input</span>
+                <paper-input label="[[item.txt]]" tyoe='[[item.uitype]]'></paper-input>
             </template> 
 
             <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                <span>show drop down with external</span>
+                <paper-dropdown-menu label='[[ item.txt ]]'>
+                    <paper-listbox class="dropdown-content">
+                        <template is="dom-repeat" items="[[externals]]" >
+                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
             </template>   
         </template>
     </template>

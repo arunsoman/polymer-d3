@@ -7,13 +7,13 @@ Polymer({
             type: Array,
             value: [{
                 input: 'slice',
-                txt: '',
+                txt: 'Pick a dimension',
                 selectedValue: Array,
                 selectedName: Array,
                 uitype: 'single-value'
             }, {
                 input: 'sliceSize',
-                txt: '',
+                txt: 'Pick a messure',
                 selectedValue: Array,
                 selectedName: Array,
                 uitype: 'single-value'
@@ -24,7 +24,7 @@ Polymer({
             type: Array,
             value: [{
                 input: 'displayTxt',
-                txt: '',
+                txt: 'Placement of lables',
                 uitype: 'dropDown',
                 selectedValue: Array,
                 selectedName: Array,
@@ -40,10 +40,15 @@ Polymer({
                 }]
             }, {
                 input: 'innerRadius',
-                txt: '',
-                uitype: Number,
+                txt: 'Inner radius',
+                uitype: 'Number',
                 selectedValue: 0
             }]
-        }
+        },
+        hideSettings: true
+    },
+   
+    _toggleView: function() {
+        this.hideSettings = !this.hideSettings;
     }
 });
