@@ -9,7 +9,8 @@
     "d3": "^3.5.16",
     "paper-menu": "PolymerElements/paper-menu#^1.2.2",
     "paper-listbox": "^1.1.2",
-    "paper-item": "^1.2.1"
+    "paper-item": "^1.2.1",
+    "polymer-color-picker": "^1.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

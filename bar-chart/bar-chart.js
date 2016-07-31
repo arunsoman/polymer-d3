@@ -78,6 +78,14 @@ Polymer({
                 selectedValue: 10,
                 notify: true,
                 observer: '_marginChanged'
+            },{
+                input: 'colorRange',
+                txt: 'Color range',
+                uitype: 'colorRangePicker',
+                from: "#aad",
+                to: "#556",
+                notify: true,
+                observer: '_colorRangeChanged'
             }]
         },
         hideSettings: true,
@@ -98,6 +106,9 @@ Polymer({
     },
     _getWidth() {
         return this.settings[1].selectedValue;
+    },
+    _colorRangeChanged: function() {
+        this.chart = this.draw();
     },
     _areaChanged: function() {
         this.chart = this.draw();
@@ -145,7 +156,7 @@ Polymer({
 
         var color = d3.scale.linear()
             .domain([0, n - 1])
-            .range(["#aad", "#556"]);
+            .range([this.settings[6].to, this.settings[6].from]);
 
         var xAxis = d3.svg.axis()
             .scale(x)

@@ -2,6 +2,8 @@
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/polymer-color-picker/polymer-color-picker.html">
+
 <dom-module id='display-component' >
     <template>
         <template is='dom-repeat' items="{{settings}}">
@@ -38,6 +40,14 @@
                     </paper-menu>
                 </paper-dropdown-menu>
             </template>
+
+            <template is="dom-if" if="{{isColorRangePicker(item.uitype)}}">
+                <span>from:</span>
+                <polymer-color-picker color="{{item.from}}"></polymer-color-picker>
+                <span>to:</span>
+                <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
+            </template>
+
         </template>
     </template>
     <script type="text/javascript">
@@ -53,7 +63,9 @@
             isMultiValue:function(name){
                 return name == 'multi-value';
             },
-
+            isColorRangePicker: function (argument) {
+                return argument == 'colorRangePicker';
+            },
             isNumber:function(argument) {
                 return argument == 'Number';
             }
