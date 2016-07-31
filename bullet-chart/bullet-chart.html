@@ -2,57 +2,34 @@
 <link rel="import" href="../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 
-<dom-module id='pie-chart'>
+<dom-module id='bullet-chart'>
 <style>
-	  
+
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  width: 960px;
-  height: 500px;
+  margin: auto;
+  padding-top: 40px;
   position: relative;
+  width: 960px;
 }
 
-svg {
-	width: 100%;
-	height: 100%;
+button {
+  position: absolute;
+  right: 10px;
+  top: 10px;
 }
 
-path.slice{
-	stroke-width:2px;
-}
-
-polyline{
-	opacity: .3;
-	stroke: black;
-	stroke-width: 2px;
-	fill: none;
-}
-
-.labelValue
-{
-	font-size: 60%;
-	opacity: .5;
-	
-}
-
-.toolTip {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    position: absolute;
-    display: none;
-    width: auto;
-    height: auto;
-    background: none repeat scroll 0 0 white;
-    border: 0 none;
-    border-radius: 8px 8px 8px 8px;
-    box-shadow: -3px 3px 15px #888888;
-    color: black;
-    font: 12px sans-serif;
-    padding: 5px;
-    text-align: center;
-}
-text {
-  font: 12px sans-serif;
-}          
+.bullet { font: 10px sans-serif; }
+.bullet .marker { stroke: #000; stroke-width: 2px; }
+.bullet .tick line { stroke: #666; stroke-width: .5px; }
+.bullet .range.s0 { fill: #eee; }
+.bullet .range.s1 { fill: #ddd; }
+.bullet .range.s2 { fill: #ccc; }
+.bullet .measure.s0 { fill: lightsteelblue; }
+.bullet .measure.s1 { fill: steelblue; }
+.bullet .title { font-size: 14px; font-weight: bold; }
+.bullet .subtitle { fill: #999; }
+          
     </style>
 
     <template>
@@ -67,7 +44,7 @@ text {
         <div id="chart"></div>
     </template>
 </dom-module>
-<script src='pie-chart.js'></script>
+<script src='bullet-chart.js'></script>
 <script src='../bower_components/d3/d3.min.js'></script>
 
 
