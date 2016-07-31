@@ -152,8 +152,8 @@ Polymer({
             .tickSize(0)
             .tickPadding(6)
             .orient("bottom");
-
-        var svg = d3.select("body").append("svg")
+        this.$.barChart.innerHTML = '';
+        var svg = d3.select(this.$.barChart).append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
