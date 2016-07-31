@@ -91,7 +91,8 @@ Polymer({
         hideSettings: true,
         data: String,
         external: Array,
-        chart: Object
+        chart: Object,
+        svg:Object
     },
     _getMargin: function() {
         return {
@@ -121,9 +122,21 @@ Polymer({
         this.chart = this.draw();
     },
     attached: function() {
+        this.svg = d3.select('#barChart').append("svg");
+        this._addToolTip();
+    },
+    _addToolTip(){
+        var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+          .html(function(d) {
+            return "<strong>Frequency:</strong> <span style='color:red'>"  + "</span>";
+          });       
+        this.svg.call(tip);
+        this.svg.on('mouseover', tip.show)
+      .on('mouseout', tip.hide)
 
     },
-
     draw: function() {
         var n = 4, // number of layers
             m = 58, // number of samples per layer
@@ -163,14 +176,13 @@ Polymer({
             .tickSize(0)
             .tickPadding(6)
             .orient("bottom");
-        this.$.barChart.innerHTML = '';
-        var svg = d3.select(this.$.barChart).append("svg")
-            .attr("width", width + margin.left + margin.right)
+        //this.$.barChart.innerHTML = '';
+        this.svg .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var layer = svg.selectAll(".layer")
+        var layer = this.svg.selectAll(".layer")
             .data(layers)
             .enter().append("g")
             .attr("class", "layer")
@@ -178,7 +190,9 @@ Polymer({
                 return color(i);
             });
 
-        var rect = layer.selectAll("rect")
+        var rect = layer.
+
+        selectAll("rect")
             .data(function(d) {
                 return d;
             })
@@ -200,7 +214,7 @@ Polymer({
             .attr("height", function(d) {
                 return y(d.y0) - y(d.y0 + d.y);
             });
-        svg.append("g")
+        this.svg.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis);
