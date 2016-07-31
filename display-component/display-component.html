@@ -25,6 +25,16 @@
                         </template>
                     </paper-listbox>
                 </paper-dropdown-menu>
+            </template>
+
+            <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
+                <paper-dropdown-menu label='[[ item.txt ]]'>
+                    <paper-menu multi class="dropdown-content">
+                        <template is="dom-repeat" items="[[external]]" >
+                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
             </template>   
         </template>
     </template>
@@ -37,6 +47,9 @@
             },
             isSingleValue:function(name){
                 return name == 'single-value';
+            },
+            isMultiValue:function(name){
+                return name == 'multi-value';
             },
 
             isNumber:function(argument) {
