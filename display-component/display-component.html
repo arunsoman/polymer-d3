@@ -1,5 +1,7 @@
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
 <dom-module id='display-component' >
     <template>
         <template is='dom-repeat' items="{{settings}}">
@@ -14,8 +16,8 @@
             </template>
 
             <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                <paper-input label="[[item.txt]]" tyoe='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
-            </template> 
+                <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+            </template>
 
             <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
                 <paper-dropdown-menu label='[[ item.txt ]]'>
@@ -35,7 +37,7 @@
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
-            </template>   
+            </template>
         </template>
     </template>
     <script type="text/javascript">
