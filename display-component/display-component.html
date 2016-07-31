@@ -9,12 +9,13 @@
     <template>
         <template is='dom-repeat' items="{{settings}}">
             <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
+                <paper-dropdown-menu label='[[ item.txt ]]' selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
                     <paper-listbox class="dropdown-content">
                         <template is="dom-repeat" items="[[item.options]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
                     </paper-listbox>
+                    <span>------------{{item.selectedValue}}' ,, '{{item.selectedName}}'</span>
                 </paper-dropdown-menu>
             </template>
 
@@ -23,7 +24,7 @@
             </template>
 
             <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
+                <paper-dropdown-menu label='[[ item.txt ]]'  selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
                     <paper-listbox class="dropdown-content">
                         <template is="dom-repeat" items="[[external]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
@@ -34,7 +35,7 @@
 
             <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
                 <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-menu multi class="dropdown-content">
+                    <paper-menu multi class="dropdown-content"  selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
                         <template is="dom-repeat" items="[[external]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
