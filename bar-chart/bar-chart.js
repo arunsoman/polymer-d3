@@ -37,48 +37,6 @@ Polymer({
             notify: true,
             type: Array,
             value: [{
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 500,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 960,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'marginTop',
-                txt: 'Top  margin',
-                uitype: 'Number',
-                selectedValue: 40,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginRight',
-                txt: 'Right margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginBottom',
-                txt: 'Bottom margin',
-                uitype: 'Number',
-                selectedValue: 20,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginLeft',
-                txt: 'Left margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            },{
                 input: 'colorRange',
                 txt: 'Color range',
                 uitype: 'colorRangePicker',
@@ -91,41 +49,20 @@ Polymer({
         hideSettings: true,
         data: String,
         external: Array,
-        chart: Object,
-        svg:Object
+        chart: Object
     },
-    _getMargin: function() {
-        return {
-            top: this.settings[2].selectedValue,
-            right: this.settings[3].selectedValue,
-            bottom: this.settings[4].selectedValue,
-            left: this.settings[5].selectedValue
-        }
-    },
-    _getHeight() {
-        return this.settings[0].selectedValue;
-    },
-    _getWidth() {
-        return this.settings[1].selectedValue;
-    },
-    _colorRangeChanged: function() {
-        this.chart = this.draw();
-    },
-    _areaChanged: function() {
-        this.chart = this.draw();
-    },
-    _marginChanged: function() {
-        this.chart = this.draw();
-    },
+    behaviors: [
+        PolymerD3.sizing,
+        PolymerD3.propertiesBehavior,
+        PolymerD3.chartconfigObserver,
+        PolymerD3.chartBehavior
+    ],
+
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
-        this.chart = this.draw();
     },
-    attached: function() {
-        this.svg = d3.select('#barChart').append("svg");
-        this._addToolTip();
-    },
-    _addToolTip(){
+
+    _addToolTip: function(){
         var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
@@ -155,9 +92,9 @@ Polymer({
                 });
             });
 
-        var margin = this._getMargin();
-        var width = this._getWidth() - margin.left - margin.right;
-        var height = this._getHeight() - margin.top - margin.bottom;
+        var margin = this.getMargins();
+        var width = this.getWidth() - margin.left - margin.right;
+        var height = this.getHeight() - margin.top - margin.bottom;
 
         var x = d3.scale.ordinal()
             .domain(d3.range(m))
@@ -177,7 +114,7 @@ Polymer({
             .tickPadding(6)
             .orient("bottom");
         //this.$.barChart.innerHTML = '';
-        this.svg .attr("width", width + margin.left + margin.right)
+        this.svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");

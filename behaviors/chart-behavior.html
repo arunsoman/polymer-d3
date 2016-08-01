@@ -1,0 +1,14 @@
+<script>
+  PolymerD3.chartBehavior = {
+    properties: {
+      svg: Object
+    },
+    attached: function() {
+      var elem = document.createElement('div');
+      var svg = document.createElement('svg');
+      elem.id = 'chart'
+      this.appendChild(elem);
+      this.svg = d3.select(elem).append("svg");
+    }
+  }
+</script>

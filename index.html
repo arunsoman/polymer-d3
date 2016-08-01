@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script src="namespace.js"></script>
+        <script src='bower_components/d3/d3.min.js'></script>
+        <script src='bower_components/d3-tip/index.js'></script>
         <link href="bower_components/polymer/polymer.html" rel="import">
-              <link href="pie-chart/pie-chart.html" rel="import">
+        <link href="behaviors/properties-behavior.html" rel="import">
+        <link href="behaviors/chartconfig-observer-behavior.html" rel="import">
+        <link href="behaviors/sizing-behavior.html" rel="import">
+        <link href="behaviors/chart-behavior.html" rel="import">
         <link href="bar-chart/bar-chart.html" rel="import">
-        
+        <link href="pie-chart/pie-chart.html" rel="import">
         <!--
   <link href="bullet-chart/bullet-chart.html" rel="import">
         <link href="difference-chart/difference-chart.html" rel="import">
@@ -13,7 +19,7 @@
         </head>
     <body>
     
-    	<pie-chart external= '[{"key": "label","value":1},{"key": "count","value":2}]' 
+    	<!-- <pie-chart external= '[{"key": "label","value":1},{"key": "count","value":2}]' 
     	data= "label,count
 Monday,379130
 Tuesday,424923
@@ -22,10 +28,12 @@ Thursday,432138
 Friday,428295
 Saturday,368239
 Sunday,282701"
-></pie-chart>
+></pie-chart> -->
 
 
 <bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart>
+<bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart>
+<!-- <bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart> -->
 
 <!--
 
@@ -39,5 +47,6 @@ Sunday,282701"
 </difference-chart> 
 
 -->
+
     </body>
 </html>

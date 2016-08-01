@@ -1,0 +1,36 @@
+<script>
+  PolymerD3.propertiesBehavior = {
+    setSettingsProperty: function(key){
+        if(arguments.length < 1){
+            return
+        }
+        newVal = arguments[1];
+        this.settings.forEach(function(elem){
+            if(elem.input == key){
+                console.log(elem);
+                for(var newKey in newVal){
+                    elem[newKey] = newVal[newKey];
+                 }   
+            }
+        });
+    },
+    getSettingsProperty: function(key){
+        var result;
+        this.settings.forEach(function(elem){
+            if(elem.input == key){
+                result = elem.selectedValue;
+            }
+        });
+        return result;
+    },
+    getSettings: function(){
+        return this.settings;
+    },
+    getHeight: function() {
+        return this.getSettingsProperty('height');
+    },
+    getWidth: function() {
+        return this.getSettingsProperty('width');
+    }
+  }
+</script>

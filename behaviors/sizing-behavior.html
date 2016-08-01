@@ -1,0 +1,65 @@
+<script>
+  PolymerD3.sizing = {
+    properties: {
+      area: {
+        type: Array,
+        value: [{
+                input: 'height',
+                txt: 'Height of the chart',
+                uitype: 'Number',
+                selectedValue: 500,
+                notify: true,
+                observer: '_areaChanged'
+            }, {
+                input: 'width',
+                txt: 'Width of the chart',
+                uitype: 'Number',
+                selectedValue: 960,
+                notify: true,
+                observer: '_areaChanged'
+            }, {
+                input: 'marginTop',
+                txt: 'Top  margin',
+                uitype: 'Number',
+                selectedValue: 40,
+                notify: true,
+                observer: '_marginChanged'
+            }, {
+                input: 'marginRight',
+                txt: 'Right margin',
+                uitype: 'Number',
+                selectedValue: 10,
+                notify: true,
+                observer: '_marginChanged'
+            }, {
+                input: 'marginBottom',
+                txt: 'Bottom margin',
+                uitype: 'Number',
+                selectedValue: 20,
+                notify: true,
+                observer: '_marginChanged'
+            }, {
+                input: 'marginLeft',
+                txt: 'Left margin',
+                uitype: 'Number',
+                selectedValue: 10,
+                notify: true,
+                observer: '_marginChanged'
+            }]
+        }
+    },
+
+    attached: function() {
+        this.push('settings', ...this.area);
+    },
+
+    getMargins: function() {
+        return {
+            top: this.getSettingsProperty('marginTop'),
+            right: this.getSettingsProperty('marginRight'),
+            bottom: this.getSettingsProperty('marginBottom'),
+            left: this.getSettingsProperty('marginLeft')
+        }
+    }, 
+  }
+</script>

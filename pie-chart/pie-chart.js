@@ -77,20 +77,40 @@ Polymer({
         external: Array,
         svg: Object
     },
+    observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)'],
+
+    behaviors: [PolymerD3.sizing],
+
+    _settingsWatcher: function(settings) {
+        if (settings.path === 'settings') {
+            return
+        }
+        this.draw();
+    },
+    getBeh: function() {
+       return this; 
+    },
+    _inputsWatcher: function(inputs) {
+        if (inputs.path === 'inputs') {
+            return
+        }
+        this.draw();
+    },
+
     _getHeight() {
         return this.settings[2].selectedValue;
     },
     _getWidth() {
         return this.settings[3].selectedValue;
     },
-    _heightChanged: function() {
-      console.log('New height' + height);
-        this.draw();
-    },
-    _widthChanged: function() {
-        console.log('New width' + width);
-        this.draw();
-    },
+    // _heightChanged: function() {
+    //   console.log('New height' + height);
+    //     this.draw();
+    // },
+    // _widthChanged: function() {
+    //     console.log('New width' + width);
+    //     this.draw();
+    // },
 
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
