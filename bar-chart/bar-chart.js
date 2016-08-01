@@ -125,16 +125,15 @@ Polymer({
         this.svg = d3.select('#barChart').append("svg");
         this._addToolTip();
     },
-    _addToolTip(){
-        var tip = d3.tip()
+    _addToolTip: function() {
+        this.tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
           .html(function(d) {
             return "<strong>Frequency:</strong> <span style='color:red'>"  + "</span>";
           });       
-        this.svg.call(tip);
-        this.svg.on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
+        this.svg.append('rect');
+        this.svg.call(this.tip);
 
     },
     draw: function() {
@@ -202,7 +201,9 @@ Polymer({
             })
             .attr("y", height)
             .attr("width", x.rangeBand())
-            .attr("height", 0);
+            .attr("height", 0)
+            .on('mouseover', this.tip.show)
+            .on('mouseout', this.tip.hide);
 
         rect.transition()
             .delay(function(d, i) {
