@@ -149,6 +149,9 @@ Polymer({
                 return y(d.y0 + d.y);
             })
             .attr("height", function(d) {
+                if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                    throw new Error("height for chart can't be negative", 'bar-chart.rect.transition(');
+                }
                 return y(d.y0) - y(d.y0 + d.y);
             });
         this.svg.append("g")
@@ -173,6 +176,9 @@ Polymer({
                     return y(d.y);
                 })
                 .attr("height", function(d) {
+                    if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                        throw new Error("height for chart can't be negative", 'bar-chart.transitionGrouped');
+                    }
                     return height - y(d.y);
                 });
         };
@@ -189,6 +195,9 @@ Polymer({
                     return y(d.y0 + d.y);
                 })
                 .attr("height", function(d) {
+                    if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                        throw new Error("height for chart can't be negative", 'bar-chart.transitionStacked');
+                    }
                     return y(d.y0) - y(d.y0 + d.y);
                 })
                 .transition()
