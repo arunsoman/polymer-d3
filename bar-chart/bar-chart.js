@@ -62,16 +62,16 @@ Polymer({
         this.hideSettings = !this.hideSettings;
     },
 
-    _addToolTip: function(){
+    _addToolTip: function() {
         var tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
-          .html(function(d) {
-            return "<strong>Frequency:</strong> <span style='color:red'>"  + "</span>";
-          });       
+            .html(function(d) {
+                return "<strong>Frequency:</strong> <span style='color:red'>" + "</span>";
+            });
         this.svg.call(tip);
         this.svg.on('mouseover', tip.show)
-      .on('mouseout', tip.hide)
+            .on('mouseout', tip.hide)
 
     },
     draw: function() {
@@ -106,14 +106,16 @@ Polymer({
 
         var color = d3.scale.linear()
             .domain([0, n - 1])
-            .range([this.settings[6].to, this.settings[6].from]);
+            .range([this.getSettingsPropertyObj('colorRange').to, this.getSettingsPropertyObj('colorRange').from]);
 
         var xAxis = d3.svg.axis()
             .scale(x)
             .tickSize(0)
             .tickPadding(6)
             .orient("bottom");
-        //this.$.barChart.innerHTML = '';
+
+        this.makeChartWrap();
+
         this.svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -127,9 +129,7 @@ Polymer({
                 return color(i);
             });
 
-        var rect = layer.
-
-        selectAll("rect")
+        var rect = layer.selectAll("rect")
             .data(function(d) {
                 return d;
             })
@@ -229,7 +229,7 @@ Polymer({
         if (his.settings[0].selectedValue === "Grouped") {
             this.chart['transitionGrouped']();
         } else {
-            this.chart['transitionStacked']();;
+            this.chart['transitionStacked']();
         }
     }
 

@@ -50,7 +50,14 @@
     },
 
     attached: function() {
-        this.push('settings', ...this.area);
+        this.async(function() {
+            //For cloning settings
+            var settings = JSON.stringify(this.settings);
+            this.settings = JSON.parse(settings);
+            ///Change to ES5
+            console.log(this);
+            this.push('settings', ...this.area);            
+        });
     },
 
     getMargins: function() {
