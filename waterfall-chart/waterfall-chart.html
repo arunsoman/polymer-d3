@@ -1,0 +1,55 @@
+<link href="../display-component/display-component.html" rel="import">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id='waterfall-chart'>
+  <style>  
+    .bar.total rect {
+      fill: steelblue;
+    }
+
+    .bar.positive rect {
+      fill: darkolivegreen;
+    }
+    .bar.negative rect {
+      fill: crimson;
+    }
+
+    .bar line.connector {
+      stroke: grey;
+      stroke-dasharray: 3;
+    }
+
+    .bar text {
+      fill: white;
+      font: 12px sans-serif;
+      text-anchor: middle;
+    }
+
+    .axis text {
+      font: 10px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+  </style>
+
+  <template>
+      <div class='mandatory'>
+      <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+      </div>
+
+      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+      <div class='optional' hidden="{{hideSettings}}">
+          <display-component settings="{{settings}}" external='[[external]]'></display-component>
+      </div>
+      <div id="waterfallChart"></div>
+  </template>
+</dom-module>
+<script src='waterfall-chart.js'></script>
+<script src='../bower_components/d3/d3.min.js'></script>
+<script src='../bower_components/d3-tip/index.js'></script>
