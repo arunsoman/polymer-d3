@@ -1,0 +1,27 @@
+{
+  "name": "polymer-d3",
+  "version": "1.0.0",
+  "description": "polymer web components for d3 charts",
+  "main": "namespace.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint **/*.js && eslint **/*.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arunsoman/polymer-d3.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/arunsoman/polymer-d3/issues"
+  },
+  "homepage": "https://github.com/arunsoman/polymer-d3#readme",
+  "devDependencies": {
+    "eslint": "^3.2.2",
+    "eslint-config-google": "^0.6.0"
+  }
+}

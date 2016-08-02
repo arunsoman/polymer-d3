@@ -5,6 +5,9 @@
 app/css/*
 dist
 
+#Npm log
+npm-debug.log
+
 # Dev directories
 bower_components
 node_modules
