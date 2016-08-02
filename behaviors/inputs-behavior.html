@@ -13,6 +13,24 @@
     },
     getInputs: function(){
         return this.inputs;
+    },
+    ready: function() {
+        var inputs;
+        if (this.inputs && this.inputs.length > 0) {
+            // Cloning inputs to fix duplicate
+            inputs = JSON.stringify(this.inputs);
+            this.inputs = JSON.parse(inputs);
+        }
+    },
+    _setExternal: function(dataHeaders) {
+        var options = [];
+        dataHeaders.forEach(function(dataHeader, index) {
+            options.push({
+                key: dataHeader,
+                value: index
+            });
+        });
+        this.set('external', options);
     }
   }
 </script>

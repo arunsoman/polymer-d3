@@ -31,6 +31,16 @@ Polymer({
                     key: 'Stacked',
                     value: 1
                 }]
+            }, {
+                input: 'layers',
+                txt: 'No: layers',
+                uitype: 'Number',
+                selectedValue: 4
+            }, {
+                input: 'samples',
+                txt: 'Samples per layer',
+                uitype: 'Number',
+                selectedValue: 58
             }]
         },
         settings: {
@@ -68,22 +78,22 @@ Polymer({
     },
 
     draw: function() {
-        var n = 4, // number of layers
-            m = 58, // number of samples per layer
-            stack = d3.layout.stack(),
-            layers = stack(d3.range(n).map(function() {
-                return bumpLayer(m, .1);
-            })),
-            yGroupMax = d3.max(layers, function(layer) {
-                return d3.max(layer, function(d) {
-                    return d.y;
-                });
-            }),
-            yStackMax = d3.max(layers, function(layer) {
-                return d3.max(layer, function(d) {
-                    return d.y0 + d.y;
-                });
+        var n = this.getInputsProperty('layers'); // number of layers
+        var m = this.getInputsProperty('samples'); // number of samples per layer
+        var stack = d3.layout.stack();
+        var layers = stack(d3.range(n).map(function() {
+            return bumpLayer(m, .1);
+        }));
+        var yGroupMax = d3.max(layers, function(layer) {
+            return d3.max(layer, function(d) {
+                return d.y;
             });
+        });
+        var yStackMax = d3.max(layers, function(layer) {
+            return d3.max(layer, function(d) {
+                return d.y0 + d.y;
+            });
+        });
 
         var margin = this.getMargins();
         var width = this.getWidth() - margin.left - margin.right;
