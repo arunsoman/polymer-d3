@@ -1,0 +1,18 @@
+<script>
+  PolymerD3.inputsBehavior = {
+    setInputsProperty: function(key) {
+        PolymerD3.utilities._setProperty.call(this, 'inputs', key);
+    },
+    getInputsProperty: function(key) {
+        var result;
+        result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        return result.selectedValue;
+    },
+    getInputsPropertyObj: function(key) {
+        return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+    },
+    getInputs: function(){
+        return this.inputs;
+    }
+  }
+</script>
