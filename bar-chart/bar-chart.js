@@ -243,6 +243,6 @@ Polymer({
         } else {
             this.chart['transitionStacked']();
         }
-    }
+    },
 
 });
