@@ -32,9 +32,6 @@ Polymer({
   },
 
   behaviors: [
-      PolymerD3.sizing,
-      PolymerD3.propertiesBehavior,
-      PolymerD3.chartconfigObserver,
       PolymerD3.chartBehavior
   ],
 

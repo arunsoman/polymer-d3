@@ -14,21 +14,28 @@ Polymer({
                 uitype: 'multiple-value'
             }]
         },
+        settings: {
+            type: Array,
+            value: []
+        },
         hideSettings: true
     },
+    behaviors: [
+        PolymerD3.sizing,
+        PolymerD3.propertiesBehavior,
+        PolymerD3.chartconfigObserver,
+        PolymerD3.chartBehavior
+    ],
 
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
+        this.draw();
     },
     draw: function() {
-        var margin = {
-                top: 30,
-                right: 10,
-                bottom: 10,
-                left: 10
-            },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        var me = this;
+        var margin = this.getMargins();
+        var width = this.getWidth() - margin.left - margin.right;
+        var height = this.getHeight() - margin.top - margin.bottom;
 
         var x = d3.scale.ordinal().rangePoints([0, width], 1),
             y = {},
@@ -39,8 +46,7 @@ Polymer({
             background,
             foreground;
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
+        me.svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -57,23 +63,23 @@ Polymer({
             }));
 
             // Add grey background lines for context.
-            background = svg.append("g")
+            background = me.svg.append("g")
                 .attr("class", "background")
                 .selectAll("path")
                 .data(cars)
                 .enter().append("path")
-                .attr("d", path);
+                .attr("d", this.path);
 
             // Add blue foreground lines for focus.
-            foreground = svg.append("g")
+            foreground = me.svg.append("g")
                 .attr("class", "foreground")
                 .selectAll("path")
                 .data(cars)
                 .enter().append("path")
-                .attr("d", path);
+                .attr("d", this.path);
 
             // Add a group element for each dimension.
-            var g = svg.selectAll(".dimension")
+            var g = me.svg.selectAll(".dimension")
                 .data(dimensions)
                 .enter().append("g")
                 .attr("class", "dimension")
@@ -92,22 +98,22 @@ Polymer({
                     })
                     .on("drag", function(d) {
                         dragging[d] = Math.min(width, Math.max(0, d3.event.x));
-                        foreground.attr("d", path);
+                        foreground.attr("d", this.path);
                         dimensions.sort(function(a, b) {
-                            return position(a) - position(b);
+                            return this.position(a) - this.position(b);
                         });
                         x.domain(dimensions);
                         g.attr("transform", function(d) {
-                            return "translate(" + position(d) + ")";
+                            return "translate(" + this.position(d) + ")";
                         })
                     })
                     .on("dragend", function(d) {
                         delete dragging[d];
-                        transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
-                        transition(foreground).attr("d", path);
+                        this.transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
+                        this.transition(foreground).attr("d", this.path);
                         background
-                            .attr("d", path)
-                            .transition()
+                            .attr("d", this.path)
+                            .this.transition()
                             .delay(500)
                             .duration(0)
                             .attr("visibility", null);
@@ -130,35 +136,35 @@ Polymer({
             g.append("g")
                 .attr("class", "brush")
                 .each(function(d) {
-                    d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", brushstart).on("brush", brush));
+                    d3.select(this).call(y[d].brush = d3.svg.brush().y(y[d]).on("brushstart", this.brushstart).on("brush", this.brush));
                 })
                 .selectAll("rect")
                 .attr("x", -8)
                 .attr("width", 16);
         });
-    },
-    position: function(d) {
+
+        position = function(d) {
         var v = dragging[d];
         return v == null ? x(d) : v;
-    },
+    };
 
-    transition: function(g) {
+    transition= function(g) {
         return g.transition().duration(500);
-    },
+    };
 
     // Returns the path for a given data point.
-    path: function(d) {
+    path=function(d) {
         return line(dimensions.map(function(p) {
-            return [position(p), y[p](d[p])];
+            return [this.position(p), y[p](d[p])];
         }));
-    },
+    };
 
-    brushstart: function() {
+    brushstart= function() {
         d3.event.sourceEvent.stopPropagation();
-    },
+    };
 
     // Handles a brush event, toggling the display of foreground lines.
-    brush: function() {
+    brush= function() {
         var actives = dimensions.filter(function(p) {
                 return !y[p].brush.empty();
             }),
@@ -170,5 +176,7 @@ Polymer({
                 return extents[i][0] <= d[p] && d[p] <= extents[i][1];
             }) ? null : "none";
         });
+    };
     }
+    
 });

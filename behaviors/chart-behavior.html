@@ -1,39 +1,12 @@
+<link rel="import" href="chartconfig-observer-behavior.html">
+<link rel="import" href="properties-behavior.html">
+<link rel="import" href="sizing-behavior.html">
+<link rel="import" href="chart-init-behavior.html">
 <script>
-  PolymerD3.chartBehavior = {
-
-    properties: {
-      chartWrap: Object,
-      svg: Object
-    },
-
-    attached: function(argument) {
-      // Adds stylescope listener to chart container
-      var container = document.createElement('div');
-      container.className = "chartContainer";
-      this.appendChild(container);
-      console.log(this);
-      this.makeChartWrap();
-      this.scopeSubtree(this.querySelector('.chartContainer'), true);
-    },
-
-    makeChartWrap: function(id) {
-      // Places chart inside listner
-      if (!id) {
-        id = 'chart';
-      }
-      var prev = this.querySelector('#' + id);
-      if (prev) {
-        prev.remove();
-      }
-      var elem = document.createElement('div');
-      var svg = document.createElement('svg');
-      elem.id = id;
-      if (this.querySelector('.chartContainer')) {
-        this.querySelector('.chartContainer').appendChild(elem);
-        this.chartWrap = d3.select(elem);
-        this.svg = d3.select(elem).append("svg");
-      }
-    }
-
-  }
+  PolymerD3.chartBehavior = [
+    PolymerD3.chartInitBehavior,
+    PolymerD3.chartconfigObserver,
+    PolymerD3.propertiesBehavior,
+    PolymerD3.sizingBehavior
+  ]
 </script>

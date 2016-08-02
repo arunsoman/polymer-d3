@@ -1,0 +1,49 @@
+<script>
+  PolymerD3.chartInitBehavior = {
+
+    properties: {
+      chartWrap: Object,
+      svg: Object
+    },
+
+    ready: function() {
+      //Hack for duplicate settings
+      var settings;
+      if (!this.settings || this.settings.length === 0) {
+        this.settings = [];
+      } else {
+        settings = JSON.stringify(this.settings);
+        this.settings = JSON.parse(this.settings);
+      }
+    },
+
+    attached: function(argument) {
+      // Adds stylescope listener to chart container
+      var container = document.createElement('div');
+      container.className = "chartContainer";
+      this.appendChild(container);
+      this.makeChartWrap();
+      this.scopeSubtree(this.querySelector('.chartContainer'), true);
+    },
+
+    makeChartWrap: function(id) {
+      // Places chart inside listner
+      if (!id) {
+        id = 'chart';
+      }
+      var prev = this.querySelector('#' + id);
+      if (prev) {
+        prev.remove();
+      }
+      var elem = document.createElement('div');
+      var svg = document.createElement('svg');
+      elem.id = id;
+      if (this.querySelector('.chartContainer')) {
+        this.querySelector('.chartContainer').appendChild(elem);
+        this.chartWrap = d3.select(elem);
+        this.svg = d3.select(elem).append("svg");
+      }
+    }
+
+  }
+</script>
