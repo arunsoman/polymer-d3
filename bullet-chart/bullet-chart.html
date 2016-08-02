@@ -33,6 +33,7 @@ button {
     </style>
 
     <template>
+      <template is="dom-if" if="[[editMode]]">
         <div class='mandatory'>
         <display-component settings="{{inputs}}" external='[[external]]'></display-component>
         </div>
@@ -41,7 +42,7 @@ button {
         <div class='optional' hidden="{{hideSettings}}">
             <display-component settings="{{settings}}" external='[[external]]'></display-component>
         </div>
-        <div id="chart"></div>
+      </template>
     </template>
 </dom-module>
 <script src='bullet-chart.js'></script>

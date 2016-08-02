@@ -39,6 +39,7 @@ svg {
 }
 </style>
     <template>
+      <template is="dom-if" if="[[editMode]]">
         <div class='mandatory'>
         <display-component settings="{{inputs}}" external=[[external]]></display-component>
         </div>
@@ -47,6 +48,7 @@ svg {
         <div class='optional' hidden="{{hideSettings}}">
             <display-component settings="{{settings}}" external=[[external]]></display-component>
         </div>
+      </template>
     </template>
 </dom-module>
 <script src='parallel-coordinate.js'></script>
