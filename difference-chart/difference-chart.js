@@ -31,92 +31,20 @@ Polymer({
         settings: {
             notify: true,
             type: Array,
-            value: [{
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 500,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 960,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'marginTop',
-                txt: 'Top  margin',
-                uitype: 'Number',
-                selectedValue: 40,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginRight',
-                txt: 'Right margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginBottom',
-                txt: 'Bottom margin',
-                uitype: 'Number',
-                selectedValue: 20,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginLeft',
-                txt: 'Left margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'colorRange',
-                txt: 'Color range',
-                uitype: 'colorRangePicker',
-                from: "#aad",
-                to: "#556",
-                notify: true,
-                observer: '_colorRangeChanged'
-            }]
+            value: []
         },
         hideSettings: true,
         data: String,
-        external: Array,
-        svg: Object 
+        external: Array
     },
-    _getMargin: function() {
-        return {
-            top: this.settings[2].selectedValue,
-            right: this.settings[3].selectedValue,
-            bottom: this.settings[4].selectedValue,
-            left: this.settings[5].selectedValue
-        }
-    },
-    _getHeight() {
-        return this.settings[0].selectedValue;
-    },
-    _getWidth() {
-        return this.settings[1].selectedValue;
-    },
-    _colorRangeChanged: function() {
-        this.chart = this.draw();
-    },
-    _areaChanged: function() {
-        this.chart = this.draw();
-    },
-    _marginChanged: function() {
-        this.chart = this.draw();
-    },
+    behaviors: [
+        PolymerD3.chartBehavior,
+        PolymerD3.colorPickerBehavior
+    ],
+
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
         this.chart = this.draw();
-    },
-    attached: function() {
-        svg = d3.select("#chartHolder").append("svg");
     },
 
     draw: function() {
@@ -132,9 +60,9 @@ Polymer({
         console.log(this.inputs[2].selectedValue);
         console.log(this.inputs[2].selectedName);
 
-        var margin = this._getMargin();
-        var width = this._getWidth() - margin.left - margin.right;
-        var height = this._getHeight() - margin.top - margin.bottom;
+        var margin = this.getMargins();
+        var width = this.getWidth() - margin.left - margin.right;
+        var height = this.getHeight() - margin.top - margin.bottom;
 
         var parseDate = d3.time.format("%Y%m%d").parse;
 
@@ -170,7 +98,7 @@ Polymer({
                 return y(d[y1Name]);
             });
 
-        svg 
+        this.svg 
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
@@ -198,9 +126,9 @@ Polymer({
                 })
             ]);
 
-            svg.datum(data);
+            this.svg.datum(data);
 
-            svg.append("clipPath")
+            this.svg.append("clipPath")
                 .attr("id", "clip-below")
                 .append("path")
                 .attr("d", area.y0(height));
