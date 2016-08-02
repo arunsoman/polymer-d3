@@ -22,49 +22,7 @@ Polymer({
     settings: {
       notify: true,
       type: Array,
-      value: [{
-          input: 'height',
-          txt: 'Height of the chart',
-          uitype: 'Number',
-          selectedValue: 500,
-          notify: true,
-          observer: '_areaChanged'
-      }, {
-          input: 'width',
-          txt: 'Width of the chart',
-          uitype: 'Number',
-          selectedValue: 960,
-          notify: true,
-          observer: '_areaChanged'
-      }, {
-          input: 'marginTop',
-          txt: 'Top  margin',
-          uitype: 'Number',
-          selectedValue: 40,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginRight',
-          txt: 'Right margin',
-          uitype: 'Number',
-          selectedValue: 10,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginBottom',
-          txt: 'Bottom margin',
-          uitype: 'Number',
-          selectedValue: 20,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginLeft',
-          txt: 'Left margin',
-          uitype: 'Number',
-          selectedValue: 10,
-          notify: true,
-          observer: '_marginChanged'
-      }]
+      value: []
     },
     hideSettings: true,
     data: String,
@@ -74,9 +32,6 @@ Polymer({
   },
 
   behaviors: [
-      PolymerD3.sizing,
-      PolymerD3.propertiesBehavior,
-      PolymerD3.chartconfigObserver,
       PolymerD3.chartBehavior
   ],
 

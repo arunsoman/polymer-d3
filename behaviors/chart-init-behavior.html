@@ -9,7 +9,7 @@
     ready: function() {
       //Hack for duplicate settings
       var settings;
-      if (this.settings.length === 0) {
+      if (!this.settings || this.settings.length === 0) {
         this.settings = [];
       } else {
         settings = JSON.stringify(this.settings);
