@@ -20,13 +20,17 @@ Polymer({
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
     },
+    draw: function() {
+        var margin = {
+                top: 30,
+                right: 10,
+                bottom: 10,
+                left: 10
+            },
+            width = 960 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
 
-    attached: function() {
-        var m = [30, 10, 10, 10],
-            w = 960 - m[1] - m[3],
-            h = 500 - m[0] - m[2];
-
-        var x = d3.scale.ordinal().rangePoints([0, w], 1),
+        var x = d3.scale.ordinal().rangePoints([0, width], 1),
             y = {},
             dragging = {};
 
@@ -36,12 +40,12 @@ Polymer({
             foreground;
 
         var svg = d3.select("body").append("svg")
-            .attr("width", w + m[1] + m[3])
-            .attr("height", h + m[0] + m[2])
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
             .append("g")
-            .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        d3.csv(data, function(error, cars) {
+        d3.csv("cars.csv", function(error, cars) {
 
             // Extract the list of dimensions and create a scale for each.
             x.domain(dimensions = d3.keys(cars[0]).filter(function(d) {
@@ -49,7 +53,7 @@ Polymer({
                     .domain(d3.extent(cars, function(p) {
                         return +p[d];
                     }))
-                    .range([h, 0]));
+                    .range([height, 0]));
             }));
 
             // Add grey background lines for context.
@@ -77,12 +81,17 @@ Polymer({
                     return "translate(" + x(d) + ")";
                 })
                 .call(d3.behavior.drag()
+                    .origin(function(d) {
+                        return {
+                            x: x(d)
+                        };
+                    })
                     .on("dragstart", function(d) {
-                        dragging[d] = this.__origin__ = x(d);
+                        dragging[d] = x(d);
                         background.attr("visibility", "hidden");
                     })
                     .on("drag", function(d) {
-                        dragging[d] = Math.min(w, Math.max(0, this.__origin__ += d3.event.dx));
+                        dragging[d] = Math.min(width, Math.max(0, d3.event.x));
                         foreground.attr("d", path);
                         dimensions.sort(function(a, b) {
                             return position(a) - position(b);
@@ -93,11 +102,9 @@ Polymer({
                         })
                     })
                     .on("dragend", function(d) {
-                        delete this.__origin__;
                         delete dragging[d];
                         transition(d3.select(this)).attr("transform", "translate(" + x(d) + ")");
-                        transition(foreground)
-                            .attr("d", path);
+                        transition(foreground).attr("d", path);
                         background
                             .attr("d", path)
                             .transition()
@@ -113,9 +120,11 @@ Polymer({
                     d3.select(this).call(axis.scale(y[d]));
                 })
                 .append("text")
-                .attr("text-anchor", "middle")
+                .style("text-anchor", "middle")
                 .attr("y", -9)
-                .text(String);
+                .text(function(d) {
+                    return d;
+                });
 
             // Add and store a brush for each axis.
             g.append("g")
@@ -127,32 +136,29 @@ Polymer({
                 .attr("x", -8)
                 .attr("width", 16);
         });
-
     },
-
     position: function(d) {
         var v = dragging[d];
         return v == null ? x(d) : v;
-    }
+    },
 
-        transition: function(g) {
+    transition: function(g) {
         return g.transition().duration(500);
-    }
+    },
 
     // Returns the path for a given data point.
-        path: function(d) {
+    path: function(d) {
         return line(dimensions.map(function(p) {
             return [position(p), y[p](d[p])];
         }));
-    }
+    },
 
-    // When brushing, don’t trigger axis dragging.
-        brushstart: function() {
+    brushstart: function() {
         d3.event.sourceEvent.stopPropagation();
-    }
+    },
 
     // Handles a brush event, toggling the display of foreground lines.
-        brush: function() {
+    brush: function() {
         var actives = dimensions.filter(function(p) {
                 return !y[p].brush.empty();
             }),
@@ -165,5 +171,4 @@ Polymer({
             }) ? null : "none";
         });
     }
-
 });

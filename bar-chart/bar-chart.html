@@ -5,8 +5,6 @@
 
 <dom-module id='bar-chart'>
 
-  <template>
-
     <style>
       body {
         font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -54,17 +52,17 @@
         left: 0;
       }*/
     </style>
-    <div class='mandatory'>
-    <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-    </div>
+    <template>
+        <div class='mandatory'>
+        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+        </div>
 
-    <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-    <div class='optional' hidden="{{hideSettings}}">
-        <display-component settings="{{settings}}" external='[[external]]'></display-component>
-    </div>
-    <div id="barChart"></div>
-  </template>
+        <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+        <div class='optional' hidden="{{hideSettings}}">
+            <display-component settings="{{settings}}" external='[[external]]'></display-component>
+        </div>
+        <!-- <div id="barChart"></div> -->
+    </template>
+
 </dom-module>
 <script src='bar-chart.js'></script>
-<script src='../bower_components/d3/d3.min.js'></script>
-<script src='../bower_components/d3-tip/index.js'></script>

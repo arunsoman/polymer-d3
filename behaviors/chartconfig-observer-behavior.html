@@ -1,0 +1,19 @@
+<script>
+  PolymerD3.chartconfigObserver = {
+    observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)'],
+
+    _settingsWatcher: function(settings) {
+      var me = this;
+      this.debounce('redrawSettings', function() {
+        me.draw();
+      }, 1000);
+    },
+
+    _inputsWatcher: function(inputs) {
+      var me = this;
+      this.debounce('redrawInput', function() {
+        me.draw();
+      }, 1000);
+    }
+  }
+</script>

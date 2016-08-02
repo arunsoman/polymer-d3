@@ -37,48 +37,6 @@ Polymer({
             notify: true,
             type: Array,
             value: [{
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 500,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 960,
-                notify: true,
-                observer: '_areaChanged'
-            }, {
-                input: 'marginTop',
-                txt: 'Top  margin',
-                uitype: 'Number',
-                selectedValue: 40,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginRight',
-                txt: 'Right margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginBottom',
-                txt: 'Bottom margin',
-                uitype: 'Number',
-                selectedValue: 20,
-                notify: true,
-                observer: '_marginChanged'
-            }, {
-                input: 'marginLeft',
-                txt: 'Left margin',
-                uitype: 'Number',
-                selectedValue: 10,
-                notify: true,
-                observer: '_marginChanged'
-            },{
                 input: 'colorRange',
                 txt: 'Color range',
                 uitype: 'colorRangePicker',
@@ -91,40 +49,19 @@ Polymer({
         hideSettings: true,
         data: String,
         external: Array,
-        chart: Object,
-        svg:Object
+        chart: Object
     },
-    _getMargin: function() {
-        return {
-            top: this.settings[2].selectedValue,
-            right: this.settings[3].selectedValue,
-            bottom: this.settings[4].selectedValue,
-            left: this.settings[5].selectedValue
-        }
-    },
-    _getHeight() {
-        return this.settings[0].selectedValue;
-    },
-    _getWidth() {
-        return this.settings[1].selectedValue;
-    },
-    _colorRangeChanged: function() {
-        this.chart = this.draw();
-    },
-    _areaChanged: function() {
-        this.chart = this.draw();
-    },
-    _marginChanged: function() {
-        this.chart = this.draw();
-    },
+    behaviors: [
+        PolymerD3.sizing,
+        PolymerD3.propertiesBehavior,
+        PolymerD3.chartconfigObserver,
+        PolymerD3.chartBehavior
+    ],
+
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
-        this.chart = this.draw();
     },
-    attached: function() {
-        this.svg = d3.select('#barChart').append("svg");
-        this._addToolTip();
-    },
+
     _addToolTip: function() {
         this.tip = d3.tip()
             .attr('class', 'd3-tip')
@@ -132,10 +69,13 @@ Polymer({
           .html(function(d) {
             return "<strong>Frequency:</strong> <span style='color:red'>"  + "</span>";
           });       
-        this.svg.append('rect');
         this.svg.call(this.tip);
-
+        this.svg.selectAll('.layer')
+            .selectAll('rect') 
+            .on('mouseover', this.tip.show)
+            .on('mouseout', this.tip.hide);
     },
+
     draw: function() {
         var n = 4, // number of layers
             m = 58, // number of samples per layer
@@ -154,9 +94,9 @@ Polymer({
                 });
             });
 
-        var margin = this._getMargin();
-        var width = this._getWidth() - margin.left - margin.right;
-        var height = this._getHeight() - margin.top - margin.bottom;
+        var margin = this.getMargins();
+        var width = this.getWidth() - margin.left - margin.right;
+        var height = this.getHeight() - margin.top - margin.bottom;
 
         var x = d3.scale.ordinal()
             .domain(d3.range(m))
@@ -168,15 +108,17 @@ Polymer({
 
         var color = d3.scale.linear()
             .domain([0, n - 1])
-            .range([this.settings[6].to, this.settings[6].from]);
+            .range([this.getSettingsPropertyObj('colorRange').to, this.getSettingsPropertyObj('colorRange').from]);
 
         var xAxis = d3.svg.axis()
             .scale(x)
             .tickSize(0)
             .tickPadding(6)
             .orient("bottom");
-        //this.$.barChart.innerHTML = '';
-        this.svg .attr("width", width + margin.left + margin.right)
+
+        this.makeChartWrap();
+
+        this.svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -189,9 +131,7 @@ Polymer({
                 return color(i);
             });
 
-        var rect = layer.
-
-        selectAll("rect")
+        var rect = layer.selectAll("rect")
             .data(function(d) {
                 return d;
             })
@@ -201,9 +141,7 @@ Polymer({
             })
             .attr("y", height)
             .attr("width", x.rangeBand())
-            .attr("height", 0)
-            .on('mouseover', this.tip.show)
-            .on('mouseout', this.tip.hide);
+            .attr("height", 0);
 
         rect.transition()
             .delay(function(d, i) {
@@ -213,6 +151,9 @@ Polymer({
                 return y(d.y0 + d.y);
             })
             .attr("height", function(d) {
+                if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                    throw new Error("height for chart can't be negative", 'bar-chart.rect.transition(');
+                }
                 return y(d.y0) - y(d.y0 + d.y);
             });
         this.svg.append("g")
@@ -237,6 +178,9 @@ Polymer({
                     return y(d.y);
                 })
                 .attr("height", function(d) {
+                    if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                        throw new Error("height for chart can't be negative", 'bar-chart.transitionGrouped');
+                    }
                     return height - y(d.y);
                 });
         };
@@ -253,6 +197,9 @@ Polymer({
                     return y(d.y0 + d.y);
                 })
                 .attr("height", function(d) {
+                    if(y(d.y0) - y(d.y0 + d.y) < 0 ){
+                        throw new Error("height for chart can't be negative", 'bar-chart.transitionStacked');
+                    }
                     return y(d.y0) - y(d.y0 + d.y);
                 })
                 .transition()
@@ -285,6 +232,7 @@ Polymer({
                 };
             });
         };
+        this._addToolTip();
         return [transitionStacked, transitionGrouped];
 
     },
@@ -293,7 +241,7 @@ Polymer({
         if (his.settings[0].selectedValue === "Grouped") {
             this.chart['transitionGrouped']();
         } else {
-            this.chart['transitionStacked']();;
+            this.chart['transitionStacked']();
         }
     }
 

@@ -9,9 +9,9 @@
     <template>
         <template is='dom-repeat' items="{{settings}}">
             <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]' selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
-                    <paper-listbox class="dropdown-content">
-                        <template is="dom-repeat" items="[[item.options]]" >
+                <paper-dropdown-menu label='[[ item.txt ]]'>
+                    <paper-listbox class="dropdown-content" selected-item='{{item.selectedValue}}'>
+                        <template is="dom-repeat" items="[[item.options]]">
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
                     </paper-listbox>
@@ -24,8 +24,8 @@
             </template>
 
             <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'  selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
-                    <paper-listbox class="dropdown-content">
+                <paper-dropdown-menu label='[[ item.txt ]]' selectedItemLabel='{{item.selectedName}}'>
+                    <paper-listbox class="dropdown-content" selected='{{item.selectedValue}}'>
                         <template is="dom-repeat" items="[[external]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
@@ -35,7 +35,7 @@
 
             <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
                 <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-menu multi class="dropdown-content"  selectedItem='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
+                    <paper-menu multi class="dropdown-content"  selected='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
                         <template is="dom-repeat" items="[[external]]" >
                             <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
