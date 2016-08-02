@@ -39,40 +39,36 @@ Polymer({
     this.scopeSubtree(this.$.chart, true);
   },
 
-  _getMargin: function() {
-    return {
-        top: this.settings[2].selectedValue,
-        right: this.settings[3].selectedValue,
-        bottom: this.settings[4].selectedValue,
-        left: this.settings[5].selectedValue
-      }
-    },
+  // _getMargin: function() {
+  //   return {
+  //       top: this.settings[2].selectedValue,
+  //       right: this.settings[3].selectedValue,
+  //       bottom: this.settings[4].selectedValue,
+  //       left: this.settings[5].selectedValue
+  //     }
+  //   },
 
-    _getHeight() {
-      return this.settings[0].selectedValue;
-    },
+  //   _getHeight() {
+  //     return this.settings[0].selectedValue;
+  //   },
 
-    _getWidth() {
-      return this.settings[1].selectedValue;
-    },
+  //   _getWidth() {
+  //     return this.settings[1].selectedValue;
+  //   },
 
-    _areaChanged: function() {
-      this.chart = this.draw();
-    },
+  //   _areaChanged: function() {
+  //     this.chart = this.draw();
+  //   },
 
-    _marginChanged: function() {
-      this.chart = this.draw();
-    },
+  //   _marginChanged: function() {
+  //     this.chart = this.draw();
+  //   },
 
     _toggleView: function() {
       this.hideSettings = !this.hideSettings;
-      this.chart = this.draw();
+      // this.chart = this.draw();
     },
 
-    // attached: function() {
-    //   this.svg = d3.select('#waterfallChart').append("svg");
-    //   // this._addToolTip();
-    // },
     
     _addToolTip(){
         var tip = d3.tip()
@@ -91,9 +87,9 @@ Polymer({
 
     draw: function() {
       var me = this;
-      var margin = me._getMargin();
-      var width = me._getWidth() - margin.left - margin.right;
-      var height = me._getHeight() - margin.top - margin.bottom;
+      var margin = me.getMargins();
+      var width = me.getWidth() - margin.left - margin.right;
+      var height = me.getHeight() - margin.top - margin.bottom;
       var padding = 0.3;
 
       var x = d3.scale.ordinal()
@@ -119,7 +115,6 @@ Polymer({
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-
       d3.csv("profit.csv", type, function(error, data) {
 
         // Transform data (i.e., finding cumulative values and total) for easier charting
@@ -138,7 +133,7 @@ Polymer({
           class: 'total'
         });
 
-        x.domain(data.map(function(d) { return d.name; }));
+        x.domain(data.map(function(d) { return d[me.getInputsProperty('x')]; }));
         y.domain([0, d3.max(data, function(d) { return d.end; })]);
 
         me.svg

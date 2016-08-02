@@ -1,36 +1,15 @@
 <script>
   PolymerD3.propertiesBehavior = {
     setSettingsProperty: function(key) {
-        if(arguments.length < 1){
-            return
-        }
-        newVal = arguments[1];
-        this.settings.forEach(function(elem){
-            if(elem.input == key){
-                console.log(elem);
-                for(var newKey in newVal){
-                    elem[newKey] = newVal[newKey];
-                 }   
-            }
-        });
+        PolymerD3.utilities._setProperty.call(this, 'settings', key);
     },
     getSettingsProperty: function(key) {
         var result;
-        this.settings.forEach(function(elem) {
-            if(elem.input == key){
-                result = elem.selectedValue;
-            }
-        });
-        return result;
+        result = PolymerD3.utilities._getProperty.call(this, 'settings', key);
+        return result.selectedValue;
     },
     getSettingsPropertyObj: function(key) {
-        var result;
-        this.settings.forEach(function(elem) {
-            if(elem.input == key){
-                result = elem;
-            }
-        });
-        return result;
+        return PolymerD3.utilities._getProperty.call(this, 'settings', key);
     },
     getSettings: function(){
         return this.settings;

@@ -3,7 +3,8 @@
 
     properties: {
       chartWrap: Object,
-      svg: Object
+      svg: Object,
+      editMode: false
     },
 
     ready: function() {
@@ -13,7 +14,7 @@
         this.settings = [];
       } else {
         settings = JSON.stringify(this.settings);
-        this.settings = JSON.parse(this.settings);
+        this.settings = JSON.parse(settings);
       }
     },
 

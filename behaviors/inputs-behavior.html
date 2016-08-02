@@ -1,0 +1,36 @@
+<script>
+  PolymerD3.inputsBehavior = {
+    setInputsProperty: function(key) {
+        PolymerD3.utilities._setProperty.call(this, 'inputs', key);
+    },
+    getInputsProperty: function(key) {
+        var result;
+        result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        return result.selectedValue;
+    },
+    getInputsPropertyObj: function(key) {
+        return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+    },
+    getInputs: function(){
+        return this.inputs;
+    },
+    ready: function() {
+        var inputs;
+        if (this.inputs && this.inputs.length > 0) {
+            // Cloning inputs to fix duplicate
+            inputs = JSON.stringify(this.inputs);
+            this.inputs = JSON.parse(inputs);
+        }
+    },
+    _setExternal: function(dataHeaders) {
+        var options = [];
+        dataHeaders.forEach(function(dataHeader, index) {
+            options.push({
+                key: dataHeader,
+                value: index
+            });
+        });
+        this.set('external', options);
+    }
+  }
+</script>

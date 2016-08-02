@@ -53,6 +53,7 @@
       }*/
     </style>
     <template>
+      <template is="dom-if" if="[[editMode]]">
         <div class='mandatory'>
         <display-component settings="{{inputs}}" external='[[external]]'></display-component>
         </div>
@@ -60,7 +61,8 @@
         <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
         <div class='optional' hidden="{{hideSettings}}">
             <display-component settings="{{settings}}" external='[[external]]'></display-component>
-        </div>
+        </div>        
+      </template>
     </template>
 
 </dom-module>

@@ -39,14 +39,18 @@
   </style>
 
   <template>
-      <div class='mandatory'>
-      <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-      </div>
+      <h3>[[chartName]]</h3>
+      <template is="dom-if" if="[[editMode]]">
+        <div class='mandatory'>
+        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+        </div>
 
-      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-      <div class='optional' hidden="{{hideSettings}}">
-          <display-component settings="{{settings}}" external='[[external]]'></display-component>
-      </div>
+        <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+        <div class='optional' hidden="{{hideSettings}}">
+            <display-component settings="{{settings}}" external='[[external]]'></display-component>
+        </div>        
+      </template>
+      <div id="waterfallChart"></div>
   </template>
 </dom-module>
 <script src='waterfall-chart.js'></script>
