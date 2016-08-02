@@ -1,5 +1,5 @@
 <script>
-  PolymerD3.sizing = {
+  PolymerD3.sizingBehavior = {
     properties: {
       area: {
         type: Array,
@@ -50,13 +50,14 @@
     },
 
     attached: function() {
+        var me = this;
         this.async(function() {
-            //For cloning settings
-            var settings = JSON.stringify(this.settings);
-            this.settings = JSON.parse(settings);
+
             ///Change to ES5
-            console.log(this);
-            this.push('settings', ...this.area);            
+            // console.log(this);
+            // this.push('settings', ...this.area);
+            console.log(me);
+            PolymerD3.utilities.merge.apply(me, ['settings', 'area']);
         });
     },
 

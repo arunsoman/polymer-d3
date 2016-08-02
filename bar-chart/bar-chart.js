@@ -36,15 +36,7 @@ Polymer({
         settings: {
             notify: true,
             type: Array,
-            value: [{
-                input: 'colorRange',
-                txt: 'Color range',
-                uitype: 'colorRangePicker',
-                from: "#aad",
-                to: "#556",
-                notify: true,
-                observer: '_colorRangeChanged'
-            }]
+            value: []
         },
         hideSettings: true,
         data: String,
@@ -52,10 +44,11 @@ Polymer({
         chart: Object
     },
     behaviors: [
-        PolymerD3.sizing,
+        PolymerD3.sizingBehavior,
         PolymerD3.propertiesBehavior,
         PolymerD3.chartconfigObserver,
-        PolymerD3.chartBehavior
+        PolymerD3.chartBehaviorBehavior,
+        PolymerD3.colorPickerBehavior
     ],
 
     _toggleView: function() {
@@ -231,6 +224,12 @@ Polymer({
         } else {
             this.chart['transitionStacked']();
         }
+    },
+
+    ready: function() {
+        //For fixing issue in polmer where all pre-declared properties are being shared
+        this.settings = [];
+        console.info('chart');
     }
 
 });
