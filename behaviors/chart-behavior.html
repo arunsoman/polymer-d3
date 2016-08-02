@@ -1,17 +1,26 @@
 <script>
   PolymerD3.chartBehavior = {
+
     properties: {
       chartWrap: Object,
       svg: Object
     },
-    attached: function() {
+
+    attached: function(argument) {
+      // Adds stylescope listener to chart container
+      var container = document.createElement('div');
+      container.className = "chartContainer";
+      this.appendChild(container);
+      console.log(this);
       this.makeChartWrap();
+      this.scopeSubtree(this.querySelector('.chartContainer'), true);
     },
+
     makeChartWrap: function(id) {
+      // Places chart inside listner
       if (!id) {
         id = 'chart';
       }
-      //this.$$() not working here
       var prev = this.querySelector('#' + id);
       if (prev) {
         prev.remove();
@@ -19,9 +28,12 @@
       var elem = document.createElement('div');
       var svg = document.createElement('svg');
       elem.id = id;
-      this.appendChild(elem);
-      this.chartWrap = d3.select(elem);
-      this.svg = d3.select(elem).append("svg");
+      if (this.querySelector('.chartContainer')) {
+        this.querySelector('.chartContainer').appendChild(elem);
+        this.chartWrap = d3.select(elem);
+        this.svg = d3.select(elem).append("svg");
+      }
     }
+
   }
 </script>
