@@ -63,17 +63,19 @@ Polymer({
     },
 
     _addToolTip: function() {
-        var tip = d3.tip()
+        this.tip = d3.tip()
             .attr('class', 'd3-tip')
             .offset([-10, 0])
-            .html(function(d) {
-                return "<strong>Frequency:</strong> <span style='color:red'>" + "</span>";
-            });
-        this.svg.call(tip);
-        this.svg.on('mouseover', tip.show)
-            .on('mouseout', tip.hide)
-
+          .html(function(d) {
+            return "<strong>Frequency:</strong> <span style='color:red'>"  + "</span>";
+          });       
+        this.svg.call(this.tip);
+        this.svg.selectAll('.layer')
+            .selectAll('rect') 
+            .on('mouseover', this.tip.show)
+            .on('mouseout', this.tip.hide);
     },
+
     draw: function() {
         var n = 4, // number of layers
             m = 58, // number of samples per layer
@@ -230,6 +232,7 @@ Polymer({
                 };
             });
         };
+        this._addToolTip();
         return [transitionStacked, transitionGrouped];
 
     },
@@ -240,6 +243,6 @@ Polymer({
         } else {
             this.chart['transitionStacked']();
         }
-    }
+    },
 
 });
