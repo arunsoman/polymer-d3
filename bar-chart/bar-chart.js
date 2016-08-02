@@ -36,26 +36,17 @@ Polymer({
         settings: {
             notify: true,
             type: Array,
-            value: [{
-                input: 'colorRange',
-                txt: 'Color range',
-                uitype: 'colorRangePicker',
-                from: "#aad",
-                to: "#556",
-                notify: true,
-                observer: '_colorRangeChanged'
-            }]
+            value: []
         },
         hideSettings: true,
         data: String,
         external: Array,
         chart: Object
     },
+
     behaviors: [
-        PolymerD3.sizing,
-        PolymerD3.propertiesBehavior,
-        PolymerD3.chartconfigObserver,
-        PolymerD3.chartBehavior
+        PolymerD3.chartBehavior,
+        PolymerD3.colorPickerBehavior
     ],
 
     _toggleView: function() {
@@ -240,6 +231,5 @@ Polymer({
         } else {
             this.chart['transitionStacked']();
         }
-    },
-
+    }
 });

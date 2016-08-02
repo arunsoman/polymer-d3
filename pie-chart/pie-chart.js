@@ -79,7 +79,6 @@ Polymer({
     },
     observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)'],
 
-    behaviors: [PolymerD3.sizing],
 
     _settingsWatcher: function(settings) {
         if (settings.path === 'settings') {

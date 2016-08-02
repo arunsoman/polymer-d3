@@ -1,5 +1,5 @@
 <script>
-  PolymerD3.colorPicker = {
+  PolymerD3.colorPickerBehavior = {
     properties: {
       color: {
         type: Array,
@@ -15,49 +15,9 @@
         },
         // pointer: this.area,
     },
-    observers: ['_areaWatcher(area.*)'],
-    _areaWatcher: function(area) {
-        console.log(area);
-    },
-    created: function() {
-        debugger;
-        
-    },
     attached: function() {
-        
-        this.setProperty = function(key){
-            if(arguments.length < 1){
-                return
-            }
-            newVal = arguments[1];
-            this.area.forEach(function(elem){
-                if(elem.input == key){
-                    console.log(elem);
-                    for(var newKey in newVal){
-                        elem[newKey] = newVal[newKey];
-                     }   
-                }
-            });
-        },
-        this.getProperty = function(key){
-            var result;
-            this.area.forEach(function(elem){
-                if(elem.input == key){
-                    result = elem.selectedValue;
-                }
-            });
-            return result;
-        },
-        this.getConfig = function(){
-            return this.area;
-        }
-    },
-
-    getHeight: function() {
-        return this.getProperty('height');
-    },
-    getWidth: function() {
-        return this.getProperty('width');
+        console.info('color picker');
+        PolymerD3.utilities.merge.apply(this, ['settings', 'color']);
     }
   }
 </script>
