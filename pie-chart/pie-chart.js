@@ -43,28 +43,6 @@ Polymer({
                 txt: 'Inner radius',
                 uitype: 'Number',
                 selectedValue: 0
-            }, {
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 300,
-                notify: true,
-                observer: '_heightChanged'
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 300,
-                notify: true,
-                observer: '_widthChanged'
-            },{
-                input: 'colorRange',
-                txt: 'Color range',
-                uitype: 'colorRangePicker',
-                from: "#aad",
-                to: "#556",
-                notify: true,
-                observer: '_colorRangeChanged'
             }]
         },
         hideSettings: true,
@@ -77,39 +55,11 @@ Polymer({
         external: Array,
         svg: Object
     },
-    observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)'],
 
-
-    _settingsWatcher: function(settings) {
-        if (settings.path === 'settings') {
-            return
-        }
-        this.draw();
-    },
-    getBeh: function() {
-       return this; 
-    },
-    _inputsWatcher: function(inputs) {
-        if (inputs.path === 'inputs') {
-            return
-        }
-        this.draw();
-    },
-
-    _getHeight() {
-        return this.settings[2].selectedValue;
-    },
-    _getWidth() {
-        return this.settings[3].selectedValue;
-    },
-    // _heightChanged: function() {
-    //   console.log('New height' + height);
-    //     this.draw();
-    // },
-    // _widthChanged: function() {
-    //     console.log('New width' + width);
-    //     this.draw();
-    // },
+    behaviors: [
+        PolymerD3.chartBehavior,
+        PolymerD3.colorPickerBehavior
+    ],
 
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
@@ -118,21 +68,22 @@ Polymer({
     attached: function() {
         console.log("svg computed");
         var me = this;
-        me.svg = d3.select('#chart')
-            .append('svg')
-            .append('g')
-            .attr('transform', 'translate(' + (me._getWidth() / 2) +
-                ',' + (me._getHeight() / 2) + ')');
+        me.async(function() {
+            // me.svg.append('g')
+            //     .attr('transform', 'translate(' + (me.getWidth() / 2) +
+            //         ',' + (me.getHeight() / 2) + ')');
 
-        me.tooltip = d3.select('#chart')
-            .append('div')
-            .attr('class', 'tooltip')
-            .append('div')
-            .attr('class', me.inputs[0].selectedName)
-            .append('div')
-            .attr('class', me.inputs[1].selectedName)
-            .append('div')
-            .attr('class', 'percent');
+            // me.tooltip = d3.select('#chart')
+            //     .append('div')
+            //     .attr('class', 'tooltip')
+            //     .append('div')
+            //     .attr('class', me.inputs[0].selectedName)
+            //     .append('div')
+            //     .attr('class', me.inputs[1].selectedName)
+            //     .append('div')
+            //     .attr('class', 'percent');
+            me.draw();
+        });
 
     },
     _parseData(){
@@ -152,8 +103,8 @@ Polymer({
         var donutWidth = 75;
         var legendRectSize = 18;
         var legendSpacing = 4;
-        var width = this._getWidth(),
-            height = this._getHeight(),
+        var width = this.getWidth(),
+            height = this.getHeight(),
             radius = Math.min(width, height) / 2;
 
         var color = d3.scale.ordinal()//this  needs to change, its hardcoded 
