@@ -22,49 +22,7 @@ Polymer({
     settings: {
       notify: true,
       type: Array,
-      value: [{
-          input: 'height',
-          txt: 'Height of the chart',
-          uitype: 'Number',
-          selectedValue: 500,
-          notify: true,
-          observer: '_areaChanged'
-      }, {
-          input: 'width',
-          txt: 'Width of the chart',
-          uitype: 'Number',
-          selectedValue: 960,
-          notify: true,
-          observer: '_areaChanged'
-      }, {
-          input: 'marginTop',
-          txt: 'Top  margin',
-          uitype: 'Number',
-          selectedValue: 40,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginRight',
-          txt: 'Right margin',
-          uitype: 'Number',
-          selectedValue: 10,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginBottom',
-          txt: 'Bottom margin',
-          uitype: 'Number',
-          selectedValue: 20,
-          notify: true,
-          observer: '_marginChanged'
-      }, {
-          input: 'marginLeft',
-          txt: 'Left margin',
-          uitype: 'Number',
-          selectedValue: 10,
-          notify: true,
-          observer: '_marginChanged'
-      }]
+      value: []
     },
     hideSettings: true,
     data: String,
@@ -164,6 +122,7 @@ Polymer({
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+
       d3.csv("profit.csv", type, function(error, data) {
 
         // Transform data (i.e., finding cumulative values and total) for easier charting
@@ -222,7 +181,7 @@ Polymer({
       });
 
       this._addToolTip();
-      
+
       function type(d) {
         d.value = +d.value;
         return d;
@@ -236,7 +195,5 @@ Polymer({
         }
         return '$' + result;
       }
-      // console.log(me.data);
-      // d3.tsv(me.data,)
     }
 });
