@@ -1,0 +1,18 @@
+<script>
+  PolymerD3.colorPickerBehavior = {
+    properties: {
+      source: {
+        type: Array,
+        value: []
+      },
+      // pointer: this.area,
+    },
+    observers: ['_sourceWatcher(source)'],
+
+    _sourceWatcher: function(source) {
+      if (source.length > 0) {
+        this.draw();
+      }
+    }
+  }
+</script>
