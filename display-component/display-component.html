@@ -12,7 +12,7 @@
                 <paper-dropdown-menu label='[[ item.txt ]]'>
                     <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
                         <template is="dom-repeat" items="[[item.options]]">
-                            <paper-item value="[[item.key]]" class="dropdown-item">[[item.key]]</paper-item>
+                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
                     </paper-listbox>
                     <span>------------{{item.selectedValue}}' ,, '{{item.selectedName}}'</span>
@@ -27,7 +27,7 @@
                 <paper-dropdown-menu label='[[ item.txt ]]'>
                     <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
                         <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[item.key]]" class="dropdown-item">[[item.key]]</paper-item>
+                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
                     </paper-listbox>
                 </paper-dropdown-menu>
