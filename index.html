@@ -17,20 +17,17 @@
         -->
         </head>
     <body>
-    
-    	<!-- <pie-chart external= '[{"key": "label","value":1},{"key": "count","value":2}]' 
-    	data= "label,count
-Monday,379130
-Tuesday,424923
-Wednesday,430728
-Thursday,432138
-Friday,428295
-Saturday,368239
-Sunday,282701"
-></pie-chart> -->
+        
+        <!-- weekdays.csv -->
+    	<!-- <pie-chart external='[{"key": "label","value":1},{"key": "count","value":2}]' 
+    	source= '[["Monday", "379130"], ["Tuesday", "424923"], ["Wednesday", "430728"], ["Thursday", "432138"], ["Friday", "428295"], ["Saturday", "368239"], ["Sunday", "282701"]]' edit-mode="true"></pie-chart> -->
 
+        <!-- population.csv -->
+        <pie-chart external='[{"key": "label","value":1},{"key": "count","value":2}]' 
+        source= '[["<5", "2704659"], ["5-13", "4499890"], ["14-17", "2159981"], ["18-24", "3853788"], ["25-44", "14106543"], ["45-64", "8819342"], ["≥65", "612463"]]' edit-mode="true"></pie-chart>
 
-<bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]' edit-mode="true" ></bar-chart>
+<!-- 
+<bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]' edit-mode="true" ></bar-chart> -->
 <!-- <bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart>
 <bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart> -->
 <!-- <bar-chart external= '[{"key": "source","value":1},{"key": "destination","value":2},{"key": "count","value":3}]'></bar-chart> -->
@@ -48,7 +45,7 @@ Sunday,282701"
 
 -->
 
-<waterfall-chart external='[{"key": "name","value":0},{"key": "count","value":1}]' edit-mode="true" source='[["Product Revenue", "420000"], ["Services Revenue", "210000"], ["Fixed Costs", "-170000"],["Variable Costs", "-140000"]]'></waterfall-chart>
+<!-- <waterfall-chart external='[{"key": "name","value":0},{"key": "count","value":1}]' edit-mode="true" source='[["Product Revenue", "420000"], ["Services Revenue", "210000"], ["Fixed Costs", "-170000"],["Variable Costs", "-140000"]]'></waterfall-chart> -->
 
     </body>
 </html>
