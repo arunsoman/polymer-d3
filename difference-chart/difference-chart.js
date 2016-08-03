@@ -48,7 +48,7 @@ Polymer({
     },
 
     draw: function() {
-        var me = this ;
+        var me = this;
         var xName = this.inputs[0].selectedName;
         var y1Name = this.inputs[1].selectedName;
         var y2Name = this.inputs[2].selectedName;

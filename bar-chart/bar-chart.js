@@ -14,7 +14,7 @@ Polymer({
             }, {
                 input: 'y',
                 txt: 'Pick measures',
-                selectedValue: [],
+                selectedValue: [1, 2],
                 selectedName: [],
                 uitype: 'multi-value'
             }, {
@@ -31,16 +31,6 @@ Polymer({
                     key: 'Stacked',
                     value: 1
                 }]
-            }, {
-                input: 'layers',
-                txt: 'No: layers',
-                uitype: 'Number',
-                selectedValue: 4
-            }, {
-                input: 'samples',
-                txt: 'Samples per layer',
-                uitype: 'Number',
-                selectedValue: 58
             }]
         },
         settings: {
@@ -49,7 +39,7 @@ Polymer({
             value: []
         },
         hideSettings: true,
-        data: String,
+        source: Array,
         external: Array,
         chart: Object
     },
@@ -78,21 +68,24 @@ Polymer({
     },
 
     draw: function() {
-        var n = this.getInputsProperty('layers'); // number of layers
-        var m = this.getInputsProperty('samples'); // number of samples per layer
+        var me = this;
+        var n = this.getInputsProperty('y').length; // number of layers
+        var m = this.source.length; // number of samples per layer
         var stack = d3.layout.stack();
-        var layers = stack(d3.range(n).map(function() {
-            return bumpLayer(m, .1);
-        }));
-        var yGroupMax = d3.max(layers, function(layer) {
-            return d3.max(layer, function(d) {
-                return d.y;
-            });
+        var layers = stack(me.source);
+        var yGroupMax = d3.max(layers, function(array) {
+          return d3.max(array.filter(function(value) {
+            return typeof value === "number";
+          }));
         });
         var yStackMax = d3.max(layers, function(layer) {
-            return d3.max(layer, function(d) {
-                return d.y0 + d.y;
+            var sum = 0;
+            var elems = me.getInputsProperty('y');
+            elems.forEach(function(array) {
+                sum += layer[array];
             });
+            return sum;
+
         });
 
         var margin = this.getMargins();
@@ -208,30 +201,6 @@ Polymer({
                     return x(d.x);
                 })
                 .attr("width", x.rangeBand());
-        };
-        // Inspired by Lee Byron's test data generator.
-        function bumpLayer(n, o) {
-
-            function bump(a) {
-                var x = 1 / (.1 + Math.random()),
-                    y = 2 * Math.random() - .5,
-                    z = 10 / (.1 + Math.random());
-                for (var i = 0; i < n; i++) {
-                    var w = (i / n - y) * z;
-                    a[i] += x * Math.exp(-w * w);
-                }
-            }
-
-            var a = [],
-                i;
-            for (i = 0; i < n; ++i) a[i] = o + o * Math.random();
-            for (i = 0; i < 5; ++i) bump(a);
-            return a.map(function(d, i) {
-                return {
-                    x: i,
-                    y: Math.max(0, d)
-                };
-            });
         };
         this._addToolTip();
         return [transitionStacked, transitionGrouped];
