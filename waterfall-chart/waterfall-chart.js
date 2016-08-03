@@ -8,15 +8,14 @@ Polymer({
       value: [{
           input: 'x',
           txt: 'Pick a dimension',
-          selectedValue: 0,
-          selectedName: 'label',
+          selectedValue: -1,
+          
           uitype: 'single-value'
       }, {
           input: 'y',
           txt: 'Pick measures',
-          selectedValue: [],
-          selectedName: [],
-          uitype: 'multi-value'
+          selectedValue: -1,
+          uitype: 'single-value'
       }]
     },
     settings: {
@@ -25,7 +24,7 @@ Polymer({
       value: []
     },
     hideSettings: true,
-    data: String,
+    source: Array,
     external: Array,
     chart: Object,
     svg:Object
@@ -87,6 +86,10 @@ Polymer({
 
     draw: function() {
       var me = this;
+      if (me.getInputsProperty('x') === -1 || me.getInputsProperty('y') === -1) {
+        throw new Error('inputs not selected');
+      } 
+      
       var margin = me.getMargins();
       var width = me.getWidth() - margin.left - margin.right;
       var height = me.getHeight() - margin.top - margin.bottom;
@@ -115,26 +118,33 @@ Polymer({
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      d3.csv("profit.csv", type, function(error, data) {
+        var startIndex;
+        var endIndex;
+        var classIndex;
+        me.source.forEach(function(dataum) {
+          dataum[me.getInputsProperty('y')] = + dataum[me.getInputsProperty('y')];
+          startIndex = dataum.push(0)-1;
+          endIndex = dataum.push(0)-1;
+          classIndex = dataum.push(0)-1;
+        });
+        
 
-        // Transform data (i.e., finding cumulative values and total) for easier charting
+      // d3.csv("profit.csv", type, function(error, data) {
+
+        var data = me.source;
         var cumulative = 0;
         for (var i = 0; i < data.length; i++) {
-          data[i].start = cumulative;
-          cumulative += data[i].value;
-          data[i].end = cumulative;
+          summary = {};
+          data[i][startIndex] = cumulative;
+          cumulative += data[i][me.getInputsProperty('y')];
+          data[i][endIndex] = cumulative;
 
-          data[i].class = ( data[i].value >= 0 ) ? 'positive' : 'negative'
+          data[i][classIndex] = ( data[i][me.getInputsProperty('y')] >= 0 ) ? 'positive' : 'negative'
         }
-        data.push({
-          name: 'Total',
-          end: cumulative,
-          start: 0,
-          class: 'total'
-        });
+        data.push(['Total',cumulative, 0,  cumulative,'total' ]);
 
         x.domain(data.map(function(d) { return d[me.getInputsProperty('x')]; }));
-        y.domain([0, d3.max(data, function(d) { return d.end; })]);
+        y.domain([0, d3.max(data, function(d) { return d[endIndex]; })]);
 
         me.svg
           .append("g")
@@ -150,27 +160,27 @@ Polymer({
         var bar = me.svg.selectAll(".bar")
           .data(data)
           .enter().append("g")
-            .attr("class", function(d) { return "bar " + d.class })
-            .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; });
+            .attr("class", function(d) { return "bar " + d[classIndex] })
+            .attr("transform", function(d) { return "translate(" + x(d[me.getInputsProperty('x')]) + ",0)"; });
 
         bar.append("rect")
-            .attr("y", function(d) { return y( Math.max(d.start, d.end) ); })
-            .attr("height", function(d) { return Math.abs( y(d.start) - y(d.end) ); })
+            .attr("y", function(d) { return y( Math.max(d[startIndex], d[endIndex]) ); })
+            .attr("height", function(d) { return Math.abs( y(d[startIndex]) - y(d[endIndex]) ); })
             .attr("width", x.rangeBand());
 
         bar.append("text")
             .attr("x", x.rangeBand() / 2)
-            .attr("y", function(d) { return y(d.end) + 5; })
-            .attr("dy", function(d) { return ((d.class=='negative') ? '-' : '') + ".75em" })
-            .text(function(d) { return dollarFormatter(d.end - d.start);});
+            .attr("y", function(d) { return y(d[endIndex]) + 5; })
+            .attr("dy", function(d) { return ((d[classIndex]=='negative') ? '-' : '') + ".75em" })
+            .text(function(d) { return dollarFormatter(d[endIndex] - d[startIndex]);});
 
         bar.filter(function(d) { return d.class != "total" }).append("line")
             .attr("class", "connector")
             .attr("x1", x.rangeBand() + 5 )
-            .attr("y1", function(d) { return y(d.end) } )
+            .attr("y1", function(d) { return y(d[endIndex]) } )
             .attr("x2", x.rangeBand() / ( 1 - padding) - 5 )
-            .attr("y2", function(d) { return y(d.end) } )
-      });
+            .attr("y2", function(d) { return y(d[endIndex]) } )
+      // }); // end of csv
 
       this._addToolTip();
 
