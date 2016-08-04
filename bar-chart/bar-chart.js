@@ -21,7 +21,7 @@ Polymer({
         input: 'chartType',
         txt: 'Grouped or stacked',
         uitype: 'dropDown',
-        selectedValue: 0,
+        selectedValue: 1,
         selectedName: 'Grouped',
         observer: '_chartTypehanged',
         options: [{
@@ -78,36 +78,13 @@ Polymer({
 
     //To create new chart wrap
     this.makeChartWrap();
+
     // Selects stack of elements as Y-Axis
-    var selected = this.getInputsProperty('y');
+    var selected = me.getInputsProperty('y');
 
-    // X axis
-    var x = d3.scale.ordinal()
-      .rangeRoundBands([0, width]);
-
-    // Y Axis
-    var y = d3.scale.linear()
-      .rangeRound([height, 0]);
 
     // Colors : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
     var z = d3.scale.category10();
-
-    //Set X Axis at Bottom
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient('bottom');
-
-    // Sets Y axis at right
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient('left');
-
-    // Parent SVG
-    var svg = this.svg
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
     // Sets data source
     var src = me.source;
@@ -116,59 +93,173 @@ Polymer({
       console.warn('Data source empty');
       return false;
     }
+   
+    //Renders respective chart as per chart type
+    if (this.getInputsProperty('chartType') === 1) {
+      stackedChart();
+    } else {
+      groupedChart();
+    }
 
-    // Create layers based on stack
-    // Parses the data as : {x: '',y: '',y0: ''}
-    var layers = d3.layout.stack()(selected.map(function(c) {
-      return src.map(function(d) {
-        return {
-          x: d[me.getInputsProperty('x')],
-          y: d[c]
-        };
+    function stackedChart() {
+
+      // X axis
+      var x = d3.scale.ordinal()
+        .rangeRoundBands([0, width]);
+
+      // Y Axis
+      var y = d3.scale.linear()
+        .rangeRound([height, 0]);
+
+      //Set X Axis at Bottom
+      var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom');
+
+      // Sets Y axis at right
+      var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left');
+
+      // Parent SVG
+      var svg = me.svg
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+      // Create layers based on stack
+      // Parses the data as : {x: '',y: '',y0: ''}
+      var layers = d3.layout.stack()(selected.map(function(c) {
+        return src.map(function(d) {
+          return {
+            x: d[me.getInputsProperty('x')],
+            y: d[c]
+          };
+        });
+      }));
+
+      //Draws the chart with newly mapped data
+      x.domain(layers[0].map(function(d) {
+        return d.x;
+      }));
+
+      y.domain([0, d3.max(layers[layers.length - 1], function(d) {
+        return d.y0 + d.y;
+      })]).nice();
+
+      var layer = svg.selectAll('.layer')
+        .data(layers)
+        .enter().append('g')
+        .attr('class', 'layer')
+        .style('fill', function(d, i) {
+          return z(i);
+        });
+
+      layer.selectAll('rect')
+        .data(function(d) {
+          return d;
+        })
+        .enter().append('rect')
+        .attr('x', function(d) {
+          return x(d.x);
+        })
+        .attr('y', function(d) {
+          return y(d.y + d.y0);
+        })
+        .attr('height', function(d) {
+          return y(d.y0) - y(d.y + d.y0);
+        })
+        .attr('width', x.rangeBand() - 1);
+
+      svg.append('g')
+        .attr('class', 'axis axis--x')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis);
+
+      svg.append('g')
+        .attr('class', 'axis axis--y')
+        .attr('transform', 'translate(' + width + ',0)')
+        .call(yAxis);
+    }
+
+    function groupedChart() {
+      // Generates new mapped array and find yMax
+      var mapped = [];
+      var yMax = 0;
+      selected.forEach(function(s) {
+        var arr = src.map(function(arr) {
+          if (yMax < arr[s] ) {
+            yMax = arr[s];
+          }
+          return arr[s];
+        });
+        mapped.push(arr);
       });
-    }));
 
-    //Draws the chart with newly mapped data
-    x.domain(layers[0].map(function(d) {
-      return d.x;
-    }));
 
-    y.domain([0, d3.max(layers[layers.length - 1], function(d) {
-      return d.y0 + d.y;
-    })]).nice();
+      // Y Axis
+      var y = d3.scale.linear()
+        .domain([0, yMax])
+        .rangeRound([height, 0]);
 
-    var layer = svg.selectAll('.layer')
-      .data(layers)
-      .enter().append('g')
-      .attr('class', 'layer')
-      .style('fill', function(d, i) {
-        return z(i);
-      });
+      // X axis
+      var x0 = d3.scale.ordinal()
+          .domain(d3.range(src.length))
+          .rangeBands([0, width], .2);
 
-    layer.selectAll('rect')
-      .data(function(d) {
-        return d;
-      })
-      .enter().append('rect')
-      .attr('x', function(d) {
-        return x(d.x);
-      })
-      .attr('y', function(d) {
-        return y(d.y + d.y0);
-      })
-      .attr('height', function(d) {
-        return y(d.y0) - y(d.y + d.y0);
-      })
-      .attr('width', x.rangeBand() - 1);
+      var x1 = d3.scale.ordinal()
+          .domain(d3.range(me.getInputsProperty('y').length))
+          .rangeBands([0, x0.rangeBand()]);
 
-    svg.append('g')
-      .attr('class', 'axis axis--x')
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(xAxis);
+      // Color
+      var z = d3.scale.category10();
 
-    svg.append('g')
-      .attr('class', 'axis axis--y')
-      .attr('transform', 'translate(' + width + ',0)')
-      .call(yAxis);
+      var xAxis = d3.svg.axis()
+          .scale(x0)
+          .orient("bottom");
+
+      var yAxis = d3.svg.axis()
+          .scale(y)
+          .orient("left");
+
+      var svg = me.svg
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .append("svg:g")
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      svg.append("g")
+          .attr("class", "y axis")
+          .call(yAxis);
+
+      svg.append("g")
+          .attr("class", "x axis")
+          .attr("transform", "translate(0," + height + ")")
+          .call(xAxis);
+
+      svg.append("g").selectAll("g")
+        .data(mapped)
+        .enter().append("g")
+        .style("fill", function(d, i) {
+          return z(i);
+        })
+        .attr("transform", function(d, i) {
+          return "translate(" + x1(i) + ",0)";
+        })
+        .selectAll("rect")
+        .data(function(d) {
+          return d;
+        })
+        .enter().append("rect")
+        .attr("width", x1.rangeBand())
+        .attr("height", y)
+        .attr("x", function(d, i) {
+          return x0(i);
+        })
+        .attr("y", function(d) {
+          return height - y(d);
+        });
+    }
   }
 });
