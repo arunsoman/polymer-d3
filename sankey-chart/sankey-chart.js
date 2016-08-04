@@ -52,15 +52,16 @@ Polymer({
 
     _createNodesAndLinks(){
         if(!this.dataMutated){
-            var sourceIndex = this.getInputProperties('x');
-            var destinationIndex = this.getInputProperties('y');
-            var countIndex = this.getInputProperties('z');
+            var sourceIndex = this.getInputsProperty('x');
+            var destinationIndex = this.getInputsProperty('y');
+            var countIndex = this.getInputsProperty('z');
             this.graph = {"nodes" : [], "links" : []};
+            var graph = this.graph;
 
             this.source.forEach(function (d) {
-              this.graph.nodes.push({ "name": d[sourceIndex] });
-              this.graph.nodes.push({ "name": d[destinationIndex] });
-              this.graph.links.push({ "source": d[sourceIndex],
+              graph.nodes.push({ "name": d[sourceIndex] });
+              graph.nodes.push({ "name": d[destinationIndex] });
+              graph.links.push({ "source": d[sourceIndex],
                                  "target": d[destinationIndex],
                                  "value": d[countIndex] });
              });
@@ -84,11 +85,17 @@ Polymer({
     },
     draw: function () {
         this._createNodesAndLinks();
+
+var units = "Widgets";
+var formatNumber = d3.format(",.0f"),    // zero decimal places
+    format = function(d) { return formatNumber(d) + " " + units; },
+    color = d3.scale.category20();
+
         var margin = this.getMargins();
         var width = this.getWidth() - margin.left - margin.right;
         var height = this.getHeight() - margin.top - margin.bottom;
         var svg = this.svg;
-
+        var graph = this.graph;
         var sankey = d3.sankey().nodeWidth(36)
             .nodePadding(40)
             .size([width, height]);
