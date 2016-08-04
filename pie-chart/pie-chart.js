@@ -73,9 +73,8 @@ Polymer({
   },
 
   draw: function() {
-    
-    'use strict';
     var me = this;
+    me.makeChartWrap();
     var sliceHeader = this.inputs[0].selectedName;
     var sliceSizeHeader = this.inputs[1].selectedName;
     var donutWidth = 75;
@@ -97,9 +96,7 @@ Polymer({
       .innerRadius(radius - 40);
 
     me._parseData();
-    
-    // me.makeChartWrap();
-    
+
     var pie = d3.layout.pie()
       .sort(null)
       .value(function(d) {
@@ -113,7 +110,9 @@ Polymer({
       .append("g")
       .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    var g = this.svg.selectAll(".arc")
+    me.gWrap = me.svg.select("g");
+
+    var g = me.gWrap.selectAll(".arc")
       .data(pie(me.newData))
       .enter().append("g")
       .attr("class", "arc");

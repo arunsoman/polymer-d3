@@ -60,7 +60,7 @@ Polymer({
         d3.json("bullets.json", function(error, data) {
             if (error) throw error;
 
-            me.svg .data(data)
+            me.svg.data(data)
                 .attr("class", "bullet")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)

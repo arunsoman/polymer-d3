@@ -41,11 +41,6 @@
         console.log('attached');
         var me = this;
         this.async(function() {
-
-            ///Change to ES5
-            // console.log(this);
-            // this.push('settings', ...this.area);
-            console.log(me);
             PolymerD3.utilities.merge.apply(me, ['settings', 'area']);
         });
     },
