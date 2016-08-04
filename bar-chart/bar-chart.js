@@ -76,6 +76,8 @@ Polymer({
     var width = this.getWidth() - margin.left - margin.right;
     var height = this.getHeight() - margin.top - margin.bottom;
 
+    //To create new chart wrap
+    this.makeChartWrap();
     // Selects stack of elements as Y-Axis
     var selected = this.getInputsProperty('y');
 
@@ -87,7 +89,7 @@ Polymer({
     var y = d3.scale.linear()
       .rangeRound([height, 0]);
 
-    // Colors
+    // Colors : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
     var z = d3.scale.category10();
 
     //Set X Axis at Bottom
