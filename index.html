@@ -13,6 +13,7 @@
         <link href="difference-chart/difference-chart.html" rel="import">
         <link href="parallel-coordinate/parallel-coordinate.html" rel="import">
         <link href="bullet-chart/bullet-chart.html" rel="import">
+        <link href="sankey-chart/sankey-chart.html" rel="import">
         <!--
   <link href="bullet-chart/bullet-chart.html" rel="import">
         <link href="difference-chart/difference-chart.html" rel="import">
@@ -30,6 +31,8 @@
         <pie-chart external='[{"key": "label","value":1},{"key": "count","value":2}]' 
         source= '[["<5", "2704659"], ["5-13", "4499890"], ["14-17", "2159981"], ["18-24", "3853788"], ["25-44", "14106543"], ["45-64", "8819342"], ["≥65", "612463"]]' edit-mode="true"></pie-chart>
 
+<sankey-chart external='[{"key": "source","value":0},{"key": "destination","value":1},{"key": "count","value":2}]' 
+        source= '[["Barry", "Elvis", 2],["Frodo", "Elvis", 2],["Frodo", "Sarah", 2],["Barry", "Alice", 2],["Elvis", "Sarah", 2],["Elvis", "Alice", 2],["Sarah", "Alice", 4]]' ></sankey-chart>
 <bullet-chart></bullet-chart>
 
 <!-- 

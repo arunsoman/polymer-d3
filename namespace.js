@@ -34,20 +34,13 @@ PolymerD3.utilities._getProperty = function(arr, key) {
 };
 
 PolymerD3.utilities._formatNumber = function(n) {
-  var result;
-  n = Math.round(n);
-  var abs = Math.abs(n);
-  if (abs > 999) {
-    result = Math.round(n/1000) + 'K';
-  }
-  if (abs > 1000000) {
-    result = Math.round(n/1000000) + 'million';
-  }
-  if (abs > 10000000) {
-    result = Math.round(n/10000000) * 10 + 'million';
-  }
-  if (abs > 1000000000) {
-    result = Math.round(n/1000000000) * 100 + 'million';
-  }
-  return '$' + result;
+  return d3.format(".2s")(n);
+};
+
+PolymerD3.utilities._formatCurrency = function(n) {
+  return d3.format("$.2s")(n);
+};
+
+PolymerD3.utilities._formatPercent = function(n) {
+  return d3.format(".0%")(n);
 };
