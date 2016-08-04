@@ -60,13 +60,24 @@ Polymer({
         d3.json("bullets.json", function(error, data) {
             if (error) throw error;
 
-            me.svg.data(data)
+            // To remove previously initialized SVG
+            // Bullet chart needs 5 svg elems, previous elements causes some problems in  rendering
+            me.chartWrap[0][0].removeChild(me.chartWrap[0][0].firstChild);
+
+            var q = me
+                .chartWrap
+                .selectAll("svg")
+                .data(data)
+                .enter()
+                .append("svg")
                 .attr("class", "bullet")
                 .attr("width", width + margin.left + margin.right)
                 .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                 .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
                 .call(chart);
+
+            me.svg = me.chartWrap.selectAll('svg');
 
             var title = me.svg.append("g")
                 .style("text-anchor", "end")
