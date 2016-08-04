@@ -89,7 +89,7 @@ Polymer({
 
     var arc = d3.svg.arc()
       .outerRadius(radius - 10)
-      .innerRadius(0);
+      .innerRadius(me.getSettingsProperty("innerRadius"));
 
     var labelArc = d3.svg.arc()
       .outerRadius(radius - 40)
@@ -101,7 +101,6 @@ Polymer({
       .sort(null)
       .value(function(d) {
         return d[me.getInputsProperty('sliceSize')];
-        // return d[sliceSizeHeader];
       });
 
     this.svg
@@ -121,7 +120,6 @@ Polymer({
       .attr("d", arc)
       .style("fill", function(d) {
         return color(d.data[me.getInputsProperty('slice')]);
-        // return color(d.data[sliceHeader]);
       });
 
     g.append("text")
@@ -131,7 +129,6 @@ Polymer({
       .attr("dy", ".35em")
       .text(function(d) {
         return d.data[me.getInputsProperty('slice')];
-        // return d.data[sliceHeader]+":" + d.data[sliceSizeHeader];
       });
   }
 });
