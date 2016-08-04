@@ -11,7 +11,7 @@ Polymer({
                 txt: 'Pick a messure',
                 selectedValue: Array,
                 selectedName: Array,
-                uitype: 'multiple-value'
+                uitype: 'multi-value'
             }]
         },
         settings: {
