@@ -217,47 +217,47 @@ Polymer({
 
       var xAxis = d3.svg.axis()
           .scale(x0)
-          .orient("bottom");
+          .orient('bottom');
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .orient("left");
+          .orient('left');
 
       var svg = me.svg
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-          .append("svg:g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          .attr('width', width + margin.left + margin.right)
+          .attr('height', height + margin.top + margin.bottom)
+          .append('svg:g')
+          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-      svg.append("g")
-          .attr("class", "y axis")
+      svg.append('g')
+          .attr('class', 'y axis')
           .call(yAxis);
 
-      svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
+      svg.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0,' + height + ')')
           .call(xAxis);
 
-      svg.append("g").selectAll("g")
+      svg.append('g').selectAll('g')
         .data(mapped)
-        .enter().append("g")
-        .style("fill", function(d, i) {
+        .enter().append('g')
+        .style('fill', function(d, i) {
           return z(i);
         })
-        .attr("transform", function(d, i) {
-          return "translate(" + x1(i) + ",0)";
+        .attr('transform', function(d, i) {
+          return 'translate(' + x1(i) + ',0)';
         })
-        .selectAll("rect")
+        .selectAll('rect')
         .data(function(d) {
           return d;
         })
-        .enter().append("rect")
-        .attr("width", x1.rangeBand())
-        .attr("height", y)
-        .attr("x", function(d, i) {
+        .enter().append('rect')
+        .attr('width', x1.rangeBand())
+        .attr('height', y)
+        .attr('x', function(d, i) {
           return x0(i);
         })
-        .attr("y", function(d) {
+        .attr('y', function(d) {
           return height - y(d);
         });
     }
