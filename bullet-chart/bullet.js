@@ -231,13 +231,16 @@ d3.bullet = function() {
 
 function bulletRanges(d) {
     return d.ranges;
+    // return d[2];
 }
 
 function bulletMarkers(d) {
+    // return d[4];
     return d.markers;
 }
 
 function bulletMeasures(d) {
+    // return d[3];
     return d.measures;
 }
 
