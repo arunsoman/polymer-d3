@@ -16,7 +16,7 @@ Polymer({
           txt: 'Subtitle',
           selectedValue: -1,
           selectedName: 'subTitle',
-          uitype: 'single-value'
+          uitype: 'single-value',
           maxSelectableValues: 2
       },  {
           input: 'range1',
