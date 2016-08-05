@@ -10,13 +10,15 @@ Polymer({
         txt: 'Pick a dimension',
         selectedValue: 0,
         selectedName: 'label',
-        uitype: 'single-value'
+        uitype: 'single-value',
+        tickFormat: 'Tabbrweekday'
       }, {
         input: 'sliceSize',
         txt: 'Pick a messure',
         selectedValue: 1,
         selectedName: 'count',
-        uitype: 'single-value'
+        uitype: 'single-value',
+        tickFormat: 'number'
       }]
     },
     external: Array,
@@ -58,11 +60,11 @@ Polymer({
 
       var xAxis = d3.svg.axis()
           .scale(x)
-          .orient("bottom");
+          .orient("bottom").tickFormat(PolymerD3.utilities._formater(this.inputs[0].tickFormat));
 
       var yAxis = d3.svg.axis()
           .scale(y)
-          .orient("left");
+          .orient("left").tickFormat(PolymerD3.utilities._formater(this.inputs[1].tickFormat));
 
       var area = d3.svg.area()
           .x(function(d) { return x(d[0]); })
@@ -76,11 +78,15 @@ Polymer({
           .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
       var data = me.source;
+      var xtickVals = [];
       if (data) {
         data.forEach(function(d) {
           d[0] = parseDate(d[0]);
           d[1] = +d[1];
+          xtickVals.push(d[0]);
         });
+        //this has to be more sofisticated than this
+        xAxis.tickValues(xtickVals);
 
         x.domain(d3.extent(data, function(d) { return d[0]; }));
         y.domain([0, d3.max(data, function(d) { return d[1]; })]);

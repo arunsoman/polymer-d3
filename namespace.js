@@ -44,9 +44,16 @@ PolymerD3.utilities._formater = function(dataType, parser){
     };
     if(dataType.startsWith('T')){
       //d3.time.format('%a')(d3.time.format("%B %d, %Y").parse("June 30, 2015"));
-       return function(input){
-          return d3.time.format(type[dataType])(d3.time.format(parser).parse(input));
-       };
+       if(arguments.length < 2){
+          return function(input){
+            return d3.time.format(type[dataType])(input);
+            }  
+        }
+        else{
+          return function(input){
+            return d3.time.format(type[dataType])(d3.time.format(parser).parse(input));
+          }
+        }
     }
     
     return d3.format(type[dataType]);
