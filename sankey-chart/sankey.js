@@ -1,5 +1,6 @@
 if(!d3.sankey){}
-d3.sankey = function() {
+d3.sankey = function(me) {
+
   var sankey = {},
       nodeWidth = 24,
       nodePadding = 8,
@@ -73,7 +74,6 @@ d3.sankey = function() {
       curvature = +_;
       return link;
     };
-
     return link;
   };
 
@@ -128,7 +128,7 @@ d3.sankey = function() {
 
     //
     moveSinksRight(x);
-    scaleNodeBreadths((width - nodeWidth) / (x - 1));
+    scaleNodeBreadths((me.getSettingsProperty('width') - nodeWidth) / (x - 1));
   }
 
   function moveSourcesRight() {

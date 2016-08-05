@@ -6,22 +6,28 @@ Polymer({
             notify: true,
             type: Array,
             value: [{
-                input: 'x',
+                input: 'source',
                 txt: 'Pick Source',
                 selectedValue: 0,
                 uitype: 'single-value',
                 notify: true,
             }, {
-                input: 'y',
+                input: 'destination',
                 txt: 'Pick Destination',
                 selectedValue: 1,
                 uitype: 'single-value',
                 notify: true
             }, {
-                input: 'z',
+                input: 'count',
                 txt: 'Pick count',
-                selectedValue: 0,
+                selectedValue: 2,
                 uitype: 'single-value',
+                notify: true
+            }, {
+                input: 'units',
+                txt: 'Enter unit',
+                selectedValue: "widget",
+                uitype: 'Text',
                 notify: true
             }]
         },
@@ -50,11 +56,11 @@ Polymer({
         this.chart = this.draw();
     },
 
-    _createNodesAndLinks(){
+    _createNodesAndLinks: function(){
         if(!this.dataMutated){
-            var sourceIndex = this.getInputsProperty('x');
-            var destinationIndex = this.getInputsProperty('y');
-            var countIndex = this.getInputsProperty('z');
+            var sourceIndex = this.getInputsProperty('source');
+            var destinationIndex = this.getInputsProperty('destination');
+            var countIndex = this.getInputsProperty('count');
             this.graph = {"nodes" : [], "links" : []};
             var graph = this.graph;
 
@@ -65,7 +71,7 @@ Polymer({
                                  "target": d[destinationIndex],
                                  "value": d[countIndex] });
              });
-         // return only the distinct / unique nodes
+            // return only the distinct / unique nodes
              graph.nodes = d3.keys(d3.nest()
                .key(function (d) { return d.name; })
                .map(graph.nodes));
@@ -81,22 +87,32 @@ Polymer({
              graph.nodes.forEach(function (d, i) {
                graph.nodes[i] = { "name": d };
              });
+             this.dataMutated = true;
          }
     },
     draw: function () {
-        this._createNodesAndLinks();
-
-var units = "Widgets";
-var formatNumber = d3.format(",.0f"),    // zero decimal places
-    format = function(d) { return formatNumber(d) + " " + units; },
-    color = d3.scale.category20();
+      // Sankey mapper function gets overflowed in this condition
+      if (this.getInputsProperty('source') === this.getInputsProperty('destination')) {
+        return;
+      }
+      this.makeChartWrap();
+      this._createNodesAndLinks();
+      var me = this;
+      var units = this.getInputsProperty('units');
+      var formatNumber = d3.format(",.0f");// zero decimal places
+      var format = function(d) {
+        return formatNumber(d) + " " + units;
+      };
+      var color = d3.scale.category20();
 
         var margin = this.getMargins();
         var width = this.getWidth() - margin.left - margin.right;
         var height = this.getHeight() - margin.top - margin.bottom;
-        var svg = this.svg;
+        var svg = this.svg
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom);
         var graph = this.graph;
-        var sankey = d3.sankey().nodeWidth(36)
+        var sankey = d3.sankey(me).nodeWidth(36)
             .nodePadding(40)
             .size([width, height]);
 
@@ -115,13 +131,13 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
             .style("stroke-width", function(d) { return Math.max(1, d.dy); })
             .sort(function(a, b) { return b.dy - a.dy; });
 
-// add the link titles
+        // add the link titles
         link.append("title")
             .text(function(d) {
             return d.source.name + " → " + 
                 d.target.name + "\n" + format(d.value); });
 
-// add in the nodes
+        // add in the nodes
         var node = svg.append("g").selectAll(".node")
             .data(graph.nodes)
             .enter().append("g")
@@ -134,7 +150,7 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
                 this.parentNode.appendChild(this); })
             .on("drag", dragmove));
 
-// add the rectangles for the nodes
+      // add the rectangles for the nodes
         node.append("rect")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
@@ -146,7 +162,7 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
       .text(function(d) { 
           return d.name + "\n" + format(d.value); });
 
-// add in the title for the nodes
+      // add in the title for the nodes
         node.append("text")
       .attr("x", -6)
       .attr("y", function(d) { return d.dy / 2; })
@@ -158,7 +174,7 @@ var formatNumber = d3.format(",.0f"),    // zero decimal places
             .attr("x", 6 + sankey.nodeWidth())
             .attr("text-anchor", "start");
 
-// the function for moving the nodes
+      // the function for moving the nodes
         function dragmove(d) {
             d3.select(this).attr("transform", "translate(" + d.x + "," + ( d.y = Math.max(0, Math.min(height - d.dy, d3.event.y))) + ")");
             sankey.relayout();
