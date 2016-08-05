@@ -37,26 +37,25 @@ Example:
     </style>
     <div uuid = [[getUUID]]></div>
     <div class="sortable-wrap">
-      <sortable-js id="master">
+      <sortable-js id="master" >
         <template is="dom-repeat" items={{externals}}>
           <div>{{item.key}}</div>
         </template>
-      </sortable-js>      
+      </sortable-js>
     </div>
     <div id="inputWrap">
-      <template is="dom-repeat" items="{{inputs}}" as="input">
+      <template is="dom-repeat" items="{{inputs}}" as="input" index-as="inputIndex">
         <div class="sortable-wrap">
           <h4>
             {{input.txt}}
           </h4>
           <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}">
             <template is="dom-repeat" items="{{input.selectedValue}}">
-              <draggable-element parent-array="{{inputs}}" current-input="{{input}}" current-item="{{item}}"></draggable-element>
-              </iron-icon>
+              <draggable-element current-input="{{input}}" current-item="{{item}}" index="{{index}}"></draggable-element>
             </template>
-          </sortable-js>          
+          </sortable-js>
         </div>
-      </template>      
+      </template>
     </div>
   </template>
   <script>
@@ -78,7 +77,7 @@ Example:
         },
         uuid: String
       },
-      attached: function () {
+      attached: function() {
         this.$.inputWrap.addEventListener("add", function(e) {
           debugger;
         });
@@ -94,9 +93,6 @@ Example:
             name: me.uuid
           }
         }
-      }, 
-      getUUID: function() {
-        return PolymerD3.utilities.getUUID();        
       }
     });
   </script>
