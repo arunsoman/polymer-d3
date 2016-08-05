@@ -49,7 +49,7 @@ Polymer({
 
     _toggleView: function() {
         this.hideSettings = !this.hideSettings;
-        this.chart = this.draw();
+        // this.chart = this.draw();
     },
 
     draw: function() {
