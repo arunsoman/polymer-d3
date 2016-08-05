@@ -33,6 +33,17 @@ PolymerD3.utilities._getProperty = function(arr, key) {
   return result;
 };
 
+PolymerD3.utilities._formater = function(dataType, parser){
+    if(dataType === 'datetime'){
+        return d3.time.format(parser).parse;
+    }
+    var type={
+      'number':'.2s',
+      'currency':'$.2s',
+      'percent':'.0%'
+    };
+    return d3.format(type[dataType]);
+};
 PolymerD3.utilities._formatNumber = function(n) {
   return d3.format(".2s")(n);
 };
