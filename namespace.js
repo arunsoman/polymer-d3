@@ -34,14 +34,21 @@ PolymerD3.utilities._getProperty = function(arr, key) {
 };
 
 PolymerD3.utilities._formater = function(dataType, parser){
-    if(dataType === 'datetime'){
-        return d3.time.format(parser).parse;
-    }
     var type={
+      'Tabbrweekday': '%a ',
+      'Tabbrmonth': '%b ',
+
       'number':'.2s',
       'currency':'$.2s',
       'percent':'.0%'
     };
+    if(dataType.startsWith('T')){
+      //d3.time.format('%a')(d3.time.format("%B %d, %Y").parse("June 30, 2015"));
+       return function(input){
+          return d3.time.format(type[dataType])(d3.time.format(parser).parse(input));
+       };
+    }
+    
     return d3.format(type[dataType]);
 };
 PolymerD3.utilities._formatNumber = function(n) {
