@@ -3,29 +3,29 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 
 <dom-module id='pie-chart'>
-<style>
+  <style>
     .arc text {
-  font: 10px sans-serif;
-  text-anchor: middle;
-}
+    font: 10px sans-serif;
+    text-anchor: middle;
+    }
 
-.arc path {
-  stroke: #fff;
-}
-    </style>
+    .arc path {
+    stroke: #fff;
+    }
+  </style>
 
-    <template>
-        <template is="dom-if" if="[[editMode]]">
-            <div class='mandatory'>
-            <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-            </div>
+  <template>
+    <template is="dom-if" if="[[editMode]]">
+      <div class='mandatory'>
+        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+      </div>
 
-            <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-            <div class='optional' hidden="{{hideSettings}}">
-                <display-component settings="{{settings}}" external='[[external]]'></display-component>
-            </div>
-        </template>
+      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+      <div class='optional' hidden="{{hideSettings}}">
+        <display-component settings="{{settings}}" external='[[external]]'></display-component>
+      </div>
     </template>
+  </template>
 </dom-module>
 
 <script src='pie-chart.js'></script>

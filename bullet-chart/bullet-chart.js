@@ -1,45 +1,53 @@
 Polymer({
-    is: 'bullet-chart',
-    properties: {
-        title: '',
-        inputs: {
-            notify: true,
-            type: Array,
-            value: [{
-                input: 'slice',
-                txt: 'Pick a dimension',
-                selectedValue: 0,
-                selectedName: 'label',
-                uitype: 'single-value'
-            }, {
-                input: 'sliceSize',
-                txt: 'Pick a messure',
-                selectedValue: 1,
-                selectedName: 'count',
-                uitype: 'single-value'
-            }]
-        },
-        settings: {
-            notify: true,
-            type: Array,
-            value: []
-        },
-        hideSettings: true,
-        data: String,
-        external: Array
+  is: 'bullet-chart',
+  properties: {
+    title: '',
+    inputs: {
+      notify: true,
+      type: Array,
+      value: [{
+          input: 'txtLabel',
+          txt: 'Pick a label',
+          selectedValue: 0,
+          selectedName: 'label',
+          uitype: 'single-value'
+      }, {
+          input: 'qualityRanges',
+          txt: 'Enter quality ranges',
+          selectedValue: [],
+          selectedName: 'performanceRange',
+          uitype: 'multi-value'
+      }, {
+          input: 'featuredMeasures',
+          txt: 'Enter current value and expected value',
+          selectedValue: [],
+          selectedName: 'featuredMeasures',
+          uitype: 'multi-value'
+      },  {
+          input: 'marker',
+          txt: 'Enter target value',
+          selectedValue: 0,
+          selectedName: 'marker',
+          uitype: 'single-value'
+      }]
     },
+    settings: {
+      notify: true,
+      type: Array,
+      value: []
+    },
+    hideSettings: true,
+    data: String,
+    external: Array
+  },
+
     behaviors: [
         PolymerD3.chartBehavior,
         PolymerD3.colorPickerBehavior
     ],
 
     _toggleView: function() {
-        this.hideSettings = !this.hideSettings;
-        this.draw();
-    },
-    
-    attached: function() {
-        this.draw();
+      this.hideSettings = !this.hideSettings;
     },
 
     draw: function() {

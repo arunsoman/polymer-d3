@@ -3,47 +3,47 @@
 <link rel="import" href="../bower_components/iron-icon/iron-icon.html">
 
 <dom-module id='bullet-chart'>
-<style>
+  <style>
 
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  margin: auto;
-  padding-top: 40px;
-  position: relative;
-  width: 960px;
-}
+    body {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      margin: auto;
+      padding-top: 40px;
+      position: relative;
+      width: 960px;
+    }
 
-button {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
+    button {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+    }
 
-.bullet { font: 10px sans-serif; }
-.bullet .marker { stroke: #000; stroke-width: 2px; }
-.bullet .tick line { stroke: #666; stroke-width: .5px; }
-.bullet .range.s0 { fill: #eee; }
-.bullet .range.s1 { fill: #ddd; }
-.bullet .range.s2 { fill: #ccc; }
-.bullet .measure.s0 { fill: lightsteelblue; }
-.bullet .measure.s1 { fill: steelblue; }
-.bullet .title { font-size: 14px; font-weight: bold; }
-.bullet .subtitle { fill: #999; }
+    .bullet { font: 10px sans-serif; }
+    .bullet .marker { stroke: #000; stroke-width: 2px; }
+    .bullet .tick line { stroke: #666; stroke-width: .5px; }
+    .bullet .range.s0 { fill: #eee; }
+    .bullet .range.s1 { fill: #ddd; }
+    .bullet .range.s2 { fill: #ccc; }
+    .bullet .measure.s0 { fill: lightsteelblue; }
+    .bullet .measure.s1 { fill: steelblue; }
+    .bullet .title { font-size: 14px; font-weight: bold; }
+    .bullet .subtitle { fill: #999; }
           
-    </style>
+  </style>
 
-    <template>
-      <template is="dom-if" if="[[editMode]]">
-        <div class='mandatory'>
+  <template>
+    <template is="dom-if" if="[[editMode]]">
+      <div class='mandatory'>
         <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-        </div>
+      </div>
 
-        <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-        <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external='[[external]]'></display-component>
-        </div>
-      </template>
+      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+      <div class='optional' hidden="{{hideSettings}}">
+        <display-component settings="{{settings}}" external='[[external]]'></display-component>
+      </div>
     </template>
+  </template>
 </dom-module>
 <script src='bullet.js'></script>
 <script src='bullet-chart.js'></script>
