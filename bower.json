@@ -11,7 +11,8 @@
     "paper-listbox": "^1.1.2",
     "paper-item": "^1.2.1",
     "polymer-color-picker": "^1.0.1",
-    "d3-tip": "v0.6.3"
+    "d3-tip": "v0.6.3",
+    "polymer-sortablejs": "^0.1.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

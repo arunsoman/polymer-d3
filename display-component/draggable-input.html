@@ -1,0 +1,100 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+<link rel="import" href="../bower_components/polymer-sortablejs/polymer-sortablejs.html">
+<dom-module id="draggable-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .sortable-wrap {
+        display: inline-block;
+        height: 200px;
+        width: 200px;
+        border: 2px solid red;
+      }
+
+      sortable-js {
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <div uuid = [[getUUID]]></div>
+    <div class="sortable-wrap">
+      <sortable-js id="master">
+        <template is="dom-repeat" items={{externals}}>
+          <div>{{item.key}}</div>
+        </template>
+      </sortable-js>      
+    </div>
+    <div id="inputWrap">
+      <template is="dom-repeat" items="{{inputs}}" as="input">
+        <div class="sortable-wrap">
+          <h4>
+            {{input.txt}}
+          </h4>
+          <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}">
+            <template is="dom-repeat" items="{{input.selectedValue}}">
+              <div>{{item.key}}</div>
+            </template>
+          </sortable-js>          
+        </div>
+      </template>      
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'draggable-input',
+      properties: {
+        inputs: {
+          value: [],
+          notify: true,
+          type: Array
+        },
+        externals: {
+          value: [],
+          notify: true,
+          type: Array
+        },
+        group: {
+          type: Object
+        },
+        uuid: String
+      },
+      attached: function () {
+        this.$.inputWrap.addEventListener("add", function(e) {
+          debugger;
+        });
+        var me = this;
+        this.uuid = PolymerD3.utilities.getUUID();
+        this.$.master.group = {
+          name: me.uuid,
+          pull: 'clone'
+        }
+        var slaves = this.querySelectorAll('.slaves');
+        for (var i = 0; i < slaves.length; i++) {
+          slaves[i].group = {
+            name: me.uuid
+          }
+        }
+      }, 
+      getUUID: function(){
+          return PolymerD3.utilities.getUUID();        
+      }
+    });
+  </script>
+</dom-module>
