@@ -58,13 +58,6 @@ Polymer({
         var y1Name = this.inputs[1].selectedName;
         var y2Name = this.inputs[2].selectedName;
 
-        console.log(this.inputs[0].selectedValue);
-        console.log(this.inputs[0].selectedName);
-        console.log(this.inputs[1].selectedValue);
-        console.log(this.inputs[1].selectedName);
-        console.log(this.inputs[2].selectedValue);
-        console.log(this.inputs[2].selectedName);
-
         var margin = this.getMargins();
         var width = this.getWidth() - margin.left - margin.right;
         var height = this.getHeight() - margin.top - margin.bottom;
