@@ -1,0 +1,33 @@
+<dom-module id="area-chart">
+<style>
+  body {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.area {
+  fill: steelblue;
+}
+
+</style>
+<template>
+<h4>Area Chart</h4>
+  <template is="dom-if" if="[[editMode]]">
+        <div class='mandatory'>
+        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+        </div>
+
+        <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+        <div class='optional' hidden="{{hideSettings}}">
+            <display-component settings="{{settings}}" external='[[external]]'></display-component>
+        </div>        
+      </template>
+</template>
+</dom-module>
+<script src='area-chart.js'></script>

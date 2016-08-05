@@ -23,6 +23,12 @@ Polymer({
                 selectedValue: 2,
                 uitype: 'single-value',
                 notify: true
+            }, {
+                input: 'units',
+                txt: 'Enter unit',
+                selectedValue: "widget",
+                uitype: 'Text',
+                notify: true
             }]
         },
         settings: {
@@ -81,6 +87,7 @@ Polymer({
              graph.nodes.forEach(function (d, i) {
                graph.nodes[i] = { "name": d };
              });
+             this.dataMutated = true;
          }
     },
     draw: function () {
@@ -91,7 +98,7 @@ Polymer({
       this.makeChartWrap();
       this._createNodesAndLinks();
       var me = this;
-      var units = "Widgets";
+      var units = this.getInputsProperty('units');
       var formatNumber = d3.format(",.0f");// zero decimal places
       var format = function(d) {
         return formatNumber(d) + " " + units;
