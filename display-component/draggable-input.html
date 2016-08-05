@@ -14,6 +14,8 @@ Example:
 @demo demo/index.html
 -->
 <link rel="import" href="../bower_components/polymer-sortablejs/polymer-sortablejs.html">
+<link rel="import" href="draggable-element.html">
+
 <dom-module id="draggable-input">
   <template>
     <style>
@@ -49,7 +51,8 @@ Example:
           </h4>
           <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}">
             <template is="dom-repeat" items="{{input.selectedValue}}">
-              <div>{{item.key}}</div>
+              <draggable-element parent-array="{{inputs}}" current-input="{{input}}" current-item="{{item}}"></draggable-element>
+              </iron-icon>
             </template>
           </sortable-js>          
         </div>
@@ -92,8 +95,8 @@ Example:
           }
         }
       }, 
-      getUUID: function(){
-          return PolymerD3.utilities.getUUID();        
+      getUUID: function() {
+        return PolymerD3.utilities.getUUID();        
       }
     });
   </script>

@@ -1,0 +1,45 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="draggable-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <div>{{currentItem.key}}</div><iron-icon on-tap="_deleteKey" icon="icons:delete">
+  </template>
+  <script>
+    Polymer({
+      is: 'draggable-element',
+      properties: {
+        parentArray: {
+          type: Array
+        },
+        currentInput: {
+          type: Object
+        },
+        currentItem: {
+          type: Object
+        },
+      },
+      _deleteKey: function(e) {
+        e.target.parentArray.selectedValue.splice(e.model.index, 1);
+      }
+    });
+  </script>
+</dom-module>
