@@ -33,49 +33,77 @@ PolymerD3.utilities._getProperty = function(arr, key) {
   return result;
 };
 
-PolymerD3.utilities._formater = function(dataType, parser){
-    var type={
-      'Tabbrweekday': '%a ',
-      'Tabbrmonth': '%b ',
-
-      'number':'.2s',
-      'currency':'$.2s',
-      'percent':'.0%'
+PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
+    var arryadata = [];
+    d3.csv(name, function(error, data) {
+        
+        data.forEach(function(d) {
+            var row = [];
+            for (var key in d) {
+                row.push(d[key]);
+            }
+            numberIndexArray.forEach(function(n) {
+                row[n] = +row[n];
+            });
+            dateIndexArray.forEach(function(n) {
+                row[n] = d3.time.format(dateParser).parse(row[n])
+            });
+            arryadata.push(row);
+        });
+    });
+    return function(){
+      return arryadata;;
     };
-    if(dataType.startsWith('T')){
-      //d3.time.format('%a')(d3.time.format("%B %d, %Y").parse("June 30, 2015"));
-       if(arguments.length < 2){
-          return function(input){
-            return d3.time.format(type[dataType])(input);
-            }  
+}
+PolymerD3.axis = function(type, formater, extends){
+  var map = {
+    'number':  d3.scale.linear(),
+    'time':  d3.time.scale(),
+    'currency': d3.scale.linear(),
+    'percent': d3.scale.linear(),
+    'category': d3.scale.ordinal()
+  };
+
+  var formaterMap ={
+    'time': {
+        'Tabbrweekday': '%a ',
+        'Tabbrmonth': '%b '},
+    'category':'',
+    'number': '.2s',
+    'currency': '$.2s',
+    'percent':'.0%'
+  };
+
+  var axis = d3.svg.axis().scale(map[type]);
+  if(extends){
+    if(d3.timeYear.count(extends[0], extends[1]) < 10){
+        if(d3.timeMonth.count(extends[0], extends[1]) < 10){
+            if(d3.timeWeek.count(extends[0], extends[1]) < 10){
+                //todo
+                //(d3.timeDay.count(extends[0], extends[1]) < 10) 
+                //(d3.timeHour.count(extends[0], extends[1]) < 10) 
+            }
+            else{
+                axis.tickFormat(d3.time.format('%d-%b'));
+            }
         }
         else{
-          return function(input){
-            return d3.time.format(type[dataType])(d3.time.format(parser).parse(input));
-          }
+            axis.tickFormat(d3.time.format('%a-%b'));
         }
     }
-    
-    return d3.format(type[dataType]);
-};
-PolymerD3.utilities._formatNumber = function(n) {
-  return d3.format(".2s")(n);
-};
-
-PolymerD3.utilities._formatCurrency = function(n) {
-  return d3.format("$.2s")(n);
-};
-
-PolymerD3.utilities._formatPercent = function(n) {
-  return d3.format(".0%")(n);
-};
-
-PolymerD3.utilities.getUUID = function() {
-  function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-      .toString(16)
-      .substring(1);
+    else{
+        axis.tickFormat(d3.time.format('%b-%Y'));
+    }
   }
-  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-    s4() + '-' + s4() + s4() + s4();
+  if(formater){
+    var ff = formaterMap['time'][formater];
+    if(ff){
+      axis.tickFormat(d3.time.format(ff));
+    }
+  }
+  else{
+    if(type !== 'category')
+      axis.tickFormat(d3.format(formaterMap[type]));
+  }
+  return axis;
 }
