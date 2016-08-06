@@ -60,22 +60,24 @@ Polymer({
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
 
-        var x = d3.time.scale()
+            var xAxis = PolymerD3.axis('time', 'Tabbrmonth');
+            var yAxis = PolymerD3.axis('currency');
+        var x = xAxis.scale()
             .range([0, width]);
 
-        var y = d3.scale.linear()
+        var y = yAxis.scale()
             .range([height, 0]);
 
         var z = d3.scale.category20c();
 
-        var xAxis = d3.svg.axis()
-            .scale(x)
-            .orient("bottom")
+        //var xAxis = d3.svg.axis()
+         //   .scale(x)
+            xAxis.orient("bottom")
             .ticks(d3.time.days);
 
-        var yAxis = d3.svg.axis()
-            .scale(y)
-            .orient("left");
+        //var yAxis = d3.svg.axis()
+          //  .scale(y)
+            yAxis.orient("left");
 
         var stack = d3.layout.stack()
             .offset("zero")

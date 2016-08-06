@@ -106,3 +106,35 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
       return arryadata;;
     };
 }
+PolymerD3.axis = function(type, formater){
+  var map = {
+    'number':  d3.scale.linear(),
+    'time':  d3.time.scale(),
+    'currency': d3.scale.linear(),
+    'percent': d3.scale.linear(),
+    'category': d3.scale.ordinal()
+  };
+
+  var formaterMap ={
+    'time': {
+        'Tabbrweekday': '%a ',
+        'Tabbrmonth': '%b '},
+    'category':'',
+    'number': '.2s',
+    'currency': '$.2s',
+    'percent':'.0%'
+  };
+
+  var axis = d3.svg.axis().scale(map[type]);
+  if(formater){
+    var ff = formaterMap['time'][formater];
+    if(ff){
+      axis.tickFormat(d3.time.format(ff));      
+    }
+  }
+  else{
+    if(type !== 'category')
+      axis.tickFormat(d3.format(formaterMap[type]));
+  }
+  return axis;
+}
