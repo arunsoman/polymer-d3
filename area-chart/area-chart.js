@@ -115,8 +115,8 @@ Polymer({
             source = sourceHandle();
 
             //todo work with source
-            
-        d3.csv("data.csv", function(error, data) {
+
+        d3.csv("area.csv", function(error, data) {
             if (error) throw error;
 
             data.forEach(function(d) {
