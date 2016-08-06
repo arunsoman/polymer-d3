@@ -69,3 +69,37 @@ PolymerD3.utilities._formatCurrency = function(n) {
 PolymerD3.utilities._formatPercent = function(n) {
   return d3.format(".0%")(n);
 };
+
+PolymerD3.dateUtil = function(d1, d2) {
+    var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
+    return {
+        getDays: function() {
+            return Math.round(Math.abs((d1.getTime() - d2.getTime()) / (oneDay)));
+        },
+        getMonths: function() {
+            return getDays() / 12;
+        },
+        getYears: function() {
+            return getDays() / 366;
+        }
+    };
+}
+PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
+    var arryadata = [];
+    d3.csv("data.csv", function(error, data) {
+        var row = [];
+        data.forEach(function(d) {
+            for (var key in d) {
+                row.push(d[key]);
+            }
+            numberIndexArray.forEach(function(n) {
+                row[n] = +row[n];
+            });
+            dateIndexArray.forEach(function(n) {
+                row[n] = d3.time.format(dateParser).parse(row[n])
+            });
+            arryadata.push(row);
+        });
+    });
+    return arryadata;
+}
