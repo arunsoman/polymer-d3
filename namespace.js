@@ -33,57 +33,6 @@ PolymerD3.utilities._getProperty = function(arr, key) {
   return result;
 };
 
-PolymerD3.utilities._formater = function(dataType, parser){
-    var type={
-      'Tabbrweekday': '%a ',
-      'Tabbrmonth': '%b ',
-
-      'number':'.2s',
-      'currency':'$.2s',
-      'percent':'.0%'
-    };
-    if(dataType.startsWith('T')){
-      //d3.time.format('%a')(d3.time.format("%B %d, %Y").parse("June 30, 2015"));
-       if(arguments.length < 2){
-          return function(input){
-            return d3.time.format(type[dataType])(input);
-            }  
-        }
-        else{
-          return function(input){
-            return d3.time.format(type[dataType])(d3.time.format(parser).parse(input));
-          }
-        }
-    }
-    
-    return d3.format(type[dataType]);
-};
-PolymerD3.utilities._formatNumber = function(n) {
-  return d3.format(".2s")(n);
-};
-
-PolymerD3.utilities._formatCurrency = function(n) {
-  return d3.format("$.2s")(n);
-};
-
-PolymerD3.utilities._formatPercent = function(n) {
-  return d3.format(".0%")(n);
-};
-
-PolymerD3.dateUtil = function(d1, d2) {
-    var oneDay = 24 * 60 * 60 * 1000; // hours*minutes*seconds*milliseconds
-    return {
-        getDays: function() {
-            return Math.round(Math.abs((d1.getTime() - d2.getTime()) / (oneDay)));
-        },
-        getMonths: function() {
-            return getDays() / 12;
-        },
-        getYears: function() {
-            return getDays() / 366;
-        }
-    };
-}
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
     var arryadata = [];
     d3.csv(name, function(error, data) {
