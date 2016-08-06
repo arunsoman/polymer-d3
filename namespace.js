@@ -3,40 +3,40 @@ var PolymerD3 = {};
 PolymerD3.utilities = {};
 
 PolymerD3.utilities.merge = function(from, to) {
-  var me = this;
-  this[to].forEach(function(t) {
-    me.push(from, t);
-  });
+    var me = this;
+    this[to].forEach(function(t) {
+        me.push(from, t);
+    });
 };
 
 PolymerD3.utilities._setProperty = function(arr, key) {
-  if (arguments.length < 1) {
-    return;
-  }
-  var newVal = arguments[1];
-  this[arr].forEach(function(elem) {
-    if (elem.input === key) {
-      for (var newKey in newVal) {
-        elem[newKey] = newVal[newKey];
-      }
+    if (arguments.length < 1) {
+        return;
     }
-  });
+    var newVal = arguments[1];
+    this[arr].forEach(function(elem) {
+        if (elem.input === key) {
+            for (var newKey in newVal) {
+                elem[newKey] = newVal[newKey];
+            }
+        }
+    });
 };
 
 PolymerD3.utilities._getProperty = function(arr, key) {
-  var result;
-  this[arr].forEach(function(elem) {
-    if (elem.input === key) {
-      result = elem;
-    }
-  });
-  return result;
+    var result;
+    this[arr].forEach(function(elem) {
+        if (elem.input === key) {
+            result = elem;
+        }
+    });
+    return result;
 };
 
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
     var arryadata = [];
     d3.csv(name, function(error, data) {
-        
+
         data.forEach(function(d) {
             var row = [];
             for (var key in d) {
@@ -51,59 +51,56 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             arryadata.push(row);
         });
     });
-    return function(){
-      return arryadata;;
+    return function() {
+        return arryadata;;
     };
-}
-PolymerD3.axis = function(type, formater, extends){
-  var map = {
-    'number':  d3.scale.linear(),
-    'time':  d3.time.scale(),
-    'currency': d3.scale.linear(),
-    'percent': d3.scale.linear(),
-    'category': d3.scale.ordinal()
-  };
+};
+PolymerD3.axis = function(type, formater, bound) {
+    var map = {
+        'number': d3.scale.linear(),
+        'time': d3.time.scale(),
+        'currency': d3.scale.linear(),
+        'percent': d3.scale.linear(),
+        'category': d3.scale.ordinal()
+    };
 
-  var formaterMap ={
-    'time': {
-        'Tabbrweekday': '%a ',
-        'Tabbrmonth': '%b '},
-    'category':'',
-    'number': '.2s',
-    'currency': '$.2s',
-    'percent':'.0%'
-  };
+    var formaterMap = {
+        'time': {
+            'Tabbrweekday': '%a ',
+            'Tabbrmonth': '%b '
+        },
+        'category': '',
+        'number': '.2s',
+        'currency': '$.2s',
+        'percent': '.0%'
+    };
 
-  var axis = d3.svg.axis().scale(map[type]);
-  if(extends){
-    if(d3.timeYear.count(extends[0], extends[1]) < 10){
-        if(d3.timeMonth.count(extends[0], extends[1]) < 10){
-            if(d3.timeWeek.count(extends[0], extends[1]) < 10){
-                //todo
-                //(d3.timeDay.count(extends[0], extends[1]) < 10) 
-                //(d3.timeHour.count(extends[0], extends[1]) < 10) 
+    var axis = d3.svg.axis().scale(map[type]);
+    if (bound) {
+        if (d3.timeYear.count(bound[0], bound[1]) < 10) {
+            if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
+                if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
+                    //todo
+                    //(d3.timeDay.count(bound[0], bound[1]) < 10) 
+                    //(d3.timeHour.count(bound[0], extends[1]) < 10) 
+                } else {
+                    axis.tickFormat(d3.time.format('%d-%b'));
+                }
+            } else {
+                axis.tickFormat(d3.time.format('%a-%b'));
             }
-            else{
-                axis.tickFormat(d3.time.format('%d-%b'));
-            }
-        }
-        else{
-            axis.tickFormat(d3.time.format('%a-%b'));
+        } else {
+            axis.tickFormat(d3.time.format('%b-%Y'));
         }
     }
-    else{
-        axis.tickFormat(d3.time.format('%b-%Y'));
+    if (formater) {
+        var ff = formaterMap['time'][formater];
+        if (ff) {
+            axis.tickFormat(d3.time.format(ff));
+        }
+    } else {
+        if (type !== 'category')
+            axis.tickFormat(d3.format(formaterMap[type]));
     }
-  }
-  if(formater){
-    var ff = formaterMap['time'][formater];
-    if(ff){
-      axis.tickFormat(d3.time.format(ff));      
-    }
-  }
-  else{
-    if(type !== 'category')
-      axis.tickFormat(d3.format(formaterMap[type]));
-  }
-  return axis;
-}
+    return axis;
+};
