@@ -61,7 +61,7 @@ Polymer({
   draw: function() {
     var me = this;
     if (me.getInputsProperty('x') === -1 || me.getInputsProperty('y') === -1) {
-      throw new Error('inputs not selected');
+      return;
     } 
     
     var margin = me.getMargins();

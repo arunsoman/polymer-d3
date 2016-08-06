@@ -48,6 +48,7 @@ Polymer({
         this.chart = this.draw();
     },
     draw: function() {
+        var sourceHandle = PolymerD3.fileReader('area.csv',[1],[2],"%m/%d/%y");
         var format = d3.time.format("%m/%d/%y");
 
         var margin = {
@@ -111,6 +112,10 @@ Polymer({
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            source = sourceHandle();
+
+            //todo work with source
+            
         d3.csv("data.csv", function(error, data) {
             if (error) throw error;
 

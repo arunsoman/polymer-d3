@@ -86,9 +86,10 @@ PolymerD3.dateUtil = function(d1, d2) {
 }
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
     var arryadata = [];
-    d3.csv("data.csv", function(error, data) {
-        var row = [];
+    d3.csv(name, function(error, data) {
+        
         data.forEach(function(d) {
+            var row = [];
             for (var key in d) {
                 row.push(d[key]);
             }
@@ -101,5 +102,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             arryadata.push(row);
         });
     });
-    return arryadata;
+    return function(){
+      return arryadata;;
+    };
 }
