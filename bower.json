@@ -12,12 +12,15 @@
     "paper-item": "^1.2.1",
     "polymer-color-picker": "^1.0.1",
     "d3-tip": "v0.6.3",
-    "polymer-sortablejs": "^0.1.3"
+    "polymer-sortablejs": "https://github.com/SortableJS/polymer-sortablejs.git#master"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
     "web-component-tester": "^4.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "polymer-sortablejs": "master"
   }
 }
