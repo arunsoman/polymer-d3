@@ -106,7 +106,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
       return arryadata;;
     };
 }
-PolymerD3.axis = function(type, formater){
+PolymerD3.axis = function(type, formater, extends){
   var map = {
     'number':  d3.scale.linear(),
     'time':  d3.time.scale(),
@@ -126,6 +126,26 @@ PolymerD3.axis = function(type, formater){
   };
 
   var axis = d3.svg.axis().scale(map[type]);
+  if(extends){
+    if(d3.timeYear.count(extends[0], extends[1]) < 10){
+        if(d3.timeMonth.count(extends[0], extends[1]) < 10){
+            if(d3.timeWeek.count(extends[0], extends[1]) < 10){
+                //todo
+                //(d3.timeDay.count(extends[0], extends[1]) < 10) 
+                //(d3.timeHour.count(extends[0], extends[1]) < 10) 
+            }
+            else{
+                axis.tickFormat(d3.time.format('%d-%b'));
+            }
+        }
+        else{
+            axis.tickFormat(d3.time.format('%a-%b'));
+        }
+    }
+    else{
+        axis.tickFormat(d3.time.format('%b-%Y'));
+    }
+  }
   if(formater){
     var ff = formaterMap['time'][formater];
     if(ff){
