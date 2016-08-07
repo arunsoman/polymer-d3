@@ -78,7 +78,6 @@ var yValue = function(d) { return d["Protein (g)"];}, // data -> value
 var cValue = function(d) { return d.Manufacturer;},
     color = d3.scale.category10();
 
-
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
     .attr("class", "tooltip")
