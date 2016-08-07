@@ -1,3 +1,4 @@
+//https://bl.ocks.org/mbostock/3887118
 Polymer({
     is: 'scatter-plot',
     properties: {
@@ -67,10 +68,7 @@ var cValue = function(d) { return d.Manufacturer;},
     color = d3.scale.category10();
 
 // add the graph canvas to the body of the webpage
-svg.attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+PolymerD3.setSvgArea(svg);
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
@@ -93,7 +91,7 @@ d3.csv("cereal.csv", function(error, data) {
 
   // x-axis
   svg.append("g")
-      .attr("class", "x axis")
+      .attr("class", "xAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
     .append("text")
@@ -105,7 +103,7 @@ d3.csv("cereal.csv", function(error, data) {
 
   // y-axis
   svg.append("g")
-      .attr("class", "y axis")
+      .attr("class", "yAxis")
       .call(yAxis)
     .append("text")
       .attr("class", "label")
