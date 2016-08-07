@@ -59,8 +59,10 @@ Polymer({
 var xValue = function(d) {
       return d.Calories;
     }, // data -> value
-    xAxis = PolymerD3.axis('number').orient("bottom"),
     xScale = d3.scale.linear().range([0, width]), // value -> display
+    xAxis = PolymerD3.axis('number')
+      .scale(xScale)
+      .orient("bottom"),
     xMap = function(d) {
       return xScale(xValue(d));
     }; // data -> display
