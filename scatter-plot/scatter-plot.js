@@ -68,7 +68,7 @@ var cValue = function(d) { return d.Manufacturer;},
     color = d3.scale.category10();
 
 // add the graph canvas to the body of the webpage
-PolymerD3.setSvgArea(svg);
+PolymerD3.setSvgArea(svg, width, height, margin);
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
