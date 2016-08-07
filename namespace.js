@@ -33,7 +33,7 @@ PolymerD3.utilities._getProperty = function(arr, key) {
     return result;
 };
 
-PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser) {
+PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback) {
     var arryadata = [];
     d3.csv(name, function(error, data) {
 
@@ -50,10 +50,9 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             });
             arryadata.push(row);
         });
+        callback(arryadata);
     });
-    return function() {
-        return arryadata;;
-    };
+    
 };
 PolymerD3.axis = function(type, formater, bound) {
     var map = {
