@@ -50,25 +50,35 @@ Polymer({
         this.makeChartWrap();
         var svg = this.svg;
 
+        // add the graph canvas to the body of the webpage
+        PolymerD3.setSvgArea(svg, width, height, margin);
 
-// setup x 
-var xValue = function(d) { return d.Calories;}, // data -> value
-    xMap = function(d) { return xScale(xValue(d));}, // data -> display
-    xAxis = PolymerD3.axis('number').orient("bottom"),
-    xScale = xAxis.scale().range([0, width]); // value -> display
-   
+        var g = this.svg.select('g');
+
+// setup x
+var xValue = function(d) {
+      return d.Calories;
+    }, // data -> value
+    xScale = d3.scale.linear().range([0, width]), // value -> display
+    xAxis = PolymerD3.axis('number')
+      .scale(xScale)
+      .orient("bottom"),
+    xMap = function(d) {
+      return xScale(xValue(d));
+    }; // data -> display
+
 // setup y
 var yValue = function(d) { return d["Protein (g)"];}, // data -> value
     yMap = function(d) { return yScale(yValue(d));}, // data -> display
-    yAxis = PolymerD3.axis('number').orient("left"),
-    yScale = xAxis.scale().range([height,0]); // value -> display
+    yScale = d3.scale.linear().range([height,0]), // value -> display
+    yAxis = PolymerD3
+      .axis('number')
+      .scale(yScale)
+      .orient("left");
 
 // setup fill color
 var cValue = function(d) { return d.Manufacturer;},
     color = d3.scale.category10();
-
-// add the graph canvas to the body of the webpage
-PolymerD3.setSvgArea(svg, width, height, margin);
 
 // add the tooltip area to the webpage
 var tooltip = d3.select("body").append("div")
@@ -90,7 +100,7 @@ d3.csv("cereal.csv", function(error, data) {
   yScale.domain([d3.min(data, yValue)-1, d3.max(data, yValue)+1]);
 
   // x-axis
-  svg.append("g")
+  g.append("g")
       .attr("class", "xAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis)
@@ -102,7 +112,7 @@ d3.csv("cereal.csv", function(error, data) {
       .text("Calories");
 
   // y-axis
-  svg.append("g")
+  g.append("g")
       .attr("class", "yAxis")
       .call(yAxis)
     .append("text")
@@ -114,7 +124,7 @@ d3.csv("cereal.csv", function(error, data) {
       .text("Protein (g)");
 
   // draw dots
-  svg.selectAll(".dot")
+  g.selectAll(".dot")
       .data(data)
     .enter().append("circle")
       .attr("class", "dot")

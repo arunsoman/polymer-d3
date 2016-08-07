@@ -106,6 +106,7 @@ PolymerD3.axis = function(type, formater, bound) {
 PolymerD3.setSvgArea = function(svg, width, height, margin){
      svg.attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
+    //There is a small problem with this, some charts don't just append a <g> directly to <svg>
     .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     return svg;
