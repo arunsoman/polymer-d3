@@ -60,7 +60,7 @@ Example:
     <div class="sortable-wrap">
       <sortable-js id="master" >
         <template is="dom-repeat" items={{externals}}>
-          <div class="list-item">{{item.key}}</div>
+          <div class="list-item" data-item="{{item}}">{{item.key}}</div>
         </template>
       </sortable-js>
     </div>
@@ -70,8 +70,8 @@ Example:
           <h4>
             {{input.txt}}
           </h4>
-          <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}">
-            <template is="dom-repeat" items="{{input.selectedValue}}">
+          <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}" no-duplicates="{{input.maxSelectableValues}}">
+            <template is="dom-repeat" items="{{input.selectedObjs}}">
               <draggable-element current-input="{{input}}" current-item="{{item}}" index="{{index}}" class="list-item"></draggable-element>
             </template>
           </sortable-js>
@@ -93,27 +93,108 @@ Example:
           notify: true,
           type: Array
         },
+        currentDrag: Object,
         group: {
           type: Object
         },
         uuid: String
       },
       attached: function() {
-        this.$.inputWrap.addEventListener("add", function(e) {
-          debugger;
-        });
         var me = this;
-        this.uuid = PolymerD3.utilities.getUUID();
-        this.$.master.group = {
+        me.$.inputWrap.addEventListener("add", me._addWatcher.bind(me));
+        // var draggables = me.$.inputWrap.querySelectorAll('.sortable-wrap');
+        // for (var i = 0; i < draggables.length; i++) {
+        //   draggables[i]
+        //     .querySelector('sortable-js')
+        //     .addEventListener("dragenter", me._dragEnterWatcher.bind(me));
+        //   draggables[i]
+        //     .querySelector('sortable-js')
+        //     .addEventListener("dragleave", me._dragLeaveWatcher.bind(me));
+        // }
+        me.$.inputWrap.addEventListener("update", me._updateWatcher);
+        me.uuid = PolymerD3.utilities.getUUID();
+        me.$.master.sort = false;
+        me.$.master.group = {
           name: me.uuid,
           pull: 'clone'
         }
-        var slaves = this.querySelectorAll('.slaves');
+        me.$.master.addEventListener('dragstart', this._addDragElem.bind(me));
+        var slaves = me.querySelectorAll('.slaves');
         for (var i = 0; i < slaves.length; i++) {
           slaves[i].group = {
             name: me.uuid
           }
         }
+      },
+
+      _addDragElem: function(e) {
+        this.set('currentDrag', e.target.dataItem);
+      },
+
+      _remDragElem: function() {
+        this.set('currentDrag', {});
+      },
+
+      _dragEnterWatcher: function(e) {
+        debugger;
+        var me = this;
+        me.debounce('dragstartWatch', function() {
+          var items = e.target.dataItems;
+          console.log(e.target.dataItems);
+          if (items && items.length) {
+            items.forEach(function(item) {
+              if (item.value === me.currentDrag) {
+                e.target.group.pull = false;
+                console.log(false);
+              }
+            });
+          }
+        }, 200);
+        debugger;
+      },
+
+      _dragLeaveWatcher: function(e) {
+        debugger;
+      },
+
+      _addWatcher: function(e) {
+        this.debounce('adderDebounce', function() {
+          var items = e.target.querySelector('template').items;
+          var draggable = e.target.querySelector('draggable-element');
+          var selected = [];
+          if (items && items.length) {
+            items.forEach(function(i) {
+              selected.push(i.value);
+            });
+          }
+          if (draggable) {
+            draggable.set('currentInput.selectedValue', selected);
+          }
+        }, 300);
+        // this._remDragElem();
+        debugger;
+        // debugger;
+        // var me = this;
+        // var template = e.target.querySelector('template');
+        // var sortableItems = template.items;
+        // if (sortableItems) {
+        //   var valueArr = sortableItems.map(function(item) {
+        //     return item.value
+        //   });
+        //   var isDuplicate = valueArr.some(function(item, idx) { 
+        //       if (valueArr.indexOf(item) !== idx) {
+        //         template.splice('items', idx, 1);
+
+        //         return true;
+        //       }
+        //   });
+        //   console.log(isDuplicate);
+        // }
+      },
+
+      _updateWatcher: function(e) {
+        var draggables = e.target.querySelector('draggable-element');
+        debugger;
       }
     });
   </script>

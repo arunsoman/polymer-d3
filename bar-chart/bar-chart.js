@@ -9,6 +9,7 @@ Polymer({
         input: 'x',
         txt: 'Pick a dimension',
         selectedValue: [],
+        selectedObjs: [],
         selectedName: 'label',
         uitype: 'single-value',
         maxSelectableValues: 1
@@ -16,6 +17,7 @@ Polymer({
         input: 'y',
         txt: 'Pick measures',
         selectedValue: [],
+        selectedObjs: [],
         selectedName: [],
         uitype: 'multi-value',
         maxSelectableValues: 2
