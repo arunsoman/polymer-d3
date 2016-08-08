@@ -52,8 +52,8 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
         });
         callback(arryadata);
     });
-    
 };
+
 PolymerD3.axis = function(type, bound) {
     var map = {
         'number': d3.scale.linear(),
@@ -113,6 +113,7 @@ PolymerD3.axis = function(type, bound) {
     // }
     return axis;
 };
+
 PolymerD3.setSvgArea = function(svg, width, height, margin){
      svg.attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)

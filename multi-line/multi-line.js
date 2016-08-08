@@ -8,13 +8,13 @@ Polymer({
             value: [{
                 input: 'x',
                 txt: 'Pick a x',
-                selectedValue: 0,
+                selectedValue: -1,
                 uitype: 'single-value',
                 notify: true,
             }, {
                 input: 'y',
                 txt: 'Pick y',
-                selectedValue: [1, 2, 3],
+                selectedValue: [],
                 uitype: 'multi-value',
                 notify: true
             }]
@@ -45,6 +45,11 @@ Polymer({
 
     draw: function() {
       var me = this;
+
+      if (me.getInputsProperty('x') === -1 || me.getInputsProperty('y').length === 0) {
+        throw new Error('Inputs not selected');
+      }
+
       me.makeChartWrap();
       var margin = me.getMargins();
       var width = me.getWidth() - margin.left - margin.right;

@@ -38,11 +38,11 @@
 
             <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
                 <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-menu multi attr-for-selected="value" class="dropdown-content"  selected='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
+                    <paper-listbox multi attr-for-selected="value" class="dropdown-content"  selected-values='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
                         <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[item.key]]" class="dropdown-item">[[item.key]]</paper-item>
+                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                         </template>
-                    </paper-menu>
+                    </paper-listbox>
                 </paper-dropdown-menu>
             </template>
 
