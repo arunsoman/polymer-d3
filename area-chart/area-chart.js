@@ -6,36 +6,34 @@ Polymer({
             notify: true,
             type: Array,
             value: [{
-                input: 'slice',
+                input: 'x',
                 txt: 'Pick a dimension',
                 selectedValue: 2,
                 uitype: 'single-value',
                 tickFormat: 'Tabbrweekday'
             }, {
-                input: 'sliceSize',
-                txt: 'Pick a messure',
-                selectedValue: 1,
-                uitype: 'single-value',
+                input: 'y',
+                txt: 'Group',
+                selectedValue: [0],
+                uitype: 'multi-value',
                 tickFormat: 'number'
             }, {
-                input: 'sliceSize',
-                txt: 'Pick a group',
-                selectedValue: 0,
+                input: 'z',
+                txt: 'Pick a dimension',
+                selectedValue: 1,
                 uitype: 'single-value',
                 tickFormat: 'number'
             }]
         },
-        external: Array,
         settings: {
             notify: true,
             type: Array,
             value: []
         },
-        source: {
-            type: Array,
-            value: [],
-            notify: true
-        }
+        hideSettings: true,
+        source: [],
+        external: Array,
+        svg: Object
     },
 
     behaviors: [
@@ -47,44 +45,56 @@ Polymer({
         this.hideSettings = !this.hideSettings;
         this.chart = this.draw();
     },
-    attached: function(){
-      me = this;
-      function callme(data){
-        me.source = data;
-      }
-       PolymerD3.fileReader('area.csv',[1],[2],"%m/%d/%y", callme);
+    attached: function() {
+        me = this;
+
+        function callme(data) {
+            me.source = data;
+        }
+        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", callme);
     },
+
     draw: function() {
-        
-        var format = d3.time.format("%m/%d/%y");
+        var xIndex = this.getInputsProperty('x');
+        var yIndices = this.getInputsProperty('y');
+        var zIndex = this.getInputsProperty('z');
+        if (xIndex == -1 || yIndices.length == 0) {
+            return;
+        }
+        if (yIndices.length == 1) {
+            this.drawStack(xIndex, yIndices, zIndex);
+        }
+    },
+    drawStack: function(xIndex, yIndices, zIndex) {
+        var data = this.source;
+        var margin = this.getMargins();
+        var width = this.getWidth() - margin.left - margin.right;
+        var height = this.getHeight() - margin.top - margin.bottom;
 
-        var margin = {
-                top: 20,
-                right: 30,
-                bottom: 30,
-                left: 40
-            },
-            width = 960 - margin.left - margin.right,
-            height = 500 - margin.top - margin.bottom;
+        this.makeChartWrap();
+        var xBound = d3.extent(this.source, function(row) {
+            return row[xIndex];
+        });
+        var xAxis = PolymerD3.axis('time', xBound, [0, width]).orient("bottom");
 
-            var xAxis = PolymerD3.axis('time', d3.extent(this.source, function(row){return row[2];}));
-            var yAxis = PolymerD3.axis('currency');
-        var x = xAxis.scale()
-            .range([0, width]);
+        var yAxis = PolymerD3.axis('currency', undefined, [height, 0]).orient("left");
 
-        var y = yAxis.scale()
-            .range([height, 0]);
+        var x = xAxis.scale().domain(xBound);
+
+        var y = yAxis.scale();
+        var groupYsum = d3.nest().key(function(d) {
+            return d[yIndices[0]];
+        }).rollup(function(d) {
+            return d3.sum(d, function(g) {
+                return g[zIndex];
+            });
+        }).entries(data);
+        var maxY = d3.sum(groupYsum, function(g) {
+            return g.values;
+        });
+        y.domain([0, maxY]);
 
         var z = d3.scale.category20c();
-
-        //var xAxis = d3.svg.axis()
-         //   .scale(x)
-            xAxis.orient("bottom")
-            .ticks(d3.time.days);
-
-        //var yAxis = d3.svg.axis()
-          //  .scale(y)
-            yAxis.orient("left");
 
         var stack = d3.layout.stack()
             .offset("zero")
@@ -92,21 +102,22 @@ Polymer({
                 return d.values;
             })
             .x(function(d) {
-                return d.date;
+                return d[xIndex];
             })
             .y(function(d) {
-                return d.value;
+                return d[zIndex];
             });
+
 
         var nest = d3.nest()
             .key(function(d) {
-                return d.key;
+                return d[yIndices];
             });
 
         var area = d3.svg.area()
             .interpolate("cardinal")
             .x(function(d) {
-                return x(d.date);
+                return x(d[2]);
             })
             .y0(function(d) {
                 return y(d.y0);
@@ -115,52 +126,33 @@ Polymer({
                 return y(d.y0 + d.y);
             });
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width + margin.left + margin.right)
+        var svg = this.svg;
+        svg.attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            //source = sourceHandle();
+        var layers = stack(nest.entries(data));
 
-            //todo work with source
-
-        d3.csv("area.csv", function(error, data) {
-            if (error) throw error;
-
-            data.forEach(function(d) {
-                d.date = format.parse(d.date);
-                d.value = +d.value;
+        svg.selectAll(".layer")
+            .data(layers)
+            .enter().append("path")
+            .attr("class", "layer")
+            .attr("d", function(d) {
+                return area(d.values);
+            })
+            .style("fill", function(d, i) {
+                return z(i);
             });
 
-            var layers = stack(nest.entries(data));
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
 
-            x.domain(d3.extent(data, function(d) {
-                return d.date;
-            }));
-            y.domain([0, d3.max(data, function(d) {
-                return d.y0 + d.y;
-            })]);
-
-            svg.selectAll(".layer")
-                .data(layers)
-                .enter().append("path")
-                .attr("class", "layer")
-                .attr("d", function(d) {
-                    return area(d.values);
-                })
-                .style("fill", function(d, i) {
-                    return z(i);
-                });
-
-            svg.append("g")
-                .attr("class", "x axis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(xAxis);
-
-            svg.append("g")
-                .attr("class", "y axis")
-                .call(yAxis);
-        }); //end of csv
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+        // }); //end of csv
     }
 });

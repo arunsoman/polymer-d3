@@ -54,7 +54,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
     });
     
 };
-PolymerD3.axis = function(type, bound) {
+PolymerD3.axis = function(type, bound, range) {
     var map = {
         'number': d3.scale.linear(),
         'time': d3.time.scale(),
@@ -74,8 +74,15 @@ PolymerD3.axis = function(type, bound) {
         'percent': '.0%'
     };
 
-    var axis = d3.svg.axis().scale(map[type]);
+    var scale  = map[type];
+    var axis = d3.svg.axis();
+    if(range){
+        scale.range(range);
+    }
+    
     if (bound) {
+        scale.domain(bound);
+
         if (d3.timeYear.count(bound[0], bound[1]) < 10) {
             if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
                 if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
@@ -102,15 +109,9 @@ PolymerD3.axis = function(type, bound) {
             axis.tickFormat(d3.time.format('%b-%Y'));
         }
     }
-    // if (formater) {
-    //     var ff = formaterMap['time'][formater];
-    //     if (ff) {
-    //         axis.tickFormat(d3.time.format(ff));
-    //     }
-    // } else {
-        if (type === 'category')
-            axis.tickFormat(d3.format(formaterMap[type]));
-    // }
+    if (type === 'category')
+        axis.tickFormat(d3.format(formaterMap[type]));
+    axis.scale(scale);
     return axis;
 };
 PolymerD3.setSvgArea = function(svg, width, height, margin){
