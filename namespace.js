@@ -92,24 +92,6 @@ PolymerD3.axis = function(type, formater, bound) {
             axis.tickFormat(d3.time.format('%b-%Y'));
         }
     }
-<<<<<<< HEAD
-    else{
-        axis.tickFormat(d3.time.format('%b-%Y'));
-    }
-  }
-  if(formater){
-    var ff = formaterMap['time'][formater];
-    if(ff){
-      axis.tickFormat(d3.time.format(ff));
-    }
-  }
-  else{
-    if(type !== 'category')
-      axis.tickFormat(d3.format(formaterMap[type]));
-  }
-  return axis;
-}
-=======
     if (formater) {
         var ff = formaterMap['time'][formater];
         if (ff) {
@@ -129,4 +111,3 @@ PolymerD3.setSvgArea = function(svg, width, height, margin){
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     return svg;
 };
->>>>>>> be962183e88565162743f8bb6f06bdf74a64c6cb
