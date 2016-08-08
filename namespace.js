@@ -54,7 +54,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
     });
     
 };
-PolymerD3.axis = function(type, formater, bound) {
+PolymerD3.axis = function(type, bound) {
     var map = {
         'number': d3.scale.linear(),
         'time': d3.time.scale(),
@@ -65,8 +65,8 @@ PolymerD3.axis = function(type, formater, bound) {
 
     var formaterMap = {
         'time': {
-            'Tabbrweekday': '%a ',
-            'Tabbrmonth': '%b '
+            'Tabbrweekday': '%a ',
+            'Tabbrmonth': '%b '
         },
         'category': '',
         'number': '.2s',
@@ -80,10 +80,20 @@ PolymerD3.axis = function(type, formater, bound) {
             if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
                 if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
                     //todo
-                    //(d3.timeDay.count(bound[0], bound[1]) < 10) 
-                    //(d3.timeHour.count(bound[0], extends[1]) < 10) 
-                } else {
-                    axis.tickFormat(d3.time.format('%d-%b'));
+                    if (d3.timeDay.count(bound[0], bound[1]) < 10) {
+                        if (d3.timeHour.count(bound[0], bound[1]) < 240)  {
+                          if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
+                              axis.tickFormat(d3.time.format('%d-%b'));
+                            } else{
+                              axis.tickFormat(d3.time.format('%a-%I-%M'));
+                            }
+                        } else {
+                          axis.tickFormat(d3.time.format('%d-%b'));
+                        }
+                     } else {
+                        axis.tickFormat(d3.time.format('%d-%b'));
+                     }
+                   // axis.tickFormat(d3.time.format('%d-%b'));
                 }
             } else {
                 axis.tickFormat(d3.time.format('%a-%b'));
@@ -92,15 +102,15 @@ PolymerD3.axis = function(type, formater, bound) {
             axis.tickFormat(d3.time.format('%b-%Y'));
         }
     }
-    if (formater) {
-        var ff = formaterMap['time'][formater];
-        if (ff) {
-            axis.tickFormat(d3.time.format(ff));
-        }
-    } else {
-        if (type !== 'category')
+    // if (formater) {
+    //     var ff = formaterMap['time'][formater];
+    //     if (ff) {
+    //         axis.tickFormat(d3.time.format(ff));
+    //     }
+    // } else {
+        if (type === 'category')
             axis.tickFormat(d3.format(formaterMap[type]));
-    }
+    // }
     return axis;
 };
 PolymerD3.setSvgArea = function(svg, width, height, margin){
