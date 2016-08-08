@@ -47,8 +47,15 @@ Polymer({
         this.hideSettings = !this.hideSettings;
         this.chart = this.draw();
     },
+    attached: function(){
+      me = this;
+      function callme(data){
+        me.source = data;
+      }
+       PolymerD3.fileReader('area.csv',[1],[2],"%m/%d/%y", callme);
+    },
     draw: function() {
-        var sourceHandle = PolymerD3.fileReader('area.csv',[1],[2],"%m/%d/%y");
+        
         var format = d3.time.format("%m/%d/%y");
 
         var margin = {
@@ -60,7 +67,7 @@ Polymer({
             width = 960 - margin.left - margin.right,
             height = 500 - margin.top - margin.bottom;
 
-            var xAxis = PolymerD3.axis('time', 'Tabbrmonth');
+            var xAxis = PolymerD3.axis('time', d3.extent(this.source, function(row){return row[2];}));
             var yAxis = PolymerD3.axis('currency');
         var x = xAxis.scale()
             .range([0, width]);
@@ -114,7 +121,7 @@ Polymer({
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            source = sourceHandle();
+            //source = sourceHandle();
 
             //todo work with source
 
