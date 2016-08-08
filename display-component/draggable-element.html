@@ -1,3 +1,4 @@
+<!-- Watches and handles various properties related to the specific input -->
 <dom-module id="draggable-element">
   <template>
     <style>
@@ -14,17 +15,36 @@
       is: 'draggable-element',
       properties: {
         currentInput: {
-          type: Object
+          type: Object,
+          notify: true,
+          value: {
+            selectedObjs: []
+          }
         },
         currentItem: {
           type: Object
         },
         index: {
           type: Number
+        },
+        notify: {
+          type: Object
         }
       },
+
+      attached: function() {
+        // Implements currentInput.selectedValue
+        Object.defineProperty(this.currentInput, 'selectedValue', {
+          get: function() {
+            return this.selectedObjs.map(function(o) {
+              return o.value;
+            });
+          }
+        });
+      },
+
       _delete: function(e) {
-        this.splice('currentInput.selectedValue', this.index, 1);
+        this.splice('currentInput.selectedObjs', this.index, 1);
       }
     });
   </script>
