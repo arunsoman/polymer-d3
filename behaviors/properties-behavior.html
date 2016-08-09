@@ -1,24 +1,18 @@
 <script>
   PolymerD3.propertiesBehavior = {
-    setSettingsProperty: function(key) {
-        PolymerD3.utilities._setProperty.call(this, 'settings', key);
-    },
+    // setSettingsProperty: function(key, value) {
+    //     PolymerD3.utilities._setProperty.call(this, 'settings', key);
+    // },
     getSettingsProperty: function(key) {
         var result;
-        result = PolymerD3.utilities._getProperty.call(this, 'settings', key);
+        result = this.settings[key];
         return result.selectedValue;
     },
     getSettingsPropertyObj: function(key) {
-        return PolymerD3.utilities._getProperty.call(this, 'settings', key);
+        return this.settings[key];
     },
     getSettings: function(){
         return this.settings;
-    },
-    getHeight: function() {
-        return this.getSettingsProperty('height');
-    },
-    getWidth: function() {
-        return this.getSettingsProperty('width');
     }
   }
 </script>

@@ -43,21 +43,52 @@
         ];
     },
 
+    attached: function() {
+        var me = this;
+        this.makeChartWrap();
+        if (!this.svgs) {
+            this.svgs = [];
+        }
+        this.svgs.push(me.svg);
+        var margin = me.getMargins();
+        this._widthChanged();
+        this._heightChanged();
+        this.svgs.forEach(function(svg) {
+            svg.attr('width', me._getWidth() + margin.left + margin.right)
+                .attr('height', me._getHeight() + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        });
+    },
+
     _areaChanged:function(area){
         if (area.path === 'settings.area') {
             return false;
         }
-        console.info(area);
+        var me = this;
+        var margin = me.getMargins();
         this._widthChanged();
         this._heightChanged();
-        this.draw();
+        this.svgs.forEach(function(svg) {
+            svg.attr('width', me._getWidth() + margin.left + margin.right)
+                .attr('height', me._getHeight() + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        });
+        this.areaUpdated();
+    },
+    _getHeight: function() {
+        return this.area[0]['selectedValue'];
+    },
+    _getWidth: function() {
+        return this.area[1]['selectedValue'];
     },
     getMargins: function() {
         return {
-            top: this.getSettingsProperty('marginTop'),
-            right: this.getSettingsProperty('marginRight'),
-            bottom: this.getSettingsProperty('marginBottom'),
-            left: this.getSettingsProperty('marginLeft')
+            top: this.area[2]['selectedValue'],
+            right: this.area[3]['selectedValue'],
+            bottom: this.area[4]['selectedValue'],
+            left: this.area[5]['selectedValue']
         }
     },
     registerHeightChange: function(scale, invert, scaleType){
@@ -72,15 +103,15 @@
     },
     _computeHeight: function(){
         var margin = this.getMargins();
-        return this.getHeight() - margin.top - margin.bottom;
+        return this._getHeight() - margin.top - margin.bottom;
     },
     _computeWidth: function(){
         var margin = this.getMargins();
-        return this.getWidth() - margin.left - margin.right;
+        return this._getWidth() - margin.left - margin.right;
     },
     _heightChanged: function(){
         if(this.heightScales){
-            var height = _computeHeight();
+            var height = this._computeHeight();
             this.heightScales.forEach(function(aScale){
                 switch(aScale[2]){
                 case 'time':
@@ -96,9 +127,17 @@
     },
     _widthChanged: function(){
         if(this.widthScales){
-            var width = _computeWidth();
+            var width = this._computeWidth();
             this.widthScales.forEach(function(aScale){
-                aScale[0].range(aScale[1]?[0, width]:[width,0]);
+                switch(aScale[2]){
+                case 'time':
+                case 'linear':
+                    aScale[0].range(aScale[1]?[0, width]:[width, 0]);
+                    break;
+                case 'category':
+                    aScale[0].rangeRoundBands(aScale[1]?[0, width]:[width, 0]);
+                    break;
+                }
             });
         }
     }

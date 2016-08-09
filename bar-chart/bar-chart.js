@@ -32,7 +32,10 @@ Polymer({
     source: Array,
     external: Array,
     chart: Object,
-    dataMutated: false
+    dataMutated: false,
+    xAxis: Object,
+    yAxis: Object,
+    z: Object
   },
 
   behaviors: [
@@ -42,7 +45,7 @@ Polymer({
 
   attached: function() {
     console.info('Ready');
-    // Sets 
+    var me = this;
     this.settings = {
       //Temporary hack for rendering chart type using <display-component>
       chartType: [{
@@ -62,6 +65,16 @@ Polymer({
       }]
     }
     this.set('settings.area', this.area);
+    //Set X Axis at Bottom
+    this.xAxis = me.createAxis('category', 'v', false, 'time');
+    this.xAxis.orient('bottom');
+    
+    // Sets Y axis at right
+    this.yAxis = me.createAxis('linear','h', false, undefined);
+    this.yAxis.orient('left');
+
+    // Colors : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
+    this.z = d3.scale.category10();
   },
   _toggleView: function() {
     this.hideSettings = !this.hideSettings;
@@ -86,29 +99,23 @@ Polymer({
   },
 
   areaUpdated: function() {
-    // SVG and frame updated
-
+    this.draw();
   },
 
   draw: function() {
+    var me = this;
 
     if (!this.source || this.source.length === 0) {
       console.warn('Data source empty');
       return false;
     }
-    var parseDate = d3.time.format('%m/%Y').parse;
-    var me = this;
-    
-    //To create new chart wrap
-    this.makeChartWrap();
-
     // Selects stack of elements as Y-Axis
     var selected = me.getInputsProperty('y');
-
-
-    // Colors : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
-    var z = d3.scale.category10();
-
+    var selectedX = me.getInputsProperty('x');
+    if (!selected || selected.length === 0 || !selectedX) {
+      console.warn('Dimensions or Measures empty');
+      return false;      
+    }
     // Sets data source
     var src = me.source;
    
@@ -120,42 +127,18 @@ Polymer({
     }
 
     function stackedChart() {
+      
+      var x = me.xAxis.scale();      
+      var y = me.yAxis.scale();
 
-      // // X axis
-      // var x = d3.scale.ordinal()
-      //   .rangeRoundBands([0, width]);
-
-      // // Y Axis
-      // var y = d3.scale.linear()
-      //   .rangeRound([height, 0]);
-
-      //Set X Axis at Bottom
-      var xAxis = me.createAxis('category', 'v', false, 'time');
-      // d3.svg.axis()
-      //   .scale(x)
-       xAxis.orient('bottom');
-       var x = xAxis.scale();
-
-      // Sets Y axis at right
-      var yAxis = me.createAxis('linear','h', false, undefined);
-      //d3.svg.axis()
-      //  .scale(y)
-        yAxis.orient('left');
-        var y = yAxis.scale();
-
-      // Parent SVG
-      var svg = me.svg
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      var svg = me.svgs[0];
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
       var layers = d3.layout.stack()(selected.map(function(c) {
         return src.map(function(d) {
           return {
-            x: d[me.getInputsProperty('x')],
+            x: d[selectedX],
             y: d[c]
           };
         });
@@ -175,7 +158,7 @@ Polymer({
         .enter().append('g')
         .attr('class', 'layer')
         .style('fill', function(d, i) {
-          return z(i);
+          return me.z(i);
         });
 
       layer.selectAll('rect')
@@ -196,13 +179,13 @@ Polymer({
 
       svg.append('g')
         .attr('class', 'axis axis--x')
-        .attr('transform', 'translate(0,' + height + ')')
-        .call(xAxis);
+        .attr('transform', 'translate(0,' + me._getHeight() + ')')
+        .call(me.xAxis);
 
       svg.append('g')
         .attr('class', 'axis axis--y')
-        .attr('transform', 'translate(' + width + ',0)')
-        .call(yAxis);
+        .attr('transform', 'translate(' + me._getWidth() + ',0)')
+        .call(me.yAxis);
     }
 
     function groupedChart() {

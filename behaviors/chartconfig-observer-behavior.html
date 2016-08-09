@@ -3,25 +3,25 @@
     observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)', '_sourceWatcher(source.*)'],
 
     _settingsWatcher: function(settings) {
-      var me = this;
-      // To avoid calling draw on merging and initiation
-      if (settings.path === 'settings.splices' || settings.path === 'settings.length' || settings.path === 'settings') {
-        return;
-      }
-      this.debounce('redrawSettings', function() {
-        me.draw();
-      }, 1000);
+      // var me = this;
+      // // To avoid calling draw on merging and initiation
+      // if (settings.path === 'settings.splices' || settings.path === 'settings.length' || settings.path === 'settings') {
+      //   return;
+      // }
+      // this.debounce('redrawSettings', function() {
+      //   me.draw();
+      // }, 1000);
     },
 
     _inputsWatcher: function(inputs) {
-      var me = this;
-      // To avoid calling draw on initation
-      if (inputs.path === 'inputs') {
-        return;
-      }
-      this.debounce('redrawInput', function() {
-        me.draw();
-      }, 1000);
+      // var me = this;
+      // // To avoid calling draw on initation
+      // if (inputs.path === 'inputs') {
+      //   return;
+      // }
+      // this.debounce('redrawInput', function() {
+      //   me.draw();
+      // }, 1000);
     },
 
     // Draw when datasource is avialable
