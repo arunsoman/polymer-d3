@@ -36,14 +36,19 @@
             }]
         }
     },
-
+    observers: ['_areaChanged(area)'],
+    
+    _areaChanged:function(area)}{
+        this._widthChanged();
+        this._heightChanged();
+        this.draw();
+    },
     attached: function() {
         var me = this;
         this.async(function() {
             PolymerD3.utilities.merge.apply(me, ['settings', 'area']);
         });
     },
-
     getMargins: function() {
         return {
             top: this.getSettingsProperty('marginTop'),
@@ -51,6 +56,40 @@
             bottom: this.getSettingsProperty('marginBottom'),
             left: this.getSettingsProperty('marginLeft')
         }
-    }, 
+    },
+    registerHeightChange: function(scale, invert){
+        if(!this.heightScales)
+            this.heightScales = [];
+        this.heightScales.push([scale, invert]);
+    },
+    registerWidthChange: function(scale, invert){
+        if(!this.widthScales)
+            this.widthScales = [];
+        this.widthScales.push([scale, invert]);
+    },
+    _computeHeight: function(){
+        var margin = this.getMargins();
+        return this.getHeight() - margin.top - margin.bottom;
+    },
+    _computeWidth: function(){
+        var margin = this.getMargins();
+        return this.getWidth() - margin.left - margin.right;
+    }
+    _heightChanged: function(){
+        if(this.heightScales){
+            var height = _computeHeight();
+            this.heightScales.forEach(function(aScale){
+                aScale[0].range(aScale[1]?[height,0]:[0,height]);
+            });
+        }
+    },
+    _widthChanged: function(){
+        if(this.widthScales){
+            var width = _computeWidth();
+            this.widthScales.forEach(function(aScale){
+                aScale[0].range(aScale[1]?[0, width]:[width,0]);
+            });
+        }
+    }
   }
 </script>
