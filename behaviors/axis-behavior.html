@@ -1,0 +1,66 @@
+<script>
+  PolymerD3.axis = {
+    createAxis: function(scaleType, align, inverted, format){
+      var map = {
+        'linear': d3.scale.linear(),
+        'time': d3.time.scale(),
+        'category': d3.scale.ordinal()
+      };
+      var scale = map[scaleType];
+      var axis = d3.svg.axis();
+      switch(align){
+        case "h":
+          this.registerHeightChange(scale, inverted);
+          break;
+        case "v":
+          this.registerWidthChange(scale, inverted);
+          break;
+      }
+      if(format && scaleType !== 'category'){
+        switch(format){
+          case  "number":
+            axis.tickFormat(d3.format('.2s'));
+          break;
+          case  "currency":
+            axis.tickFormat(d3.format('$.2s'));
+          break;
+          case  "percent":
+            axis.tickFormat(d3.format('.0%'));
+          break;
+        }
+      }
+      axis.scale(scale);
+      return axis;
+    }
+
+    applyTimeTickFormate: function(axis, bound){
+      if (bound) {
+          if (d3.timeYear.count(bound[0], bound[1]) < 10) {
+              if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
+                  if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
+                      //todo
+                      if (d3.timeDay.count(bound[0], bound[1]) < 10) {
+                          if (d3.timeHour.count(bound[0], bound[1]) < 240)  {
+                            if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
+                                axis.tickFormat(d3.time.format('%d-%b'));
+                              } else{
+                                axis.tickFormat(d3.time.format('%a-%I-%M'));
+                              }
+                          } else {
+                            axis.tickFormat(d3.time.format('%d-%b'));
+                          }
+                       } else {
+                          axis.tickFormat(d3.time.format('%d-%b'));
+                       }
+                     // axis.tickFormat(d3.time.format('%d-%b'));
+                  }
+              } else {
+                  axis.tickFormat(d3.time.format('%a-%b'));
+              }
+          } else {
+              axis.tickFormat(d3.time.format('%b-%Y'));
+          }
+    }
+    }
+  }
+</script>
