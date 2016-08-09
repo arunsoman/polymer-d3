@@ -57,15 +57,15 @@
             left: this.getSettingsProperty('marginLeft')
         }
     },
-    registerHeightChange: function(scale, invert){
+    registerHeightChange: function(scale, invert, scaleType){
         if(!this.heightScales)
             this.heightScales = [];
-        this.heightScales.push([scale, invert]);
+        this.heightScales.push([scale, invert, scaleType]);
     },
-    registerWidthChange: function(scale, invert){
+    registerWidthChange: function(scale, invert, scaleType){
         if(!this.widthScales)
             this.widthScales = [];
-        this.widthScales.push([scale, invert]);
+        this.widthScales.push([scale, invert, scaleType]);
     },
     _computeHeight: function(){
         var margin = this.getMargins();
@@ -79,7 +79,15 @@
         if(this.heightScales){
             var height = _computeHeight();
             this.heightScales.forEach(function(aScale){
-                aScale[0].range(aScale[1]?[height,0]:[0,height]);
+                switch(aScale[2]){
+                case 'time':
+                case 'linear':
+                    aScale[0].range(aScale[1]?[height,0]:[0,height]);
+                    break;
+                case 'category':
+                    aScale[0].rangeRoundBands(aScale[1]?[height,0]:[0,height]);
+                    break;
+                }
             });
         }
     },

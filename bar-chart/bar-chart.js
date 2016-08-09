@@ -77,10 +77,7 @@ Polymer({
 
     var parseDate = d3.time.format('%m/%Y').parse;
     var me = this;
-    var margin = this.getMargins();
-    var width = this.getWidth() - margin.left - margin.right;
-    var height = this.getHeight() - margin.top - margin.bottom;
-
+    
     //To create new chart wrap
     this.makeChartWrap();
 
@@ -108,23 +105,27 @@ Polymer({
 
     function stackedChart() {
 
-      // X axis
-      var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width]);
+      // // X axis
+      // var x = d3.scale.ordinal()
+      //   .rangeRoundBands([0, width]);
 
-      // Y Axis
-      var y = d3.scale.linear()
-        .rangeRound([height, 0]);
+      // // Y Axis
+      // var y = d3.scale.linear()
+      //   .rangeRound([height, 0]);
 
       //Set X Axis at Bottom
-      var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient('bottom');
+      var xAxis = createAxis('category', 'v', false, 'time');
+      // d3.svg.axis()
+      //   .scale(x)
+       xAxis.orient('bottom');
+       var x = xAxis.scale();
 
       // Sets Y axis at right
-      var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient('left');
+      var yAxis = createAxis('linear','h', false, undefined);
+      //d3.svg.axis()
+      //  .scale(y)
+        yAxis.orient('left');
+        var y = yAxis.scale();
 
       // Parent SVG
       var svg = me.svg

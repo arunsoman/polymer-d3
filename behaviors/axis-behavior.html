@@ -10,10 +10,10 @@
       var axis = d3.svg.axis();
       switch(align){
         case "h":
-          this.registerHeightChange(scale, inverted);
+          this.registerHeightChange(scale, inverted, scaleType);
           break;
         case "v":
-          this.registerWidthChange(scale, inverted);
+          this.registerWidthChange(scale, inverted, scaleType);
           break;
       }
       if(format && scaleType !== 'category'){
