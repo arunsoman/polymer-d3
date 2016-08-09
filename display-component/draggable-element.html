@@ -1,0 +1,51 @@
+<!-- Watches and handles various properties related to the specific input -->
+<dom-module id="draggable-element">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        justify-content: space-around;
+      }
+    </style>
+    {{currentItem.key}}
+    <iron-icon on-tap="_delete" icon="icons:delete"></iron-icon>
+  </template>
+  <script>
+    Polymer({
+      is: 'draggable-element',
+      properties: {
+        currentInput: {
+          type: Object,
+          notify: true,
+          value: {
+            selectedObjs: []
+          }
+        },
+        currentItem: {
+          type: Object
+        },
+        index: {
+          type: Number
+        },
+        notify: {
+          type: Object
+        }
+      },
+
+      attached: function() {
+        // Implements currentInput.selectedValue
+        Object.defineProperty(this.currentInput, 'selectedValue', {
+          get: function() {
+            return this.selectedObjs.map(function(o) {
+              return o.value;
+            });
+          }
+        });
+      },
+
+      _delete: function(e) {
+        this.splice('currentInput.selectedObjs', this.index, 1);
+      }
+    });
+  </script>
+</dom-module>

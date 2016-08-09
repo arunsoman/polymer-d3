@@ -128,7 +128,7 @@ Polymer({
         .attr("x", x.rangeBand() / 2)
         .attr("y", function(d) { return y(d[endIndex]) + 5; })
         .attr("dy", function(d) { return ((d[classIndex]=='negative') ? '-' : '') + ".75em" })
-        .text(function(d) { return PolymerD3.utilities._formatNumber(d[endIndex] - d[startIndex]);});
+        .text(function(d) { return PolymerD3.utilities._formater('currency')(d[endIndex] - d[startIndex]);});
 
     bar.filter(function(d) { return d.class != "total" }).append("line")
         .attr("class", "connector")

@@ -32,7 +32,7 @@
     <h4>Sankey Chart</h4>
       <template is="dom-if" if="[[editMode]]">
           <div class='mandatory'>
-          <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+          <display-component settings="{{inputs}}" external='[[external]]' draggable></display-component>
           </div>
 
           <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>

@@ -8,16 +8,26 @@ Polymer({
       value: [{
         input: 'x',
         txt: 'Pick a dimension',
-        selectedValue: 0,
+        selectedValue: [],
+        selectedObjs: [],
         selectedName: 'label',
-        uitype: 'single-value'
+        uitype: 'single-value',
+        maxSelectableValues: 1
       }, {
         input: 'y',
         txt: 'Pick measures',
-        selectedValue: [2, 1],
+        selectedValue: [],
+        selectedObjs: [],
         selectedName: [],
-        uitype: 'multi-value'
-      }, {
+        uitype: 'multi-value',
+        maxSelectableValues: 2
+      }]
+    },
+    settings: {
+      notify: true,
+      type: Array,
+      value: [
+      {
         input: 'chartType',
         txt: 'Grouped or stacked',
         uitype: 'dropDown',
@@ -32,11 +42,6 @@ Polymer({
           value: 1
         }]
       }]
-    },
-    settings: {
-      notify: true,
-      type: Array,
-      value: []
     },
     hideSettings: true,
     source: Array,
@@ -95,7 +100,7 @@ Polymer({
     }
    
     //Renders respective chart as per chart type
-    if (this.getInputsProperty('chartType') === 1) {
+    if (this.getSettingsProperty('chartType') === 1) {
       stackedChart();
     } else {
       groupedChart();

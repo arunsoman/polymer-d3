@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <!-- <script src="https://d3js.org/d3-time.v1.min.js"></script> -->
         <script src="namespace.js"></script>
         <script src='bower_components/d3/d3.min.js'></script>
         <script src='bower_components/d3-tip/index.js'></script>
@@ -28,11 +27,12 @@
         </head>
     <body>
 
-    <area-chart></area-chart>
-    
-    <!-- <multi-line></multi-line>
-    <scatter-plot></scatter-plot> -->
-    <!-- <heat-map></heat-map> -->
-
+    <area-chart edit-mode='true' external= '[
+   {"key": "group","value":0},
+   {"key": "profit","value":1},
+   {"key": "date","value":2}
+   ]'></area-chart>
+  <!--     <heat-map></heat-map>
+-->
 </body>
 </html>

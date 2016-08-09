@@ -52,9 +52,10 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
         });
         callback(arryadata);
     });
-    
 };
+
 PolymerD3.axis = function(type, bound, range) {
+
     var map = {
         'number': d3.scale.linear(),
         'time': d3.time.scale(),
@@ -114,6 +115,7 @@ PolymerD3.axis = function(type, bound, range) {
     axis.scale(scale);
     return axis;
 };
+
 PolymerD3.setSvgArea = function(svg, width, height, margin){
      svg.attr('width', width + margin.left + margin.right)
     .attr('height', height + margin.top + margin.bottom)
@@ -122,3 +124,13 @@ PolymerD3.setSvgArea = function(svg, width, height, margin){
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
     return svg;
 };
+
+PolymerD3.utilities.getUUID = function() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
