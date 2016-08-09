@@ -9,18 +9,21 @@ Polymer({
                 input: 'x',
                 txt: 'Pick a dimension',
                 selectedValue: 2,
+                selectedObjs: [],
                 uitype: 'single-value',
                 tickFormat: 'Tabbrweekday'
             }, {
                 input: 'y',
                 txt: 'Group',
                 selectedValue: [0],
+                selectedObjs: [],
                 uitype: 'multi-value',
                 tickFormat: 'number'
             }, {
                 input: 'z',
                 txt: 'Pick a dimension',
                 selectedValue: 1,
+                selectedObjs: [],
                 uitype: 'single-value',
                 tickFormat: 'number'
             }]
