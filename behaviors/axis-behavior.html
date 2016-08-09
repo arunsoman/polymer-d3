@@ -1,5 +1,5 @@
 <script>
-  PolymerD3.axis = {
+  PolymerD3.axisBehavior = {
     createAxis: function(scaleType, align, inverted, format){
       var map = {
         'linear': d3.scale.linear(),
@@ -31,7 +31,7 @@
       }
       axis.scale(scale);
       return axis;
-    }
+    },
 
     applyTimeTickFormate: function(axis, bound){
       if (bound) {
@@ -60,7 +60,7 @@
           } else {
               axis.tickFormat(d3.time.format('%b-%Y'));
           }
-    }
+      }
     }
   }
 </script>

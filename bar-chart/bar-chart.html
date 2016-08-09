@@ -60,7 +60,8 @@
 
         <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
         <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external='[[external]]'></display-component>
+            <display-component settings="{{settings.area}}" external='[[external]]'></display-component>
+            <display-component settings="{{settings.chartType}}" external='[[external]]'></display-component>
         </div>        
       </template>
     </template>

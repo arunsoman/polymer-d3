@@ -25,9 +25,27 @@ Polymer({
     },
     settings: {
       notify: true,
-      type: Array,
-      value: [
-      {
+      type: Object,
+      value: {}
+    },
+    hideSettings: true,
+    source: Array,
+    external: Array,
+    chart: Object,
+    dataMutated: false
+  },
+
+  behaviors: [
+    PolymerD3.chartBehavior
+    // PolymerD3.colorPickerBehavior
+  ],
+
+  attached: function() {
+    console.info('Ready');
+    // Sets 
+    this.settings = {
+      //Temporary hack for rendering chart type using <display-component>
+      chartType: [{
         input: 'chartType',
         txt: 'Grouped or stacked',
         uitype: 'dropDown',
@@ -42,19 +60,9 @@ Polymer({
           value: 1
         }]
       }]
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false
+    }
+    this.set('settings.area', this.area);
   },
-
-  behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.colorPickerBehavior
-  ],
-
   _toggleView: function() {
     this.hideSettings = !this.hideSettings;
   },
@@ -73,8 +81,21 @@ Polymer({
       .on('mouseout', this.tip.hide);
   },
 
+  dataUpdated: function() {
+    // Transition logic
+  },
+
+  areaUpdated: function() {
+    // SVG and frame updated
+
+  },
+
   draw: function() {
 
+    if (!this.source || this.source.length === 0) {
+      console.warn('Data source empty');
+      return false;
+    }
     var parseDate = d3.time.format('%m/%Y').parse;
     var me = this;
     
@@ -90,14 +111,9 @@ Polymer({
 
     // Sets data source
     var src = me.source;
-
-    if (!src) {
-      console.warn('Data source empty');
-      return false;
-    }
    
     //Renders respective chart as per chart type
-    if (this.getSettingsProperty('chartType') === 1) {
+    if (this.settings.chartType[0].selectedValue === 1) {
       stackedChart();
     } else {
       groupedChart();
@@ -114,14 +130,14 @@ Polymer({
       //   .rangeRound([height, 0]);
 
       //Set X Axis at Bottom
-      var xAxis = createAxis('category', 'v', false, 'time');
+      var xAxis = me.createAxis('category', 'v', false, 'time');
       // d3.svg.axis()
       //   .scale(x)
        xAxis.orient('bottom');
        var x = xAxis.scale();
 
       // Sets Y axis at right
-      var yAxis = createAxis('linear','h', false, undefined);
+      var yAxis = me.createAxis('linear','h', false, undefined);
       //d3.svg.axis()
       //  .scale(y)
         yAxis.orient('left');

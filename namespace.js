@@ -133,4 +133,13 @@ PolymerD3.utilities.getUUID = function() {
   }
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
     s4() + '-' + s4() + s4() + s4();
+};
+
+PolymerD3.utilities.clone = function(obj) {
+    var clone;
+    if (obj) {
+        clone = JSON.stringify(obj);
+        clone = JSON.parse(clone);
+    }
+    return clone;
 }
