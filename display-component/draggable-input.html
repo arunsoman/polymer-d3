@@ -98,11 +98,34 @@
           slaves[i].group = {
             name: me.uuid
           }
+          // For manual delete
+          slaves[i].addEventListener('itemSpliced', this._fireRem.bind(me));
         }
+        this.$.inputWrap.addEventListener('add', this._addWatcher.bind(me));
+        this.$.inputWrap.addEventListener('remove', this._remWatcher.bind(me));
       },
 
+      // Duplicate removing logic goes here
       _addWatcher: function(e) {
-        // Duplicate removing logic goes here
+        var template = e.target.querySelector('template');
+        if (template.items.length === e.target.maxSelectable) {
+          e.target.group.put = false;
+          //Add CSS for styling data attribute
+          e.target.dataset.dis = 'disabled';
+        }
+
+      },
+
+      _remWatcher: function(e) {
+        var template = e.target.querySelector('template');
+        e.target.group.put = true;
+        e.target.dataset.dis = '';
+      },
+
+      _fireRem: function(e) {
+        var sortable = e.currentTarget;
+        sortable.fire("remove");
+        e.stopPropagation();
       }
     });
   </script>

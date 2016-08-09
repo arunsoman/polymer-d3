@@ -44,7 +44,15 @@
       },
 
       _delete: function(e) {
+        var event = new CustomEvent(
+          'itemSpliced',
+          {
+            bubbles: true,
+            cancelable: true
+          }
+        );
         this.splice('currentInput.selectedObjs', this.index, 1);
+        this.dispatchEvent(event);
       }
     });
   </script>
