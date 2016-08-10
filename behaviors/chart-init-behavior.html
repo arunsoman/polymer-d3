@@ -40,6 +40,8 @@
       var svg = document.createElement('svg');
       elem.id = id;
       if (this.querySelector('.chartContainer')) {
+        elem.style.height = this._getHeight() + 'px';
+        elem.style.width = this._getWidth() + 'px';
         this.querySelector('.chartContainer').appendChild(elem);
         this.chartWrap = d3.select(elem);
         this.svg = d3.select(elem).append("svg");

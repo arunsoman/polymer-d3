@@ -14,14 +14,14 @@
     },
 
     _inputsWatcher: function(inputs) {
-      // var me = this;
-      // // To avoid calling draw on initation
-      // if (inputs.path === 'inputs') {
-      //   return;
-      // }
-      // this.debounce('redrawInput', function() {
-      //   me.draw();
-      // }, 1000);
+      var me = this;
+      // To avoid calling draw on initation
+      if (inputs.path === 'inputs') {
+        return;
+      }
+      this.debounce('redrawInput', function() {
+        me.draw();
+      }, 1000);
     },
 
     // Draw when datasource is avialable

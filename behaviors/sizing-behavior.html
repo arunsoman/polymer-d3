@@ -38,7 +38,7 @@
                 input: 'marginLeft',
                 txt: 'Left margin',
                 uitype: 'Number',
-                selectedValue: 10
+                selectedValue: 50
             }
         ];
     },
@@ -54,52 +54,52 @@
         this._widthChanged();
         this._heightChanged();
         this.svgs.forEach(function(svg) {
-            svg.attr('width', me._getWidth() + margin.left + margin.right)
-                .attr('height', me._getHeight() + margin.top + margin.bottom)
+            svg.attr('width', me._getWidth() - (margin.left + margin.right))
+                .attr('height', me._getHeight() + (margin.top + margin.bottom))
                 .append('g')
                 .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         });
     },
 
     _areaChanged:function(area){
-        if (area.path === 'settings.area') {
-            return false;
-        }
         var me = this;
-        var margin = me.getMargins();
-        this._widthChanged();
-        this._heightChanged();
-        this.svgs.forEach(function(svg) {
-            svg.attr('width', me._getWidth() + margin.left + margin.right)
-                .attr('height', me._getHeight() + margin.top + margin.bottom)
-                .append('g')
-                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        });
-        this.areaUpdated();
+        this.debounce('areaRedraw', function() {
+            if (area.path === 'settings.area') {
+                return false;
+            }
+            var chartDiv = me.querySelector('#chart');
+            var margin = me.getMargins();
+            chartDiv.style.height = me._getHeight() + "px";
+            chartDiv.style.width = me._getWidth() + "px";
+            var g = chartDiv.querySelector('svg > g');
+            g.setAttribute('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        }, 1000);
     },
     _getHeight: function() {
-        return this.area[0]['selectedValue'];
+        return parseInt(this.area[0]['selectedValue']);
     },
     _getWidth: function() {
-        return this.area[1]['selectedValue'];
+        return parseInt(this.area[1]['selectedValue']);
     },
     getMargins: function() {
         return {
-            top: this.area[2]['selectedValue'],
-            right: this.area[3]['selectedValue'],
-            bottom: this.area[4]['selectedValue'],
-            left: this.area[5]['selectedValue']
+            top: parseInt(this.area[2]['selectedValue']),
+            right: parseInt(this.area[3]['selectedValue']),
+            bottom: parseInt(this.area[4]['selectedValue']),
+            left: parseInt(this.area[5]['selectedValue'])
         }
     },
     registerHeightChange: function(scale, invert, scaleType){
         if(!this.heightScales)
             this.heightScales = [];
         this.heightScales.push([scale, invert, scaleType]);
+        this._heightChanged();
     },
     registerWidthChange: function(scale, invert, scaleType){
         if(!this.widthScales)
             this.widthScales = [];
         this.widthScales.push([scale, invert, scaleType]);
+        this._widthChanged();
     },
     _computeHeight: function(){
         var margin = this.getMargins();

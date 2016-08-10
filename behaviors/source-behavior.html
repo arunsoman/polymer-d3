@@ -10,8 +10,11 @@
     observers: ['_sourceWatcher(source)'],
 
     _sourceWatcher: function(source) {
+      var me = this;
       if (source.length > 0) {
-        this.draw();
+        this.debounce('redrawSource', function() {
+          me.draw();
+        }, 1000);
       }
     }
   }

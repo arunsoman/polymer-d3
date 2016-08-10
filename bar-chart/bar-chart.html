@@ -51,6 +51,19 @@
         top: 100%;
         left: 0;
       }*/
+      .svg-content-responsive {
+        display: inline-block;
+        position: absolute;
+        top: 10px;
+        left: 0;
+      }
+      .chartContainer {
+        display: inline-block;
+        position: relative;
+        padding-bottom: 100%; /* aspect ratio */
+        vertical-align: top;
+        overflow: hidden;
+      }
     </style>
     <template>
       <template is="dom-if" if="[[editMode]]">
