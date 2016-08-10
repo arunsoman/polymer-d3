@@ -257,7 +257,7 @@ Polymer({
           return x0(i);
         })
         .attr('y', function(d) {
-          return height - y(d);
+          return (height - (margin.top + margin.bottom)) - y(d);
         });
     }
   }
