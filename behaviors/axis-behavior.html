@@ -1,21 +1,16 @@
 <script>
   PolymerD3.axisBehavior = {
-    createAxis: function(scaleType, align, inverted, format){
+    createAxis: function(scaleType, inverted, format){
+      var margin = this.getMargins();
+      var width = this._getWidth();
+      var height = this._getHeight();
       var map = {
-        'linear': d3.scale.linear(),
+        'linear': d3.scale.linear().rangeRound([(height - margin.top - margin.bottom), 0]),
         'time': d3.time.scale(),
-        'category': d3.scale.ordinal()
+        'category': d3.scale.ordinal().rangeRoundBands([0, (width - (margin.left + margin.right))])
       };
       var scale = map[scaleType];
       var axis = d3.svg.axis();
-      switch(align){
-        case "h":
-          this.registerHeightChange(scale, inverted, scaleType);
-          break;
-        case "v":
-          this.registerWidthChange(scale, inverted, scaleType);
-          break;
-      }
       if(format && scaleType !== 'category'){
         switch(format){
           case  "number":

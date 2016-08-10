@@ -36,8 +36,6 @@ Polymer({
   },
 
   attached: function() {
-    console.info('Ready');
-    var me = this;
     this.settings = {
       //Temporary hack for rendering chart type using <display-component>
       chartType: [{
@@ -113,35 +111,23 @@ Polymer({
       return false;
     }
    
-    stackedChart();
+    groupedChart();
 
     function stackedChart() {
 
-      // X axis
-      var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width]);
-
-      // Y Axis
-      var y = d3.scale.linear()
-        .rangeRound([height, 0]);
-
       //Set X Axis at Bottom
-      var xAxis = d3.svg.axis()
-        .scale(x)
+      var xAxis = me.createAxis('category', false, undefined)
         .orient('bottom');
 
       // Sets Y axis at right
-      var yAxis = d3.svg.axis()
-        .scale(y)
+      var yAxis = me.createAxis('linear', false, 'number')
         .orient('left');
 
-      // Parent SVG
-      var svg = me.svg
-        .attr("preserveAspectRatio", "xMaxYMax meet")
-        .attr("viewBox", "0 0 " + width + " " + height)
-        .classed("svg-content-responsive", true)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      // X axis
+      var x = xAxis.scale();
+
+      // Y Axis
+      var y = yAxis.scale();
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
@@ -163,7 +149,7 @@ Polymer({
         return d.y0 + d.y;
       })]).nice();
 
-      var layer = svg.selectAll('.layer')
+      var layer = me.svg.select('g').selectAll('.layer')
         .data(layers)
         .enter().append('g')
         .attr('class', 'layer')
@@ -186,16 +172,8 @@ Polymer({
           return (y(d.y0) - y(d.y + d.y0));
         })
         .attr('width', x.rangeBand() - 1);
-
-      svg.append('g')
-        .attr('class', 'axis axis--x')
-        .attr('transform', 'translate(0,' + (height - (margin.top + margin.bottom)) + ')')
-        .call(xAxis);
-
-      svg.append('g')
-        .attr('class', 'axis axis--y')
-        // .attr('transform', 'translate(' + (width - margin.right) + ', -'+ (margin.top + margin.bottom) +')')
-        .call(yAxis);
+      me.alignAxis(xAxis, 'bottom');
+      me.alignAxis(yAxis, 'left');
     }
 
     function groupedChart() {
@@ -212,16 +190,22 @@ Polymer({
         mapped.push(arr);
       });
 
+      var xAxis = me.createAxis('category', false, undefined)
+        .orient('bottom');
+
+      var yAxis = me.createAxis('linear', false, undefined)
+        .orient('left');
+
 
       // Y Axis
-      var y = d3.scale.linear()
+      var y = yAxis.scale()
         .domain([0, yMax])
-        .rangeRound([height, 0]);
+        .rangeRound([height - (margin.top + margin.bottom), 0]);
 
       // X axis
-      var x0 = d3.scale.ordinal()
+      var x0 = xAxis.scale()
           .domain(d3.range(src.length))
-          .rangeBands([0, width], .2);
+          .rangeBands([0, width - (margin.left + margin.right)], .2);
 
       var x1 = d3.scale.ordinal()
           .domain(d3.range(me.getInputsProperty('y').length))
@@ -230,30 +214,30 @@ Polymer({
       // Color
       var z = d3.scale.category10();
 
-      var xAxis = d3.svg.axis()
-          .scale(x0)
-          .orient('bottom');
 
-      var yAxis = d3.svg.axis()
-          .scale(y)
-          .orient('left');
+      // var svg = me.svg
+      //     .attr('width', width + margin.left + margin.right)
+      //     .attr('height', height + margin.top + margin.bottom)
+      //     .append('svg:g')
+      //     .attr('transform',
+      //       'translate(' + margin.left + ',' + margin.top + ')'
+      //     );
 
-      var svg = me.svg
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('svg:g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      // svg.append('g')
+      //     .attr('class', 'y axis')
+      //     .call(yAxis);
 
-      svg.append('g')
-          .attr('class', 'y axis')
-          .call(yAxis);
+      // svg.append('g')
+      //     .attr('class', 'x axis')
+      //     .attr('transform', 'translate(0,' + height + ')')
+      //     .call(xAxis);
 
-      svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(xAxis);
+      me.alignAxis(xAxis, 'bottom');
+      me.alignAxis(yAxis, 'left');
 
-      svg.append('g').selectAll('g')
+      var g = me.svg.select('g');
+
+      g.append('g').selectAll('g')
         .data(mapped)
         .enter().append('g')
         .style('fill', function(d, i) {
