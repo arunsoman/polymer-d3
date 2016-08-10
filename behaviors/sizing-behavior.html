@@ -44,37 +44,64 @@
     },
 
     attached: function() {
-        var me = this;
-        this.makeChartWrap();
-        if (!this.svgs) {
-            this.svgs = [];
-        }
-        this.svgs.push(me.svg);
-        var margin = me.getMargins();
-        this._widthChanged();
-        this._heightChanged();
-        this.svgs.forEach(function(svg) {
-            svg.attr('width', me._getWidth() - (margin.left + margin.right))
-                .attr('height', me._getHeight() + (margin.top + margin.bottom))
-                .append('g')
-                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        });
+        var unit = [1];
+        var outerWidth = this._getWidth();
+        var outerHeight = this._getHeight();
+        var margin = this.getMargins();
+        this.chartWidth  = outerWidth  - margin.left - margin.right;
+        this.chartHeight = outerHeight - margin.top  - margin.bottom;
+      
+        var chartContainer = this.querySelector('.chartContainer');
+        var d3CharContainer = d3.select(chartContainer);
+        var svg = d3.select(d3CharContainer).data(unit);
+        svg.enter().append("svg")
+            .attr("width",  outerWidth)
+            .attr("height", outerHeight)
+            .attr("class", "chartSvgClass");
+        
+        svg.attr("width",  outerWidth)
+            .attr("height", outerHeight);
+
+        svg.exit().remove();
+
+        this. parentG = svg.append("g")
+            .attr("class" , "parentGClass")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
     },
 
     _areaChanged:function(area){
         var me = this;
-        this.debounce('areaRedraw', function() {
-            if (area.path === 'settings.area') {
-                return false;
-            }
-            var chartDiv = me.querySelector('#chart');
-            var margin = me.getMargins();
-            chartDiv.style.height = me._getHeight() + "px";
-            chartDiv.style.width = me._getWidth() + "px";
-            var g = chartDiv.querySelector('svg > g');
-            g.setAttribute('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        }, 1000);
+        var unit = [1];
+        var outerWidth = this._getWidth();
+        var outerHeight = this._getHeight();
+        var margin = this.getMargins();
+        this.chartWidth  = outerWidth  - margin.left - margin.right;
+        this.chartHeight = outerHeight - margin.top  - margin.bottom;
+      
+        var svg = d3.select(this.querySelector('.chartSvgClass')).data[unit];
+        svg.enter().append("svg")
+            .attr("width",  outerWidth)
+            .attr("height", outerHeight)
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + chartWidth +" " + chartHeight +"")
+            .attr("class", "chartSvgClass");
+        
+        svg.attr("width",  outerWidth)
+            .attr("height", outerHeight);
+
+        svg.exit().remove();
+
+        this.parentG =  d3.select(this.querySelector('.chartSvgClass')).data(unit);
+        this. parentG = svg.append("g")
+            .attr("class" , "parentGClass")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        this.parentG.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        this.parentG.exit.remove();
+
     },
+
     _getHeight: function() {
         return parseInt(this.area[0]['selectedValue']);
     },
