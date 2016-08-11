@@ -45,7 +45,15 @@
     },
 
     attached: function() {
+        var container = document.createElement('div');
+            container.className = "chartContainer";
+            this.appendChild(container);
+            //this.makeChartWrap();
+            this.scopeSubtree(this.querySelector('.chartContainer'), true);
+        this._manageDom();  
+    },
 
+    _manageDom: function(){
         var unit = [1];
         var outerWidth = this._getWidth();
         var outerHeight = this._getHeight();
@@ -53,13 +61,6 @@
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
 
-        var container = document.createElement('div');
-      container.className = "chartContainer";
-      this.appendChild(container);
-      //this.makeChartWrap();
-      this.scopeSubtree(this.querySelector('.chartContainer'), true);
-        debugger;
-      
         var chartContainer = this.querySelector('.chartContainer');
         var svg = d3.selectAll('.chartContainer').selectAll('svg').data([1]);
         svg.enter().append("svg")
@@ -74,46 +75,24 @@
 
         svg.exit().remove();
 
-        this. parentG = svg.append("g")
+        this.parentG = svg.selectAll("g").data([1]);
+        this.parentG.enter().append('g')
             .attr("class" , "parentGClass")
-            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-    },
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        
+        this.parentG
+            .attr("class" , "parentGClass")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+        this.parentG.exit().remove();
+    },
     _areaChanged:function(area){
-        var me = this;
-        var unit = [1];
-        var outerWidth = this._getWidth();
-        var outerHeight = this._getHeight();
-        var margin = this.getMargins();
-        this.chartWidth  = outerWidth  - margin.left - margin.right;
-        this.chartHeight = outerHeight - margin.top  - margin.bottom;
-      
         if(this.querySelector('.chartSvgClass') == null){
             console.log("chart container not ready yet");
             return;
         }
-        var svg = d3.select(this.querySelector('.chartSvgClass')).data[unit];
-        svg.enter().append("svg")
-            .attr("width",  outerWidth)
-            .attr("height", outerHeight)
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + this.chartWidth +" " + this.chartHeight +"")
-            .attr("class", "chartSvgClass");
-        
-        svg.attr("width",  outerWidth)
-            .attr("height", outerHeight);
-
-        svg.exit().remove();
-
-        this.parentG =  d3.select(this.querySelector('.chartSvgClass')).data(unit);
-        this. parentG = svg.append("g")
-            .attr("class" , "parentGClass")
-            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-        
-        this.parentG.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
-        
-        this.parentG.exit.remove();
-},
+        this._manageDom();
+    },
 
     _getHeight: function() {
         return parseInt(this.area[0]['selectedValue']);
