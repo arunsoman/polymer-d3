@@ -41,22 +41,31 @@
                 selectedValue: 50
             }
         ];
-        console.log(this.area);
+      console.log('sizingBehavior: created');
     },
 
     attached: function() {
+
         var unit = [1];
         var outerWidth = this._getWidth();
         var outerHeight = this._getHeight();
         var margin = this.getMargins();
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
+
+        var container = document.createElement('div');
+      container.className = "chartContainer";
+      this.appendChild(container);
+      //this.makeChartWrap();
+      this.scopeSubtree(this.querySelector('.chartContainer'), true);
+        debugger;
       
         var chartContainer = this.querySelector('.chartContainer');
-        var d3CharContainer = d3.select(chartContainer);
-        var svg = d3.select(d3CharContainer).data(unit);
+        var svg = d3.selectAll('.chartContainer').selectAll('svg').data([1]);
         svg.enter().append("svg")
             .attr("width",  outerWidth)
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 " + this.chartWidth +" " + this.chartHeight +"")
             .attr("height", outerHeight)
             .attr("class", "chartSvgClass");
         
@@ -67,7 +76,7 @@
 
         this. parentG = svg.append("g")
             .attr("class" , "parentGClass")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
     },
 
     _areaChanged:function(area){
@@ -79,12 +88,16 @@
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
       
+        if(this.querySelector('.chartSvgClass') == null){
+            console.log("chart container not ready yet");
+            return;
+        }
         var svg = d3.select(this.querySelector('.chartSvgClass')).data[unit];
         svg.enter().append("svg")
             .attr("width",  outerWidth)
             .attr("height", outerHeight)
             .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + chartWidth +" " + chartHeight +"")
+            .attr("viewBox", "0 0 " + this.chartWidth +" " + this.chartHeight +"")
             .attr("class", "chartSvgClass");
         
         svg.attr("width",  outerWidth)
@@ -95,9 +108,9 @@
         this.parentG =  d3.select(this.querySelector('.chartSvgClass')).data(unit);
         this. parentG = svg.append("g")
             .attr("class" , "parentGClass")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
         
-        this.parentG.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        this.parentG.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
         
         this.parentG.exit.remove();
 },
