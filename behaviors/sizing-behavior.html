@@ -68,7 +68,7 @@
         var svg = d3.selectAll('.chartContainer').selectAll('svg').data([1]);
         svg.enter().append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + this.chartWidth +" " + this.chartHeight +"")
+            .attr("viewBox", "0 0 " + outerWidth +" " + outerHeight +"")
             .attr("class", "chartSvgClass");
 
         svg.exit().remove();
@@ -110,7 +110,6 @@
                     .call(axis);
                 break;
             case 'bottom':
-                debugger;
                 this.svg.select('g')
                     .append('g')
                     .attr('class', 'axis axis--' + alignment)
