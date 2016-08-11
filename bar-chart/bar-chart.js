@@ -9,7 +9,10 @@ Polymer({
         input: 'x',
         txt: 'Pick a dimension',
         selectedValue: [],
-        selectedObjs: [],
+        selectedObjs: [{
+          key: 'state',
+          value: '0'
+        }],
         selectedName: 'label',
         uitype: 'single-value',
         maxSelectableValues: 1
@@ -17,7 +20,10 @@ Polymer({
         input: 'y',
         txt: 'Pick measures',
         selectedValue: [],
-        selectedObjs: [],
+        selectedObjs: [{
+          key: 'Under Five Year',
+          value: '1'
+        }],
         selectedName: [],
         uitype: 'multi-value',
         maxSelectableValues: 2
@@ -114,10 +120,10 @@ Polymer({
     function stackedChart() {
 
       //Set X Axis at Bottom
-      var xAxis = this.createAxis("category", 'h', 'category');
+      var xAxis = me.createAxis("category", 'h', 'category', 'bottom');
 
       // Sets Y axis at right
-      var yAxis = this.createAxis('linear','v', 'number');
+      var yAxis = me.createAxis('linear','v', 'number', 'left');
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
@@ -142,7 +148,7 @@ Polymer({
         return d.y0 + d.y;
       })]).nice();
 
-      var layer = this.parentG.selectAll('.layer')
+      var layer = me.parentG.selectAll('.layer')
         .data(layers)
         .enter().append('g')
         .attr('class', 'layer')
@@ -166,7 +172,8 @@ Polymer({
           return (y(d.y0) - y(d.y + d.y0));
         })
         .attr('width', x.rangeBand() - 1);
-
+      // me.alignAxis(xAxis, 'bottom');
+      // me.alignAxis(yAxis, 'left');
     }
 
     function groupedChart() {
