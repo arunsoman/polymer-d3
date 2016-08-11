@@ -1,6 +1,9 @@
 <script>
   PolymerD3.axisBehavior = {
-    createAxis: function(scaleType, align, inverted, format){
+    createAxis: function(scaleType, align, format){
+      var margin = this.getMargins();
+      var width = this._getWidth();
+      var height = this._getHeight();
       var map = {
         'linear': d3.scale.linear().range((align==='v')? [this.chartHeight,0]: [0, this.chatWidth]),
         'time': d3.time.scale().range((align==='v')? [this.chartHeight,0]: [0, this.chatWidth]),
@@ -20,6 +23,9 @@
             axisG.attr("transform", "translate(0," + this.chartHeight + ")");
         break;
       }
+
+      var scale = map[scaleType];
+      var axis = d3.svg.axis();
 
       if(format && scaleType !== 'category'){
         switch(format){

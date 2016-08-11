@@ -99,8 +99,7 @@
         this.parentG.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
         this.parentG.exit.remove();
-
-    },
+},
 
     _getHeight: function() {
         return parseInt(this.area[0]['selectedValue']);
@@ -108,64 +107,46 @@
     _getWidth: function() {
         return parseInt(this.area[1]['selectedValue']);
     },
+    alignAxis: function(axis, alignment) {
+        var height = this._getHeight();
+        var width = this._getWidth();
+        var margin = this.getMargins();
+        switch(alignment) {
+            case 'top':
+                this.svg.select('g')
+                    .append('g')
+                    .attr('class', 'axis axis--' + alignment)
+                    .call(axis);
+                break;
+            case 'bottom':
+                debugger;
+                this.svg.select('g')
+                    .append('g')
+                    .attr('class', 'axis axis--' + alignment)
+                    .attr('transform', 'translate(0,' + (height - (margin.top + margin.bottom)) + ')')
+                    .call(axis);
+                break;
+            case 'left':
+                this.svg.select('g')
+                    .append('g')
+                    .attr('class', 'axis axis--' + alignment)
+                    .call(axis);
+                break;
+            case 'right':
+                this.svg
+                    .select('g').append('g')
+                    .attr('class', 'axis axis--' + alignment)
+                    .attr('transform', 'translate(0,' + (width - (margin.left + margin.right)) + ')')
+                    .call(axis);
+                break;
+        }
+    },
     getMargins: function() {
         return {
             top: parseInt(this.area[2]['selectedValue']),
             right: parseInt(this.area[3]['selectedValue']),
             bottom: parseInt(this.area[4]['selectedValue']),
             left: parseInt(this.area[5]['selectedValue'])
-        }
-    },
-    registerHeightChange: function(scale, invert, scaleType){
-        if(!this.heightScales)
-            this.heightScales = [];
-        this.heightScales.push([scale, invert, scaleType]);
-        this._heightChanged();
-    },
-    registerWidthChange: function(scale, invert, scaleType){
-        if(!this.widthScales)
-            this.widthScales = [];
-        this.widthScales.push([scale, invert, scaleType]);
-        this._widthChanged();
-    },
-    _computeHeight: function(){
-        var margin = this.getMargins();
-        return this._getHeight() - margin.top - margin.bottom;
-    },
-    _computeWidth: function(){
-        var margin = this.getMargins();
-        return this._getWidth() - margin.left - margin.right;
-    },
-    _heightChanged: function(){
-        if(this.heightScales){
-            var height = this._computeHeight();
-            this.heightScales.forEach(function(aScale){
-                switch(aScale[2]){
-                case 'time':
-                case 'linear':
-                    aScale[0].range(aScale[1]?[height,0]:[0,height]);
-                    break;
-                case 'category':
-                    aScale[0].rangeRoundBands(aScale[1]?[height,0]:[0,height]);
-                    break;
-                }
-            });
-        }
-    },
-    _widthChanged: function(){
-        if(this.widthScales){
-            var width = this._computeWidth();
-            this.widthScales.forEach(function(aScale){
-                switch(aScale[2]){
-                case 'time':
-                case 'linear':
-                    aScale[0].range(aScale[1]?[0, width]:[width, 0]);
-                    break;
-                case 'category':
-                    aScale[0].rangeRoundBands(aScale[1]?[0, width]:[width, 0]);
-                    break;
-                }
-            });
         }
     }
   }

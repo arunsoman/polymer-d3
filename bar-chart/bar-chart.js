@@ -84,14 +84,10 @@ Polymer({
 
   draw: function() {
 
-    var parseDate = d3.time.format('%m/%Y').parse;
     var me = this;
     var margin = this.getMargins();
     var width = this._getWidth();
     var height = this._getHeight();
-
-    //To create new chart wrap
-    this.makeChartWrap();
 
     // Selects stack of elements as Y-Axis
     var selected = me.getInputsProperty('y');
@@ -117,31 +113,11 @@ Polymer({
 
     function stackedChart() {
 
-      // X axis
-      var x = d3.scale.ordinal()
-        .rangeRoundBands([0, width]);
-
-      // Y Axis
-      var y = d3.scale.linear()
-        .rangeRound([height, 0]);
-
       //Set X Axis at Bottom
-      var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient('bottom');
+      var xAxis = this.createAxis("category", 'h', 'category');
 
       // Sets Y axis at right
-      var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient('left');
-
-      // Parent SVG
-      var svg = me.svg
-        .attr("preserveAspectRatio", "xMaxYMax meet")
-        .attr("viewBox", "0 0 " + width + " " + height)
-        .classed("svg-content-responsive", true)
-        .append('g')
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      var yAxis = this.createAxis('linear','v' 'number');
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
@@ -154,6 +130,9 @@ Polymer({
         });
       }));
 
+      var x = xAxis.scale();
+      var y = yAxis.scale();
+
       //Draws the chart with newly mapped data
       x.domain(layers[0].map(function(d) {
         return d.x;
@@ -163,13 +142,14 @@ Polymer({
         return d.y0 + d.y;
       })]).nice();
 
-      var layer = svg.selectAll('.layer')
+      var layer = this.parentG.selectAll('.layer')
         .data(layers)
         .enter().append('g')
         .attr('class', 'layer')
         .style('fill', function(d, i) {
           return z(i);
         });
+
 
       layer.selectAll('rect')
         .data(function(d) {
@@ -187,15 +167,6 @@ Polymer({
         })
         .attr('width', x.rangeBand() - 1);
 
-      svg.append('g')
-        .attr('class', 'axis axis--x')
-        .attr('transform', 'translate(0,' + (height - (margin.top + margin.bottom)) + ')')
-        .call(xAxis);
-
-      svg.append('g')
-        .attr('class', 'axis axis--y')
-        // .attr('transform', 'translate(' + (width - margin.right) + ', -'+ (margin.top + margin.bottom) +')')
-        .call(yAxis);
     }
 
     function groupedChart() {
@@ -212,16 +183,19 @@ Polymer({
         mapped.push(arr);
       });
 
+      //Set X Axis at Bottom
+      var xAxis = this.createAxis("category", 'h', 'category');
+
+      // Sets Y axis at right
+      var yAxis = this.createAxis('linear','v' 'number');
 
       // Y Axis
-      var y = d3.scale.linear()
-        .domain([0, yMax])
-        .rangeRound([height, 0]);
+      var y = yAxis.scale()
+        .domain([0, yMax]);
 
       // X axis
-      var x0 = d3.scale.ordinal()
-          .domain(d3.range(src.length))
-          .rangeBands([0, width], .2);
+      var x0 = xAxis.scale()
+          .domain(d3.range(src.length));
 
       var x1 = d3.scale.ordinal()
           .domain(d3.range(me.getInputsProperty('y').length))
@@ -229,29 +203,6 @@ Polymer({
 
       // Color
       var z = d3.scale.category10();
-
-      var xAxis = d3.svg.axis()
-          .scale(x0)
-          .orient('bottom');
-
-      var yAxis = d3.svg.axis()
-          .scale(y)
-          .orient('left');
-
-      var svg = me.svg
-          .attr('width', width + margin.left + margin.right)
-          .attr('height', height + margin.top + margin.bottom)
-          .append('svg:g')
-          .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-      svg.append('g')
-          .attr('class', 'y axis')
-          .call(yAxis);
-
-      svg.append('g')
-          .attr('class', 'x axis')
-          .attr('transform', 'translate(0,' + height + ')')
-          .call(xAxis);
 
       svg.append('g').selectAll('g')
         .data(mapped)
@@ -273,7 +224,7 @@ Polymer({
           return x0(i);
         })
         .attr('y', function(d) {
-          return height - y(d);
+          return this.dhartHeight - y(d);
         });
     }
   }
