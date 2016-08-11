@@ -141,6 +141,7 @@ Polymer({
 
       //Draws the chart with newly mapped data
       x.domain(layers[0].map(function(d) {
+        console.log("print domain " + d.x);
         return d.x;
       }));
 

@@ -70,20 +70,16 @@ Polymer({
     },
     drawStack: function(xIndex, yIndices, zIndex) {
         var data = this.source;
-        var margin = this.getMargins();
-        var width = this.getWidth() - margin.left - margin.right;
-        var height = this.getHeight() - margin.top - margin.bottom;
-
-        this.makeChartWrap();
         var xBound = d3.extent(this.source, function(row) {
             return row[xIndex];
         });
-        var xAxis = PolymerD3.axis('time', xBound, [0, width]).orient("bottom");
-
-        var yAxis = PolymerD3.axis('currency', undefined, [height, 0]).orient("left");
+         //Set X Axis at Bottom
+        var xAxis = me.createAxis("linear", 'h', 'time', 'bottom');
+          // Sets Y axis at right
+          var yAxis = me.createAxis('linear','v', 'currency', 'left');
 
         var x = xAxis.scale().domain(xBound);
-
+        this.applyTimeTickFormate(xAxis, xBound);
         var y = yAxis.scale();
         var groupYsum = d3.nest().key(function(d) {
             return d[yIndices[0]];
@@ -129,15 +125,9 @@ Polymer({
                 return y(d.y0 + d.y);
             });
 
-        var svg = this.svg;
-        svg.attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
         var layers = stack(nest.entries(data));
 
-        svg.selectAll(".layer")
+        this.parentG.selectAll(".layer")
             .data(layers)
             .enter().append("path")
             .attr("class", "layer")
@@ -147,15 +137,5 @@ Polymer({
             .style("fill", function(d, i) {
                 return z(i);
             });
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-        // }); //end of csv
     }
 });

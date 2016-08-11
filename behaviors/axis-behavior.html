@@ -1,6 +1,6 @@
 <script>
   PolymerD3.axisBehavior = {
-    createAxis: function(scaleType, align, format, position, barPadding){
+    createAxis: function(scaleType, align, format, position, barPadding, label){
       var margin = this.getMargins();
       var width = this._getWidth();
       var height = this._getHeight();
@@ -34,9 +34,19 @@
             axisG.attr("transform", "translate(0," + this.chartHeight + ")");
           break;
       }
+      if(label){
+        axisG.append("text")
+        .attr("class", "label")
+        .attr("transform", (align === 'v')? "rotate(-90)": "rotate(0)")
+        .attr("y", (align === 'v')?6:-6)
+        .attr("x", (align === 'v')?0:this.chartWidth)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text(yInput);
+      }
 
       var scale = map[scaleType];
-      var axis = d3.svg.axis();
+      var axis = d3.svg.axis().orient(position);
 
       if(format && scaleType !== 'category'){
         switch(format){
@@ -49,6 +59,9 @@
           case  "percent":
             axis.tickFormat(d3.format('.0%'));
           break;
+          case "category":
+            axis.tickFormat(d3.requote("**"));
+          break;
         }
       }
       if(format === 'category'){
@@ -56,7 +69,6 @@
           [this.chartHeight, 0]:
           [0, this.chartWidth], barPadding);
       }
-      var axis = d3.svg.axis().orient(position);
       axis.scale(scale);
       axisG.call(axis);
       return axis;
