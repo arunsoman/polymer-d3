@@ -121,8 +121,9 @@ Polymer({
 //scaleType, align, format, position, barPadding, label, domain){
       //Set X Axis at Bottom
       xDomain = src.map(function(d){return d[selectedX];});
-      var xAxis = me.createAxis({'scaleType':"category", 
-        'align':'h', 'format':'category', 'position':'bottom','domain':xDomain});
+      var config = {'scaleType':"category", 
+        'align':'h', 'format':'category', 'position':'bottom','domain':xDomain}
+      var xAxis = me.createAxis(config);
 
       // Sets Y axis at right
       yDomain = d3.max(src, function(d){
