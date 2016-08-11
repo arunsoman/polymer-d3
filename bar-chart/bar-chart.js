@@ -75,20 +75,20 @@ Polymer({
       .html(function(d) {
         return '<strong>Frequency:</strong> <span style=\'color:red\'>' + '</span>';
       });
+    //todo bind it on this.parentG
+    /*
     this.svg.call(this.tip);
     this.svg.selectAll('.layer')
       .selectAll('rect')
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide);
+    */
   },
 
   draw: function() {
 
     var me = this;
-    var margin = this.getMargins();
-    var width = this._getWidth();
-    var height = this._getHeight();
-
+    
     // Selects stack of elements as Y-Axis
     var selected = me.getInputsProperty('y');
     var selectedX = me.getInputsProperty('x');
@@ -204,7 +204,7 @@ Polymer({
       // Color
       var z = d3.scale.category10();
 
-      svg.append('g').selectAll('g')
+      this.parentG.selectAll('g')
         .data(mapped)
         .enter().append('g')
         .style('fill', function(d, i) {
