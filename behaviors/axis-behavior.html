@@ -1,16 +1,32 @@
 <script>
   PolymerD3.axisBehavior = {
-    createAxis: function(scaleType, inverted, format){
+    createAxis: function(scaleType, align, format){
       var margin = this.getMargins();
       var width = this._getWidth();
       var height = this._getHeight();
       var map = {
-        'linear': d3.scale.linear().rangeRound([(height - margin.top - margin.bottom), 0]),
-        'time': d3.time.scale(),
-        'category': d3.scale.ordinal().rangeRoundBands([0, (width - (margin.left + margin.right))])
+        'linear': d3.scale.linear().range((align==='v')? [this.chartHeight,0]: [0, this.chatWidth]),
+        'time': d3.time.scale().range((align==='v')? [this.chartHeight,0]: [0, this.chatWidth]),
+        'category': d3.scale.ordinal().rangeRoundPoints((align==='v')? [this.chartHeight, 0]:[0, innerWidth], barPadding)
       };
       var scale = map[scaleType];
+      
+      var axisG = this.parentG.append("g");
+      axisG.attr("class", align + " axis");
+      switch(align){
+        case 'top':
+        case 'left':
+        break;
+        case 'right':
+            axisG.attr("transform", "translate(" + this.chatWidth + ", 0)");
+        case 'bottom':    
+            axisG.attr("transform", "translate(0," + this.chartHeight + ")");
+        break;
+      }
+
+      var scale = map[scaleType];
       var axis = d3.svg.axis();
+
       if(format && scaleType !== 'category'){
         switch(format){
           case  "number":
@@ -24,6 +40,11 @@
           break;
         }
       }
+      if(format === 'category'){
+        scale.rangeRoundBands((align==='v')? [this.chartHeight, 0]:[0, innerWidth], barPadding);
+      }
+      var axis = d3.svg.axis().orient(align);
+      axisG.call(axis);
       axis.scale(scale);
       return axis;
     },
