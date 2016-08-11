@@ -118,12 +118,23 @@ Polymer({
     stackedChart();
 
     function stackedChart() {
-
+//scaleType, align, format, position, barPadding, label, domain){
       //Set X Axis at Bottom
-      var xAxis = me.createAxis("category", 'h', 'category', 'bottom');
+      xDomain = src.map(function(d){return d[selectedX];});
+      var xAxis = me.createAxis({'scaleType':"category", 
+        'align':'h', 'format':'category', 'position':'bottom','domain':xDomain});
 
       // Sets Y axis at right
-      var yAxis = me.createAxis('linear','v', 'number', 'left');
+      yDomain = d3.max(src, function(d){
+        var temp ;
+        selected.forEach(function(d2){
+          temp += d[d2];
+        });
+        return temp;
+      });
+      
+      var yAxis = me.createAxis({'scaleType':'linear', 
+        'align':'v', 'format':'number', 'position':'left', 'domain':yDomain});
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
