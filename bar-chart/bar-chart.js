@@ -117,7 +117,7 @@ Polymer({
       var xAxis = this.createAxis("category", 'h', 'category');
 
       // Sets Y axis at right
-      var yAxis = this.createAxis('linear','v' 'number');
+      var yAxis = this.createAxis('linear','v', 'number');
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
@@ -187,7 +187,7 @@ Polymer({
       var xAxis = this.createAxis("category", 'h', 'category');
 
       // Sets Y axis at right
-      var yAxis = this.createAxis('linear','v' 'number');
+      var yAxis = this.createAxis('linear','v', 'number');
 
       // Y Axis
       var y = yAxis.scale()
