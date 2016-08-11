@@ -7,7 +7,7 @@
     },
     observers: ['_areaChanged(settings.area.*)'],
 
-    ready: function() {
+    created: function() {
         this.area = [
             {
                 input: 'height',
@@ -41,6 +41,7 @@
                 selectedValue: 50
             }
         ];
+        console.log(this.area);
     },
 
     attached: function() {
