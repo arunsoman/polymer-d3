@@ -12,10 +12,12 @@
             }
 
             var map = {
-                'linear': d3.scale.linear().range((align === 'v') ? [0, this.chartHeight]: [this.chartWidth, 0] ),
-                'time': d3.time.scale().range((align === 'v') ? [0, this.chartHeight] : [this.chartWidth,0]),
+                'linear': d3.scale.linear().range((align === 'v') ? [this.chartHeight, 0]: [0, this.chartWidth] ),
+                'time': d3.time.scale().range((align === 'v') ? 
+                  [this.chartHeight, 0] :
+                  [0, this.chartWidth]),
                 'category': format === 'category' ?
-                    d3.scale.ordinal().rangeRoundBands((align === 'v') ? [0, this.chartHeight] : [this.chartWidth, 0], barPadding) : d3.scale.ordinal().rangeRoundPoints((align === 'v') ? [0, this.chartHeight] : [this.chartWidth, 0], barPadding)
+                    d3.scale.ordinal().rangeRoundBands((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding) : d3.scale.ordinal().rangeRoundPoints((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding)
             };
             var scale = map[config.scaleType];
             if (!scale) {

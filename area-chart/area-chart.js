@@ -70,29 +70,30 @@ Polymer({
     },
     drawStack: function(xIndex, yIndices, zIndex) {
         var data = this.source;
-        var xBound = d3.extent(this.source, function(row) {
-            return row[xIndex];
-        });
-         //Set X Axis at Bottom
-        var xAxis = me.createAxis("linear", 'h', 'time', 'bottom');
-          // Sets Y axis at right
-          var yAxis = me.createAxis('linear','v', 'currency', 'left');
+        var dataSummary = d3.nest().key((d) => { return d[xIndex];})
+                    .rollup( (d) => 
+                    { 
+                        return d3.sum(d, g => {return g[zIndex];});
+                    })
+                    .entries(data);
+        var xBound = d3.extent(dataSummary, (d) => {
+                    return new Date(d.key);
+                });
+        var yBound = d3.extent(dataSummary, (d) => {
+                    return d.values;
+                });
 
-        var x = xAxis.scale().domain(xBound);
-        this.applyTimeTickFormate(xAxis, xBound);
+        var config = {'scaleType':"time", 
+        'align':'h', 'format':'time', 'position':'bottom','domain':xBound};
+        var xAxis = me.createAxis(config);
+
+        config = {'scaleType':"linear", 
+        'align':'v', 'format':'currency', 'position':'left','domain':[0, yBound[1]]};
+          var yAxis = me.createAxis(config);
+
+//        y.domain([0, maxY]);
         var y = yAxis.scale();
-        var groupYsum = d3.nest().key(function(d) {
-            return d[yIndices[0]];
-        }).rollup(function(d) {
-            return d3.sum(d, function(g) {
-                return g[zIndex];
-            });
-        }).entries(data);
-        var maxY = d3.sum(groupYsum, function(g) {
-            return g.values;
-        });
-        y.domain([0, maxY]);
-
+        var x = xAxis.scale();        
         var z = d3.scale.category20c();
 
         var stack = d3.layout.stack()
