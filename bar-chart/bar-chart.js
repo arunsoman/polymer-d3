@@ -9,22 +9,24 @@ Polymer({
         input: 'x',
         txt: 'Pick a dimension',
         selectedValue: [],
+        scaleType: '',
+        format:'',
         selectedObjs: [{
           key: 'state',
           value: '0'
         }],
-        selectedName: 'label',
         uitype: 'single-value',
         maxSelectableValues: 1
       }, {
         input: 'y',
         txt: 'Pick measures',
         selectedValue: [],
+        format:'',
+        scaleType: '',
         selectedObjs: [{
           key: 'Under Five Year',
           value: '1'
         }],
-        selectedName: [],
         uitype: 'multi-value',
         maxSelectableValues: 2
       }]

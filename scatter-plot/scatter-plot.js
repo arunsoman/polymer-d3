@@ -11,19 +11,28 @@ Polymer({
           txt: 'Pick a x',
           selectedValue: -1,
           uitype: 'single-value',
-          notify: true,
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1,
       }, {
           input: 'y',
           txt: 'Pick y',
           selectedValue: -1,
           uitype: 'single-value',
-          notify: true
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       }, {
           input: 'z',
           txt: 'Pick dimension',
           selectedValue: -1,
           uitype: 'single-value',
-          notify: true
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
         }]
     },
     settings: {
