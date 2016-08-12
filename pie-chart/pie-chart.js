@@ -62,64 +62,57 @@ Polymer({
   _toggleView: function() {
     this.hideSettings = !this.hideSettings;
   },
-
-  _parseData(){
-    var me = this;
-    me.newData =[];
-    me.source.forEach(function(d) {
-      d[me.getInputsProperty('sliceSize')] = +d[me.getInputsProperty('sliceSize')];
-      me.newData.push(d);
-    });
-  },
+  
+  attached: function() {
+        me = this;
+        //TODO remove this 
+        this.inputs[0].selectedValue = 0;
+        this.inputs[1].selectedValue = 3;
+        function callme(data) {
+            me.source = data;
+            me.draw()
+        }
+        PolymerD3.fileReader('cereal-small.csv', [this.inputs[1].selectedValue], [], undefined, callme, true);
+    },
 
   draw: function() {
     var me = this;
-    me.makeChartWrap();
-    var sliceHeader = this.inputs[0].selectedName;
-    var sliceSizeHeader = this.inputs[1].selectedName;
-    var donutWidth = 75;
-    var legendRectSize = 18;
-    var legendSpacing = 4;
-    var width = this.getWidth(),
-      height = this.getHeight(),
-      radius = Math.min(width, height) / 2;
+    //me.makeChartWrap();
+    var slice = this.inputs[0].selectedValue;
+    var sliceSize = this.inputs[1].selectedValue;
 
-    var color = d3.scale.ordinal()//this  needs to change, its hardcoded 
-      .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+    var width = this.chartWidth,
+      height = this.chartHeight,
+      radius = Math.min(width, height) / 2;
+    var innerRadius = 10; //me.getSettingsProperty("innerRadius");
+    
+    var color = d3.scale.category20c();
 
     var arc = d3.svg.arc()
       .outerRadius(radius - 10)
-      .innerRadius(me.getSettingsProperty("innerRadius"));
+      .innerRadius(innerRadius);
 
     var labelArc = d3.svg.arc()
       .outerRadius(radius - 40)
       .innerRadius(radius - 40);
 
-    me._parseData();
-
     var pie = d3.layout.pie()
       .sort(null)
       .value(function(d) {
-        return d[me.getInputsProperty('sliceSize')];
+        return d[sliceSize];
       });
 
-    this.svg
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+    this.parentG.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    me.gWrap = me.svg.select("g");
-
-    var g = me.gWrap.selectAll(".arc")
-      .data(pie(me.newData))
+    var g = this.parentG.selectAll(".arc")
+      .data(pie(me.source))
       .enter().append("g")
       .attr("class", "arc");
 
     g.append("path")
       .attr("d", arc)
       .style("fill", function(d) {
-        return color(d.data[me.getInputsProperty('slice')]);
+        return color(d.data[slice]);
       });
 
     g.append("text")
@@ -128,7 +121,7 @@ Polymer({
       })
       .attr("dy", ".35em")
       .text(function(d) {
-        return d.data[me.getInputsProperty('slice')];
+        return d.data[slice];
       });
   }
 });
