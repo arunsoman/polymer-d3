@@ -33,11 +33,13 @@ PolymerD3.utilities._getProperty = function(arr, key) {
     return result;
 };
 
-PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback) {
+PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
     var arryadata = [];
     d3.csv(name, function(error, data) {
 
-        data.forEach(function(d) {
+        data.forEach(function(d, i) {
+            if(header &&  i == 0)
+                return;
             var row = [];
             for (var key in d) {
                 row.push(d[key]);
