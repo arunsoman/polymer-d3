@@ -20,6 +20,12 @@
         return;
       }
       this.debounce('redrawInput', function() {
+        var chartWrap = me.$$('.chartContainer');
+        if (chartWrap) {
+          chartWrap.removeChild();
+        }
+        me._manageDom()
+
         me.draw();
       }, 1000);
     },
