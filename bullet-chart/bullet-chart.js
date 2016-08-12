@@ -9,51 +9,74 @@ Polymer({
           input: 'title',
           txt: 'Title',
           selectedValue: -1,
-          selectedName: 'title',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       },  {
           input: 'subtitle',
           txt: 'Subtitle',
           selectedValue: -1,
-          selectedName: 'subTitle',
           uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
           maxSelectableValues: 2
       },  {
           input: 'range1',
           txt: 'Range1',
           selectedValue: -1,
-          selectedName: 'range1',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       },  {
           input: 'range2',
           txt: 'Range2',
           selectedValue: -1,
-          selectedName: 'title',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       },  {
           input: 'range3',
           txt: 'Range3',
           selectedValue: -1,
-          selectedName: 'range3',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       }, {
           input: 'measure1',
           txt: 'Measure 1',
           selectedValue: -1,
-          selectedName: 'measure1',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       },  {
           input: 'measure2',
           txt: 'Measure 2',
           selectedValue: -1,
-          selectedName: 'measure2',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       },  {
           input: 'marker',
           txt: 'Marker',
           selectedValue: -1,
-          selectedName: 'marker',
-          uitype: 'single-value'
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
       }]
     },
     settings: {

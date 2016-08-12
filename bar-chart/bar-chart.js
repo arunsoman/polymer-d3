@@ -9,16 +9,24 @@ Polymer({
         input: 'x',
         txt: 'Pick a dimension',
         selectedValue: [],
-        selectedObjs: [],
-        selectedName: 'label',
+        scaleType: '',
+        format:'',
+        selectedObjs: [{
+          key: 'state',
+          value: '0'
+        }],
         uitype: 'single-value',
         maxSelectableValues: 1
       }, {
         input: 'y',
         txt: 'Pick measures',
         selectedValue: [],
-        selectedObjs: [],
-        selectedName: [],
+        format:'',
+        scaleType: '',
+        selectedObjs: [{
+          key: 'Under Five Year',
+          value: '1'
+        }],
         uitype: 'multi-value',
         maxSelectableValues: 2
       }]
@@ -36,6 +44,8 @@ Polymer({
   },
 
   attached: function() {
+    console.info('Ready');
+    var me = this;
     this.settings = {
       //Temporary hack for rendering chart type using <display-component>
       chartType: [{
@@ -73,24 +83,20 @@ Polymer({
       .html(function(d) {
         return '<strong>Frequency:</strong> <span style=\'color:red\'>' + '</span>';
       });
+    //todo bind it on this.parentG
+    /*
     this.svg.call(this.tip);
     this.svg.selectAll('.layer')
       .selectAll('rect')
       .on('mouseover', this.tip.show)
       .on('mouseout', this.tip.hide);
+    */
   },
 
   draw: function() {
 
-    var parseDate = d3.time.format('%m/%Y').parse;
     var me = this;
-    var margin = this.getMargins();
-    var width = this._getWidth();
-    var height = this._getHeight();
-
-    //To create new chart wrap
-    this.makeChartWrap();
-
+    
     // Selects stack of elements as Y-Axis
     var selected = me.getInputsProperty('y');
     var selectedX = me.getInputsProperty('x');
@@ -111,23 +117,27 @@ Polymer({
       return false;
     }
    
-    groupedChart();
+    stackedChart();
 
     function stackedChart() {
-
+//scaleType, align, format, position, barPadding, label, domain){
       //Set X Axis at Bottom
-      var xAxis = me.createAxis('category', false, undefined)
-        .orient('bottom');
+      xDomain = src.map(function(d){return d[selectedX];});
+      var config = {'scaleType':"category", 
+        'align':'h', 'format':'category', 'position':'bottom','domain':xDomain}
+      var xAxis = me.createAxis(config);
 
       // Sets Y axis at right
-      var yAxis = me.createAxis('linear', false, 'number')
-        .orient('left');
-
-      // X axis
-      var x = xAxis.scale();
-
-      // Y Axis
-      var y = yAxis.scale();
+      yDomain = d3.max(src, function(d){
+        var temp ;
+        selected.forEach(function(d2){
+          temp += d[d2];
+        });
+        return temp;
+      });
+      
+      var yAxis = me.createAxis({'scaleType':'linear', 
+        'align':'v', 'format':'number', 'position':'left', 'domain':yDomain});
 
       // Create layers based on stack
       // Parses the data as : {x: '',y: '',y0: ''}
@@ -140,8 +150,12 @@ Polymer({
         });
       }));
 
+      var x = xAxis.scale();
+      var y = yAxis.scale();
+
       //Draws the chart with newly mapped data
       x.domain(layers[0].map(function(d) {
+        console.log("print domain " + d.x);
         return d.x;
       }));
 
@@ -149,13 +163,14 @@ Polymer({
         return d.y0 + d.y;
       })]).nice();
 
-      var layer = me.svg.select('g').selectAll('.layer')
+      var layer = me.parentG.selectAll('.layer')
         .data(layers)
         .enter().append('g')
         .attr('class', 'layer')
         .style('fill', function(d, i) {
           return z(i);
         });
+
 
       layer.selectAll('rect')
         .data(function(d) {
@@ -172,8 +187,8 @@ Polymer({
           return (y(d.y0) - y(d.y + d.y0));
         })
         .attr('width', x.rangeBand() - 1);
-      me.alignAxis(xAxis, 'bottom');
-      me.alignAxis(yAxis, 'left');
+      // me.alignAxis(xAxis, 'bottom');
+      // me.alignAxis(yAxis, 'left');
     }
 
     function groupedChart() {
@@ -190,22 +205,19 @@ Polymer({
         mapped.push(arr);
       });
 
-      var xAxis = me.createAxis('category', false, undefined)
-        .orient('bottom');
+      //Set X Axis at Bottom
+      var xAxis = this.createAxis("category", 'h', 'category');
 
-      var yAxis = me.createAxis('linear', false, undefined)
-        .orient('left');
-
+      // Sets Y axis at right
+      var yAxis = this.createAxis('linear','v', 'number');
 
       // Y Axis
       var y = yAxis.scale()
-        .domain([0, yMax])
-        .rangeRound([height - (margin.top + margin.bottom), 0]);
+        .domain([0, yMax]);
 
       // X axis
       var x0 = xAxis.scale()
-          .domain(d3.range(src.length))
-          .rangeBands([0, width - (margin.left + margin.right)], .2);
+          .domain(d3.range(src.length));
 
       var x1 = d3.scale.ordinal()
           .domain(d3.range(me.getInputsProperty('y').length))
@@ -214,30 +226,7 @@ Polymer({
       // Color
       var z = d3.scale.category10();
 
-
-      // var svg = me.svg
-      //     .attr('width', width + margin.left + margin.right)
-      //     .attr('height', height + margin.top + margin.bottom)
-      //     .append('svg:g')
-      //     .attr('transform',
-      //       'translate(' + margin.left + ',' + margin.top + ')'
-      //     );
-
-      // svg.append('g')
-      //     .attr('class', 'y axis')
-      //     .call(yAxis);
-
-      // svg.append('g')
-      //     .attr('class', 'x axis')
-      //     .attr('transform', 'translate(0,' + height + ')')
-      //     .call(xAxis);
-
-      me.alignAxis(xAxis, 'bottom');
-      me.alignAxis(yAxis, 'left');
-
-      var g = me.svg.select('g');
-
-      g.append('g').selectAll('g')
+      this.parentG.selectAll('g')
         .data(mapped)
         .enter().append('g')
         .style('fill', function(d, i) {
@@ -257,7 +246,7 @@ Polymer({
           return x0(i);
         })
         .attr('y', function(d) {
-          return (height - (margin.top + margin.bottom)) - y(d);
+          return this.dhartHeight - y(d);
         });
     }
   }

@@ -11,21 +11,30 @@ Polymer({
                 selectedValue: 0,
                 selectedName: 'date',
                 uitype: 'single-value',
-                notify: true,
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }, {
                 input: 'y',
                 txt: 'Pick measure 1',
                 selectedValue: 0,
                 selectedName: 'New York',
                 uitype: 'single-value',
-                notify: true
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }, {
                 input: 'z',
                 txt: 'Pick measure 2',
                 selectedValue: 0,
                 selectedName: 'San Francisco',
                 uitype: 'single-value',
-                notify: true
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }]
         },
         settings: {

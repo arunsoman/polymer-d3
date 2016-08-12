@@ -1,61 +1,139 @@
 <script>
-  PolymerD3.axisBehavior = {
-    createAxis: function(scaleType, inverted, format){
-      var margin = this.getMargins();
-      var width = this._getWidth();
-      var height = this._getHeight();
-      var map = {
-        'linear': d3.scale.linear().rangeRound([(height - margin.top - margin.bottom), 0]),
-        'time': d3.time.scale(),
-        'category': d3.scale.ordinal().rangeRoundBands([0, (width - (margin.left + margin.right))])
-      };
-      var scale = map[scaleType];
-      var axis = d3.svg.axis();
-      if(format && scaleType !== 'category'){
-        switch(format){
-          case  "number":
-            axis.tickFormat(d3.format('.2s'));
-          break;
-          case  "currency":
-            axis.tickFormat(d3.format('$.2s'));
-          break;
-          case  "percent":
-            axis.tickFormat(d3.format('.0%'));
-          break;
-        }
-      }
-      axis.scale(scale);
-      return axis;
-    },
+    PolymerD3.axisBehavior = {
+        _scaleFactory: function(config) {
+            var barPadding = (!config.barPadding) ? .1 : config.barPadding;
+            var align = config.align;
+            if(!align){
+              throw new Error("config.align not defined values {v,h}");
+            }
+            var format = config.format;
+            if(!format){
+              throw new Error("config.format undefined values{number, currency, percent, time, category}");
+            }
 
-    applyTimeTickFormate: function(axis, bound){
-      if (bound) {
-          if (d3.timeYear.count(bound[0], bound[1]) < 10) {
-              if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
-                  if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
-                      //todo
-                      if (d3.timeDay.count(bound[0], bound[1]) < 10) {
-                          if (d3.timeHour.count(bound[0], bound[1]) < 240)  {
-                            if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
-                                axis.tickFormat(d3.time.format('%d-%b'));
-                              } else{
-                                axis.tickFormat(d3.time.format('%a-%I-%M'));
-                              }
-                          } else {
-                            axis.tickFormat(d3.time.format('%d-%b'));
-                          }
-                       } else {
-                          axis.tickFormat(d3.time.format('%d-%b'));
-                       }
-                     // axis.tickFormat(d3.time.format('%d-%b'));
-                  }
-              } else {
-                  axis.tickFormat(d3.time.format('%a-%b'));
-              }
-          } else {
-              axis.tickFormat(d3.time.format('%b-%Y'));
-          }
-      }
+            var map = {
+                'linear': d3.scale.linear().range((align === 'v') ? [this.chartHeight, 0]: [0, this.chartWidth] ),
+                'time': d3.time.scale().range((align === 'v') ? 
+                  [this.chartHeight, 0] :
+                  [0, this.chartWidth]),
+                'category': format === 'category' ?
+                    d3.scale.ordinal().rangeRoundBands((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding) : d3.scale.ordinal().rangeRoundPoints((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding)
+            };
+            var scale = map[config.scaleType];
+            if (!scale) {
+                throw new Error("config.scale not valid supported {linear, time,category}")
+            }
+            if (config.domain)
+                scale.domain(config.domain);
+            return scale;
+        },
+
+        _createAxisGroup: function(config) {
+            if (!config.position) {
+                throw new Error("config.position undefined, can't create axisGroup");
+            }
+            var axisG = this.parentG.append("g");
+            axisG.attr("class", config.align + " axis");
+
+            switch (config.position) {
+                case 'top':
+                    break;
+                case 'left':
+                    break;
+                case 'right':
+                    axisG.attr("transform", "translate(" + this.chartWidth + ", 0)");
+                    break;
+                case 'bottom':
+                    axisG.attr("transform", "translate(0," + this.chartHeight + ")");
+                    break;
+            }
+            return axisG;
+        },
+
+        _createAxis: function(config) {
+            if (!config.position) {
+                throw new Error("config.position undefined, can't create d3 axis");
+            }
+            var axis = d3.svg.axis().orient(config.position);
+            return axis;
+        },
+
+        _formateAxis: function(config, axis) {
+            if (!config.format) {
+                throw new Error("config.format undefined values{number, currency, percent, time}");
+            }
+            if (config.format) {
+                switch (config.format) {
+                    case "number":
+                        axis.tickFormat(d3.format('.2s'));
+                        break;
+                    case "currency":
+                        axis.tickFormat(d3.format('$.2s'));
+                        break;
+                    case "percent":
+                        axis.tickFormat(d3.format('.0%'));
+                        break;
+                    case "category":
+                //        axis.tickFormat(d3.requote("**"));
+                        break;
+                    case "time":
+                        if (config.domain) {
+                            var bound = config.domain;
+                            if (d3.timeYear.count(bound[0], bound[1]) < 10) {
+                                if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
+                                    if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
+                                        //todo
+                                        if (d3.timeDay.count(bound[0], bound[1]) < 10) {
+                                            if (d3.timeHour.count(bound[0], bound[1]) < 240) {
+                                                if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
+                                                    axis.tickFormat(d3.time.format('%d-%b'));
+                                                } else {
+                                                    axis.tickFormat(d3.time.format('%a-%I-%M'));
+                                                }
+                                            } else {
+                                                axis.tickFormat(d3.time.format('%d-%b'));
+                                            }
+                                        } else {
+                                            axis.tickFormat(d3.time.format('%d-%b'));
+                                        }
+                                    }
+                                } else {
+                                    axis.tickFormat(d3.time.format('%a-%b'));
+                                }
+                            } else {
+                                axis.tickFormat(d3.time.format('%b-%Y'));
+                            }
+                        }
+                        break
+                }
+            }
+        },
+
+        _applyLabel: function(config, axisG) {
+            if (config.label) {
+                var align = config.align;
+                axisG.append("text")
+                    .attr("class", "label")
+                    .attr("transform", (align === 'v') ? "rotate(-90)" : "rotate(0)")
+                    .attr("y", (align === 'v') ? 6 : -6)
+                    .attr("x", (align === 'v') ? 0 : this.chartWidth)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text(config.label);
+            }
+        },
+
+        createAxis: function(config) {
+            //scaleType, align, format, position, barPadding, label, domain){
+            var scale = this._scaleFactory(config);
+            var axis = this._createAxis(config);
+            var axisG = this._createAxisGroup(config)
+            this._applyLabel(config, axis);
+            this._formateAxis(config, axis);
+            axis.scale(scale);
+            axisG.call(axis);
+            return axis;
+        }
+
     }
-  }
 </script>

@@ -9,23 +9,29 @@ Polymer({
                 input: 'x',
                 txt: 'Pick a dimension',
                 selectedValue: 2,
-                selectedObjs: [],
                 uitype: 'single-value',
-                tickFormat: 'Tabbrweekday'
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }, {
                 input: 'y',
                 txt: 'Group',
                 selectedValue: [0],
-                selectedObjs: [],
                 uitype: 'multi-value',
-                tickFormat: 'number'
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }, {
                 input: 'z',
                 txt: 'Pick a dimension',
                 selectedValue: 1,
-                selectedObjs: [],
                 uitype: 'single-value',
-                tickFormat: 'number'
+                selectedObjs: [],
+                scaleType: '',
+                format:'',
+                maxSelectableValues: 1
             }]
         },
         settings: {
@@ -70,33 +76,30 @@ Polymer({
     },
     drawStack: function(xIndex, yIndices, zIndex) {
         var data = this.source;
-        var margin = this.getMargins();
-        var width = this.getWidth() - margin.left - margin.right;
-        var height = this.getHeight() - margin.top - margin.bottom;
+        var dataSummary = d3.nest().key((d) => { return d[xIndex];})
+                    .rollup( (d) => 
+                    { 
+                        return d3.sum(d, g => {return g[zIndex];});
+                    })
+                    .entries(data);
+        var xBound = d3.extent(dataSummary, (d) => {
+                    return new Date(d.key);
+                });
+        var yBound = d3.extent(dataSummary, (d) => {
+                    return d.values;
+                });
 
-        this.makeChartWrap();
-        var xBound = d3.extent(this.source, function(row) {
-            return row[xIndex];
-        });
-        var xAxis = PolymerD3.axis('time', xBound, [0, width]).orient("bottom");
+        var config = {'scaleType':"time", 
+        'align':'h', 'format':'time', 'position':'bottom','domain':xBound};
+        var xAxis = me.createAxis(config);
 
-        var yAxis = PolymerD3.axis('currency', undefined, [height, 0]).orient("left");
+        config = {'scaleType':"linear", 
+        'align':'v', 'format':'currency', 'position':'left','domain':[0, yBound[1]]};
+          var yAxis = me.createAxis(config);
 
-        var x = xAxis.scale().domain(xBound);
-
+//        y.domain([0, maxY]);
         var y = yAxis.scale();
-        var groupYsum = d3.nest().key(function(d) {
-            return d[yIndices[0]];
-        }).rollup(function(d) {
-            return d3.sum(d, function(g) {
-                return g[zIndex];
-            });
-        }).entries(data);
-        var maxY = d3.sum(groupYsum, function(g) {
-            return g.values;
-        });
-        y.domain([0, maxY]);
-
+        var x = xAxis.scale();        
         var z = d3.scale.category20c();
 
         var stack = d3.layout.stack()
@@ -129,15 +132,9 @@ Polymer({
                 return y(d.y0 + d.y);
             });
 
-        var svg = this.svg;
-        svg.attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
         var layers = stack(nest.entries(data));
 
-        svg.selectAll(".layer")
+        this.parentG.selectAll(".layer")
             .data(layers)
             .enter().append("path")
             .attr("class", "layer")
@@ -147,15 +144,5 @@ Polymer({
             .style("fill", function(d, i) {
                 return z(i);
             });
-
-        svg.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        svg.append("g")
-            .attr("class", "y axis")
-            .call(yAxis);
-        // }); //end of csv
     }
 });

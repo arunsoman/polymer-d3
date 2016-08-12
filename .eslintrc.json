@@ -24,6 +24,7 @@
         "new-cap": 0
     },
     "globals": {
-        "Polymer": true
+        "Polymer": true,
+        "d3": true
     }
 }

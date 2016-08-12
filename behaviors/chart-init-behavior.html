@@ -16,19 +16,22 @@
         settings = JSON.stringify(this.settings);
         this.settings = JSON.parse(settings);
       }
+      /*var container = document.createElement('div');
+      container.className = "chartContainer";
+      this.appendChild(container);
+      //this.makeChartWrap();
+      this.scopeSubtree(this.querySelector('.chartContainer'), true);
+      */  
+      console.log("chart init: ready");
     },
 
     attached: function(argument) {
       // Adds stylescope listener to chart container
-      var container = document.createElement('div');
-      container.className = "chartContainer";
-      this.appendChild(container);
-      this.makeChartWrap();
-      this.scopeSubtree(this.querySelector('.chartContainer'), true);
+      console.log("chart init: attached");
     },
 
     makeChartWrap: function(id) {
-      // Places chart inside listner
+      /*// Places chart inside listner
       if (!id) {
         id = 'chart';
       }
@@ -45,15 +48,7 @@
         this.querySelector('.chartContainer').appendChild(elem);
         this.chartWrap = d3.select(elem);
         this.svg = d3.select(elem).append("svg");
-        var margin = this.getMargins();
-        var svg = this.svg
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + this._getWidth() + " " + this._getHeight())
-            .classed("svg-content-responsive", true)
-            .append('g')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-            .attr('id', 'parentG');
-      }
+      }*/
     }
 
   }
