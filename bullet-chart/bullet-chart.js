@@ -144,52 +144,25 @@ Polymer({
             .width(this.chartWidth)
             .height(bulletHeight);
 
-        // To remove previously initialized SVG
-        // Bullet chart needs 5 svg elems, previous elements causes some problems in  rendering
-
-        shift = function(charts) {
-          var scale = d3.scale.linear();
-          scale.range([0, me.chartHeight]);
-          scale.domain([0, charts]);
-          var bI = 0; var tI = 0; var sI = 0;
-          return (type)=>{
-            var m = {
-             'bullet':scale(bI++),
-             'title':scale(tI++)
-           }
-           console.log("tI" + tI +": "+type + " bI:" + bI);
-           return m[type];
-          };
-        }(me.data.length);
-
-        translateBulletG = function(){
-          var tt = shift('bullet');
-          str = "translate(" + 0 + "," + tt + ")";
-          console.log("tt= >" + str + "<" + tt);
-          return str;
-        }
-        translateTitleG = function(){
-         var tt = shift('title');
-          str = "translate(" + 0 + "," + tt + ")";
-          console.log("titleG= >" + str + "<" + tt);
-          return str; 
-        }
-
         var bulletSVG = this.parentG.selectAll('g').data(me.data);
-            
+        var scaleB = d3.scale.linear();
+          scaleB.range([0, me.chartHeight]);
+          scaleB.domain([0, me.data.length]);
+        var index = 0;    
         bulletSVG.enter()
             .append("g")
             .attr("class", "bulletG")
-            .attr('transform', translateBulletG)
+            .attr('transform', (d)=>{return "translate(" + 0 + "," + scaleB(index++) + ")";})
             .append("svg")
             .attr("class", "bullet")
             .call(chart);
 
+        index = 0;
         var title = bulletSVG.enter()
             .append("g")
             .style("text-anchor", "end")
             .attr("class", "titleG")
-            .attr("transform", translateTitleG);
+            .attr("transform", (d)=>{return "translate(" + 0 + "," + (scaleB(index++) +(bulletHeight/2)) + ")";})
 
         title.append("text")
             .attr("class", "title")
