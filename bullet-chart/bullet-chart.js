@@ -129,7 +129,7 @@ Polymer({
         if (me.getInputsProperty('title') === -1 ||
             me.getInputsProperty('range1') === -1 ||
             me.getInputsProperty('range2') === -1 ||
-            me.getInputsProperty('range3') === -1 ||
+              me.getInputsProperty('range3') === -1 ||
             me.getInputsProperty('measure1') === -1 ||
             me.getInputsProperty('measure2') === -1 ||
             me.getInputsProperty('marker') === -1) {
@@ -149,32 +149,47 @@ Polymer({
 
         shift = function(charts) {
           var scale = d3.scale.linear();
-          scale.range([me.chartHeight, 0]);
+          scale.range([0, me.chartHeight]);
           scale.domain([0, charts]);
-          var bI = 0, tI = 0, sI = 0;
-          return {
+          var bI = 0; var tI = 0; var sI = 0;
+          return (type)=>{
+            var m = {
              'bullet':scale(bI++),
-             'title':scale(tI++),
-             'subtitle':scale(sI++)
+             'title':scale(tI++)
+           }
+           console.log("tI" + tI +": "+type + " bI:" + bI);
+           return m[type];
           };
         }(me.data.length);
 
-        var bulletSVG = this.parentG.selectAll('.bullet').data(me.data);
+        translateBulletG = function(){
+          var tt = shift('bullet');
+          str = "translate(" + 0 + "," + tt + ")";
+          console.log("tt= >" + str + "<" + tt);
+          return str;
+        }
+        translateTitleG = function(){
+         var tt = shift('title');
+          str = "translate(" + 0 + "," + tt + ")";
+          console.log("titleG= >" + str + "<" + tt);
+          return str; 
+        }
+
+        var bulletSVG = this.parentG.selectAll('g').data(me.data);
             
         bulletSVG.enter()
             .append("g")
-            .attr("transform", "translate(" + margin.left + "," + shift.bullet + ")")
+            .attr("class", "bulletG")
+            .attr('transform', translateBulletG)
             .append("svg")
             .attr("class", "bullet")
-            //.attr("width", this.chatWidth)
-            //.attr("height", bulletHeight + margin.top + margin.bottom)
             .call(chart);
-        
-        bulletSVG.exit().remove();
 
-        var title = bulletSVG.enter().append("g")
+        var title = bulletSVG.enter()
+            .append("g")
             .style("text-anchor", "end")
-            .attr("transform", "translate(-6," + shift.title + ")");
+            .attr("class", "titleG")
+            .attr("transform", translateTitleG);
 
         title.append("text")
             .attr("class", "title")
@@ -189,6 +204,7 @@ Polymer({
                 return d.subtitle;
             });
 
+        bulletSVG.exit().remove();
     },
 
     _prepareData: function() {
@@ -219,6 +235,5 @@ Polymer({
             });
             me.sourceChanged = true;
         }
-
     }
 });

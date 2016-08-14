@@ -76,6 +76,8 @@
         this.parentG = svg.selectAll("g").data([1]);
         this.parentG.enter().append('g')
             .attr("class" , "parentGClass")
+            .attr("height", this.chartHeight)
+            .attr('width', this.chartWidth)
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
         this.parentG
