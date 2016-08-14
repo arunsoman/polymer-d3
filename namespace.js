@@ -137,4 +137,95 @@ PolymerD3.utilities.clone = function(obj) {
         clone = JSON.parse(clone);
     }
     return clone;
-}
+};
+PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack) => {
+    findMinMax = function(aRow) {
+        var temp = [];
+        yIndices.forEach((d) =>{
+            temp.push(aRow[0][d]);
+        });
+        return d3.extent(temp);
+    };
+    findStackedMinMax = (aRow) => {
+        var min, max, sum;
+        yIndices.forEach((yd, i) => {
+            if (i == 0) {
+                min = aRow[0][yd];
+                max = aRow[0][yd];
+                sum = min;
+            } else {
+                var datum = aRow[0][yd];
+                if (datum < min) {
+                    min = datum;
+                }
+                sum += datum;
+            }
+        });
+        return [min, max];
+    };
+
+    findXDomain = (array, format) => {
+        switch (format) {
+            case 'string':
+                return d3.map(array, (d) => {
+                    return d.key;
+                });
+            case 'time':
+                return d3.extent(array, (d) => {
+                    return new Date(d.key);
+                });
+            case 'number':
+                return d3.extent(array, (d) => {
+                    return +d.key;
+                });
+        }
+    };
+
+    findYDomain = (array, format) => {
+        return [
+        d3.min(array, (q)=>{return q.values[0]}),
+        d3.max(array, (q)=>{return q.values[1]})
+        ];
+    };
+    var handler = (stack) ? findStackedMinMax : findMinMax;
+    var dataSummary = d3.nest()
+        .key((d) => {
+            return d[xIndex];
+        })
+        .rollup(handler)
+        .entries(data);
+    var Xdomain = findXDomain(dataSummary, xFormat);
+    var Ydomain = findYDomain(dataSummary, yFormat);
+    return {
+        'getXDomain': () => {
+            return Xdomain
+        },
+        'getYDomain': () => {
+            return Ydomain
+        }
+        };
+};
+
+PolymerD3.rollup = (data, groupby, handler) =>{
+    var dataSummary = d3.nest()
+    .key((d) => {
+        return d[groupby];
+    })
+    .rollup((aRow) => {
+        handler(aRow);
+    })
+    .entries(data);
+    return dataSummary;
+};
+
+PolymerD3.rollupMultiValued = (columns, columnHeaders, xId, data)=>{
+    var multiValue = columns.map(function(id) {
+        return {
+            id: columnHeaders[id],
+            values: data.map((d) => {
+                return {'x': d[xId], 'y': d[id]};
+            })
+        };
+    });
+    return multiValue;
+};
