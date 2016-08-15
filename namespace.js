@@ -222,14 +222,6 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
                 });
         }
     };
-/*
-    findYDomain = (array, format) => {
-        return [
-        d3.min(array, (q)=>{return q.values[0]}),
-        d3.max(array, (q)=>{return q.values[1]})
-        ];
-    };
-    */
 
     if(yIndices.length < 1){
         var handler = (stack) ? findStackedMinMaxMultiCol : findMinMaxMultiCol;
@@ -243,6 +235,8 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
     }
     var Xdomain = findXDomain(dataSummary, xFormat);
     var Ydomain = [priMin, priMax];// findYDomain(dataSummary, yFormat);
+    
+    console.log("xDom:" + Xdomain + " yDom:" + Ydomain);
     return {
         'getXDomain': () => {
             return Xdomain

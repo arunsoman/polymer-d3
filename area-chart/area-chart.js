@@ -43,7 +43,7 @@ Polymer({
         source: [],
         external: Array,
         isStack: {
-            value : false,
+            value : true,
             type: Boolean
         }
     },
@@ -61,7 +61,9 @@ Polymer({
         me = this;
 
         //single
-        this._loadSingleCol();
+        //this._loadSingleCol();
+
+        this._loadMultiCol();
        
     },
 
@@ -108,7 +110,17 @@ Polymer({
 //        y.domain([0, maxY]);
         var y = yAxis.scale();
         var x = xAxis.scale();        
-        var z = d3.scale.category20c();
+        var z = d3.scale.category10();
+        
+        if(yIndices.length == 1){
+            this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex);
+        }else{
+            this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex);
+        }
+    },
+    _drawSingleColArea: function(x,y,z, xIndex, yIndices, zIndex){
+        me = this;
+        var data = this.source;
 
         var stack = d3.layout.stack()
             .offset("zero")
@@ -121,7 +133,6 @@ Polymer({
             .y(function(d) {
                 return d[yIndices[0]];
             });
-
 
         var nest = d3.nest()
             .key(function(d) {
@@ -160,6 +171,68 @@ Polymer({
                 "layer unstack"})
             .attr("d", function(d) {
                 return area(d.values);
+            })
+            .style("fill", function(d, i) {
+                return z(i);
+            });
+    },
+    _drawMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
+        me = this;
+        var data = this.source;
+
+        var stack = d3.layout.stack()
+            .offset("zero")
+            .values(function(d) {
+                return d;
+            })
+            .x(function(d) {
+                return d[0];
+            })
+            .y(function(d) {
+                return d[1];
+            });
+
+        var area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function(d) {
+                return x(d[xIndex]);
+            });
+        if(me.isStack){
+            area.y0(function(d) {
+                return y(d.y0);
+            })
+            .y1(function(d) {
+                return y(d.y0 + d.y);
+            });
+        }else{
+            area.y0(function(d) {
+                return y(0);
+            })
+            .y1(function(d) {
+                return y(d.y);
+            });
+        }
+        //var groupBy = nest.entries(data);
+        var ds = [];
+        yIndices.forEach((d)=>{
+            var temp = [];
+            me.source.forEach((s)=>{
+                temp.push( [ s[xIndex], s[d] ])
+            });
+            ds.push(temp);
+        })
+        
+        var layers = stack(ds);
+
+        this.parentG.selectAll(".layer")
+            .data(layers)
+            .enter().append("path")
+            .attr("class", ()=>{ 
+                return (me.isStack)?
+                "layer stack":
+                "layer unstack"})
+            .attr("d", function(d) {
+                return area(d);
             })
             .style("fill", function(d, i) {
                 return z(i);
