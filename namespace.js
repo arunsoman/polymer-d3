@@ -22,7 +22,7 @@ PolymerD3.utilities._setProperty = function(arr, key) {
         }
     });
 };
-
+    
 PolymerD3.utilities._getProperty = function(arr, key) {
     var result;
     this[arr].forEach(function(elem) {
@@ -36,7 +36,7 @@ PolymerD3.utilities._getProperty = function(arr, key) {
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
     var arryadata = [];
     d3.text(name, function(error, text) {
-        d3.csv.parseRows(text, (aline) =>{
+        d3.csv.parseRows(text, (aline, ind) =>{
             numberIndexArray.forEach((token) =>{
                 aline[token] = +aline[token];
             });
@@ -45,7 +45,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             });
             arryadata.push(aline);
         });
-        callback(arryadata);
+        callback((header)? arryadata.splice(1):arryadata);
     });
 };
 
@@ -138,15 +138,52 @@ PolymerD3.utilities.clone = function(obj) {
     }
     return clone;
 };
-PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack) => {
-    findMinMax = function(aRow) {
+PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, measure) => {
+    var priMin = Number.MAX_VALUE;
+    var priMax = Number.MIN_VALUE;
+    findMinMax = function(groups) {
+        var min, max, sum;
+        groups.forEach((aGroup, i) => {
+            var ds = aGroup.values.map((a)=>{return a[yIndices[0]];});
+            var extent = d3.extent(ds);
+            if(extent[0] < priMin){
+                priMin = extent[0] ;
+            }
+            if(extent[1] > priMax){
+                priMax = extent[1] ;
+            }
+        });
+        return [min, sum];
+    };
+    findStackedMinMax = (groups) => {
+        var min, max, sum;
+        groups.forEach((aGroup, i) => {
+            var ds = aGroup.values.map((a)=>{return a[yIndices[0]];});
+            min = d3.min(ds);
+            sum = d3.sum(ds);
+            if(min < priMin){
+                priMin = min ;
+            }
+            if(sum > priMax){
+                priMax = sum ;
+            }
+        });
+        return [min, sum];
+    };
+    findMinMaxMultiCol = function(aRow) {
         var temp = [];
         yIndices.forEach((d) =>{
             temp.push(aRow[0][d]);
         });
-        return d3.extent(temp);
+        var result = d3.extent(temp);
+        if(result[0]< priMin){
+            priMin = result[0];
+        }else if(result[1]< priMax){
+            priMax = result[1];
+        } 
+        return result;
     };
-    findStackedMinMax = (aRow) => {
+    findStackedMinMaxMultiCol = (aRow) => {
         var min, max, sum;
         yIndices.forEach((yd, i) => {
             if (i == 0) {
@@ -161,7 +198,12 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack) => {
                 sum += datum;
             }
         });
-        return [min, max];
+        if(min < priMin){
+            priMin = min ;
+        }else if(sum < priMax){
+            priMax = sum ;
+        }
+        return [min, sum];
     };
 
     findXDomain = (array, format) => {
@@ -180,22 +222,27 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack) => {
                 });
         }
     };
-
+/*
     findYDomain = (array, format) => {
         return [
         d3.min(array, (q)=>{return q.values[0]}),
         d3.max(array, (q)=>{return q.values[1]})
         ];
     };
-    var handler = (stack) ? findStackedMinMax : findMinMax;
-    var dataSummary = d3.nest()
+    */
+
+    if(yIndices.length < 1){
+        var handler = (stack) ? findStackedMinMaxMultiCol : findMinMaxMultiCol;
+    }else {
+        var dataSummary = d3.nest()
         .key((d) => {
             return d[xIndex];
         })
-        .rollup(handler)
         .entries(data);
+        (stack) ? findStackedMinMax(dataSummary) : findMinMax(dataSummary);
+    }
     var Xdomain = findXDomain(dataSummary, xFormat);
-    var Ydomain = findYDomain(dataSummary, yFormat);
+    var Ydomain = [priMin, priMax];// findYDomain(dataSummary, yFormat);
     return {
         'getXDomain': () => {
             return Xdomain
