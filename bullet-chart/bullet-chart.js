@@ -153,12 +153,12 @@ Polymer({
           scale.domain([0, charts]);
           var bI = 0; var tI = 0; var sI = 0;
           return (type)=>{
-            var m = {
-             'bullet':scale(bI++),
-             'title':scale(tI++)
-           }
+            if (type === 'bullet') {
+                return scale(bI++)
+            } else if (type === 'title') {
+                return scale(tI++)
+            }
            console.log("tI" + tI +": "+type + " bI:" + bI);
-           return m[type];
           };
         }(me.data.length);
 
@@ -169,14 +169,15 @@ Polymer({
           return str;
         }
         translateTitleG = function(){
-         var tt = shift('title');
-          str = "translate(" + 0 + "," + tt + ")";
-          console.log("titleG= >" + str + "<" + tt);
-          return str; 
+            // 22 is set considering the height and font size in bullet.js
+            var tt = +shift('title') + 22;
+            str = "translate(" + 0 + "," + tt + ")";
+            console.log("titleG= >" + str + "<" + tt);
+            return str;
         }
 
         var bulletSVG = this.parentG.selectAll('g').data(me.data);
-            
+
         bulletSVG.enter()
             .append("g")
             .attr("class", "bulletG")

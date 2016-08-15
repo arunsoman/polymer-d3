@@ -1,0 +1,5 @@
+title, subtitle, range1, range2, range3, measure1, measure2, markers
+Revenue, US$, in thousands, 150, 225, 300, 220, 270, 250,
+OrderSize, US$, average, 350,500,600, 100,320, 550
+NewCustomers, count, 1400,2000,2500, 1000,1650, 2100
+Satisfaction, out of 5, 3.5,4.25,5, 3.2,4.7, 4.4
