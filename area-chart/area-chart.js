@@ -61,9 +61,9 @@ Polymer({
         me = this;
 
         //single
-        //this._loadSingleCol();
+        this._loadSingleCol();
 
-        this._loadMultiCol();
+        //this._loadMultiCol();
        
     },
 
