@@ -9,19 +9,20 @@
 
     ready: function() {
       //Hack for duplicate settings
-      var settings;
-      if (!this.settings || this.settings.length === 0) {
-        this.settings = [];
-      } else {
-        settings = JSON.stringify(this.settings);
-        this.settings = JSON.parse(settings);
-      }
+      // Hack removed. Add data as a function that returns the required object
+      // var settings;
+      // if (!this.settings || this.settings.length === 0) {
+      //   this.settings = [];
+      // } else {
+      //   settings = JSON.stringify(this.settings);
+      //   this.settings = JSON.parse(settings);
+      // }
       /*var container = document.createElement('div');
       container.className = "chartContainer";
       this.appendChild(container);
       //this.makeChartWrap();
       this.scopeSubtree(this.querySelector('.chartContainer'), true);
-      */  
+      */
       console.log("chart init: ready");
     },
 

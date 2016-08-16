@@ -5,36 +5,40 @@ Polymer({
     inputs: {
       notify: true,
       type: Array,
-      value: [{
-        input: 'x',
-        txt: 'Pick a dimension',
-        selectedValue: [],
-        scaleType: '',
-        format:'',
-        selectedObjs: [{
-          key: 'state',
-          value: '0'
-        }],
-        uitype: 'single-value',
-        maxSelectableValues: 1
-      }, {
-        input: 'y',
-        txt: 'Pick measures',
-        selectedValue: [],
-        format:'',
-        scaleType: '',
-        selectedObjs: [{
-          key: 'Under Five Year',
-          value: '1'
-        }],
-        uitype: 'multi-value',
-        maxSelectableValues: 2
-      }]
+      value: function() {
+        return [{
+          input: 'x',
+          txt: 'Pick a dimension',
+          selectedValue: [],
+          scaleType: '',
+          format:'',
+          selectedObjs: [{
+            key: 'state',
+            value: '0'
+          }],
+          uitype: 'single-value',
+          maxSelectableValues: 1
+        }, {
+          input: 'y',
+          txt: 'Pick measures',
+          selectedValue: [],
+          format:'',
+          scaleType: '',
+          selectedObjs: [{
+            key: 'Under Five Year',
+            value: '1'
+          }],
+          uitype: 'multi-value',
+          maxSelectableValues: 2
+        }];
+      }
     },
     settings: {
       notify: true,
       type: Object,
-      value: {}
+      value: function(){
+        return {};
+      }
     },
     hideSettings: true,
     source: Array,

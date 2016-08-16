@@ -3,15 +3,17 @@
     properties: {
       color: {
         type: Array,
-        value: [{
-            input: 'colorRange',
-            txt: 'Color range',
-            uitype: 'colorRangePicker',
-            from: "#aad",
-            to: "#556",
-            notify: true,
-            observer: '_colorRangeChanged'
-        }]
+        value: function() {
+            return [{
+                input: 'colorRange',
+                txt: 'Color range',
+                uitype: 'colorRangePicker',
+                from: "#aad",
+                to: "#556",
+                notify: true,
+                observer: '_colorRangeChanged'
+            }];
+        }
         },
         // pointer: this.area,
     },

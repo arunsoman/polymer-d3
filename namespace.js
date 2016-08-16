@@ -22,7 +22,7 @@ PolymerD3.utilities._setProperty = function(arr, key) {
         }
     });
 };
-
+    
 PolymerD3.utilities._getProperty = function(arr, key) {
     var result;
     this[arr].forEach(function(elem) {
@@ -36,7 +36,7 @@ PolymerD3.utilities._getProperty = function(arr, key) {
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
     var arryadata = [];
     d3.text(name, function(error, text) {
-        d3.csv.parseRows(text, (aline) =>{
+        d3.csv.parseRows(text, (aline, ind) =>{
             numberIndexArray.forEach((token) =>{
                 aline[token] = +aline[token];
             });
@@ -45,7 +45,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             });
             arryadata.push(aline);
         });
-        callback(arryadata);
+        callback((header)? arryadata.splice(1):arryadata);
     });
 };
 
@@ -137,4 +137,158 @@ PolymerD3.utilities.clone = function(obj) {
         clone = JSON.parse(clone);
     }
     return clone;
-}
+};
+PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, measure) => {
+    
+    var Xdomain;
+    var Ydomain;
+    var stacked;
+
+    findMinMax = function() {
+        var priYMin = Number.MAX_VALUE;
+        var priYMax = Number.MIN_VALUE;
+        var priXMin = Number.MAX_VALUE;
+        var priXMax = Number.MIN_VALUE;
+        data.forEach((aRow, i) => {
+            if(i == 0){
+                priYMax = priYMin = aRow[yIndices[0]];
+                priXMax = priXMin = aRow[xIndex];
+            }
+            else{
+                if(aRow[yIndices[0]] < priYMin){
+                    priYMin = aRow[yIndices[0]] ;
+                }
+                if(aRow[yIndices[0]] > priYMax){
+                    priYMax = aRow[yIndices[0]] ;
+                }
+                if(aRow[xIndex] < priXMin){
+                    priXMin = aRow[xIndex] ;
+                }
+                if(aRow[xIndex] > priXMax){
+                    priXMax = aRow[xIndex] ;
+                }
+            }
+        });
+        Xdomain= [priXMin, priXMax];
+        Ydomain= [priYMin, priYMax];
+    };
+    findStackedMinMax = () => {
+        var layers = d3.nest()
+                    .key(function(d) { return d[measure]; })
+                    //.rollup(function(aRow) { return [ aRow[xIndex], aRow[yIndices[0]] ] })
+                    .entries(data);
+        stacked = d3.layout.stack()
+                    .y((d)=>{
+                        return d[yIndices[0]]})
+                    .values((d) => d.values)
+                    (layers);
+        var topS = stacked[stacked.length-1];
+        Ydomain = d3.extent(topS.values, (d) => {
+            return (d.y + d.y0)})
+        Xdomain = d3.extent(topS.values, (d) => {
+            return d[xIndex]; } )
+    };
+    findXDomain = (array, format) => {
+        switch (format) {
+            case 'string':
+                return d3.map(array, (d) => {
+                    return d.key;
+                });
+            case 'time':
+                return d3.extent(array, (d) => {
+                    return new Date(d.key);
+                });
+            case 'number':
+                return d3.extent(array, (d) => {
+                    return +d.key;
+                });
+        }
+    };
+
+    if(yIndices.length == 1){
+        var handler = (stack) ? findStackedMinMax : findMinMax;
+        handler();
+    }
+    else if (yIndices.length > 1){
+        if(stack) {
+           var layers = [];
+            yIndices.forEach(function (aCatIndex) {
+                var catArray = [];
+                data.forEach(function (datum) {
+                    catArray.push([datum[xIndex], datum[aCatIndex]]);
+                });
+                layers.push(catArray);
+            });
+            stacked = d3.layout.stack().y((d)=>{return d[1]})(layers);
+
+            var topS = stacked[stacked.length-1];
+            Ydomain = d3.extent(topS, (d) => {return (d.y + d.y0)})
+            Xdomain = d3.extent(topS, (d) => {return d[0];} )
+
+        } else{
+             Ymax = d3.max(data, function (aRow) {
+                return d3.max(aRow.filter(function (value, index) {
+                    return yIndices.includes(index);
+                }));
+            });
+            Ymin = d3.max(data, function (aRow) {
+                return d3.max(aRow.filter(function (value, index) {
+                    return yIndices.includes(index);
+                }));
+            });
+            Xmax = d3.max(data, function (aRow) {
+                return d3.max(aRow.filter(function (value, index) {
+                    return index == xIndex;
+                }));
+            });
+            Xmin = d3.min(data, function (aRow) {
+                return d3.min(aRow.filter(function (value, index) {
+                    return index == xIndex;
+                }));
+            });
+            Ydomain = [Ymin, Ymax];
+            Xdomain = [Xmin, Xmax];
+        }
+    }
+    else{
+        throw new Error("invalid entry in yIndices" + yIndices);
+    }
+    // findYDomain(dataSummary, yFormat);
+    
+    console.log("xDom:" + Xdomain + " yDom:" + Ydomain);
+    return {
+        'getStack': ()=>{
+            return stacked;
+        },
+        'getXDomain': () => {
+            return Xdomain
+        },
+        'getYDomain': () => {
+            return Ydomain
+        }
+        };
+};
+
+PolymerD3.rollup = (data, groupby, handler) =>{
+    var dataSummary = d3.nest()
+    .key((d) => {
+        return d[groupby];
+    })
+    .rollup((aRow) => {
+        handler(aRow);
+    })
+    .entries(data);
+    return dataSummary;
+};
+
+PolymerD3.rollupMultiValued = (columns, columnHeaders, xId, data)=>{
+    var multiValue = columns.map(function(id) {
+        return {
+            id: columnHeaders[id],
+            values: data.map((d) => {
+                return {'x': d[xId], 'y': d[id]};
+            })
+        };
+    });
+    return multiValue;
+};

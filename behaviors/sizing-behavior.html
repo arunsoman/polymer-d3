@@ -2,45 +2,45 @@
   PolymerD3.sizingBehavior = {
     properties: {
         area: {
-            type: Array
+            type: Array,
+            value: function() {
+                return [{
+                    input: 'height',
+                    txt: 'Height of the chart',
+                    uitype: 'Number',
+                    selectedValue: 500
+                }, {
+                    input: 'width',
+                    txt: 'Width of the chart',
+                    uitype: 'Number',
+                    selectedValue: 960
+                }, {
+                    input: 'marginTop',
+                    txt: 'Top  margin',
+                    uitype: 'Number',
+                    selectedValue: 40
+                }, {
+                    input: 'marginRight',
+                    txt: 'Right margin',
+                    uitype: 'Number',
+                    selectedValue: 10
+                }, {
+                    input: 'marginBottom',
+                    txt: 'Bottom margin',
+                    uitype: 'Number',
+                    selectedValue: 20
+                }, {
+                    input: 'marginLeft',
+                    txt: 'Left margin',
+                    uitype: 'Number',
+                    selectedValue: 50
+                }];
+            }
         }
     },
     observers: ['_areaChanged(settings.area.*)'],
 
     created: function() {
-        this.area = [
-            {
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 500
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 960
-            }, {
-                input: 'marginTop',
-                txt: 'Top  margin',
-                uitype: 'Number',
-                selectedValue: 40
-            }, {
-                input: 'marginRight',
-                txt: 'Right margin',
-                uitype: 'Number',
-                selectedValue: 10
-            }, {
-                input: 'marginBottom',
-                txt: 'Bottom margin',
-                uitype: 'Number',
-                selectedValue: 20
-            }, {
-                input: 'marginLeft',
-                txt: 'Left margin',
-                uitype: 'Number',
-                selectedValue: 50
-            }
-        ];
       console.log('sizingBehavior: created');
     },
 
