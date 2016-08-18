@@ -77,14 +77,14 @@ Polymer({
       this.inputs[0].name = 'time';
       this.inputs[1].selectedValue  = [1,2,3];
       this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
-      this.layers = undefine;
+      this.layers = undefined;
     },
     _loadSingleCol: function(){
         PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme, true);
         this.inputs[0].selectedValue = 2;
         this.inputs[1].selectedValue = [1];
         this.inputs[2].selectedValue = 0;
-        this.layers = undefine
+        this.layers = undefined;
     },
 
     draw: function() {
@@ -161,7 +161,7 @@ Polymer({
             pathClass = "line";
         }
         this.parentG.selectAll(".layer")
-            .data(layers)
+            .data(me.layers)
             .enter().append("path")
             .attr("class", pathClass)
             .attr("d", function(d) {
