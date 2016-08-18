@@ -45,6 +45,10 @@ Polymer({
         isStack: {
             value : true,
             type: Boolean
+        },
+        isArea: {
+            value : false,
+            type: Boolean
         }
     },
 
@@ -59,17 +63,14 @@ Polymer({
     },
     attached: function() {
         me = this;
-
-        //single
         this._loadSingleCol();
-
         //this._loadMultiCol();
-       
     },
 
     _callme: function(data) {
         me.source = data;
     },
+
     _loadMultiCol: function(){
         PolymerD3.fileReader("ms.csv", [1, 2, 3], [0], "%Y%m%d", this._callme);
       this.inputs[0].selectedValue = 0;
@@ -111,14 +112,66 @@ Polymer({
         var y = yAxis.scale();
         var x = xAxis.scale();        
         var z = d3.scale.category10();
-        
-        if(yIndices.length == 1){
-            this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex);
+
+        var area = d3.svg.area()
+            .interpolate("cardinal")
+            .x(function(d) {
+                return x(d[xIndex]);
+            });
+        if(me.isStack){
+            area.y0(function(d) {
+                return y(d.y0);
+            })
+            .y1(function(d) {
+                return y(d.y0 + d.y);
+            });
         }else{
-            this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex);
+            area.y0(function(d) {
+                return y(0);
+            })
+            .y1(function(d) {
+                return y(d.y);
+            });
+        };
+        var line = d3.svg.line().interpolate("basis")
+          .x( (d) => { 
+            return x(d[xIndex]);
+             })
+          .y( (d) => { 
+            return (me.isStack)?y(d.y+d.y0):y(d.y); 
+          });
+
+        var display = (this.isArea)?area:line;
+        var layers;
+        if(yIndices.length == 1){
+            layers = this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex, display);
+        }else{
+            layers = this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex, display);
         }
+        var pathClass;
+        if(me.isArea){
+          pathClass= (me.isStack)?
+                "layer stack":
+                "layer unstack";
+        }
+        else{
+            pathClass = "line";
+        }
+        this.parentG.selectAll(".layer")
+            .data(layers)
+            .enter().append("path")
+            .attr("class", pathClass)
+            .attr("d", function(d) {
+                return display(d.values);
+            })
+            .style("fill", function(d, i) {
+                return (me.isArea)?z(i):'none';
+            })
+            .style("stroke", function(d, i) {
+                return (! me.isArea)?z(i):'none';
+            }) ;
     },
-    _drawSingleColArea: function(x,y,z, xIndex, yIndices, zIndex){
+    _drawSingleColArea: function(x,y,z, xIndex, yIndices, zIndex, display){
         me = this;
         var data = this.source;
 
@@ -139,42 +192,10 @@ Polymer({
                 return d[zIndex];
             });
 
-        var area = d3.svg.area()
-            .interpolate("cardinal")
-            .x(function(d) {
-                return x(d[xIndex]);
-            });
-        if(me.isStack){
-            area.y0(function(d) {
-                return y(d.y0);
-            })
-            .y1(function(d) {
-                return y(d.y0 + d.y);
-            });
-        }else{
-            area.y0(function(d) {
-                return y(0);
-            })
-            .y1(function(d) {
-                return y(d.y);
-            });
-        }
         var groupBy = nest.entries(data);
         var layers = stack(groupBy);
+        return layers;
 
-        this.parentG.selectAll(".layer")
-            .data(layers)
-            .enter().append("path")
-            .attr("class", ()=>{ 
-                return (me.isStack)?
-                "layer stack":
-                "layer unstack"})
-            .attr("d", function(d) {
-                return area(d.values);
-            })
-            .style("fill", function(d, i) {
-                return z(i);
-            });
     },
     _drawMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
         me = this;
@@ -192,26 +213,6 @@ Polymer({
                 return d[1];
             });
 
-        var area = d3.svg.area()
-            .interpolate("cardinal")
-            .x(function(d) {
-                return x(d[xIndex]);
-            });
-        if(me.isStack){
-            area.y0(function(d) {
-                return y(d.y0);
-            })
-            .y1(function(d) {
-                return y(d.y0 + d.y);
-            });
-        }else{
-            area.y0(function(d) {
-                return y(0);
-            })
-            .y1(function(d) {
-                return y(d.y);
-            });
-        }
         //var groupBy = nest.entries(data);
         var ds = [];
         yIndices.forEach((d)=>{
@@ -223,19 +224,6 @@ Polymer({
         })
         
         var layers = stack(ds);
-
-        this.parentG.selectAll(".layer")
-            .data(layers)
-            .enter().append("path")
-            .attr("class", ()=>{ 
-                return (me.isStack)?
-                "layer stack":
-                "layer unstack"})
-            .attr("d", function(d) {
-                return area(d);
-            })
-            .style("fill", function(d, i) {
-                return z(i);
-            });
+        return layers;
     }
 });

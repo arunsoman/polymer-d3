@@ -145,32 +145,62 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
     var stacked;
 
     findMinMax = function() {
-        var priYMin = Number.MAX_VALUE;
-        var priYMax = Number.MIN_VALUE;
-        var priXMin = Number.MAX_VALUE;
-        var priXMax = Number.MIN_VALUE;
-        data.forEach((aRow, i) => {
-            if(i == 0){
-                priYMax = priYMin = aRow[yIndices[0]];
-                priXMax = priXMin = aRow[xIndex];
-            }
-            else{
-                if(aRow[yIndices[0]] < priYMin){
-                    priYMin = aRow[yIndices[0]] ;
+        whenNotOrdinal = function(){
+            var priYMin;
+            var priYMax;
+            var priXMin;
+            var priXMax;
+            data.forEach((aRow, i) => {
+                if(i == 0){
+                    priYMax = priYMin = aRow[yIndices[0]];
+                    priXMax = priXMin = aRow[xIndex];
                 }
-                if(aRow[yIndices[0]] > priYMax){
-                    priYMax = aRow[yIndices[0]] ;
+                else{
+                    if(aRow[yIndices[0]] < priYMin){
+                        priYMin = aRow[yIndices[0]] ;
+                    }
+                    if(aRow[yIndices[0]] > priYMax){
+                        priYMax = aRow[yIndices[0]] ;
+                    }
+                    if(aRow[xIndex] < priXMin){
+                        priXMin = aRow[xIndex] ;
+                    }
+                    if(aRow[xIndex] > priXMax){
+                        priXMax = aRow[xIndex] ;
+                    }
                 }
-                if(aRow[xIndex] < priXMin){
-                    priXMin = aRow[xIndex] ;
+            });
+            Xdomain= [priXMin, priXMax];
+            Ydomain= [priYMin, priYMax];
+        };
+        whenOrdinal = function(){
+            var priYMin;
+            var priYMax;
+            var setX = d3.set();
+            data.forEach((aRow, i) => {
+                if(i == 0){
+                    priYMax = priYMin = aRow[yIndices[0]];
+                    setX.add(aRow[xIndex]);
                 }
-                if(aRow[xIndex] > priXMax){
-                    priXMax = aRow[xIndex] ;
+                else{
+                    if(aRow[yIndices[0]] < priYMin){
+                        priYMin = aRow[yIndices[0]] ;
+                    }
+                    if(aRow[yIndices[0]] > priYMax){
+                        priYMax = aRow[yIndices[0]] ;
+                    }
+                    setX.add(aRow[xIndex]);
+                    
                 }
-            }
-        });
-        Xdomain= [priXMin, priXMax];
-        Ydomain= [priYMin, priYMax];
+            });
+            Xdomain= setX.values();
+            Ydomain= [priYMin, priYMax];
+        };
+        if(xFormat === 'string'){
+            whenOrdinal();
+        }else{
+            whenNotOrdinal();
+        }
     };
     findStackedMinMax = () => {
         var layers = d3.nest()
@@ -187,22 +217,6 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
             return (d.y + d.y0)})
         Xdomain = d3.extent(topS.values, (d) => {
             return d[xIndex]; } )
-    };
-    findXDomain = (array, format) => {
-        switch (format) {
-            case 'string':
-                return d3.map(array, (d) => {
-                    return d.key;
-                });
-            case 'time':
-                return d3.extent(array, (d) => {
-                    return new Date(d.key);
-                });
-            case 'number':
-                return d3.extent(array, (d) => {
-                    return +d.key;
-                });
-        }
     };
 
     if(yIndices.length == 1){
@@ -231,8 +245,8 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
                     return yIndices.includes(index);
                 }));
             });
-            Ymin = d3.max(data, function (aRow) {
-                return d3.max(aRow.filter(function (value, index) {
+            Ymin = d3.min(data, function (aRow) {
+                return d3.min(aRow.filter(function (value, index) {
                     return yIndices.includes(index);
                 }));
             });
