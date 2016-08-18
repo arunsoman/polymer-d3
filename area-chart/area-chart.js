@@ -77,12 +77,14 @@ Polymer({
       this.inputs[0].name = 'time';
       this.inputs[1].selectedValue  = [1,2,3];
       this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
+      this.layers = undefine;
     },
     _loadSingleCol: function(){
         PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme, true);
         this.inputs[0].selectedValue = 2;
         this.inputs[1].selectedValue = [1];
         this.inputs[2].selectedValue = 0;
+        this.layers = undefine
     },
 
     draw: function() {
@@ -142,11 +144,12 @@ Polymer({
           });
 
         var display = (this.isArea)?area:line;
-        var layers;
-        if(yIndices.length == 1){
-            layers = this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex, display);
-        }else{
-            layers = this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex, display);
+        if(! me.layers){
+            if(yIndices.length == 1){
+                me.layers = this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex, display);
+            }else{
+                me.layers = this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex, display);
+            }
         }
         var pathClass;
         if(me.isArea){
