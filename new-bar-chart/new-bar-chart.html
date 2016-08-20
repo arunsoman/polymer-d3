@@ -1,0 +1,39 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="new-bar-chart">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h4>Bar Chart New</h4>
+    <template is="dom-if" if="[[editMode]]">
+      <div class='mandatory'>
+        <display-component settings="{{inputs}}" external='[[external]]' draggable="true"></display-component>
+      </div>
+
+      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
+      <div class='optional' hidden="{{hideSettings}}">
+          <display-component settings="{{settings}}" external='[[external]]'></display-component>
+      </div>
+    </template>
+
+  </template>
+  <script src="new-bar-chart.js">
+  </script>
+</dom-module>

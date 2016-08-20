@@ -68,19 +68,22 @@ Polymer({
     },
 
     _callme: function(data) {
-        me.source = data;
+        // Chnaged this part, me cannot be used here
+        this.source = data;
     },
 
     _loadMultiCol: function(){
-        PolymerD3.fileReader("ms.csv", [1, 2, 3], [0], "%Y%m%d", this._callme);
-      this.inputs[0].selectedValue = 0;
-      this.inputs[0].name = 'time';
-      this.inputs[1].selectedValue  = [1,2,3];
-      this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
-      this.layers = undefined;
+        // Altered @param -> `callback`
+        // For setting right value for `this`
+        PolymerD3.fileReader("ms.csv", [1, 2, 3], [0], "%Y%m%d", this._callme.bind(this));
+        this.inputs[0].selectedValue = 0;
+        this.inputs[0].name = 'time';
+        this.inputs[1].selectedValue  = [1,2,3];
+        this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
+        this.layers = undefined;
     },
     _loadSingleCol: function(){
-        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme, true);
+        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme.bind(this), true);
         this.inputs[0].selectedValue = 2;
         this.inputs[1].selectedValue = [1];
         this.inputs[2].selectedValue = 0;
