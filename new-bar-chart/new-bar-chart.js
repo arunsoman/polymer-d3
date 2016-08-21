@@ -8,11 +8,11 @@
       inputs: {
         notify: true,
         type: Array,
-        value: function() {
+        value: () => {
           return [{
             input: 'x',
             txt: 'Pick a dimension',
-            selectedValue: [],
+            selectedValue: 0,
             scaleType: '',
             format:'',
             selectedObjs: [{
@@ -24,7 +24,7 @@
           }, {
             input: 'y',
             txt: 'Pick measures',
-            selectedValue: [],
+            selectedValue: [1, 2],
             format:'',
             scaleType: '',
             selectedObjs: [{
@@ -39,7 +39,7 @@
       settings: {
         notify: true,
         type: Object,
-        value: function() {
+        value: () => {
           return {};
         }
       },
@@ -63,6 +63,39 @@
     },
 
     draw: function() {
+
+      let xIndex = this.getInputsProperty('x');
+      let yIndices = this.getInputsProperty('y');
+      let data = this.source;
+
+      // requireed indices not selected
+      if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data) {
+        return false;
+      }
+
+      let summarised = PolymerD3
+        .summarizeData(data, xIndex, 'string', yIndices, 'number', true, undefined);
+      let yBound = summarised.getYDomain();
+      let xBound = summarised.getXDomain();
+
+      const xConf = {
+        'scaleType': 'category',
+        'align': 'h',
+        'format': 'category',
+        'position': 'bottom',
+        'domain': xBound
+      };
+
+      const yConf = {
+        'scaleType': 'linear',
+        'align': 'v',
+        'format': 'currency',
+        'position': 'left',
+        'domain': [0, yBound[1]]
+      };
+
+      let yAxis = this.createAxis(yConf);
+      let xAxis = this.createAxis(xConf);
     }
   });
 })();

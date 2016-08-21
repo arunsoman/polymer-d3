@@ -20,7 +20,10 @@
                     d3.scale.ordinal().rangeRoundBands((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding) : d3.scale.ordinal().rangeRoundPoints((align === 'v') ? [this.chartHeight,0] : [0, this.chartWidth], barPadding)
             };
             var scale = map[config.scaleType];
-            scale.nice();
+            // ordinals doesn't have nice()
+            if (scale.nice) {
+                scale.nice();
+            }
             if (!scale) {
                 throw new Error("config.scale not valid supported {linear, time,category}")
             }

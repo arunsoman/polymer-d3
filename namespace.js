@@ -190,7 +190,6 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
                         priYMax = aRow[yIndices[0]] ;
                     }
                     setX.add(aRow[xIndex]);
-                    
                 }
             });
             Xdomain= setX.values();
@@ -237,7 +236,14 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
 
             var topS = stacked[stacked.length-1];
             Ydomain = d3.extent(topS, (d) => {return (d.y + d.y0)})
-            Xdomain = d3.extent(topS, (d) => {return d[0];} )
+            Xdomain = d3.extent(topS, (d) => {return d[0];} );
+
+            // For ordinal Xaxis
+            if (xFormat === 'string') {
+                Xdomain = data.map(d => {
+                    return d[xIndex];
+                });
+            }
 
         } else{
              Ymax = d3.max(data, function (aRow) {
