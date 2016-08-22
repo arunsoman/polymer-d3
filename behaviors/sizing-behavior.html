@@ -65,7 +65,7 @@
         chartContainer.style.height = outerHeight + 'px';
         chartContainer.style.width = outerWidth + 'px';
 
-        var svg = d3.selectAll('.chartContainer').selectAll('svg').data([1]);
+        var svg = d3.select(chartContainer).selectAll('svg').data([1]);
         svg.enter().append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
             .attr("viewBox", "0 0 " + outerWidth +" " + outerHeight +"")

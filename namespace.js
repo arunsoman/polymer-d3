@@ -140,12 +140,14 @@ PolymerD3.utilities.clone = function(obj) {
 };
 PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, measure) => {
     
-    var Xdomain;
+    var Xdomain = [];
     var Ydomain;
     var stacked;
 
-    findMinMax = function() {
-        whenNotOrdinal = function(){
+    var xSet = d3.set();
+
+    var findMinMax = function() {
+        var whenNotOrdinal = function(){
             var priYMin;
             var priYMax;
             var priXMin;
@@ -173,7 +175,7 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
             Xdomain= [priXMin, priXMax];
             Ydomain= [priYMin, priYMax];
         };
-        whenOrdinal = function(){
+        var whenOrdinal = function(){
             var priYMin;
             var priYMax;
             var setX = d3.set();
@@ -189,46 +191,85 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
                     if(aRow[yIndices[0]] > priYMax){
                         priYMax = aRow[yIndices[0]] ;
                     }
+                    // Todo optimize
                     setX.add(aRow[xIndex]);
                 }
             });
             Xdomain= setX.values();
             Ydomain= [priYMin, priYMax];
         };
-        if(xFormat === 'string'){
+        if(xFormat === 'ordinal'){
             whenOrdinal();
         }else{
             whenNotOrdinal();
         }
     };
-    findStackedMinMax = () => {
+    var findStackedMinMax = (data) => {
+        var layerArray = [];
+        var converter = (arg) => {
+            var convertDate = function(strDate){
+                return new Date(strDate);
+            };
+            var convertNum = function(num) {
+                return +num;
+            };
+            var convertStr = function(str) {
+                return str;
+            };
+            if (arg instanceof Date) {
+                return convertDate;
+            } else if (typeof arg === 'number') {
+                return convertNum;
+            } else {
+                return convertStr;
+            }
+        };
+        var convert = converter(data[0][xIndex]);
+        // group by key.
         var layers = d3.nest()
-                    .key(function(d) { return d[measure]; })
-                    //.rollup(function(aRow) { return [ aRow[xIndex], aRow[yIndices[0]] ] })
-                    .entries(data);
-        stacked = d3.layout.stack()
-                    .y((d)=>{
-                        return d[yIndices[0]]})
-                    .values((d) => d.values)
-                    (layers);
-        var topS = stacked[stacked.length-1];
-        Ydomain = d3.extent(topS.values, (d) => {
-            return (d.y + d.y0)})
-        Xdomain = d3.extent(topS.values, (d) => {
-            return d[xIndex]; } )
+            .key(function(d) { 
+                return d[xIndex]; 
+            })
+            .entries(data)
+            .map((d) => {
+               var r = [convert(d.key)];
+               d.values.forEach(v => {
+                 r.push(v[yIndices[0]])
+               })
+               return r;
+           });
+        stackFromMultiColoumn(layers, [1, 2, 3], 0);
+        // stackFromMultiColoumn(layerArray, new params);
     };
 
-    if(yIndices.length == 1){
-        var handler = (stack) ? findStackedMinMax : findMinMax;
-        handler();
-    }
-    else if (yIndices.length > 1){
-        if(stack) {
-           var layers = [];
-            yIndices.forEach(function (aCatIndex) {
+    var stackFromMultiColoumn = (data, newYIndices, newXIndex) => {
+        var layers = [];
+        if (!newYIndices) {
+            newYIndices = yIndices;
+        }
+        if (newXIndex === undefined || newXIndex === null) {
+            newXIndex = xIndex;
+        }
+        if (xFormat === 'ordinal') {
+            // yIndices = [0,1,2,3];
+            newYIndices.forEach(function (aCatIndex) {
                 var catArray = [];
                 data.forEach(function (datum) {
-                    catArray.push([datum[xIndex], datum[aCatIndex]]);
+                    catArray.push([datum[newXIndex], datum[aCatIndex]]);
+                    // Todo: Optimize
+                });
+                layers.push(catArray);
+            });
+            stacked = d3.layout.stack().y((d)=>{return d[1]})(layers);
+
+            var topS = stacked[stacked.length-1];
+            Ydomain = d3.extent(topS, (d) => {return (d.y + d.y0)})
+            Xdomain = topS.map(t => {return t[newXIndex]})
+        } else {
+            newYIndices.forEach(function (aCatIndex) {
+                var catArray = [];
+                data.forEach(function (datum) {
+                    catArray.push([datum[newXIndex], datum[aCatIndex]]);
                 });
                 layers.push(catArray);
             });
@@ -237,25 +278,25 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
             var topS = stacked[stacked.length-1];
             Ydomain = d3.extent(topS, (d) => {return (d.y + d.y0)})
             Xdomain = d3.extent(topS, (d) => {return d[0];} );
-
-            // For ordinal Xaxis
-            if (xFormat === 'string') {
-                Xdomain = data.map(d => {
-                    return d[xIndex];
-                });
-            }
-
-        } else{
-             Ymax = d3.max(data, function (aRow) {
-                return d3.max(aRow.filter(function (value, index) {
-                    return yIndices.includes(index);
-                }));
+        }
+    };
+    var groupFromMultiColoumn = (data) => {
+        Ymax = d3.max(data, function (aRow) {
+            return d3.max(aRow.filter(function (value, index) {
+                return yIndices.includes(index);
+            }));
+        });
+        Ymin = d3.min(data, function (aRow) {
+            return d3.min(aRow.filter(function (value, index) {
+                return yIndices.includes(index);
+            }));
+        });
+        if (xFormat === 'ordinal') {
+            data.forEach(function(datum) {
+                xSet.add(datum[xIndex]);
             });
-            Ymin = d3.min(data, function (aRow) {
-                return d3.min(aRow.filter(function (value, index) {
-                    return yIndices.includes(index);
-                }));
-            });
+            Xdomain = xSet.values();
+        } else {
             Xmax = d3.max(data, function (aRow) {
                 return d3.max(aRow.filter(function (value, index) {
                     return index == xIndex;
@@ -266,9 +307,17 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
                     return index == xIndex;
                 }));
             });
-            Ydomain = [Ymin, Ymax];
             Xdomain = [Xmin, Xmax];
         }
+        Ydomain = [Ymin, Ymax];
+    }
+    if(yIndices.length == 1){
+        var handler = (stack) ? findStackedMinMax : findMinMax;
+        handler(data);
+    }
+    else if (yIndices.length > 1){
+        var handler = (stack) ? stackFromMultiColoumn : groupFromMultiColoumn;
+        handler(data);
     }
     else{
         throw new Error("invalid entry in yIndices" + yIndices);
@@ -286,7 +335,7 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
         'getYDomain': () => {
             return Ydomain
         }
-        };
+    };
 };
 
 PolymerD3.rollup = (data, groupby, handler) =>{

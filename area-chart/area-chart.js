@@ -62,13 +62,11 @@ Polymer({
         this.chart = this.draw();
     },
     attached: function() {
-        me = this;
         this._loadSingleCol();
         //this._loadMultiCol();
     },
 
     _callme: function(data) {
-        // Chnaged this part, me cannot be used here
         this.source = data;
     },
 
@@ -91,7 +89,7 @@ Polymer({
     },
 
     draw: function() {
-        me = this;
+        var me = this;
         var xIndex = this.getInputsProperty('x');
         var yIndices = this.getInputsProperty('y');
         var zIndex = this.getInputsProperty('z');
@@ -178,7 +176,7 @@ Polymer({
             }) ;
     },
     _drawSingleColArea: function(x,y,z, xIndex, yIndices, zIndex, display){
-        me = this;
+        var me = this;
         var data = this.source;
 
         var stack = d3.layout.stack()
@@ -204,7 +202,7 @@ Polymer({
 
     },
     _drawMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
-        me = this;
+        var me = this;
         var data = this.source;
 
         var stack = d3.layout.stack()

@@ -27,8 +27,9 @@
             if (!scale) {
                 throw new Error("config.scale not valid supported {linear, time,category}")
             }
-            if (config.domain)
+            if (config.domain) {
                 scale.domain(config.domain);
+            }
             return scale;
         },
 
