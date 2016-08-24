@@ -71,8 +71,8 @@
     ],
 
     attached: function() {
-      // this._loadSingleCol()
-      PolymerD3.fileReader('bar-data.csv', [1, 2, 3, 4, 5, 6, 7], [], undefined, this._setSource.bind(this));
+      this._loadSingleCol()
+      // PolymerD3.fileReader('bar-data.csv', [1, 2, 3, 4, 5, 6, 7], [], undefined, this._setSource.bind(this));
     },
 
     _setSource: function(data) {
@@ -106,7 +106,7 @@
       const xConf = {
         'scaleType': 'category',
         'align': 'h',
-        'format': 'category',
+        'format': 'time',
         'position': 'bottom',
         'domain': xBound
       };

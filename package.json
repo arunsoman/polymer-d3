@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint **/*.js && eslint **/*.html"
+    "lint": "eslint **/*.js && eslint **/*.html",
+    "serve": "browser-sync start --config bs-config.js"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,7 @@
   },
   "homepage": "https://github.com/arunsoman/polymer-d3#readme",
   "devDependencies": {
+    "browser-sync": "^2.14.0",
     "eslint": "^3.2.2",
     "eslint-config-google": "^0.6.0"
   }
