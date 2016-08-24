@@ -37,15 +37,20 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
     var arryadata = [];
     d3.text(name, function(error, text) {
         d3.csv.parseRows(text, (aline, ind) =>{
-            numberIndexArray.forEach((token) =>{
-                aline[token] = +aline[token];
-            });
-            dateIndexArray.forEach((token) =>{
-                aline[token]  = d3.time.format(dateParser).parse(aline[token]);
-            });
-            arryadata.push(aline);
+            if(ind == 0 && header === true){
+                arryadata.push(aline);
+            } else {
+                numberIndexArray.forEach((token) =>{
+                    aline[token] = +aline[token];
+                });
+                dateIndexArray.forEach((token) =>{
+                    aline[token]  = d3.time.format(dateParser).parse(aline[token]);
+                });
+                arryadata.push(aline);
+            }
         });
-        callback((header)? arryadata.splice(1):arryadata);
+        // callback((header)? arryadata.splice(1):arryadata);
+        callback(arryadata);
     });
 };
 

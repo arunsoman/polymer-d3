@@ -87,16 +87,33 @@
       this.layers = undefined;
     },
     draw: function() {
-
       let xIndex = this.getInputsProperty('x');
       let yIndices = this.getInputsProperty('y');
       let z = d3.scale.category10();
       let data = this.source;
+      var me = this;
 
       // requireed indices not selected
       if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data) {
         return false;
       }
+
+      var conf = {
+        containsHeader: true,
+        xheader : [2],
+        yheader : [1],
+        width: 700,
+        height: 300,
+        xFormat: 'string',
+        yFormat: 'number',
+        xAlign: 'bottom',
+        yAlign:'left',
+        xaxisType: 'ordinal',
+        yaxisType: 'linear',
+        parentG: me.parentG
+      };
+
+      var nChartConfig = chartConfig(conf, this.source);
 
       let summarised = PolymerD3
         .summarizeData(data, xIndex, 'ordinal', yIndices, 'number', this.isStacked, this.inputs[2].selectedValue);
