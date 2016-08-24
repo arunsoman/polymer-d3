@@ -26,11 +26,11 @@ var chartConfig = (conf, data, rowCallback) => {
         var max = Number.MIN_VALUE;
         return {
             process: (datum) => {
-                if (max < datum[index]) {
-                    max = datum[index];
+                if (max < datum[index[0]]) {
+                    max = datum[index[0]];
                 }
-                if (min > datum[index]) {
-                    min = datum[index];
+                if (min > datum[index[0]]) {
+                    min = datum[index[0]];
                 }
             },
             getDomain: () => {
@@ -57,8 +57,9 @@ var chartConfig = (conf, data, rowCallback) => {
         var myset = [];
         return {
             process: (aRow) => {
-                if (!myset.includes(aRow[index])) {
-                    myset.push(aRow[index]);
+                var aStr = aRow[index[0]].toString();
+                if(myset.filter((p)=>{return p.toString() == aStr}).length == 0){
+                    myset.push(aRow[index[0]]);
                 }
             },
             getDomain: () => {
@@ -220,10 +221,10 @@ var chartConfig = (conf, data, rowCallback) => {
             align: yConf.yAlign,
             scaleType: yConf.axisType
         };
-        yConf.scale = this._scaleFactory(config);
-        yConf.axis = this._createAxis(config);
-        var axisG = this._createAxisGroup(config);
-        yConf.axis.tickFormat(this._formateAxis(config));
+        yConf.scale =_scaleFactory(config);
+        yConf.axis = _createAxis(config);
+        var axisG = _createAxisGroup(config);
+        yConf.axis.tickFormat(_formateAxis(config));
         yConf.axis.scale(yConf.scale);
         axisG.call(yConf.axis);
     };

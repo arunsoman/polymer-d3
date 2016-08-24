@@ -104,7 +104,7 @@
         yheader : [1],
         width: 700,
         height: 300,
-        xFormat: 'string',
+        xFormat: 'time',
         yFormat: 'number',
         xAlign: 'bottom',
         yAlign:'left',
@@ -112,33 +112,7 @@
         yaxisType: 'linear',
         parentG: me.parentG
       };
-
       var nChartConfig = chartConfig(conf, this.source);
-
-      let summarised = PolymerD3
-        .summarizeData(data, xIndex, 'ordinal', yIndices, 'number', this.isStacked, this.inputs[2].selectedValue);
-      let yBound = summarised.getYDomain();
-      let xBound = summarised.getXDomain();
-
-      const xConf = {
-        'scaleType': 'category',
-        'align': 'h',
-        'format': 'time',
-        'position': 'bottom',
-        'domain': xBound
-      };
-
-      const yConf = {
-        'scaleType': 'linear',
-        'align': 'v',
-        'format': 'currency',
-        'position': 'left',
-        'domain': [0, yBound[1]]
-      };
-
-      let yAxis = this.createAxis(yConf);
-      let xAxis = this.createAxis(xConf);
-      let stack = summarised.getStack();
 
       let layer = this.parentG.selectAll('.layer')
         .data(stack)
