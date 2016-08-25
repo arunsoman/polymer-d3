@@ -140,19 +140,20 @@
 
       layer.selectAll('rect')
         .data(function(d) {
-          return d;
+          return d.values;
         })
         .enter().append('rect')
         .attr('x', function(d) {
+          console.log("x:"+ d);
           return nChartConfig.getX(d[0]);
         })
         .attr('y', function(d) {
-          return nChartConfig.getY(d.y + d.y0);
+          return nChartConfig.getY(d.y0);
         })
         .attr('height', function(d) {
-          return (nChartConfig.getY(d.y0) - nChartConfig.getY(d.y + d.y0));
+          return nChartConfig.getBarHeight(d.y);
         })
-        .attr('width', nChartConfig.getBarWidth() - 1);
+        .attr('width', nChartConfig.getBarWidth()/3 - 1);
     }
   });
 })();
