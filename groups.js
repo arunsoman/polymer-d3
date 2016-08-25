@@ -1,21 +1,20 @@
-var group_by = (indices, xIndex, yIndex) => {
+var group_by = (indices, xIndex, yIndex, headers) => {
     var _group_by_col = () => {
         var group = [];
         var map = d3.map();
         var datumIndex = indices[0];
         return {
             process: (aRow) => {
-                var key = aRow[datumIndex];
-                var aGroup = map.get(key);
+                var groupName = aRow[datumIndex];
+                var aGroup = map.get(groupName);
                 if (!aGroup) {
                     aGroup = {
-                        key: null,
+                        key: groupName,
                         values: []
                     };
                     group.push(aGroup);
-                    map.set(key, aGroup);
+                    map.set(groupName, aGroup);
                 }
-                aGroup.key = aRow[indices[0]];
                 aGroup.values.push([aRow[xIndex], aRow[yIndex]]);
             },
             getGroups: () => {
@@ -24,15 +23,24 @@ var group_by = (indices, xIndex, yIndex) => {
         };
     };
     var _group_by_cols = () => {
-        var group = [];
+        var groups = [];
         var map = d3.map();
-        var datumIndex = indices[0];
+        var xInd = xIndex[0];
         return {
             process: (aRow) => {
-                //TODO
+                indices.forEach((i)=>{
+                    var groupName = headers[i];
+                    var aGroup = map.get(groupName);
+                    if(!aGroup){
+                        aGroup = {key:groupName, values:[]};
+                    }
+                    aGroup.values.push([aRow[xInd], aRow[i]]);
+                    groups.push(aGroup);
+                    map.set(groupName, aGroup);
+                });
             },
             getGroups: () => {
-                return group;
+                return groups;
             }
         };
     };
