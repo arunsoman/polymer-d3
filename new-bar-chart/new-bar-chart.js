@@ -100,6 +100,7 @@
       }
 
       var conf = {
+        stackIndex: xIndex,
         containsHeader: true,
         xheader : [2],
         yheader : [1],
@@ -113,26 +114,18 @@
         yaxisType: 'linear',
         parentG: me.parentG
       };
-      var myGroup = group_by([zGroup], xIndex, yIndices);
+      var myGroup = group_by(yIndices.length == 1 ?[zGroup]:yIndices, xIndex, yIndices);
       var nChartConfig = chartConfig(conf, this.source, myGroup.process);
-      var groups = myGroup.getGroups();
-
-      var stack = d3.layout.stack()
-            .offset("zero")
-            .values(function(d) {
-                return d.values;
-            })
-            .x(function(d) {
-                return d[0];
-            })
-            .y(function(d) {
-                return d[1];
-            });
-      var stackData = stack(groups);
-
+      var stackData = myGroup.getStack();
+      var me = this;
       let layer = this.parentG.selectAll('.layer')
         .data(stackData)
         .enter().append('g')
+        .attr("transform", (d,i)=>
+          {return (!me.stackIndex) ?
+            'translate(' + i*nChartConfig.getBarWidth()/3 + ',0)':
+            'translate(0,0)'
+            ;})
         .attr('class', 'layer')
         .style('fill', function(d, i) {
           return z(i);
@@ -144,14 +137,13 @@
         })
         .enter().append('rect')
         .attr('x', function(d) {
-          console.log("x:"+ d);
           return nChartConfig.getX(d[0]);
         })
         .attr('y', function(d) {
-          return nChartConfig.getY(d.y0);
+          return nChartConfig.getY(d[1]);
         })
         .attr('height', function(d) {
-          return nChartConfig.getBarHeight(d.y);
+          return nChartConfig.getBarHeight(d[1]);
         })
         .attr('width', nChartConfig.getBarWidth()/3 - 1);
     }
