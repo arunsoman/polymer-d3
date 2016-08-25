@@ -37,7 +37,7 @@ var chartConfig = (conf, data, rowCallback) => {
                 }
             },
             getDomain: () => {
-                return [min, max];
+                return [(min <0)?min:0, max];
             }
         };
         var stack ={
@@ -51,7 +51,11 @@ var chartConfig = (conf, data, rowCallback) => {
                 map.set(stackKey, counter);
             },
             getDomain: () => {
-                return d3.extent(map.values());
+                var dom = d3.extent(map.values());
+                if(dom[0]> 0 ){
+                    dom[0] = 0;
+                }
+                return dom;
             }
         };
         return(stackIndex) ? stack : group;
@@ -125,9 +129,15 @@ var chartConfig = (conf, data, rowCallback) => {
             throw new Error('config.format undefined values{number, currency, percent, time, ordinal}');
         }
         var map = {
-            'linear': d3.scale.linear().range(((align === 'right') || (align === 'left')) ? [height, 0] : [0, width]),
-            'time': d3.time.scale().range(((align === 'right') || (align === 'left')) ? [height, 0] : [0, width]),
-            'ordinal': d3.scale.ordinal().rangeRoundBands(((align === 'right') || (align === 'left')) ? [height, 0] : [0, width], barPadding)
+            'linear': d3.scale.linear()
+                .range(((align === 'right') || (align === 'left')) ? 
+                    [height, 0] : [0, width]),
+            'time': d3.time.scale()
+                .range(((align === 'right') || (align === 'left')) ? 
+                    [height, 0] : [0, width]),
+            'ordinal': d3.scale.ordinal()
+                .rangeRoundBands(((align === 'right') || (align === 'left')) ? 
+                    [height, 0] : [0, width], barPadding)
         };
         var scale = map[config.scaleType];
         try {
