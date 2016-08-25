@@ -21,10 +21,13 @@ var chartConfig = (conf, data, rowCallback) => {
     };
     var height = conf.height;
     var width = conf.width;
+    var stackIndex = conf.stackIndex;
     var nonOrdinal = (index) => {
         var min = Number.MAX_VALUE;
         var max = Number.MIN_VALUE;
-        return {
+        var map = d3.map();
+
+        var group ={
             process: (datum) => {
                 if (max < datum[index[0]]) {
                     max = datum[index[0]];
@@ -37,6 +40,21 @@ var chartConfig = (conf, data, rowCallback) => {
                 return [min, max];
             }
         };
+        var stack ={
+            process: (datum) => {
+                var stackKey = datum[stackIndex];
+                var counter = map.get(stackKey);
+                if(!counter){
+                    counter = 0;
+                }
+                counter += datum[index[0]];
+                map.set(stackKey, counter);
+            },
+            getDomain: () => {
+                return d3.extent(map.values());
+            }
+        };
+        return(stackIndex) ? stack : group;
     };
     var findOrdinalFromHeader = (index) => {
         var myset = null;

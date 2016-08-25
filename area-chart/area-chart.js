@@ -47,7 +47,7 @@ Polymer({
             type: Boolean
         },
         isArea: {
-            value : false,
+            value : true,
             type: Boolean
         }
     },
@@ -97,61 +97,57 @@ Polymer({
             return;
         }
         var data = this.source;
-        var stats = PolymerD3.summarizeData(data, 
-            xIndex, 'time', yIndices, 'number', 
-            me.isStack, zIndex);
-        var xBound = stats.getXDomain();
-        var yBound = stats.getYDomain();
-
-        var config = {'scaleType':"time", 
-        'align':'h', 'format':'time', 'position':'bottom','domain':xBound};
-        var xAxis = me.createAxis(config);
-
-        config = {'scaleType':"linear", 
-        'align':'v', 'format':'currency', 'position':'left','domain':[0, yBound[1]]};
-          var yAxis = me.createAxis(config);
-
-//        y.domain([0, maxY]);
-        var y = yAxis.scale();
-        var x = xAxis.scale();        
+       var conf = {
+        stackIndex: xIndex,
+        containsHeader: true,
+        xheader : [2],
+        yheader : [1],
+        width: this.chartWidth,
+        height: this.chartHeight,
+        xFormat: 'time',
+        yFormat: 'number',
+        xAlign: 'bottom',
+        yAlign:'left',
+        xaxisType: 'ordinal',
+        yaxisType: 'linear',
+        parentG: me.parentG
+      };
+      var myGroup = group_by(yIndices.length == 1 ?[zIndex]:yIndices, xIndex, yIndices);
+      var cc = chartConfig(conf, this.source, myGroup.process);
+      var stack = myGroup.getStack();
+        
         var z = d3.scale.category10();
 
         var area = d3.svg.area()
             .interpolate("cardinal")
             .x(function(d) {
-                return x(d[xIndex]);
+                return cc.getX(d[0]);
             });
         if(me.isStack){
             area.y0(function(d) {
-                return y(d.y0);
+                return cc.getY(d.y0);
             })
             .y1(function(d) {
-                return y(d.y0 + d.y);
+                return cc.getY(d.y0 + d.y);
             });
         }else{
             area.y0(function(d) {
-                return y(0);
+                return cc.getY(0);
             })
             .y1(function(d) {
-                return y(d.y);
+                return cc.getY(d.y);
             });
         };
         var line = d3.svg.line().interpolate("basis")
           .x( (d) => { 
-            return x(d[xIndex]);
+            return cc.getX(d[0]);
              })
           .y( (d) => { 
-            return (me.isStack)?y(d.y+d.y0):y(d.y); 
+            return cc.getY((me.isStack)?(d.y+d.y0):(d.y)); 
           });
 
-        var display = (this.isArea)?area:line;
-        if(! me.layers){
-            if(yIndices.length == 1){
-                me.layers = this._drawSingleColArea(x,y,z,xIndex,yIndices,zIndex, display);
-            }else{
-                me.layers = this._drawMultiColArea(x,y,z,xIndex,yIndices,zIndex, display);
-            }
-        }
+       var display = (this.isArea)?area:line;
+
         var pathClass;
         if(me.isArea){
           pathClass= (me.isStack)?
@@ -162,7 +158,7 @@ Polymer({
             pathClass = "line";
         }
         this.parentG.selectAll(".layer")
-            .data(me.layers)
+            .data(stack)
             .enter().append("path")
             .attr("class", pathClass)
             .attr("d", function(d) {
@@ -174,60 +170,5 @@ Polymer({
             .style("stroke", function(d, i) {
                 return (! me.isArea)?z(i):'none';
             }) ;
-    },
-    _drawSingleColArea: function(x,y,z, xIndex, yIndices, zIndex, display){
-        var me = this;
-        var data = this.source;
-
-        var stack = d3.layout.stack()
-            .offset("zero")
-            .values(function(d) {
-                return d.values;
-            })
-            .x(function(d) {
-                return d[xIndex];
-            })
-            .y(function(d) {
-                return d[yIndices[0]];
-            });
-
-        var nest = d3.nest()
-            .key(function(d) {
-                return d[zIndex];
-            });
-
-        var groupBy = nest.entries(data);
-        var layers = stack(groupBy);
-        return layers;
-
-    },
-    _drawMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
-        var me = this;
-        var data = this.source;
-
-        var stack = d3.layout.stack()
-            .offset("zero")
-            .values(function(d) {
-                return d;
-            })
-            .x(function(d) {
-                return d[0];
-            })
-            .y(function(d) {
-                return d[1];
-            });
-
-        //var groupBy = nest.entries(data);
-        var ds = [];
-        yIndices.forEach((d)=>{
-            var temp = [];
-            me.source.forEach((s)=>{
-                temp.push( [ s[xIndex], s[d] ])
-            });
-            ds.push(temp);
-        })
-        
-        var layers = stack(ds);
-        return layers;
     }
 });

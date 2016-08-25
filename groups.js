@@ -1,4 +1,18 @@
 var group_by = (indices, xIndex, yIndex, headers) => {
+    var _stack = (groups) =>{
+        var stackl = d3.layout.stack()
+            .offset("zero")
+            .values(function(d) {
+                return d.values;
+            })
+            .x(function(d) {
+                return d[0];
+            })
+            .y(function(d) {
+                return d[1];
+            });
+      return stackl(groups);
+    };
     var _group_by_col = () => {
         var group = [];
         var map = d3.map();
@@ -19,7 +33,8 @@ var group_by = (indices, xIndex, yIndex, headers) => {
             },
             getGroups: () => {
                 return group;
-            }
+            },
+            getStack: () =>{return _stack(group);}
         };
     };
     var _group_by_cols = () => {
@@ -41,7 +56,8 @@ var group_by = (indices, xIndex, yIndex, headers) => {
             },
             getGroups: () => {
                 return groups;
-            }
+            },
+            getStack: () =>{return _stack(group);}
         };
     };
     if (!indices) {
