@@ -40,24 +40,24 @@ var group_by = (indices, xIndex, yIndex, headers) => {
     var _group_by_cols = () => {
         var groups = [];
         var map = d3.map();
-        var xInd = xIndex[0];
         return {
             process: (aRow) => {
                 indices.forEach((i)=>{
                     var groupName = headers[i];
                     var aGroup = map.get(groupName);
                     if(!aGroup){
+                        console.log(" no group:" + groupName);
                         aGroup = {key:groupName, values:[]};
+                        groups.push(aGroup);
                     }
-                    aGroup.values.push([aRow[xInd], aRow[i]]);
-                    groups.push(aGroup);
+                    aGroup.values.push([aRow[xIndex], aRow[i]]);
                     map.set(groupName, aGroup);
                 });
             },
             getGroups: () => {
                 return groups;
             },
-            getStack: () =>{return _stack(group);}
+            getStack: () =>{return _stack(groups);}
         };
     };
     if (!indices) {

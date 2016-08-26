@@ -71,13 +71,29 @@
         ],
 
         attached: function() {
-            this._loadWaterfall();
+            this._loadDiffdata();
+            //  this._loadHeatmap();
+            //this._loadWaterfall();
             //this._loadSingleCol();
                 // PolymerD3.fileReader('bar-data.csv', [1, 2, 3, 4, 5, 6, 7], [], undefined, this._setSource.bind(this));
         },
 
         _setSource: function(data) {
             this.source = data;
+        },
+        _loadDiffdata: function() {
+            PolymerD3.fileReader('diff-small.csv', [1,2], [0], '%Y%m%d', this._setSource.bind(this), true);
+            this.inputs[0].selectedValue = 0;
+            this.inputs[1].selectedValue = [1,2];
+            //this.inputs[2].selectedValue = 2;
+            this.layers = undefined;
+        },
+        _loadHeatmap: function() {
+            PolymerD3.fileReader('heatmap.csv', [2], [0], '%Y-%m-%d', this._setSource.bind(this), true);
+            this.inputs[0].selectedValue = 0;
+            this.inputs[1].selectedValue = [1];
+            this.inputs[2].selectedValue = 2;
+            this.layers = undefined;
         },
         _loadWaterfall: function() {
             PolymerD3.fileReader('waterfall.csv', [1], [], undefined, this._setSource.bind(this), true);
@@ -123,10 +139,10 @@
                 yaxisType: 'linear',
                 parentG: me.parentG
             };
- */
+ 
             var conf = {//for water fall load waterfall file
                 stackIndex: xIndex,
-                chartType: 'waterfall', //stack,group,diff,waterfall
+                chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
                 containsHeader: true,
                 xheader: [xIndex],
                 yOrign: 0,
@@ -141,16 +157,72 @@
                 yaxisType: 'linear',
                 parentG: me.parentG
             }; 
-            var myGroup = group_by(yIndices.length == 1 ? [zGroup] : yIndices, xIndex, yIndices);
+            
+          var conf = {//for heatmap 
+                stackIndex: xIndex,
+                chartType: 'heatmap', //stack,group,diff,waterfall,heatmap
+                containsHeader: true,
+                xheader: [xIndex],
+                yOrign: 0,
+                yheader: yIndices,
+                width: this.chartWidth,
+                height: this.chartHeight,
+                xFormat: 'time',
+                yFormat: 'string',
+                xAlign: 'bottom',
+                yAlign: 'left',
+                xaxisType: 'ordinal',
+                yaxisType: 'ordinal',
+                parentG: me.parentG
+            };
+*/
+          var conf = {//for diff 
+                stackIndex: xIndex,
+                chartType: 'diff', //stack,group,diff,waterfall,heatmap
+                containsHeader: true,
+                xheader: [xIndex],
+                yOrign: 0,
+                yheader: yIndices,
+                width: this.chartWidth,
+                height: this.chartHeight,
+                xFormat: 'time',
+                yFormat: 'number',
+                xAlign: 'bottom',
+                yAlign: 'left',
+                xaxisType: 'ordinal',
+                yaxisType: 'linear',
+                parentG: me.parentG
+            };
+
+
+            var myGroup = group_by(yIndices.length == 1 ? [zGroup] : yIndices, xIndex, yIndices, this.source[0]);
             var nChartConfig = chartConfig(conf, this.source, myGroup.process);
-            var stackData = myGroup.getStack();
+            let stackData = myGroup.getStack();
 
             var translate = null;
             var barWidth = null;
             var rectHeight = null;
             var rectY = null;
             var rectX = null;
+            var classF = null;
             switch (conf.chartType) {
+            case 'heatmap':
+                translate = (d, i) => {
+                    return 'translate(0,0)';
+                };
+                barWidth = (d, i) => {
+                    return  nChartConfig.getBarWidth() - 1 ;
+                };
+                rectX = (d) => {
+                    return nChartConfig.getX(d[0]);
+                };
+                rectY = (d) => {
+                    return nChartConfig.getY( d.y);
+                };
+                rectHeight = (d)=> {
+                    return nChartConfig.getBarHeight();
+                };
+            break;
             case 'waterfall':
                 var group = myGroup.getGroups();
                 nChartConfig.setYDomain([0,group[group.length-1].values[0].y0]);
@@ -206,17 +278,23 @@
                 translate = (d, i) => {
                     return 'translate(0,0)';
                 };
-                barWidth = (d, i) => {
-                    return  nChartConfig.getBarWidth() - 1 ;
+                barWidth = (d, i, j) => {
+                    return (j == 1)? (nChartConfig.getBarWidth()/2 - 1):
+                    (nChartConfig.getBarWidth() - 1) ;
                 };
-                rectX = (d) => {
-                    return nChartConfig.getX(d[0]);
+                rectX = (d, i, j) => {
+                    return (j == 0)? nChartConfig.getX(d[0]):
+                    nChartConfig.getX(d[0])+nChartConfig.getBarWidth()/4 ;
                 };
                 rectY = (d) => {
                     return nChartConfig.getY(d[1]);
                 };
                 rectHeight = (d)=> {
                     return nChartConfig.getBarHeight(d[1]);
+                };
+                classF = (d, i, j) => {
+                    return (j == 0)?'diff1':
+                    'diff2' ;
                 };
                 break;
             case 'group':
@@ -237,7 +315,7 @@
                 };
                 break;
             default:
-                throw Error("conf.chartType can have one among stack,group,diff");
+                throw Error('conf.chartType can have one among stack,group,diff');
             }
 
             let layer = this.parentG.selectAll('.layer')
@@ -249,7 +327,7 @@
                     return z(i);
                 });
 
-            layer.selectAll('rect')
+            var rects = layer.selectAll('rect')
                 .data(function(d) {
                     return d.values;
                 })
@@ -257,7 +335,17 @@
                 .attr('x', rectX)
                 .attr('y', rectY)
                 .attr('height', rectHeight)
-                .attr('width', barWidth);
+                .attr('width', barWidth)
+                .attr('class', classF);
+
+            if(conf.chartType == 'heatmap'){
+              var color =d3.scale.linear()
+                .domain(d3.extent(stackData.map((aobj)=>{return aobj.key;})))
+                .range(["white", "red"])
+                .interpolate(d3.interpolateLab);
+              rects.style('fill', (d, i, j) => { 
+                return color(stackData[j].key); });
+            }
         }
     });
 })();
