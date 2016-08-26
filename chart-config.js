@@ -273,7 +273,6 @@ var chartConfig = (conf, data, rowCallback) => {
             return yConf.scale(y);
         },
         getBarHeight: (h) => {
-            debugger;
             switch (yConf.axisType) {
             case 'ordinal':
                 return yConf.scale.rangeBand();
