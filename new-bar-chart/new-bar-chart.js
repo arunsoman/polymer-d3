@@ -155,10 +155,17 @@
                 var group = myGroup.getGroups();
                 nChartConfig.setYDomain([0,group[group.length-1].values[0].y0]);
                 nChartConfig.setXDomain('Total');
-                stackData.push({key:'total', 
-                  values:['total',stackData[stackData.length-1].values[0][1]], 
-                  y:(stackData[stackData.length-1].values[0].y + stackData[stackData.length-1].values[0].y0), 
-                  y0:0});
+
+                // To replicate each element in stackData
+                let total = {
+                    key: 'total',
+                    values: [['total',stackData[stackData.length-1].values[0][1]]]
+                }
+                total.values[0].y = (stackData[stackData.length-1].values[0].y + stackData[stackData.length-1].values[0].y0);
+                total.values[0].y0 = 0;
+                stackData.push(total);
+                // Replication - end
+
                 translate = (d, i) => {
                     return 'translate(0,0)';
                 };
@@ -170,12 +177,12 @@
                 };
                 rectY = (d) => {
                   if( d.y  < 0){
-                    return nChartConfig.getY(d.y0 ); 
+                    return nChartConfig.getY(d.y0);
                   }
-                  return nChartConfig.getY(d.y0 + d.y);
+                  return nChartConfig.getY(d.y + d.y0);
                 };
                 rectHeight = (d)=> {
-                  return nChartConfig.getBarHeight(( d.y <0)? -1*(d.y0 ):(d.y0 ) );
+                  return nChartConfig.getBarHeight(( d.y < 0)? -1*(d.y): (d.y));
                 };
                 break;
             case 'stack':
@@ -210,7 +217,7 @@
                 };
                 rectHeight = (d)=> {
                     return nChartConfig.getBarHeight(d[1]);
-                }; 
+                };
                 break;
             case 'group':
                 translate = (d, i) => {
@@ -241,7 +248,7 @@
                 .style('fill', function(d, i) {
                     return z(i);
                 });
-            
+
             layer.selectAll('rect')
                 .data(function(d) {
                     return d.values;
