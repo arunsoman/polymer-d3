@@ -71,14 +71,21 @@
         ],
 
         attached: function() {
-            this._loadSingleCol();
+            this._loadWaterfall();
+            //this._loadSingleCol();
                 // PolymerD3.fileReader('bar-data.csv', [1, 2, 3, 4, 5, 6, 7], [], undefined, this._setSource.bind(this));
         },
 
         _setSource: function(data) {
             this.source = data;
         },
-
+        _loadWaterfall: function() {
+            PolymerD3.fileReader('waterfall.csv', [1], [], undefined, this._setSource.bind(this), true);
+            this.inputs[0].selectedValue = 0;
+            this.inputs[1].selectedValue = [1];
+            this.inputs[2].selectedValue = 0;
+            this.layers = undefined;
+        },
         _loadSingleCol: function() {
             PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._setSource.bind(this), true);
             this.inputs[0].selectedValue = 2;
@@ -98,15 +105,16 @@
             if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data) {
                 return false;
             }
-
+/*
             var conf = {
                 stackIndex: xIndex,
-                chartType: 'stack', //stack,group,diff
+                chartType: 'stack', //stack,group,diff,waterfall
                 containsHeader: true,
-                xheader: [2],
-                yheader: [1],
-                width: 700,
-                height: 300,
+                xheader: [xIndex],
+                yOrign: 0,
+                yheader: yIndices,
+                width: this.chartWidth,
+                height: this.chartHeight,
                 xFormat: 'time',
                 yFormat: 'number',
                 xAlign: 'bottom',
@@ -115,6 +123,24 @@
                 yaxisType: 'linear',
                 parentG: me.parentG
             };
+ */
+            var conf = {//for water fall load waterfall file
+                stackIndex: xIndex,
+                chartType: 'waterfall', //stack,group,diff,waterfall
+                containsHeader: true,
+                xheader: [xIndex],
+                yOrign: 0,
+                yheader: yIndices,
+                width: this.chartWidth,
+                height: this.chartHeight,
+                xFormat: 'string',
+                yFormat: 'number',
+                xAlign: 'bottom',
+                yAlign: 'left',
+                xaxisType: 'ordinal',
+                yaxisType: 'linear',
+                parentG: me.parentG
+            }; 
             var myGroup = group_by(yIndices.length == 1 ? [zGroup] : yIndices, xIndex, yIndices);
             var nChartConfig = chartConfig(conf, this.source, myGroup.process);
             var stackData = myGroup.getStack();
@@ -123,13 +149,44 @@
             var barWidth = null;
             var rectHeight = null;
             var rectY = null;
+            var rectX = null;
             switch (conf.chartType) {
+            case 'waterfall':
+                var group = myGroup.getGroups();
+                nChartConfig.setYDomain([0,group[group.length-1].values[0].y0]);
+                nChartConfig.setXDomain('Total');
+                stackData.push({key:'total', 
+                  values:['total',stackData[stackData.length-1].values[0][1]], 
+                  y:(stackData[stackData.length-1].values[0].y + stackData[stackData.length-1].values[0].y0), 
+                  y0:0});
+                translate = (d, i) => {
+                    return 'translate(0,0)';
+                };
+                barWidth = (d, i) => {
+                    return  nChartConfig.getBarWidth() - 1 ;
+                };
+                rectX = (d,i, j) => {
+                    return j*( nChartConfig.getBarWidth() - 1 );
+                };
+                rectY = (d) => {
+                  if( d.y  < 0){
+                    return nChartConfig.getY(d.y0 ); 
+                  }
+                  return nChartConfig.getY(d.y0 + d.y);
+                };
+                rectHeight = (d)=> {
+                  return nChartConfig.getBarHeight(( d.y <0)? -1*(d.y0 ):(d.y0 ) );
+                };
+                break;
             case 'stack':
                 translate = (d, i) => {
                     return 'translate(0,0)';
                 };
                 barWidth = (d, i) => {
                     return  nChartConfig.getBarWidth() - 1 ;
+                };
+                rectX = (d) => {
+                    return nChartConfig.getX(d[0]);
                 };
                 rectY = (d) => {
                     return nChartConfig.getY(d.y0 + d.y);
@@ -145,6 +202,9 @@
                 barWidth = (d, i) => {
                     return  nChartConfig.getBarWidth() - 1 ;
                 };
+                rectX = (d) => {
+                    return nChartConfig.getX(d[0]);
+                };
                 rectY = (d) => {
                     return nChartConfig.getY(d[1]);
                 };
@@ -158,6 +218,9 @@
                 };
                 barWidth = (d, i) => {
                     return  nChartConfig.getBarWidth() / stackData.length - 1;
+                };
+                rectX = (d) => {
+                    return nChartConfig.getX(d[0]);
                 };
                 rectY = (d) => {
                     return nChartConfig.getY(d[1]);
@@ -184,9 +247,7 @@
                     return d.values;
                 })
                 .enter().append('rect')
-                .attr('x', function(d) {
-                    return nChartConfig.getX(d[0]);
-                })
+                .attr('x', rectX)
                 .attr('y', rectY)
                 .attr('height', rectHeight)
                 .attr('width', barWidth);

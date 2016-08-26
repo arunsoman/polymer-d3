@@ -58,7 +58,7 @@ var chartConfig = (conf, data, rowCallback) => {
                 return dom;
             }
         };
-        return(stackIndex) ? stack : group;
+        return(stackIndex === undefined) ? group:stack;
     };
     var findOrdinalFromHeader = (index) => {
         var myset = null;
@@ -118,6 +118,9 @@ var chartConfig = (conf, data, rowCallback) => {
     });
     xConf.domain = computex.getDomain();
     yConf.domain = computey.getDomain();
+    if(conf.yOrign != null){
+        yConf.domain[0] = conf.yOrign;
+    }
     var _scaleFactory = (config) => {
         var barPadding = (!config.barPadding) ? .1 : config.barPadding;
         var align = config.align;
@@ -237,10 +240,10 @@ var chartConfig = (conf, data, rowCallback) => {
         };
         xConf.scale = _scaleFactory(config);
         xConf.axis = _createAxis(config);
-        var axisG = _createAxisGroup(config);
+        xConf.axisG = _createAxisGroup(config);
         xConf.axis.tickFormat(_formateAxis(config));
         xConf.axis.scale(xConf.scale);
-        axisG.call(xConf.axis);
+        xConf.axisG.call(xConf.axis);
     };
     var _createYAxis = () => {
         var config = {
@@ -251,10 +254,10 @@ var chartConfig = (conf, data, rowCallback) => {
         };
         yConf.scale =_scaleFactory(config);
         yConf.axis = _createAxis(config);
-        var axisG = _createAxisGroup(config);
+        yConf.axisG = _createAxisGroup(config);
         yConf.axis.tickFormat(_formateAxis(config));
         yConf.axis.scale(yConf.scale);
-        axisG.call(yConf.axis);
+        yConf.axisG.call(yConf.axis);
     };
     _createXAxis();
     _createYAxis();
@@ -271,6 +274,19 @@ var chartConfig = (conf, data, rowCallback) => {
         },
         getY: (y) => {
             return yConf.scale(y);
+        },
+        setYDomain: (d)=>{
+            yConf.scale.domain(d);
+            yConf.axisG.call(yConf.axis);
+        },
+        setXDomain: (d)=>{
+            if(conf.xaxisType  == 'ordinal'){
+                xConf.scale.domain().push(d);
+            }
+            else{
+                xConf.scale.domain(d);
+            }
+            xConf.axisG.call(xConf.axis);
         },
         getBarHeight: (h) => {
             switch (yConf.axisType) {
