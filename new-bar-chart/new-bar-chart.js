@@ -132,10 +132,10 @@
                     return  nChartConfig.getBarWidth() - 1 ;
                 };
                 rectY = (d) => {
-                    return nChartConfig.getY(d.y );
+                    return nChartConfig.getY(d.y0 + d.y);
                 };
                 rectHeight = (d)=> {
-                    return nChartConfig.getBarHeight(d.y0 - d.y);
+                    return nChartConfig.getBarHeight(d.y);
                 };
                 break;
             case 'diff':
