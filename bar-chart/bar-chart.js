@@ -29,6 +29,18 @@ Polymer({
         }],
         uitype: 'multi-value',
         maxSelectableValues: 2
+      }, {
+        input: 'z',
+        txt: 'Pick measures',
+        selectedValue: [],
+        format:'',
+        scaleType: '',
+        selectedObjs: [{
+          key: 'Under Five Year',
+          value: '1'
+        }],
+        uitype: 'multi-value',
+        maxSelectableValues: 2
       }]
     },
     settings: {
@@ -40,31 +52,15 @@ Polymer({
     source: Array,
     external: Array,
     chart: Object,
-    dataMutated: false
-  },
-
-  attached: function() {
-    console.info('Ready');
-    var me = this;
-    this.settings = {
-      //Temporary hack for rendering chart type using <display-component>
-      chartType: [{
-        input: 'chartType',
-        txt: 'Grouped or stacked',
-        uitype: 'dropDown',
-        selectedValue: 1,
-        selectedName: 'Grouped',
-        observer: '_chartTypehanged',
-        options: [{
-          key: 'Grouped',
-          value: 0
-        }, {
-          key: 'Stacked',
-          value: 1
-        }]
-      }]
+    dataMutated: false,    
+    isStack: {
+            value : false,
+            type: Boolean
+    },
+    layers:{
+      type: Object
     }
-    this.set('settings.area', this.area);
+
   },
 
   behaviors: [
@@ -76,178 +72,153 @@ Polymer({
     this.hideSettings = !this.hideSettings;
   },
 
-  _addToolTip: function() {
-    this.tip = d3.tip()
-      .attr('class', 'd3-tip')
-      .offset([-10, 0])
-      .html(function(d) {
-        return '<strong>Frequency:</strong> <span style=\'color:red\'>' + '</span>';
-      });
-    //todo bind it on this.parentG
-    /*
-    this.svg.call(this.tip);
-    this.svg.selectAll('.layer')
-      .selectAll('rect')
-      .on('mouseover', this.tip.show)
-      .on('mouseout', this.tip.hide);
-    */
-  },
+    attached: function() {
+        me = this;
+        this._loadSingleCol();
+        //this._loadMultiCol();
+    },
 
-  draw: function() {
+    _callme: function(data) {
+        me.source = data;
+    },
 
-    var me = this;
-    
-    // Selects stack of elements as Y-Axis
-    var selected = me.getInputsProperty('y');
-    var selectedX = me.getInputsProperty('x');
+    _loadMultiCol: function(){
+        PolymerD3.fileReader("ms.csv", [1, 2, 3], [0], "%Y%m%d", this._callme);
+      this.inputs[0].selectedValue = 0;
+      this.inputs[0].name = 'time';
+      this.inputs[1].selectedValue  = [1,2,3];
+      this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
+      this.layers = undefined;
+    },
+    _loadSingleCol: function(){
+        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme, true);
+        this.inputs[0].selectedValue = 2;
+        this.inputs[1].selectedValue = [1];
+        this.inputs[2].selectedValue = 0;
+        this.layers = undefined;
+    },
+    draw: function(){
+        me = this;
+        var xIndex = this.getInputsProperty('x');
+        var yIndices = this.getInputsProperty('y');
+        var zIndex = this.getInputsProperty('z');
+        if (xIndex == -1 || yIndices.length == 0) {
+            return;
+        }
+        var data = this.source;
+        var stats = PolymerD3.summarizeData(data, 
+            xIndex, 'ordinal', yIndices, 'number', 
+            me.isStack, zIndex);
+        var xBound = stats.getXDomain();
+        var yBound = stats.getYDomain();
 
-    if (!selected || !selectedX || selected.length === 0 || selectedX.length === 0) {
-      console.warn('No inputs selected');
-      return false;
-    }
+        var config = {'scaleType':"time", 
+        'align':'h', 'format':'time', 'position':'bottom','domain':xBound};
+        var xAxis = me.createAxis(config);
 
-    // Colors : http://bl.ocks.org/aaizemberg/78bd3dade9593896a59d
-    var z = d3.scale.category10();
+        config = {'scaleType':"linear", 
+        'align':'v', 'format':'currency', 'position':'left','domain':[0, yBound[1]]};
+          var yAxis = me.createAxis(config);
 
-    // Sets data source
-    var src = me.source;
+//        y.domain([0, maxY]);
+        var y = yAxis.scale();
+        var x = xAxis.scale();        
+        var z = d3.scale.category10();
+        me.layers = stats.getStack();
+        /*
+        if(! me.layers){
+            if(yIndices.length == 1){
+                me.layers = this._getLayersSingleColArea(x,y,z,xIndex,yIndices,zIndex);
+            }else{
+                me.layers = this._getLayersMultiColArea(x,y,z,xIndex,yIndices,zIndex);
+            }
+        }
+        */
+        this._drawGroup(z);
+    },
+    _getLayersSingleColArea: function(x,y,z, xIndex, yIndices, zIndex){
+        me = this;
+        if(me.isStack)
+        var data = this.source;
 
-    if (!src) {
-      console.warn('Data source empty');
-      return false;
-    }
-   
-    stackedChart();
+        var stack = d3.layout.stack()
+            .offset("zero")
+            .values(function(d) {
+                return d.values;
+            })
+            .x(function(d) {
+                return d[xIndex];
+            })
+            .y(function(d) {
+                return d[yIndices[0]];
+            });
 
-    function stackedChart() {
-//scaleType, align, format, position, barPadding, label, domain){
-      //Set X Axis at Bottom
-      xDomain = src.map(function(d){return d[selectedX];});
-      var config = {'scaleType':"category", 
-        'align':'h', 'format':'category', 'position':'bottom','domain':xDomain}
-      var xAxis = me.createAxis(config);
+        var nest = d3.nest()
+            .key(function(d) {
+                return d[zIndex];
+            });
 
-      // Sets Y axis at right
-      yDomain = d3.max(src, function(d){
-        var temp ;
-        selected.forEach(function(d2){
-          temp += d[d2];
-        });
-        return temp;
-      });
-      
-      var yAxis = me.createAxis({'scaleType':'linear', 
-        'align':'v', 'format':'number', 'position':'left', 'domain':yDomain});
+        var groupBy = nest.entries(data);
+        var layers = stack(groupBy);
+        return layers;
 
-      // Create layers based on stack
-      // Parses the data as : {x: '',y: '',y0: ''}
-      var layers = d3.layout.stack()(selected.map(function(c) {
-        return src.map(function(d) {
-          return {
-            x: d[me.getInputsProperty('x')],
-            y: d[c]
-          };
-        });
-      }));
+    },
+    _getLayersMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
+        me = this;
+        var data = this.source;
 
-      var x = xAxis.scale();
-      var y = yAxis.scale();
+        var stack = d3.layout.stack()
+            .offset("zero")
+            .values(function(d) {
+                return d;
+            })
+            .x(function(d) {
+                return d[0];
+            })
+            .y(function(d) {
+                return d[1];
+            });
 
-      //Draws the chart with newly mapped data
-      x.domain(layers[0].map(function(d) {
-        console.log("print domain " + d.x);
-        return d.x;
-      }));
-
-      y.domain([0, d3.max(layers[layers.length - 1], function(d) {
-        return d.y0 + d.y;
-      })]).nice();
-
-      var layer = me.parentG.selectAll('.layer')
-        .data(layers)
-        .enter().append('g')
-        .attr('class', 'layer')
-        .style('fill', function(d, i) {
-          return z(i);
-        });
-
-
-      layer.selectAll('rect')
-        .data(function(d) {
-          return d;
+        //var groupBy = nest.entries(data);
+        var ds = [];
+        yIndices.forEach((d)=>{
+            var temp = [];
+            me.source.forEach((s)=>{
+                temp.push( [ s[xIndex], s[d] ])
+            });
+            ds.push(temp);
         })
-        .enter().append('rect')
-        .attr('x', function(d) {
-          return x(d.x);
-        })
-        .attr('y', function(d) {
-          return y(d.y + d.y0);
-        })
-        .attr('height', function(d) {
-          return (y(d.y0) - y(d.y + d.y0));
-        })
-        .attr('width', x.rangeBand() - 1);
-      // me.alignAxis(xAxis, 'bottom');
-      // me.alignAxis(yAxis, 'left');
-    }
+        
+        var layers = stack(ds);
+        return layers;
+    },
+    _drawGroup: function(z){
 
-    function groupedChart() {
-      // Generates new mapped array and find yMax
-      var mapped = [];
-      var yMax = 0;
-      selected.forEach(function(s) {
-        var arr = src.map(function(arr) {
-          if (yMax < arr[s] ) {
-            yMax = arr[s];
-          }
-          return arr[s];
-        });
-        mapped.push(arr);
-      });
-
-      //Set X Axis at Bottom
-      var xAxis = this.createAxis("category", 'h', 'category');
-
-      // Sets Y axis at right
-      var yAxis = this.createAxis('linear','v', 'number');
-
-      // Y Axis
-      var y = yAxis.scale()
-        .domain([0, yMax]);
-
-      // X axis
-      var x0 = xAxis.scale()
-          .domain(d3.range(src.length));
-
-      var x1 = d3.scale.ordinal()
-          .domain(d3.range(me.getInputsProperty('y').length))
-          .rangeBands([0, x0.rangeBand()]);
-
-      // Color
-      var z = d3.scale.category10();
-
-      this.parentG.selectAll('g')
-        .data(mapped)
-        .enter().append('g')
-        .style('fill', function(d, i) {
-          return z(i);
-        })
-        .attr('transform', function(d, i) {
-          return 'translate(' + x1(i) + ',0)';
-        })
-        .selectAll('rect')
-        .data(function(d) {
-          return d;
-        })
-        .enter().append('rect')
-        .attr('width', x1.rangeBand())
-        .attr('height', y)
-        .attr('x', function(d, i) {
-          return x0(i);
-        })
-        .attr('y', function(d) {
-          return this.dhartHeight - y(d);
-        });
-    }
-  }
+      var sets = this.parentG.selectAll(".set") 
+        .data(me.layers[0].values) 
+        .enter()
+        .append("g")
+        .attr("class","set")
+        .attr("transform",function(d,i){
+             return "translate(" + xScale(i) + ",0)";
+         });
+        debugger;
+      me.layers[0].values.forEach((dt,index) =>{
+          var newData = [];
+          me.layers.forEach((key, keyIndex)=>{newData.push()});
+          sets.data(me.layers)
+            .enter()
+            .append("rect")
+            .attr("class","local")
+            .attr("width", xScale.rangeBand()/me.layers.length)
+            .attr("y", function(d) {
+                return yScale(d.local);
+            })
+            .attr("x", (d,i)=>{ return xScale.rangeBand()/2})
+            .attr("height", function(d){
+                return h - yScale(d.local);
+            })
+            .attr("fill", (d,i)=>{return z(i);})
+      })
+    },
 });

@@ -86,6 +86,7 @@ Polymer({
 
       var color = d3.scale.category10();
       //z = d3.scale.ordinal(d3.schemeCategory10);
+      
       var dataStruct = PolymerD3.rollupMultiValued(
         this.inputs[1].selectedValue, 
         this.inputs[1].name,
