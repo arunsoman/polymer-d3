@@ -261,7 +261,7 @@ var chartConfig = (conf, data, rowCallback) => {
     };
     _createXAxis();
     _createYAxis();
-    console.log('xd:' + xConf.domain + ' yd:' + yConf.domain);
+    //console.log('xd:' + xConf.domain + ' yd:' + yConf.domain);
     return {
         getChartHeight: () => {
             return height;
@@ -293,9 +293,9 @@ var chartConfig = (conf, data, rowCallback) => {
             case 'ordinal':
                 return yConf.scale.rangeBand();
             default:
-            console.log("h: "+ h +" scale:"+yConf.scale(h) +
-                " height:"+ height+
-                " v:" +(height - yConf.scale(h)));
+            //console.log("h: "+ h +" scale:"+yConf.scale(h) +
+            //    " height:"+ height+
+             //   " v:" +(height - yConf.scale(h)));
                 return (height - yConf.scale(h));
             }
         },
@@ -306,6 +306,12 @@ var chartConfig = (conf, data, rowCallback) => {
             default:
                 return xConf.scale(w);
             }
+        },
+        formatX: (d)=>{
+            return xConf.axis.tickFormat()(d);
+        },
+        formatY: (d)=>{
+            return yConf.axis.tickFormat()(d);
         },
     };
 };

@@ -16,12 +16,6 @@
         settings = JSON.stringify(this.settings);
         this.settings = JSON.parse(settings);
       }
-      /*var container = document.createElement('div');
-      container.className = "chartContainer";
-      this.appendChild(container);
-      //this.makeChartWrap();
-      this.scopeSubtree(this.querySelector('.chartContainer'), true);
-      */  
       console.log("chart init: ready");
     },
 
@@ -31,24 +25,6 @@
     },
 
     makeChartWrap: function(id) {
-      /*// Places chart inside listner
-      if (!id) {
-        id = 'chart';
-      }
-      var prev = this.querySelector('#' + id);
-      if (prev) {
-        prev.remove();
-      }
-      var elem = document.createElement('div');
-      var svg = document.createElement('svg');
-      elem.id = id;
-      if (this.querySelector('.chartContainer')) {
-        elem.style.height = this._getHeight() + 'px';
-        elem.style.width = this._getWidth() + 'px';
-        this.querySelector('.chartContainer').appendChild(elem);
-        this.chartWrap = d3.select(elem);
-        this.svg = d3.select(elem).append("svg");
-      }*/
     }
 
   }

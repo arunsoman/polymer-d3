@@ -1,7 +1,7 @@
 <script>
 // http://bl.ocks.org/ZJONSSON/3918369
 // http://bl.ocks.org/mccannf/1629464
-    PolymerD3.chartInitBehavior = {
+    PolymerD3.legendBehavior = {
             properties: {
                 xLocation: 0,
                 yLocation: 0,
@@ -26,7 +26,7 @@
                     .origin(Object)
                     .on('drag', this.bdragresize);
                 var legendG = this.parentG.append('g')
-                    .attr('class': 'dragableLegendGroup')
+                    .attr('class', 'dragableLegendGroup')
                     .data([{
                         x: legendWidth / 2,
                         y: legendHeight / 2
@@ -41,7 +41,7 @@
                     })
                     .attr('height', height)
                     .attr('width', width)
-                    .attr('fill-opacity', .5)
+                    .attr('fill-opacity', 0.5)
                     .attr('cursor', 'move')
                     .call(drag);
                 dragrect.append('g')
@@ -59,7 +59,7 @@
                     .attr('id', 'dragleft')
                     .attr('width', dragbarw)
                     .attr('fill', 'lightblue')
-                    .attr('fill-opacity', .5)
+                    .attr('fill-opacity', 0.5)
                     .attr('cursor', 'ew-resize')
                     .call(dragleft);
                 var dragbarright = legendG.append('rect')
@@ -73,7 +73,7 @@
                     .attr('height', height - dragbarw)
                     .attr('width', dragbarw)
                     .attr('fill', 'lightblue')
-                    .attr('fill-opacity', .5)
+                    .attr('fill-opacity', 0.5)
                     .attr('cursor', 'ew-resize')
                     .call(dragright);
                 var dragbartop = legendG.append('rect')
@@ -87,7 +87,7 @@
                     .attr('id', 'dragleft')
                     .attr('width', width - dragbarw)
                     .attr('fill', 'lightgreen')
-                    .attr('fill-opacity', .5)
+                    .attr('fill-opacity', 0.5)
                     .attr('cursor', 'ns-resize')
                     .call(dragtop);
                 var dragbarbottom = legendG.append('rect')
@@ -101,11 +101,11 @@
                     .attr('height', dragbarw)
                     .attr('width', width - dragbarw)
                     .attr('fill', 'lightgreen')
-                    .attr('fill-opacity', .5)
+                    .attr('fill-opacity', 0.5)
                     .attr('cursor', 'ns-resize')
                     .call(dragbottom);
             },
-            function dragmove(d) {
+            dragmove: (d)=> {
                 dragrect.attr('x', d.x = Math.max(0, Math.min(w - width, d3.event.x)))
                 dragbarleft.attr('x', function (d) {
                     return d.x - (dragbarw / 2);
@@ -132,9 +132,9 @@
                 dragbarbottom.attr('y', function (d) {
                     return d.y + height - (dragbarw / 2);
                 });
-            }
+            },
 
-            function ldragresize(d) {
+            dragresize: (d) => {
                 var oldx = d.x;
                 d.x = Math.max(0, Math.min(d.x + width - (dragbarw / 2), d3.event.x));
                 width = width + (oldx - d.x);
@@ -153,11 +153,11 @@
                         return d.x + (dragbarw / 2);
                     })
                     .attr('width', width - dragbarw)
-            }
+            },
 
-            function rdragresize(d) {
+            rdragresize : (d)=> {
                 if (isXChecked) {
-                    //Max x on the left is x - width 
+                    //Max x on the left is x - width
                     //Max x on the right is width of screen + (dragbarw/2)
                     var dragx = Math.max(d.x + (dragbarw / 2), Math.min(w, d.x + width + d3.event.dx));
                     //recalculate width
@@ -172,9 +172,9 @@
                     dragbartop.attr('width', width - dragbarw)
                     dragbarbottom.attr('width', width - dragbarw)
                 }
-            }
+            },
 
-            function tdragresize(d) {
+            tdragresize : (d)=> {
                 if (isYChecked) {
                     var oldy = d.y;
                     //Max x on the right is x + width - dragbarw
@@ -197,9 +197,9 @@
                         })
                         .attr('height', height - dragbarw);
                 }
-            }
+            },
 
-            function bdragresize(d) {
+            bdragresize : (d) =>{
                 var dragy = Math.max(d.y + (dragbarw / 2), Math.min(h, d.y + height + d3.event.dy));
                 //recalculate width
                 height = dragy - d.y;
@@ -213,4 +213,5 @@
                 dragbarleft.attr('height', height - dragbarw);
                 dragbarright.attr('height', height - dragbarw);
             }
+        }
 </script>

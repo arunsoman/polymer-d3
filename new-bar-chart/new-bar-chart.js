@@ -1,4 +1,4 @@
-(function() {
+
     //State, Under 5 Years, 5 to 13 Years, 14 to 17 Years, 18 to 24 Years, 25 to 44 Years, 45 to 64 Years, 65 Years and Over
     Polymer({
         is: 'new-bar-chart',
@@ -20,6 +20,7 @@
                             value: '0'
                         }],
                         uitype: 'single-value',
+                        displayName:'myXAxis',
                         maxSelectableValues: 1
                     }, {
                         input: 'y',
@@ -32,6 +33,7 @@
                             value: '1'
                         }],
                         uitype: 'multi-value',
+                        displayName:'myYAxis',
                         maxSelectableValues: 2
                     }, {
                         input: 'z',
@@ -44,6 +46,7 @@
                             value: '1'
                         }],
                         uitype: 'multi-value',
+                        displayName:'myZAxis',
                         maxSelectableValues: 2
                     }];
                 }
@@ -205,8 +208,39 @@
             var rectY = null;
             var rectX = null;
             var classF = null;
+            var htmlCallback;
+            htmlCallback = (d, i, j) =>{
+                    var str = '<table>'+
+                    '<tr>'+
+                    '<td>'+this.inputs[0].displayName+':</td>'+
+                    '<td>'+nChartConfig.formatX(d[0])+'</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>'+this.inputs[1].displayName+':</td>'+
+                    '<td>'+nChartConfig.formatY(d[1])+'</td>'+
+                    '</tr>'+
+                    '</table>';
+                    return str;
+                };
             switch (conf.chartType) {
             case 'heatmap':
+                htmlCallback = (d, i, j) =>{
+                    var str = '<table>'+
+                    '<tr>'+
+                    '<td>'+this.inputs[0].displayName+':</td>'+
+                    '<td>'+nChartConfig.formatX(d[0])+'</td>'+
+                    '</tr>'+
+                    '<tr>'+
+                    '<td>'+this.inputs[1].displayName+':</td>'+
+                    '<td>'+nChartConfig.formatY(d[1])+'</td>'+
+                    '</tr>'+
+                    '<tr>'
+                    '<td>'+this.inputs[1].displayName+':</td>'+
+                    '<td>'+nChartConfig.formatY(stackData[j].key)+'</td>'+
+                    '</tr>'+
+                    '</table>';
+                    return str;
+                };
                 translate = (d, i) => {
                     return 'translate(0,0)';
                 };
@@ -317,7 +351,7 @@
             default:
                 throw Error('conf.chartType can have one among stack,group,diff');
             }
-
+            
             let layer = this.parentG.selectAll('.layer')
                 .data(stackData)
                 .enter().append('g')
@@ -338,14 +372,16 @@
                 .attr('width', barWidth)
                 .attr('class', classF);
 
+            this.attachToolTip(this.parentG, rects, 'vertalBars' ,htmlCallback);
+
             if(conf.chartType == 'heatmap'){
               var color =d3.scale.linear()
                 .domain(d3.extent(stackData.map((aobj)=>{return aobj.key;})))
                 .range(["white", "red"])
                 .interpolate(d3.interpolateLab);
               rects.style('fill', (d, i, j) => { 
-                return color(stackData[j].key); });
+                return color(stackData[j].key);
+                });
             }
         }
     });
-})();
