@@ -9,6 +9,7 @@
 
     ready: function() {
       //Hack for duplicate settings
+      "use strict";
       var settings;
       if (!this.settings || this.settings.length === 0) {
         this.settings = [];
@@ -16,16 +17,6 @@
         settings = JSON.stringify(this.settings);
         this.settings = JSON.parse(settings);
       }
-      console.log("chart init: ready");
     },
-
-    attached: function(argument) {
-      // Adds stylescope listener to chart container
-      console.log("chart init: attached");
-    },
-
-    makeChartWrap: function(id) {
-    }
-
-  }
+  };
 </script>

@@ -1,14 +1,15 @@
 <script>
     PolymerD3.axisBehavior = {
         _scaleFactory: function(config) {
-            var barPadding = (!config.barPadding) ? .1 : config.barPadding;
+            "use strict";
+            var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
             var align = config.align;
             if(!align){
               throw new Error("config.align not defined values {v,h}");
             }
             var format = config.format;
             if(!format){
-              throw new Error("config.format undefined values{number, currency, percent, time, category}");
+               throw new Error("config.format undefined values{number, currency, percent, time, category}");
             }
 
             var map = {
@@ -25,7 +26,7 @@
                 scale.nice();
             }
             if (!scale) {
-                throw new Error("config.scale not valid supported {linear, time,category}")
+                throw new Error('config.scale not valid supported {linear, time,category}');
             }
             if (config.domain) {
                 scale.domain(config.domain);
@@ -34,6 +35,7 @@
         },
 
         _createAxisGroup: function(config) {
+            "use strict";
             if (!config.position) {
                 throw new Error("config.position undefined, can't create axisGroup");
             }
@@ -56,6 +58,7 @@
         },
 
         _createAxis: function(config) {
+            "use strict";
             if (!config.position) {
                 throw new Error("config.position undefined, can't create d3 axis");
             }
@@ -64,6 +67,7 @@
         },
 
         _formateAxis: function(config, axis) {
+            "use strict";
             if (!config.format) {
                 throw new Error("config.format undefined values{number, currency, percent, time}");
             }
@@ -109,12 +113,13 @@
                                 axis.tickFormat(d3.time.format('%b-%Y'));
                             }
                         }
-                        break
+                        break;
                 }
             }
         },
 
         _applyLabel: function(config, axisG) {
+            "use strict";
             if (config.label) {
                 var align = config.align;
                 axisG.append("text")
@@ -129,10 +134,11 @@
         },
 
         createAxis: function(config) {
+            "use strict";
             //scaleType, align, format, position, barPadding, label, domain){
             var scale = this._scaleFactory(config);
             var axis = this._createAxis(config);
-            var axisG = this._createAxisGroup(config)
+            var axisG = this._createAxisGroup(config);
             this._applyLabel(config, axis);
             this._formateAxis(config, axis);
             axis.scale(scale);
@@ -140,5 +146,5 @@
             return axis;
         }
 
-    }
+    };
 </script>

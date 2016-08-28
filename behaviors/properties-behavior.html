@@ -1,18 +1,16 @@
 <script>
   PolymerD3.propertiesBehavior = {
-    // setSettingsProperty: function(key, value) {
-    //     PolymerD3.utilities._setProperty.call(this, 'settings', key);
-    // },
     getSettingsProperty: function(key) {
-        var result;
-        result = this.settings[key];
-        return result.selectedValue;
+        "use strict";
+        return this.settings[key].selectedValue;
     },
     getSettingsPropertyObj: function(key) {
+        "use strict";
         return this.settings[key];
     },
     getSettings: function(){
+        "use strict";
         return this.settings;
     }
-  }
+  };
 </script>

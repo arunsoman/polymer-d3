@@ -1,20 +1,22 @@
 <script>
   PolymerD3.inputsBehavior = {
     setInputsProperty: function(key) {
-        PolymerD3.utilities._setProperty.call(this, 'inputs', key);
+        "use strict"; PolymerD3.utilities._setProperty.call(this, 'inputs', key);
     },
     getInputsProperty: function(key) {
+        "use strict";
         var result;
         result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
         return result.selectedValue;
     },
     getInputsPropertyObj: function(key) {
-        return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        "use strict";return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
     },
     getInputs: function(){
-        return this.inputs;
+        "use strict";return this.inputs;
     },
     ready: function() {
+        "use strict";
         var inputs;
         if (this.inputs && this.inputs.length > 0) {
             // Cloning inputs to fix duplicate
@@ -23,6 +25,7 @@
         }
     },
     _setExternal: function(dataHeaders) {
+        "use strict";
         var options = [];
         dataHeaders.forEach(function(dataHeader, index) {
             options.push({
@@ -32,5 +35,5 @@
         });
         this.set('external', options);
     }
-  }
+  };
 </script>

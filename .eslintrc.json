@@ -2,6 +2,9 @@
     "env": {
         "browser": true
     },
+  "undef": true,
+  "unused": true,
+  "esversion":6,
     "extends": "google",
     "rules": {
         "indent": [
@@ -24,7 +27,8 @@
         "new-cap": 0
     },
     "globals": {
+        "PolymerD3":true,
         "Polymer": true,
         "d3": true
-    }
+    },
 }

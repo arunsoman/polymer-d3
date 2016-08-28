@@ -1,13 +1,14 @@
 <script>
     PolymerD3.toolTipBehavior = {
         attachToolTip: (parentG, elem, customClass, htmlCallback)=>{
-            this.tip = d3.tip()
+            "use strict";
+            let tip = d3.tip()
                 .attr('class', 'd3-tip '+customClass)
                 .html(htmlCallback);
-            parentG.call(this.tip);
+            parentG.call(tip);
 
             elem.on('mouseover', tip.show)
                 .on('mouseout', tip.hide);
         }
-    }
+    };
  </script>

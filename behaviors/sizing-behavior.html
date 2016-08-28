@@ -8,6 +8,7 @@
     observers: ['_areaChanged(settings.area.*)'],
 
     created: function() {
+        "use strict";
         this.area = [
             {
                 input: 'height',
@@ -45,6 +46,7 @@
     },
 
     attached: function() {
+       "use strict";
         var container = document.createElement('div');
             container.className = "chartContainer";
             this.appendChild(container);
@@ -54,7 +56,7 @@
     },
 
     _manageDom: function(){
-        var unit = [1];
+        "use strict";
         var outerWidth = this._getWidth();
         var outerHeight = this._getHeight();
         var margin = this.getMargins();
@@ -86,8 +88,9 @@
 
         this.parentG.exit().remove();
     },
-    _areaChanged:function(area){
-        if(this.querySelector('.chartSvgClass') == null){
+    _areaChanged:function(){
+        "use strict";
+        if(this.querySelector('.chartSvgClass') === null){
             console.log("chart container not ready yet");
             return;
         }
@@ -95,12 +98,15 @@
     },
 
     _getHeight: function() {
-        return parseInt(this.area[0]['selectedValue']);
+        "use strict";
+        return parseInt(this.area[0].selectedValue);
     },
     _getWidth: function() {
-        return parseInt(this.area[1]['selectedValue']);
+        "use strict";
+        return parseInt(this.area[1].selectedValue);
     },
     alignAxis: function(axis, alignment) {
+        "use strict";
         var height = this._getHeight();
         var width = this._getWidth();
         var margin = this.getMargins();
@@ -134,12 +140,13 @@
         }
     },
     getMargins: function() {
+        "use strict";
         return {
-            top: parseInt(this.area[2]['selectedValue']),
-            right: parseInt(this.area[3]['selectedValue']),
-            bottom: parseInt(this.area[4]['selectedValue']),
-            left: parseInt(this.area[5]['selectedValue'])
-        }
+            top: parseInt(this.area[2].selectedValue),
+            right: parseInt(this.area[3].selectedValue),
+            bottom: parseInt(this.area[4].selectedValue),
+            left: parseInt(this.area[5].selectedValue)
+        };
     }
-  }
+};
 </script>

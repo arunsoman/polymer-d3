@@ -1,14 +1,18 @@
+<link rel="import" href="axis-behavior.html">
 <link rel="import" href="chartconfig-observer-behavior.html">
+<link rel="import" href="chart-config-behavior.html">
+<link rel="import" href="chart-init-behavior.html">
+<link rel="import" href="grouping-behavior.html">
+<link rel="import" href="inputs-behavior.html">
+<link rel="import" href="legend-behavior.html">
 <link rel="import" href="properties-behavior.html">
 <link rel="import" href="sizing-behavior.html">
-<link rel="import" href="chart-init-behavior.html">
-<link rel="import" href="inputs-behavior.html">
-<link rel="import" href="axis-behavior.html">
 <link rel="import" href="source-behavior.html">
-<link rel="import" href="legend-behavior.html">
 <link rel="import" href="tool-tip-behavior.html">
 <script>
   PolymerD3.chartBehavior = [
+    PolymerD3.chartConfigBehavior,
+    PolymerD3.groupingBehavior,
     PolymerD3.chartInitBehavior,
     PolymerD3.chartconfigObserver,
     PolymerD3.propertiesBehavior,
@@ -18,5 +22,5 @@
     PolymerD3.sourceBehavior,
     PolymerD3.toolTipBehavior,
     PolymerD3.legendBehavior
-  ]
+  ];
 </script>

@@ -1,20 +1,15 @@
 <script>
   PolymerD3.chartconfigObserver = {
-    observers: ['_settingsWatcher(settings.*)', '_inputsWatcher(inputs.*)', '_sourceWatcher(source.*)'],
+    observers: [ '_inputsWatcher(inputs.*)', '_sourceWatcher(source.*)'],
 
-    _settingsWatcher: function(settings) {
-      // var me = this;
-      // // To avoid calling draw on merging and initiation
-      // if (settings.path === 'settings.splices' || settings.path === 'settings.length' || settings.path === 'settings') {
-      //   return;
-      // }
-      // this.debounce('redrawSettings', function() {
-      //   me.draw();
-      // }, 1000);
+    _settingsWatcher: function() {
+      "use strict";
+      throw Error('method not implemented yet');
     },
 
     _inputsWatcher: function(inputs) {
-      var me = this;
+      "use strict";
+      let me = this;
       // To avoid calling draw on initation
       if (inputs.path === 'inputs') {
         return;
@@ -26,6 +21,7 @@
 
     // Draw when datasource is avialable
     _sourceWatcher: function(source) {
+      "use strict";
       var me = this;
       if (source.path === 'source') {
         this.debounce('redrawInput', function() {
@@ -33,9 +29,10 @@
         }, 1000);
       }
     },
-    addLegend: function(domain){
+    addLegend: function(domain, color){
      // draw legend
-      var legend = svg.selectAll(".legend")
+      "use strict";
+      var legend = this.parentG.selectAll(".legend")
         .data(domain)
       //.data(color.domain())
       .enter().append("g")
@@ -46,20 +43,21 @@
 
       // draw legend colored rectangles
       legend.append("rect")
-        .attr("x", width - 18)
+        .attr("x", this.chartWidth - 18)
         .attr("width", 18)
         .attr("height", 18)
+        //TODO where did the color came from ?
         .style("fill", color);
 
       // draw legend text
       legend.append("text")
-        .attr("x", width - 24)
+        .attr("x", this.chartWidth - 24)
         .attr("y", 9)
         .attr("dy", ".35em")
         .style("text-anchor", "end")
         .text(function(d) { 
           return d;
         });
-  }
-  }
-</script>
+    }
+  };
+</script> 
