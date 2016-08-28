@@ -1,3 +1,4 @@
+<link rel="import" href="timeFormater.html">
 <script>
 PolymerD3.chartConfigBehavior = {
     chartConfig : (conf, data, rowCallback) => {
@@ -25,6 +26,24 @@ PolymerD3.chartConfigBehavior = {
         var height = conf.height;
         var width = conf.width;
         var stackIndex = conf.stackIndex;
+        
+        var temporal = (index)=>{
+            var set = d3.set();
+            var eng ={
+                process:(datum)=>{
+                    var dateAsNumber = +datum[index[0]];
+                    if(!set.has(dateAsNumber)){
+                        set.add(dateAsNumber);
+                    }
+                },
+                getDomain:()=>{
+                    var dom = d3.extent(set.values());
+                    return [new Date(+dom[0]), new Date(+dom[1])];
+                }
+            };
+            return eng;
+        };
+        
         var nonOrdinal = (index) => {
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
@@ -40,7 +59,7 @@ PolymerD3.chartConfigBehavior = {
                     }
                 },
                 getDomain: () => {
-                    return [(min <0)?min:0, max];
+                    return [min, max];
                 }
             };
             var stack ={
@@ -55,9 +74,6 @@ PolymerD3.chartConfigBehavior = {
                 },
                 getDomain: () => {
                     var dom = d3.extent(map.values());
-                    if(dom[0]> 0 ){
-                        dom[0] = 0;
-                    }
                     return dom;
                 }
             };
@@ -98,22 +114,34 @@ PolymerD3.chartConfigBehavior = {
         var computex;
         var computey;
         if (conf.containsHeader) {
-            var header;
-            header = data.shift();
-            if (xConf.axisType === 'ordinal' && conf.xheader.length > 1) {
-                computex = findOrdinalFromHeader(conf.xheader);
-                computex.process(header);
-            }
-            if (yConf.axisType === 'ordinal' && conf.yheader.length > 1) {
-                computey = findOrdinalFromHeader(conf.yheader);
-                computey.process(header);
-            }
+            var header = data.shift();
+            let processHeader = (axisType, domainFrom)=>{
+                if(axisType === 'ordinal' && domainFrom.length > 1) {
+                    var computer = findOrdinalFromHeader(domainFrom);
+                    computer.process(header);
+                    return computer;
+                }
+                return undefined;
+            };
+
+            computex = processHeader(xConf.axisType, conf.xheader);
+            computey = processHeader(yConf.axisType, conf.yheader);
         }
+        var findHandler =(axisType, header)=>{
+            switch(axisType){
+            case 'ordinal':
+                return findOrdinalFromCol(header);
+            case 'time':
+                return temporal(header);
+            default:
+                return nonOrdinal(header);    
+            }
+        };
         if (!computex) {
-            computex = (xConf.axisType === 'ordinal') ? findOrdinalFromCol(conf.xheader) : nonOrdinal(conf.xheader);
+            computex = findHandler(xConf.axisType,conf.xheader);
         }
         if (!computey) {
-            computey = (yConf.axisType === 'ordinal') ? findOrdinalFromCol(conf.yheader) : nonOrdinal(conf.yheader);
+            computey = findHandler(yConf.axisType,conf.yheader);
         }
         data.forEach((aRow) => {
             computex.process(aRow);
@@ -124,37 +152,39 @@ PolymerD3.chartConfigBehavior = {
         });
         xConf.domain = computex.getDomain();
         yConf.domain = computey.getDomain();
-        if(conf.yOrign !== null){
-            yConf.domain[0] = conf.yOrign;
+        if(conf.yOrigin !== undefined){
+            yConf.domain[0] = conf.yOrigin;
         }
+        console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
+        
         var _scaleFactory = (config) => {
             var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
             var align = config.align;
             if (!align) {
                 throw new Error('config.align not defined values {v,h}');
             }
-            var format = config.format;
-            if (!format) {
-                throw new Error('config.format undefined values{number, currency, percent, time, ordinal}');
-            }
-              var map = {
-                'linear': d3.scale.linear()
-                    .range(((align === 'right') || (align === 'left')) ? 
-                        [height, 0] : [0, width]),
-                'time': d3.time.scale()
-                    .range(((align === 'right') || (align === 'left')) ? 
-                        [height, 0] : [0, width]),
-                'ordinal': d3.scale.ordinal()
-                    .rangeRoundBands(((align === 'right') || (align === 'left')) ? 
-                        [height, 0] : [0, width], barPadding)
+            var computeRange=()=>{
+                return ((align === 'right') || (align === 'left')) ? 
+                        [height, 0] : [0, width];
             };
-            var scale = map[config.scaleType];
+            var scale;
+            switch(config.scaleType){
+            case 'linear': 
+                scale =  d3.scale.linear().range(computeRange());
+                break;
+            case 'time': 
+                scale =  d3.time.scale().range(computeRange());
+                break;
+            case 'ordinal':  
+                scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+                break;
+            default:
+                throw Error('invalid config.scaleType');
+            }
             try {
                 scale.nice();
             } catch (error) {
-                if (!scale) {
-                    throw 'invalid scaleType [' + config.scaleType + ']';
-                }
+                //TODO
             }
             if (config.domain){
                 scale.domain(config.domain);
@@ -181,13 +211,6 @@ PolymerD3.chartConfigBehavior = {
             }
             return axisG;
         };
-        var _createAxis = (config) => {
-            if (!config.align) {
-                throw new Error("config.align undefined, can't create d3 axis");
-            }
-            var axis = d3.svg.axis().orient(config.align);
-            return axis;
-        };
         var _formateAxis = (config) => {
             if (!config.format) {
                 throw new Error('config.format undefined values{number, currency, percent, time}');
@@ -210,36 +233,17 @@ PolymerD3.chartConfigBehavior = {
                         }
                     };
                 case 'time':
-                    if (config.domain) {
-                        var bound = config.domain;
-                        if (d3.timeYear.count(bound[0], bound[1]) < 10) {
-                            if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
-                                if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
-                                    //todo
-                                    if (d3.timeDay.count(bound[0], bound[1]) < 10) {
-                                        if (d3.timeHour.count(bound[0], bound[1]) < 240) {
-                                            if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
-                                                return (d3.time.format('%d-%b'));
-                                            } else {
-                                                return (d3.time.format('%a-%I-%M'));
-                                            }
-                                        } else {
-                                            return (d3.time.format('%d-%b'));
-                                        }
-                                    } else {
-                                        return (d3.time.format('%d-%b'));
-                                    }
-                                }
-                            } else {
-                                return (d3.time.format('%a-%b'));
-                            }
-                        } else {
-                            return (d3.time.format('%b-%Y'));
-                        }
-                    }
-                    return null;
+                    return PolymerD3.timeFormater.formater(config.domain);
                 }
             }
+        };
+        var _createAxis = (config, conf)=>{
+            conf.scale = _scaleFactory(config);
+            conf.axis = d3.svg.axis().orient(config.align);
+            conf.axisG = _createAxisGroup(config);
+            conf.axis.tickFormat(_formateAxis(config));
+            conf.axis.scale(conf.scale);
+            conf.axisG.call(conf.axis);
         };
         var _createXAxis = () => {
             var config = {
@@ -248,12 +252,7 @@ PolymerD3.chartConfigBehavior = {
                 align: xConf.xAlign,
                 scaleType: xConf.axisType
             };
-            xConf.scale = _scaleFactory(config);
-            xConf.axis = _createAxis(config);
-            xConf.axisG = _createAxisGroup(config);
-            xConf.axis.tickFormat(_formateAxis(config));
-            xConf.axis.scale(xConf.scale);
-            xConf.axisG.call(xConf.axis);
+            _createAxis(config, xConf);
         };
         var _createYAxis = () => {
             var config = {
@@ -262,16 +261,11 @@ PolymerD3.chartConfigBehavior = {
                 align: yConf.yAlign,
                 scaleType: yConf.axisType
             };
-            yConf.scale =_scaleFactory(config);
-            yConf.axis = _createAxis(config);
-            yConf.axisG = _createAxisGroup(config);
-            yConf.axis.tickFormat(_formateAxis(config));
-            yConf.axis.scale(yConf.scale);
-            yConf.axisG.call(yConf.axis);
+            _createAxis(config, yConf);
         };
         _createXAxis();
         _createYAxis();
-        //console.log('xd:' + xConf.domain + ' yd:' + yConf.domain);
+        console.log('post: xd:' + xConf.domain + ' yd:' + yConf.domain);
         return {
             getChartHeight: () => {
                 return height;
@@ -326,4 +320,8 @@ PolymerD3.chartConfigBehavior = {
         };
     }
 };
+PolymerD3.chartConfigBehaviorWithTime=[
+    PolymerD3.chartConfigBehavior,
+    PolymerD3.timeFormater
+    ];
 </script>

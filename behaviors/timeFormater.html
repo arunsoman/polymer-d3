@@ -1,0 +1,34 @@
+<script>
+PolymerD3.timeFormater = { 
+	formater :(domain) => {
+		"use strict";
+		if (domain !== undefined) {
+			var bound = domain;
+			if (d3.timeYear.count(bound[0], bound[1]) < 10) {
+				if (d3.timeMonth.count(bound[0], bound[1]) < 10) {
+					if (d3.timeWeek.count(bound[0], bound[1]) < 10) {
+						//todo
+						if (d3.timeDay.count(bound[0], bound[1]) < 10) {
+							if (d3.timeHour.count(bound[0], bound[1]) < 240) {
+								if (((d3.time.format('%H:%M')(bound[0])) === '00:00') && ((d3.time.format('%H:%M')(bound[1])) === '00:00')) {
+									return (d3.time.format('%d-%b'));
+								} else {
+									return (d3.time.format('%a-%I-%M'));
+								}
+							} else {
+								return (d3.time.format('%d-%b'));
+							}
+						} else {
+							return (d3.time.format('%d-%b'));
+						}
+					}
+				} else {
+					return (d3.time.format('%a-%b'));
+				}
+			} else {
+				return (d3.time.format('%b-%Y'));
+			}
+		}
+	}
+};
+</script>
