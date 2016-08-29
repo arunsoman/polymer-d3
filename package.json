@@ -8,8 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint **/*.js && eslint **/*.html",
-    "lint-bar": "eslint 'bar-chart/bar-chart.js'",
+    "lint": "jshint **/*.js",
+    "lint-html": "jshint **/*.html --extract='auto'",
     "serve": "browser-sync start --config bs-config.js"
   },
   "repository": {
@@ -24,7 +24,6 @@
   "homepage": "https://github.com/arunsoman/polymer-d3#readme",
   "devDependencies": {
     "browser-sync": "^2.14.0",
-    "eslint": "^3.2.2",
-    "eslint-config-google": "^0.6.0"
+    "jshint": "^2.9.3"
   }
 }

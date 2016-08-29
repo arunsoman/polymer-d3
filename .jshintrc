@@ -29,7 +29,7 @@
                                 //   true     : all variables, last function parameter
                                 //   "vars"   : all variables only
                                 //   "strict" : all variables, all function parameters
-    "strict"        : true,     // true: Requires all functions run in ES5 Strict Mode
+    "strict"        : false,     // true: Requires all functions run in ES5 Strict Mode
     "maxparams"     : false,    // {int} Max number of formal params allowed per function
     "maxdepth"      : false,    // {int} Max depth of nested blocks (within functions)
     "maxstatements" : false,    // {int} Max number statements per function
@@ -87,5 +87,11 @@
     "yui"           : false,    // Yahoo User Interface
 
     // Custom Globals
-    "globals"       : {"Polymer": true,"PolymerD3":true,"d3":true}        // additional predefined global variables
+    "globals"       : {
+        "Polymer": true,
+        "PolymerD3":true,
+        "d3":true,
+        "assert": true,
+        "fixture": true
+    }// additional predefined global variables
 }
