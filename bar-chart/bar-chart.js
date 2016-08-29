@@ -1,224 +1,410 @@
 Polymer({
-  is: 'bar-chart',
-  properties: {
-    title: '',
-    inputs: {
-      notify: true,
-      type: Array,
-      value: [{
-        input: 'x',
-        txt: 'Pick a dimension',
-        selectedValue: [],
-        scaleType: '',
-        format:'',
-        selectedObjs: [{
-          key: 'state',
-          value: '0'
-        }],
-        uitype: 'single-value',
-        maxSelectableValues: 1
-      }, {
-        input: 'y',
-        txt: 'Pick measures',
-        selectedValue: [],
-        format:'',
-        scaleType: '',
-        selectedObjs: [{
-          key: 'Under Five Year',
-          value: '1'
-        }],
-        uitype: 'multi-value',
-        maxSelectableValues: 2
-      }, {
-        input: 'z',
-        txt: 'Pick measures',
-        selectedValue: [],
-        format:'',
-        scaleType: '',
-        selectedObjs: [{
-          key: 'Under Five Year',
-          value: '1'
-        }],
-        uitype: 'multi-value',
-        maxSelectableValues: 2
-      }]
+    is: 'bar-chart',
+    properties: {
+        title: '',
+        inputs: {
+            notify: true,
+            type: Array,
+            value: () => {
+                "use strict";
+                return [{
+                    input: 'x',
+                    txt: 'Pick a dimension',
+                    selectedValue: 0,
+                    scaleType: '',
+                    format: '',
+                    selectedObjs: [{
+                        key: 'state',
+                        value: '0'
+                    }],
+                    uitype: 'single-value',
+                    displayName:'myXAxis',
+                    maxSelectableValues: 1
+                }, {
+                    input: 'y',
+                    txt: 'Pick measures',
+                    selectedValue: [1, 2],
+                    format: '',
+                    scaleType: '',
+                    selectedObjs: [{
+                        key: 'Under Five Year',
+                        value: '1'
+                    }],
+                    uitype: 'multi-value',
+                    displayName:'myYAxis',
+                    maxSelectableValues: 2
+                }, {
+                    input: 'z',
+                    txt: 'Pick z',
+                    selectedValue: [1, 2],
+                    format: '',
+                    scaleType: '',
+                    selectedObjs: [{
+                        key: 'Under Five Year',
+                        value: '1'
+                    }],
+                    uitype: 'multi-value',
+                    displayName:'myZAxis',
+                    maxSelectableValues: 2
+                }];
+            }
+        },
+        settings: {
+            notify: true,
+            type: Object,
+            value: () => {
+                "use strict";
+                return {};
+            }
+        },
+        hideSettings: true,
+        source: Array,
+        external: Array,
+        chart: Object,
+        dataMutated: false,
+        isStacked: {
+            type: Boolean,
+            value: true
+        }
     },
-    settings: {
-      notify: true,
-      type: Object,
-      value: {}
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false,    
-    isStack: {
-            value : false,
-            type: Boolean
-    },
-    layers:{
-      type: Object
-    }
 
-  },
-
-  behaviors: [
-    PolymerD3.chartBehavior
-    // PolymerD3.colorPickerBehavior
-  ],
-
-  _toggleView: function() {
-    this.hideSettings = !this.hideSettings;
-  },
+    behaviors: [
+        PolymerD3.chartBehavior
+    ],
 
     attached: function() {
-        me = this;
-        this._loadSingleCol();
-        //this._loadMultiCol();
+        "use strict";
+        this._loadDiffdata();
+        //  this._loadHeatmap();
+        //this._loadWaterfall();
+        //this._loadSingleCol();
+            // PolymerD3.fileReader('bar-data.csv', [1, 2, 3, 4, 5, 6, 7], [], undefined, this._setSource.bind(this));
     },
 
-    _callme: function(data) {
-        me.source = data;
+    _setSource: function(data) {
+        "use strict";
+        this.source = data;
     },
-
-    _loadMultiCol: function(){
-        PolymerD3.fileReader("ms.csv", [1, 2, 3], [0], "%Y%m%d", this._callme);
-      this.inputs[0].selectedValue = 0;
-      this.inputs[0].name = 'time';
-      this.inputs[1].selectedValue  = [1,2,3];
-      this.inputs[1].name = ['New York','San Francisco', 'Austin']; 
-      this.layers = undefined;
+    _loadDiffdata: function() {
+        "use strict";
+        PolymerD3.fileReader('diff-small.csv', [1,2], [0], '%Y%m%d', this._setSource.bind(this), true);
+        this.inputs[0].selectedValue = 0;
+        this.inputs[1].selectedValue = [1,2];
+        //this.inputs[2].selectedValue = 2;
+        this.layers = undefined;
     },
-    _loadSingleCol: function(){
-        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._callme, true);
+    _loadHeatmap: function() {
+        "use strict";
+        PolymerD3.fileReader('heatmap.csv', [2], [0], '%Y-%m-%d', this._setSource.bind(this), true);
+        this.inputs[0].selectedValue = 0;
+        this.inputs[1].selectedValue = [1];
+        this.inputs[2].selectedValue = 2;
+        this.layers = undefined;
+    },
+    _loadWaterfall: function() {
+        "use strict";
+        PolymerD3.fileReader('waterfall.csv', [1], [], undefined, this._setSource.bind(this), true);
+        this.inputs[0].selectedValue = 0;
+        this.inputs[1].selectedValue = [1];
+        this.inputs[2].selectedValue = 0;
+        this.layers = undefined;
+    },
+    _loadSingleCol: function() {
+        "use strict";
+        PolymerD3.fileReader('area.csv', [1], [2], "%m/%d/%y", this._setSource.bind(this), true);
         this.inputs[0].selectedValue = 2;
         this.inputs[1].selectedValue = [1];
         this.inputs[2].selectedValue = 0;
         this.layers = undefined;
     },
-    draw: function(){
-        me = this;
-        var xIndex = this.getInputsProperty('x');
-        var yIndices = this.getInputsProperty('y');
-        var zIndex = this.getInputsProperty('z');
-        if (xIndex == -1 || yIndices.length == 0) {
-            return;
+    draw: function() {
+        "use strict";
+        let xIndex = this.getInputsProperty('x');
+        let yIndices = this.getInputsProperty('y');
+        let zGroup = this.getInputsProperty('z');
+        let z = d3.scale.category10();
+        let data = this.source;
+        var me = this;
+
+        // requireed indices not selected
+        if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data) {
+            return false;
         }
-        var data = this.source;
-        var stats = PolymerD3.summarizeData(data, 
-            xIndex, 'ordinal', yIndices, 'number', 
-            me.isStack, zIndex);
-        var xBound = stats.getXDomain();
-        var yBound = stats.getYDomain();
-
-        var config = {'scaleType':"time", 
-        'align':'h', 'format':'time', 'position':'bottom','domain':xBound};
-        var xAxis = me.createAxis(config);
-
-        config = {'scaleType':"linear", 
-        'align':'v', 'format':'currency', 'position':'left','domain':[0, yBound[1]]};
-          var yAxis = me.createAxis(config);
-
-//        y.domain([0, maxY]);
-        var y = yAxis.scale();
-        var x = xAxis.scale();        
-        var z = d3.scale.category10();
-        me.layers = stats.getStack();
         /*
-        if(! me.layers){
-            if(yIndices.length == 1){
-                me.layers = this._getLayersSingleColArea(x,y,z,xIndex,yIndices,zIndex);
-            }else{
-                me.layers = this._getLayersMultiColArea(x,y,z,xIndex,yIndices,zIndex);
-            }
-        }
-        */
-        this._drawGroup(z);
-    },
-    _getLayersSingleColArea: function(x,y,z, xIndex, yIndices, zIndex){
-        me = this;
-        if(me.isStack)
-        var data = this.source;
+        var conf = {
+            stackIndex: xIndex,
+            chartType: 'stack', //stack,group,diff,waterfall
+            containsHeader: true,
+            xheader: [xIndex],
+            yOrign: 0,
+            yheader: yIndices,
+            width: this.chartWidth,
+            height: this.chartHeight,
+            xFormat: 'time',
+            yFormat: 'number',
+            xAlign: 'bottom',
+            yAlign: 'left',
+            xaxisType: 'ordinal',
+            yaxisType: 'linear',
+            parentG: me.parentG
+        };
 
-        var stack = d3.layout.stack()
-            .offset("zero")
-            .values(function(d) {
+        var conf = {//for water fall load waterfall file
+            stackIndex: xIndex,
+            chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
+            containsHeader: true,
+            xheader: [xIndex],
+            yOrign: 0,
+            yheader: yIndices,
+            width: this.chartWidth,
+            height: this.chartHeight,
+            xFormat: 'string',
+            yFormat: 'number',
+            xAlign: 'bottom',
+            yAlign: 'left',
+            xaxisType: 'ordinal',
+            yaxisType: 'linear',
+            parentG: me.parentG
+        }; 
+        
+        var conf = {//for heatmap 
+            stackIndex: xIndex,
+            chartType: 'heatmap', //stack,group,diff,waterfall,heatmap
+            containsHeader: true,
+            xheader: [xIndex],
+            yOrign: 0,
+            yheader: yIndices,
+            width: this.chartWidth,
+            height: this.chartHeight,
+            xFormat: 'time',
+            yFormat: 'string',
+            xAlign: 'bottom',
+            yAlign: 'left',
+            xaxisType: 'ordinal',
+            yaxisType: 'ordinal',
+            parentG: me.parentG
+        };
+        */
+        var conf = {//for diff 
+            stackIndex: xIndex,
+            chartType: 'diff', //stack,group,diff,waterfall,heatmap
+            containsHeader: true,
+            xheader: [xIndex],
+            yOrign: 0,
+            yheader: yIndices,
+            width: this.chartWidth,
+            height: this.chartHeight,
+            xFormat: 'time',
+            yFormat: 'number',
+            xAlign: 'bottom',
+            yAlign: 'left',
+            xaxisType: 'ordinal',
+            yaxisType: 'linear',
+            parentG: me.parentG
+        };
+
+
+        var myGroup = PolymerD3.groupingBehavior.group_by(yIndices.length === 1 ? [zGroup] : yIndices, xIndex, yIndices, this.source[0]);
+        var nChartConfig = PolymerD3.chartConfigBehavior.chartConfig(conf, this.source, myGroup.process);
+        let stackData = myGroup.getStack();
+
+        var translate = null;
+        var barWidth = null;
+        var rectHeight = null;
+        var rectY = null;
+        var rectX = null;
+        var classF = null;
+        var htmlCallback;
+        var legendF = null;
+        htmlCallback = (d) =>{
+                var str = '<table>'+
+                '<tr>'+
+                '<td>'+this.inputs[0].displayName+':</td>'+
+                '<td>'+nChartConfig.formatX(d[0])+'</td>'+
+                '</tr>'+
+                '<tr>'+
+                '<td>'+this.inputs[1].displayName+':</td>'+
+                '<td>'+nChartConfig.formatY(d[1])+'</td>'+
+                '</tr>'+
+                '</table>';
+                return str;
+            };
+        switch (conf.chartType) {
+        case 'heatmap':
+            htmlCallback = (d, i, j) =>{
+                var str = '<table>'+
+                '<tr>'+
+                '<td>'+this.inputs[0].displayName+':</td>'+
+                '<td>'+nChartConfig.formatX(d[0])+'</td>'+
+                '</tr>'+
+                '<tr>'+
+                '<td>'+this.inputs[1].displayName+':</td>'+
+                '<td>'+nChartConfig.formatY(d[1])+'</td>'+
+                '</tr>'+
+                '<tr>'+
+                '<td>'+this.inputs[1].displayName+':</td>'+
+                '<td>'+nChartConfig.formatY(stackData[j].key)+'</td>'+
+                '</tr>'+
+                '</table>';
+                return str;
+            };
+            translate = () => {
+                return 'translate(0,0)';
+            };
+            barWidth = () => {
+                return  nChartConfig.getBarWidth() - 1 ;
+            };
+            rectX = (d) => {
+                return nChartConfig.getX(d[0]);
+            };
+            rectY = (d) => {
+                return nChartConfig.getY( d.y);
+            };
+            rectHeight = ()=> {
+                return nChartConfig.getBarHeight();
+            };
+        break;
+        case 'waterfall':
+            var group = myGroup.getGroups();
+            nChartConfig.setYDomain([0,group[group.length-1].values[0].y0]);
+            nChartConfig.setXDomain('Total');
+
+            // To replicate each element in stackData
+            let total = {
+                key: 'total',
+                values: [['total',stackData[stackData.length-1].values[0][1]]]
+            };
+            total.values[0].y = (stackData[stackData.length-1].values[0].y + stackData[stackData.length-1].values[0].y0);
+            total.values[0].y0 = 0;
+            stackData.push(total);
+            // Replication - end
+
+            translate = () => {
+                return 'translate(0,0)';
+            };
+            barWidth = () => {
+                return  nChartConfig.getBarWidth() - 1 ;
+            };
+            rectX = (d,i, j) => {
+                return j*( nChartConfig.getBarWidth() - 1 );
+            };
+            rectY = (d) => {
+              if( d.y  < 0){
+                return nChartConfig.getY(d.y0);
+              }
+              return nChartConfig.getY(d.y + d.y0);
+            };
+            rectHeight = (d)=> {
+              return nChartConfig.getBarHeight(( d.y < 0)? -1*(d.y): (d.y));
+            };
+            legendF = (d,i,j)=>{
+                console.log('d:'+d+' i:'+i + ' j:'+ j);
+                return d[0];
+            };
+        break;
+        case 'stack':
+            translate = () => {
+                return 'translate(0,0)';
+            };
+            barWidth = () => {
+                return  nChartConfig.getBarWidth() - 1 ;
+            };
+            rectX = (d) => {
+                return nChartConfig.getX(d[0]);
+            };
+            rectY = (d) => {
+                return nChartConfig.getY(d.y0 + d.y);
+            };
+            rectHeight = (d)=> {
+                return nChartConfig.getBarHeight(d.y);
+            };
+            legendF = (d,i,j)=>{
+                console.log('d:'+d+' i:'+i + ' j:'+ j);
+            };
+        break;
+        case 'diff':
+            translate = () => {
+                return 'translate(0,0)';
+            };
+            barWidth = (d, i, j) => {
+                return (j === 1)? (nChartConfig.getBarWidth()/2 - 1):
+                (nChartConfig.getBarWidth() - 1) ;
+            };
+            rectX = (d, i, j) => {
+                return (j === 0)? nChartConfig.getX(d[0]):
+                nChartConfig.getX(d[0])+nChartConfig.getBarWidth()/4 ;
+            };
+            rectY = (d) => {
+                return nChartConfig.getY(d[1]);
+            };
+            rectHeight = (d)=> {
+                return nChartConfig.getBarHeight(d[1]);
+            };
+            classF = (d, i, j) => {
+                return (j === 0)?'diff1':
+                'diff2' ;
+            };
+            legendF = (d,i,j)=>{
+                console.log('d:'+d+' i:'+i + ' j:'+ j+ ' stackData:' + stackData[j].key);
+                return d[0];
+            };
+        break;
+        case 'group':
+            translate = (d, i) => {
+                return 'translate(' + i * nChartConfig.getBarWidth() / stackData.length + ',0)';
+            };
+            barWidth = () => {
+                return  nChartConfig.getBarWidth() / stackData.length - 1;
+            };
+            rectX = (d) => {
+                return nChartConfig.getX(d[0]);
+            };
+            rectY = (d) => {
+                return nChartConfig.getY(d[1]);
+            };
+            rectHeight = (d)=> {
+                return nChartConfig.getBarHeight(d[1]);
+            };
+            legendF = (d,i,j)=>{
+                console.log('d:'+d+' i:'+i + ' j:'+ j);
+            };
+        break;
+        default:
+            throw Error('conf.chartType can have one among stack,group,diff');
+        }
+
+        let layer = this.parentG.selectAll('.layer')
+            .data(stackData)
+            .enter().append('g')
+            .attr('transform', translate)
+            .attr('class', 'layer')
+            .style('fill', function(d, i) {
+                return z(i);
+            });
+        this.attachLegend(this.parentG);
+
+        var rects = layer.selectAll('rect')
+            .data(function(d) {
                 return d.values;
             })
-            .x(function(d) {
-                return d[xIndex];
-            })
-            .y(function(d) {
-                return d[yIndices[0]];
+            .enter().append('rect')
+            .attr('x', rectX)
+            .attr('y', rectY)
+            .attr('height', rectHeight)
+            .attr('width', barWidth)
+            .attr("data-legend",legendF)
+            .attr('class', classF);
+
+        this.attachToolTip(this.parentG, rects, 'vertalBars' ,htmlCallback);
+
+        if(conf.chartType === 'heatmap'){
+          var color =d3.scale.linear()
+            .domain(d3.extent(stackData.map((aobj)=>{return aobj.key;})))
+            .range(["white", "red"])
+            .interpolate(d3.interpolateLab);
+          rects.style('fill', (d, i, j) => {
+            return color(stackData[j].key);
             });
-
-        var nest = d3.nest()
-            .key(function(d) {
-                return d[zIndex];
-            });
-
-        var groupBy = nest.entries(data);
-        var layers = stack(groupBy);
-        return layers;
-
-    },
-    _getLayersMultiColArea: function(x,y,z, xIndex, yIndices, zIndex){
-        me = this;
-        var data = this.source;
-
-        var stack = d3.layout.stack()
-            .offset("zero")
-            .values(function(d) {
-                return d;
-            })
-            .x(function(d) {
-                return d[0];
-            })
-            .y(function(d) {
-                return d[1];
-            });
-
-        //var groupBy = nest.entries(data);
-        var ds = [];
-        yIndices.forEach((d)=>{
-            var temp = [];
-            me.source.forEach((s)=>{
-                temp.push( [ s[xIndex], s[d] ])
-            });
-            ds.push(temp);
-        })
-        
-        var layers = stack(ds);
-        return layers;
-    },
-    _drawGroup: function(z){
-
-      var sets = this.parentG.selectAll(".set") 
-        .data(me.layers[0].values) 
-        .enter()
-        .append("g")
-        .attr("class","set")
-        .attr("transform",function(d,i){
-             return "translate(" + xScale(i) + ",0)";
-         });
-        debugger;
-      me.layers[0].values.forEach((dt,index) =>{
-          var newData = [];
-          me.layers.forEach((key, keyIndex)=>{newData.push()});
-          sets.data(me.layers)
-            .enter()
-            .append("rect")
-            .attr("class","local")
-            .attr("width", xScale.rangeBand()/me.layers.length)
-            .attr("y", function(d) {
-                return yScale(d.local);
-            })
-            .attr("x", (d,i)=>{ return xScale.rangeBand()/2})
-            .attr("height", function(d){
-                return h - yScale(d.local);
-            })
-            .attr("fill", (d,i)=>{return z(i);})
-      })
-    },
+        }
+    }
 });
