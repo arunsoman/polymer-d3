@@ -6,7 +6,6 @@ Polymer({
       notify: true,
       type: Array,
       value: () => {
-        'use strict';
         return [{
           input: 'x',
           txt: 'Pick a dimension',
@@ -53,8 +52,13 @@ Polymer({
       notify: true,
       type: Object,
       value: () => {
-        'use strict';
-        return {};
+        return [];
+      }
+    },
+    chartType: {
+      type: Object,
+      value: () => {
+        return [];
       }
     },
     hideSettings: true,

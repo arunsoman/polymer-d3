@@ -1,12 +1,4 @@
-<link rel="import" href="../polymer/polymer.html">
-
-<!--
-`polymer-d3`
-polymer web components for d3 charts
-
-@demo demo/index.html 
--->
-
+<link rel="import" href="display-component/chart-selector.html">
 <dom-module id="polymer-d3">
   <template>
     <style>
@@ -14,21 +6,7 @@ polymer web components for d3 charts
         display: block;
       }
     </style>
-    <h2>Hello [[prop1]]</h2>
+    <chart-selector charts="[[availableCharts]]"></chart-selector>
   </template>
-
-  <script>
-    Polymer({
-
-      is: 'polymer-d3',
-
-      properties: {
-        prop1: {
-          type: String,
-          value: 'polymer-d3',
-        },
-      },
-
-    });
-  </script>
+  <script src="polymer-d3.js"></script>
 </dom-module>

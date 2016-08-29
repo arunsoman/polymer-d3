@@ -1,0 +1,32 @@
+<!--
+  Input to select chart type
+-->
+<link rel="import" href="chart-icon.html">
+<dom-module id="chart-selector">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <template is="dom-repeat" items={{charts}}>
+      <chart-icon icon="[[item.icon]]" title="[[item.label]]" on-tap="notifyTap"></chart-icon>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      is: 'chart-selector',
+      properties: {
+        charts: {
+          type: Array,
+          value: () => {
+            return [];
+          }
+        }
+      },
+      notifyTap: function() {
+        // Trigger tap
+      }
+    });
+  </script>
+</dom-module>

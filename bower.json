@@ -12,7 +12,8 @@
     "paper-item": "^1.2.1",
     "polymer-color-picker": "^1.0.1",
     "d3-tip": "v0.6.3",
-    "polymer-sortablejs": "https://github.com/SortableJS/polymer-sortablejs.git#master"
+    "polymer-sortablejs": "https://github.com/SortableJS/polymer-sortablejs.git#master",
+    "paper-icon-button": "^1.1.2"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

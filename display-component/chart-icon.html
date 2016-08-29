@@ -1,0 +1,23 @@
+<!--
+A single chart icon entity
+-->
+
+<dom-module id="chart-icon">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+    <paper-icon-button icon="[[icon]]" title="[[title]]"></paper-icon-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'chart-icon',
+      properties: {
+        icon: String,
+        title: String
+      }
+    });
+  </script>
+</dom-module>
