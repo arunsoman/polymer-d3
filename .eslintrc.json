@@ -1,7 +1,7 @@
 {
-    "env": {
-        "browser": true
-    },
+  "env": {
+      "browser": true
+  },
   "undef": true,
   "unused": true,
   "esversion":6,
@@ -30,5 +30,5 @@
         "PolymerD3":true,
         "Polymer": true,
         "d3": true
-    },
+    }
 }
