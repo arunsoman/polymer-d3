@@ -1,3 +1,6 @@
+// Initializes barchart into namespace
+PolymerD3.barChart = {};
+
 Polymer({
   is: 'bar-chart',
   properties: {
@@ -69,6 +72,12 @@ Polymer({
     isStacked: {
       type: Boolean,
       value: true
+    },
+    configurator: {
+      type: Object,
+      value: function() {
+        return {};
+      }
     }
   },
 
@@ -147,9 +156,19 @@ Polymer({
     var me = this;
 
     // requireed indices not selected
-    if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data) {
+    if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data ||
+      PolymerD3.utilities.isEmptyObject(this.configurator)
+    ) {
       return false;
     }
+    // 
+    var conf = this.configurator.conf({
+      xIndex: xIndex,
+      yIndices: yIndices,
+      chartWidth: this.chartWidth,
+      chartHeight: this.chartHeight,
+      parentG: this.parentG
+    });
     /*
     var conf = {
       stackIndex: xIndex,
@@ -204,6 +223,7 @@ Polymer({
       parentG: me.parentG
     };
     */
+    /*
     var conf = {
       // for diff
       stackIndex: xIndex,
@@ -222,7 +242,7 @@ Polymer({
       yaxisType: 'linear',
       parentG: me.parentG
     };
-
+    */
     var myGroup = PolymerD3
       .groupingBehavior
       .group_by(
@@ -233,14 +253,15 @@ Polymer({
       .chartConfig(conf, this.source, myGroup.process);
     let stackData = myGroup.getStack();
 
-    var translate = null;
-    var barWidth = null;
-    var rectHeight = null;
-    var rectY = null;
-    var rectX = null;
-    var classF = null;
+    var translations = this.configurator.processors(nChartConfig);
+    // var translate = null;
+    // var barWidth = null;
+    // var rectHeight = null;
+    // var rectY = null;
+    // var rectX = null;
+    // var classF = null;
     var htmlCallback;
-    var legendF = null;
+    // var legendF = null;
     htmlCallback = d => {
       var str = '<table>' +
         '<tr>' +
@@ -254,156 +275,156 @@ Polymer({
         '</table>';
       return str;
     };
-    switch (conf.chartType) {
-      case 'heatmap':
-        htmlCallback = (d, i, j) => {
-          var str = '<table>' +
-            '<tr>' +
-            '<td>' + this.inputs[0].displayName + ':</td>' +
-            '<td>' + nChartConfig.formatX(d[0]) + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td>' + this.inputs[1].displayName + ':</td>' +
-            '<td>' + nChartConfig.formatY(d[1]) + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td>' + this.inputs[1].displayName + ':</td>' +
-            '<td>' + nChartConfig.formatY(stackData[j].key) + '</td>' +
-            '</tr>' +
-            '</table>';
-          return str;
-        };
-        translate = () => {
-          return 'translate(0,0)';
-        };
-        barWidth = () => {
-          return nChartConfig.getBarWidth() - 1;
-        };
-        rectX = d => {
-          return nChartConfig.getX(d[0]);
-        };
-        rectY = d => {
-          return nChartConfig.getY(d.y);
-        };
-        rectHeight = () => {
-          return nChartConfig.getBarHeight();
-        };
-        break;
-      case 'waterfall':
-        var group = myGroup.getGroups();
-        nChartConfig.setYDomain([0, group[group.length - 1].values[0].y0]);
-        nChartConfig.setXDomain('Total');
+    // switch (conf.chartType) {
+    //   case 'heatmap':
+    //     htmlCallback = (d, i, j) => {
+    //       var str = '<table>' +
+    //         '<tr>' +
+    //         '<td>' + this.inputs[0].displayName + ':</td>' +
+    //         '<td>' + nChartConfig.formatX(d[0]) + '</td>' +
+    //         '</tr>' +
+    //         '<tr>' +
+    //         '<td>' + this.inputs[1].displayName + ':</td>' +
+    //         '<td>' + nChartConfig.formatY(d[1]) + '</td>' +
+    //         '</tr>' +
+    //         '<tr>' +
+    //         '<td>' + this.inputs[1].displayName + ':</td>' +
+    //         '<td>' + nChartConfig.formatY(stackData[j].key) + '</td>' +
+    //         '</tr>' +
+    //         '</table>';
+    //       return str;
+    //     };
+    //     translate = () => {
+    //       return 'translate(0,0)';
+    //     };
+    //     barWidth = () => {
+    //       return nChartConfig.getBarWidth() - 1;
+    //     };
+    //     rectX = d => {
+    //       return nChartConfig.getX(d[0]);
+    //     };
+    //     rectY = d => {
+    //       return nChartConfig.getY(d.y);
+    //     };
+    //     rectHeight = () => {
+    //       return nChartConfig.getBarHeight();
+    //     };
+    //     break;
+    //   case 'waterfall':
+    //     var group = myGroup.getGroups();
+    //     nChartConfig.setYDomain([0, group[group.length - 1].values[0].y0]);
+    //     nChartConfig.setXDomain('Total');
 
-        // To replicate each element in stackData
-        let total = {
-          key: 'total',
-          values: [
-            ['total', stackData[stackData.length - 1].values[0][1]]
-          ]
-        };
-        total.values[0].y = (stackData[stackData.length - 1].values[0].y + stackData[stackData.length - 1].values[0].y0);
-        total.values[0].y0 = 0;
-        stackData.push(total);
-        // Replication - end
+    //     // To replicate each element in stackData
+    //     let total = {
+    //       key: 'total',
+    //       values: [
+    //         ['total', stackData[stackData.length - 1].values[0][1]]
+    //       ]
+    //     };
+    //     total.values[0].y = (stackData[stackData.length - 1].values[0].y + stackData[stackData.length - 1].values[0].y0);
+    //     total.values[0].y0 = 0;
+    //     stackData.push(total);
+    //     // Replication - end
 
-        translate = () => {
-          return 'translate(0,0)';
-        };
-        barWidth = () => {
-          return nChartConfig.getBarWidth() - 1;
-        };
-        rectX = (d, i, j) => {
-          return j * (nChartConfig.getBarWidth() - 1);
-        };
-        rectY = (d) => {
-          if (d.y < 0) {
-            return nChartConfig.getY(d.y0);
-          }
-          return nChartConfig.getY(d.y + d.y0);
-        };
-        rectHeight = (d) => {
-          return nChartConfig.getBarHeight((d.y < 0) ? -1 * (d.y) : (d.y));
-        };
-        legendF = (d, i, j) => {
-          console.log('d:' + d + ' i:' + i + ' j:' + j);
-          return d[0];
-        };
-        break;
-      case 'stack':
-        translate = () => {
-          return 'translate(0,0)';
-        };
-        barWidth = () => {
-          return nChartConfig.getBarWidth() - 1;
-        };
-        rectX = (d) => {
-          return nChartConfig.getX(d[0]);
-        };
-        rectY = (d) => {
-          return nChartConfig.getY(d.y0 + d.y);
-        };
-        rectHeight = (d) => {
-          return nChartConfig.getBarHeight(d.y);
-        };
-        legendF = (d, i, j) => {
-          console.log('d:' + d + ' i:' + i + ' j:' + j);
-        };
-        break;
-      case 'diff':
-        translate = () => {
-          return 'translate(0,0)';
-        };
-        barWidth = (d, i, j) => {
-          return (j === 1) ? (nChartConfig.getBarWidth() / 2 - 1) :
-            (nChartConfig.getBarWidth() - 1);
-        };
-        rectX = (d, i, j) => {
-          return (j === 0) ? nChartConfig.getX(d[0]) :
-            nChartConfig.getX(d[0]) + nChartConfig.getBarWidth() / 4;
-        };
-        rectY = (d) => {
-          return nChartConfig.getY(d[1]);
-        };
-        rectHeight = (d) => {
-          return nChartConfig.getBarHeight(d[1]);
-        };
-        classF = (d, i, j) => {
-          return (j === 0) ? 'diff1' :
-            'diff2';
-        };
-        legendF = (d, i, j) => {
-          console.log('d:' + d + ' i:' + i + ' j:' + j + ' stackData:' + stackData[j].key);
-          return d[0];
-        };
-        break;
-      case 'group':
-        translate = (d, i) => {
-          return 'translate(' + i * nChartConfig.getBarWidth() / stackData.length + ',0)';
-        };
-        barWidth = () => {
-          return nChartConfig.getBarWidth() / stackData.length - 1;
-        };
-        rectX = (d) => {
-          return nChartConfig.getX(d[0]);
-        };
-        rectY = (d) => {
-          return nChartConfig.getY(d[1]);
-        };
-        rectHeight = (d) => {
-          return nChartConfig.getBarHeight(d[1]);
-        };
-        legendF = (d, i, j) => {
-          console.log('d:' + d + ' i:' + i + ' j:' + j);
-        };
-        break;
-      default:
-        throw Error('conf.chartType can have one among stack,group,diff');
-    }
+    //     translate = () => {
+    //       return 'translate(0,0)';
+    //     };
+    //     barWidth = () => {
+    //       return nChartConfig.getBarWidth() - 1;
+    //     };
+    //     rectX = (d, i, j) => {
+    //       return j * (nChartConfig.getBarWidth() - 1);
+    //     };
+    //     rectY = (d) => {
+    //       if (d.y < 0) {
+    //         return nChartConfig.getY(d.y0);
+    //       }
+    //       return nChartConfig.getY(d.y + d.y0);
+    //     };
+    //     rectHeight = (d) => {
+    //       return nChartConfig.getBarHeight((d.y < 0) ? -1 * (d.y) : (d.y));
+    //     };
+    //     legendF = (d, i, j) => {
+    //       console.log('d:' + d + ' i:' + i + ' j:' + j);
+    //       return d[0];
+    //     };
+    //     break;
+    //   case 'stack':
+    //     translate = () => {
+    //       return 'translate(0,0)';
+    //     };
+    //     barWidth = () => {
+    //       return nChartConfig.getBarWidth() - 1;
+    //     };
+    //     rectX = (d) => {
+    //       return nChartConfig.getX(d[0]);
+    //     };
+    //     rectY = (d) => {
+    //       return nChartConfig.getY(d.y0 + d.y);
+    //     };
+    //     rectHeight = (d) => {
+    //       return nChartConfig.getBarHeight(d.y);
+    //     };
+    //     legendF = (d, i, j) => {
+    //       console.log('d:' + d + ' i:' + i + ' j:' + j);
+    //     };
+    //     break;
+    //   case 'diff':
+    //     translate = () => {
+    //       return 'translate(0,0)';
+    //     };
+    //     barWidth = (d, i, j) => {
+    //       return (j === 1) ? (nChartConfig.getBarWidth() / 2 - 1) :
+    //         (nChartConfig.getBarWidth() - 1);
+    //     };
+    //     rectX = (d, i, j) => {
+    //       return (j === 0) ? nChartConfig.getX(d[0]) :
+    //         nChartConfig.getX(d[0]) + nChartConfig.getBarWidth() / 4;
+    //     };
+    //     rectY = (d) => {
+    //       return nChartConfig.getY(d[1]);
+    //     };
+    //     rectHeight = (d) => {
+    //       return nChartConfig.getBarHeight(d[1]);
+    //     };
+    //     classF = (d, i, j) => {
+    //       return (j === 0) ? 'diff1' :
+    //         'diff2';
+    //     };
+    //     legendF = (d, i, j) => {
+    //       console.log('d:' + d + ' i:' + i + ' j:' + j + ' stackData:' + stackData[j].key);
+    //       return d[0];
+    //     };
+    //     break;
+    //   case 'group':
+    //     translate = (d, i) => {
+    //       return 'translate(' + i * nChartConfig.getBarWidth() / stackData.length + ',0)';
+    //     };
+    //     barWidth = () => {
+    //       return nChartConfig.getBarWidth() / stackData.length - 1;
+    //     };
+    //     rectX = (d) => {
+    //       return nChartConfig.getX(d[0]);
+    //     };
+    //     rectY = (d) => {
+    //       return nChartConfig.getY(d[1]);
+    //     };
+    //     rectHeight = (d) => {
+    //       return nChartConfig.getBarHeight(d[1]);
+    //     };
+    //     legendF = (d, i, j) => {
+    //       console.log('d:' + d + ' i:' + i + ' j:' + j);
+    //     };
+    //     break;
+    //   default:
+    //     throw Error('conf.chartType can have one among stack,group,diff');
+    // }
 
     let layer = this.parentG.selectAll('.layer')
       .data(stackData)
       .enter().append('g')
-      .attr('transform', translate)
+      .attr('transform', translations.translate)
       .attr('class', 'layer')
       .style('fill', function(d, i) {
         return z(i);
@@ -415,12 +436,12 @@ Polymer({
         return d.values;
       })
       .enter().append('rect')
-      .attr('x', rectX)
-      .attr('y', rectY)
-      .attr('height', rectHeight)
-      .attr('width', barWidth)
-      .attr('data-legend', legendF)
-      .attr('class', classF);
+      .attr('x', translations.rectX)
+      .attr('y', translations.rectY)
+      .attr('height', translations.rectHeight)
+      .attr('width', translations.barWidth)
+      .attr('data-legend', translations.legendF)
+      .attr('class', translations.classF);
 
     this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
 
@@ -439,5 +460,9 @@ Polymer({
 
   initGroupedBarChart: function() {
     console.log('barchart Init')
+  },
+
+  setDiffrenceSettings: function() {
+    this.set('configurator', new PolymerD3.barChart.difference());
   }
 });

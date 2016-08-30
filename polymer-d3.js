@@ -22,6 +22,11 @@ Polymer({
           element: 'bar-chart',
           callBack: 'setWatefallSettings'
         }, {
+          label: 'Difference',
+          icon: 'icons:accessibility',
+          element: 'bar-chart',
+          callBack: 'setDiffrenceSettings'
+        }, {
           label: 'Pie Chart',
           icon: 'icons:content-cut',
           element: 'pie-chart',

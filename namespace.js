@@ -41,7 +41,7 @@ PolymerD3.utilities._setProperty = function(arr, key) {
         }
     });
 };
-    
+
 PolymerD3.utilities._getProperty = function(arr, key) {
     var result;
     this[arr].forEach(function(elem) {
