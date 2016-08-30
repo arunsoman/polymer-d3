@@ -2,40 +2,51 @@
     PolymerD3.axisBehavior = {
         attach:(axis)=>{
             return{
-                tickRotation:0,
-                rotateTicks:(degree)=>{
-                    if(degree !== undefined){
-                        this.tickRotation = degree;
+                tickRotation:{
+                    tickRotation:0,
+                    rotateTicks:(degree)=>{
+                        if(degree !== undefined){
+                            this.tickRotation = degree;
+                        }
+                        
+                        axis.selectAll('text')
+                        .attr("text-anchor", "left")
+                        .attr('transform', 'rotate('+this.tickRotation+')');
+                        return this.tickRotation;
                     }
-                    
-                    axis.selectAll('text')
-                    .attr("text-anchor", "left")
-                    .attr('transform', 'rotate('+this.tickRotation+')');
-                    return this.tickRotation;
                 },
-                axisTitle:null,
-                axisTitleX:0,
-                axisTitleY:0,
-                axisTitleRotation:0,
-                placeTitle:(title,x,y,degree)=>{
-                    this.axisTitle = (title === undefined)?this.axisTitle:title;
-                    this.axisTitleX = (x === undefined)?this.axisTitleX:x;
-                    this.axisTitleY = (y === undefined)?this.axisTitleY:y;
-                    this.axisTitleRotation = (degree === undefined)?this.axisTitleRotation:degree;
+                title:{
+                    axisTitle:null,
+                    axisTitleX:0,
+                    axisTitleY:0,
+                    axisTitleRotation:0,
+                    placeTitle:(title,x,y,degree)=>{
+                        this.axisTitle = (title === undefined)?this.axisTitle:title;
+                        this.axisTitleX = (x === undefined)?this.axisTitleX:x;
+                        this.axisTitleY = (y === undefined)?this.axisTitleY:y;
+                        this.axisTitleRotation = (degree === undefined)?this.axisTitleRotation:degree;
 
-                    var axisTitleG = axis.selectAll('.axis-title');
-                    var axisTitleGUpdate = axisTitleG.data([1]);
-                    var axisTitleGEnter = axisTitleGUpdate.enter().append('g').attr('class','axis-title');
-                    axisTitleGEnter 
-                        .append('text').attr("text-anchor", "middle")
-                        .attr("transform", 
-                            "translate("+ this.axisTitleX +","+this.axisTitleY+") rotate("+this.axisTitleRotation+')') 
-                        .text(this.axisTitle);
-                    
-                    axisTitleGUpdate.selectAll('g').selectAll('text')
-                                          .attr("transform", 
-                            "translate("+ this.axisTitleX +","+this.axisTitleY+") rotate("+this.axisTitleRotation+')') 
-                        .text(this.axisTitle);
+                        var axisTitleG = axis.selectAll('.axis-title');
+                        var axisTitleGUpdate = axisTitleG.data([1]);
+                        var axisTitleGEnter = axisTitleGUpdate.enter().append('g').attr('class','axis-title');
+                        axisTitleGEnter 
+                            .append('text').attr("text-anchor", "middle")
+                            .attr("transform", 
+                                "translate("+ this.axisTitleX +","+this.axisTitleY+") rotate("+this.axisTitleRotation+')') 
+                            .text(this.axisTitle);
+                        
+                        axisTitleGUpdate.selectAll('g').selectAll('text')
+                                              .attr("transform", 
+                                "translate("+ this.axisTitleX +","+this.axisTitleY+") rotate("+this.axisTitleRotation+')') 
+                            .text(this.axisTitle);
+                    }
+                },
+                axisVisibility:{
+                    isAxisHidden: true,
+                    toggleAxisDisplay:()=>{
+                        this.isAxisHidden = !this.isAxisHidden;
+                        return this.isAxisHidden;
+                    }
                 }
             };
         },

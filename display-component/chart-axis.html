@@ -1,0 +1,27 @@
+<dom-module id="chart-axis">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+    </style>
+    <paper-icon-button icon="[[icon]]" title="[[title]]"></paper-icon-button>
+  </template>
+  <script>
+    Polymer({
+      is: 'chart-axis',
+      properties: {
+        axis:{
+          type:Object,
+          value:{},
+          notify:true
+        } 
+      },
+      observers: [
+      //'_displayTitle(settings.axis.*)',
+      'displayTickRotation(settings.axis.tickRotation.tickRotation'],
+      displayTickRotation:()=>{}
+
+    });
+  </script>
+</dom-module>

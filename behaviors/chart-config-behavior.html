@@ -257,6 +257,7 @@ PolymerD3.chartConfigBehavior = {
             };
             _createAxis(config, xConf);
             xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
+            this.settings.axis.xConf= xConf.axisBehavior;
         };
         var _createYAxis = () => {
             var config = {
@@ -268,6 +269,7 @@ PolymerD3.chartConfigBehavior = {
             };
             _createAxis(config, yConf);
             yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
+            this.settings.axis.yConf= yConf.axisBehavior;
         };
         _createXAxis();
         _createYAxis();
