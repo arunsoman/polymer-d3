@@ -10,7 +10,7 @@ module.exports = {
         }
       }
     },
-    files: ['**/*.js'],
+    files: ['**/*.js', '**/*.html'],
     server: {
       baseDir: ['']
     }

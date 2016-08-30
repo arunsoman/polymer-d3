@@ -2,7 +2,7 @@
 <link rel="import" href="axis-behavior.html">
 <script>
 PolymerD3.chartConfigBehavior = {
-    chartConfig : (conf, data, rowCallback) => {
+    chartConfig : function (conf, data, rowCallback) {
         "use strict";
         var xConf = {
             dataIndex: conf.xheader,
@@ -257,6 +257,9 @@ PolymerD3.chartConfigBehavior = {
             };
             _createAxis(config, xConf);
             xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
+            if (!this.settings.axis) {
+                this.settings.axis = {};
+            }
             this.settings.axis.xConf= xConf.axisBehavior;
         };
         var _createYAxis = () => {
@@ -269,10 +272,13 @@ PolymerD3.chartConfigBehavior = {
             };
             _createAxis(config, yConf);
             yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
+            if (!this.settings.axis) {
+                this.settings.axis = {};
+            }
             this.settings.axis.yConf= yConf.axisBehavior;
         };
-        _createXAxis();
-        _createYAxis();
+        _createXAxis.call(this);
+        _createYAxis.call(this);
         console.log('post: xd:' + xConf.domain + ' yd:' + yConf.domain);
         return {
             getXAxisBehavior: xConf.axisBehavior,

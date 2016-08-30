@@ -30,19 +30,21 @@
         },
         selected: {
           type: Object,
-          value: () => { return {
-            k: 'vals'
-          };}
+          value: () => { return {};},
+          notify: true
         }
       },
+
+      // Sets current selected object
       notifyTap: function(e) {
         if (this.selectedBtn.style) {
           this.selectedBtn.style.color = '';
         }
         this.set('selectedBtn', e.target);
-        this.selectedBtn.style.color = 'blue';
+        this.selectedBtn.style.color = '#006599';
         this.set('selected', e.model.item);
       }
+
     });
   </script>
 </dom-module>

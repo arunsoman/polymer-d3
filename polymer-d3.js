@@ -15,7 +15,7 @@ Polymer({
           label: 'Grouped Bar Chart',
           icon: 'icons:cloud-circle',
           element: 'bar-chart',
-          callBack: 'setGroupedSettings'
+          callBack: 'initGroupedBarChart'
         }, {
           label: 'Waterfall Chart',
           icon: 'icons:accessibility',
@@ -49,5 +49,25 @@ Polymer({
       value: () => { return {};}
     }
   },
+
+  observers: ['_selectedChanged(selectedChart)'],
+
+  _selectedChanged: function(selectedChart) {
+    console.log(this);
+    if (!PolymerD3.utilities.isEmptyObject(selectedChart)) {
+      this.$$('.chartHolder').innerHTML = '';
+      PolymerD3.utilities.attachElement.call(
+        this,
+        selectedChart.element,
+        '.chartHolder',
+        selectedChart.callBack
+      );
+    } else {
+      console.info('Empyt Object');
+    }
+  },
+  check: function() {
+    console.log(this);
+  }
 
 });

@@ -229,8 +229,7 @@ Polymer({
         yIndices.length === 1 ? [zGroup] : yIndices,
         xIndex, yIndices, this.source[0]
       );
-    var nChartConfig = PolymerD3
-      .chartConfigBehavior
+    var nChartConfig = this
       .chartConfig(conf, this.source, myGroup.process);
     let stackData = myGroup.getStack();
 
@@ -436,5 +435,9 @@ Polymer({
         return color(stackData[j].key);
       });
     }
+  },
+
+  initGroupedBarChart: function() {
+    console.log('barchart Init')
   }
 });

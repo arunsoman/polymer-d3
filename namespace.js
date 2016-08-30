@@ -9,6 +9,25 @@ PolymerD3.utilities.merge = function(from, to) {
     });
 };
 
+PolymerD3.utilities.isEmptyObject = function(obj) {
+    return Object.keys(obj).length === 0 && obj.constructor === Object;
+};
+
+// Creates and attaches a dom node inside specific container and executes a meathod inside it
+PolymerD3.utilities.attachElement = function(elem, container, cb) {
+    var dynamicEl = document.createElement(elem);
+    var containerElem = this.querySelector(container);
+    if (containerElem) {
+        containerElem.appendChild(dynamicEl);
+    } else {
+        this.appendChild(dynamicEl);
+    }
+    if (cb && dynamicEl[cb]) {
+        var callBack = dynamicEl[cb];
+        callBack.call(dynamicEl);
+    }
+};
+
 PolymerD3.utilities._setProperty = function(arr, key) {
     if (arguments.length < 1) {
         return;
@@ -144,7 +163,6 @@ PolymerD3.utilities.clone = function(obj) {
     return clone;
 };
 PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, measure) => {
-    
     var Xdomain = [];
     var Ydomain;
     var stacked;
