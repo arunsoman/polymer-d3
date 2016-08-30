@@ -1,7 +1,6 @@
 <!--
   Input to select chart type
 -->
-<link rel="import" href="chart-icon.html">
 <dom-module id="chart-selector">
   <template>
     <style>
@@ -9,8 +8,12 @@
         display: block;
       }
     </style>
-    <template is="dom-repeat" items={{charts}}>
-      <chart-icon icon="[[item.icon]]" title="[[item.label]]" on-tap="notifyTap"></chart-icon>
+    <template is="dom-repeat" items="{{charts}}">
+      <paper-icon-button
+        icon="[[item.icon]]"
+        title="[[item.label]]"
+        on-tap="notifyTap"
+      ></paper-icon-button>
     </template>
   </template>
   <script>
@@ -19,13 +22,26 @@
       properties: {
         charts: {
           type: Array,
-          value: () => {
-            return [];
-          }
+          value: () => { return [];}
+        },
+        selectedBtn: {
+          type: Object,
+          value: () => { return {};}
+        },
+        selected: {
+          type: Object,
+          value: () => { return {
+            k: 'vals'
+          };}
         }
       },
-      notifyTap: function() {
-        // Trigger tap
+      notifyTap: function(e) {
+        if (this.selectedBtn.style) {
+          this.selectedBtn.style.color = '';
+        }
+        this.set('selectedBtn', e.target);
+        this.selectedBtn.style.color = 'blue';
+        this.set('selected', e.model.item);
       }
     });
   </script>

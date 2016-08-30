@@ -6,7 +6,10 @@
         display: block;
       }
     </style>
-    <chart-selector charts="[[availableCharts]]"></chart-selector>
+    <chart-selector
+      charts="[[availableCharts]]"
+      selected="{{selectedChart}}"
+    ></chart-selector>
   </template>
   <script src="polymer-d3.js"></script>
 </dom-module>
