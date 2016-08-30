@@ -161,7 +161,7 @@ Polymer({
     ) {
       return false;
     }
-    // 
+    //
     var conf = this.configurator.conf({
       xIndex: xIndex,
       yIndices: yIndices,
@@ -251,7 +251,9 @@ Polymer({
       );
     var nChartConfig = this
       .chartConfig(conf, this.source, myGroup.process);
+
     let stackData = myGroup.getStack();
+    nChartConfig.stackDataLength = stackData.length;
 
     var translations = this.configurator.processors(nChartConfig);
     // var translate = null;
@@ -459,7 +461,7 @@ Polymer({
   },
 
   initGroupedBarChart: function() {
-    console.log('barchart Init')
+    this.set('configurator', new PolymerD3.barChart.grouped());
   },
 
   setDiffrenceSettings: function() {
