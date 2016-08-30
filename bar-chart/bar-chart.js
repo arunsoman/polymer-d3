@@ -464,5 +464,6 @@ Polymer({
 
   setDiffrenceSettings: function() {
     this.set('configurator', new PolymerD3.barChart.difference());
+    this.draw();
   }
 });
