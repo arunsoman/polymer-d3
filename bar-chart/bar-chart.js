@@ -253,6 +253,8 @@ Polymer({
       .chartConfig(conf, this.source, myGroup.process);
 
     let stackData = myGroup.getStack();
+
+    // Temporary hack to pass stackData's length to processor
     nChartConfig.stackDataLength = stackData.length;
 
     var translations = this.configurator.processors(nChartConfig);
@@ -462,6 +464,7 @@ Polymer({
 
   initGroupedBarChart: function() {
     this.set('configurator', new PolymerD3.barChart.grouped());
+    this.draw();
   },
 
   setDiffrenceSettings: function() {
