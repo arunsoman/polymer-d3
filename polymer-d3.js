@@ -72,10 +72,14 @@ Polymer({
     }
   },
 
-  observers: ['_selectedChanged(selectedChart)', '_inputsChanged(inputs)'],
+  observers: ['_selectedChanged(selectedChart)', '_inputsChanged(inputs.*)'],
 
   _inputsChanged: function(i) {
-    console.log('inputs', i);
+    this.debounce('inputschangedebounce', () => {
+      if (this.selectedChart && this.selectedChart.draw) {
+        this.$$(selectedChart).draw();
+      }
+    }, 100);
   },
 
   _selectedChanged: function(selectedChart) {
@@ -98,9 +102,7 @@ Polymer({
       // Gets settings object from newly attached chart
       this.set('settings', elem.settngs);
       this.set('inputs', elem.inputs);
-      if (this.$$('draggable-input')) {
-        this.$$('draggable-input').set('parentElem', this);
-      }
+      this.set('selectedChart', selectedChart.element);
     } else {
       console.info('Empyt Object');
     }
