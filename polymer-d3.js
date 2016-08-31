@@ -69,6 +69,11 @@ Polymer({
       type:Array,
       notify: true,
       value: () => {return [];}
+    },
+    // Data
+    source: {
+      type: Array,
+      value: () => {return [];}
     }
   },
 
@@ -76,8 +81,8 @@ Polymer({
 
   _inputsChanged: function(i) {
     this.debounce('inputschangedebounce', () => {
-      if (this.selectedChart && this.selectedChart.draw) {
-        this.$$(selectedChart).draw();
+      if (this.selectedChart && this.selectedChart.element) {
+        this.$$(this.selectedChart.element).draw();
       }
     }, 100);
   },
@@ -102,6 +107,7 @@ Polymer({
       // Gets settings object from newly attached chart
       this.set('settings', elem.settngs);
       this.set('inputs', elem.inputs);
+      elem.set('source', this.source);
     } else {
       console.info('Empyt Object');
     }

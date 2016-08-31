@@ -4,19 +4,22 @@
         "use strict"; PolymerD3.utilities._setProperty.call(this, 'inputs', key);
     },
     getInputsProperty: function(key) {
-        "use strict";
-        var result;
-        result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
-        return result.selectedValue;
+        var result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        // Returns single result instead of array,
+        // if max selectable values is 1s
+        if (result.maxSelectableValues === 1) {
+            return result.selectedValue[0];
+        } else {
+            return result.selectedValue;
+        }
     },
     getInputsPropertyObj: function(key) {
-        "use strict";return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        return PolymerD3.utilities._getProperty.call(this, 'inputs', key);
     },
     getInputs: function(){
-        "use strict";return this.inputs;
+        return this.inputs;
     },
     ready: function() {
-        "use strict";
         var inputs;
         if (this.inputs && this.inputs.length > 0) {
             // Cloning inputs to fix duplicate
@@ -25,7 +28,6 @@
         }
     },
     _setExternal: function(dataHeaders) {
-        "use strict";
         var options = [];
         dataHeaders.forEach(function(dataHeader, index) {
             options.push({
