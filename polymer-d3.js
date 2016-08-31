@@ -102,7 +102,6 @@ Polymer({
       // Gets settings object from newly attached chart
       this.set('settings', elem.settngs);
       this.set('inputs', elem.inputs);
-      this.set('selectedChart', selectedChart.element);
     } else {
       console.info('Empyt Object');
     }
