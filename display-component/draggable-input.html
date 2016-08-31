@@ -89,10 +89,27 @@
           type: Object,
           value: () => {return {};}
         },
+        parentElem: {
+          type: Object,
+          value: () => {return {};}
+        },
         uuid: String
       },
 
-      observers: ['_inputsObserver(inputs)'],
+      observers: ['_inputsObserver(inputs)', '_inputsDeepObserver(inputs.*)'],
+
+      _inputsDeepObserver: function(inputs) {
+        if (inputs.path !== 'inputs') {
+          this.debounce('inputChangeDebounce', () => {
+            // Creates and dispatces a custom event to notify Parent Polymer-D3
+            var eventParam = PolymerD3.utilities
+              .dataMutationParam(inputs.path, inputs.value);
+            var event = PolymerD3.utilities
+              .dataMutationEvent(eventParam);
+            this.dispatchEvent(event);
+          });
+        }
+      },
 
       _inputsObserver: function(inputs) {
         if (inputs.length && inputs.length > 0) {

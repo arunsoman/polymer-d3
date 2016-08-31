@@ -67,11 +67,16 @@ Polymer({
     },
     inputs: {
       type:Array,
+      notify: true,
       value: () => {return [];}
     }
   },
 
-  observers: ['_selectedChanged(selectedChart)'],
+  observers: ['_selectedChanged(selectedChart)', '_inputsChanged(inputs)'],
+
+  _inputsChanged: function(i) {
+    console.log('inputs', i);
+  },
 
   _selectedChanged: function(selectedChart) {
     console.log(this);
@@ -93,6 +98,9 @@ Polymer({
       // Gets settings object from newly attached chart
       this.set('settings', elem.settngs);
       this.set('inputs', elem.inputs);
+      if (this.$$('draggable-input')) {
+        this.$$('draggable-input').set('parentElem', this);
+      }
     } else {
       console.info('Empyt Object');
     }
@@ -104,6 +112,18 @@ Polymer({
 
   showSettings: function() {
     this.set('settingsVisible', !this.settingsVisible);
+  },
+
+  attached: function() {
+    // Experimental to create a single change manager
+    // to handle deep data mutations
+    this.async(() => {
+      this.addEventListener('dataMutated', this._dataMutated.bind(this));
+    })
+  },
+
+  _dataMutated: function(e) {
+    console.log(e);
   }
 
 });

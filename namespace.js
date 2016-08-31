@@ -53,6 +53,24 @@ PolymerD3.utilities._getProperty = function(arr, key) {
     return result;
 };
 
+// Utility to create event notifying dataMutation
+// To be abandoned when polymer notify-path is fixed
+PolymerD3.utilities.dataMutationEvent = function(data) {
+    var params = {
+        bubbles: true,
+        cancelable: true,
+        detail: data
+    };
+    return new CustomEvent('dataMutated', params);
+};
+PolymerD3.utilities.dataMutationParam = function(path, data, callBack) {
+    return {
+        data: data,
+        path: path,
+        callback: callBack
+    };
+};
+
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
     var arryadata = [];
     d3.text(name, function(error, text) {

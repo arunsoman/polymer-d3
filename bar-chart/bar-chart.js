@@ -76,12 +76,6 @@ Polymer({
     PolymerD3.chartBehavior
   ],
 
-  observers: ['_inputsObs(inputs.*)'],
-
-  _inputsObs: function(inputs) {
-    debugger;
-  },
-
   attached: function() {
     'use strict';
     // this._loadDiffdata();
