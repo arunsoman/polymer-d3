@@ -1,15 +1,37 @@
 <link rel="import" href="display-component/chart-selector.html">
+<link rel="import" href="display-component/chart-selector.html">
+<link rel="import" href="display-component/settings-component.html">
 <dom-module id="polymer-d3">
   <template>
     <style>
       :host {
         display: block;
       }
+      .tool-bar {
+        position: relative;
+      }
+      .settings-icon {
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
     </style>
-    <chart-selector
-      charts="[[availableCharts]]"
-      selected="{{selectedChart}}"
-    ></chart-selector>
+    <div class="tool-bar">
+      <chart-selector
+        charts="[[availableCharts]]"
+        selected="{{selectedChart}}"
+      ></chart-selector>
+      <paper-icon-button
+        class="settings-icon"
+        icon="icons:settings"
+        title="Settings"
+        on-tap="showSettings"
+      ></paper-icon-button>
+    </div>
+    <template is="dom-if" if="{{settingsVisible}}" restamp>
+      <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+      <settings-component></settings-component>
+    </template>
     <div class="chartHolder"></div>
   </template>
   <script src="polymer-d3.js"></script>

@@ -1,22 +1,24 @@
 PolymerD3.barChart.difference = function() {
   let _conf = function(config) {
+    let xIndex = this.getInputsProperty('x');
+    let yIndices = this.getInputsProperty('y');
     return {
       // for diff
-      stackIndex: config.xIndex,
+      stackIndex: xIndex,
       chartType: 'diff', // stack,group,diff,waterfall,heatmap
       containsHeader: true,
-      xheader: [config.xIndex],
+      xheader: [xIndex],
       yOrign: 0,
-      yheader: config.yIndices,
-      width: config.chartWidth,
-      height: config.chartHeight,
+      yheader: yIndices,
+      width: this.chartWidth,
+      height: this.chartHeight,
       xFormat: 'time',
       yFormat: 'number',
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',
       yaxisType: 'linear',
-      parentG: config.parentG
+      parentG: this.parentG
     };
   };
   let _processors = function(settings) {

@@ -3,6 +3,7 @@ Polymer({
   is: 'polymer-d3',
 
   properties: {
+    // List of available charts
     availableCharts: {
       type: Array,
       value: () => {
@@ -23,7 +24,7 @@ Polymer({
           callBack: 'setWatefallSettings'
         }, {
           label: 'Difference',
-          icon: 'icons:accessibility',
+          icon: 'icons:rowing',
           element: 'bar-chart',
           callBack: 'setDiffrenceSettings'
         }, {
@@ -49,9 +50,24 @@ Polymer({
         }];
       }
     },
+    // Object desctibing selected chart type
     selectedChart: {
       type: Object,
       value: () => { return {};}
+    },
+    // Flag to display settngs components
+    settingsVisible: {
+      type: Boolean,
+      value: false
+    },
+    // Inputs
+    externals: {
+      type: Array,
+      value: () => { return [];}
+    },
+    inputs: {
+      type:Array,
+      value: () => {return [];}
     }
   },
 
@@ -59,20 +75,35 @@ Polymer({
 
   _selectedChanged: function(selectedChart) {
     console.log(this);
+    let elem;
+    this.set('settingsVisible', true);
     if (!PolymerD3.utilities.isEmptyObject(selectedChart)) {
       this.$$('.chartHolder').innerHTML = '';
-      PolymerD3.utilities.attachElement.call(
+      elem = PolymerD3.utilities.attachElement.call(
         this,
         selectedChart.element,
         '.chartHolder',
         selectedChart.callBack
       );
+      // Data and headers(externals) should come from parent
+      // and should be set to new child element
+      // elem.set('source');
+      // elem.set('externals');
+
+      // Gets settings object from newly attached chart
+      this.set('settings', elem.settngs);
+      this.set('inputs', elem.inputs);
     } else {
       console.info('Empyt Object');
     }
   },
+
   check: function() {
     console.log(this);
+  },
+
+  showSettings: function() {
+    this.set('settingsVisible', !this.settingsVisible);
   }
 
 });

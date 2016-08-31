@@ -26,6 +26,7 @@ PolymerD3.utilities.attachElement = function(elem, container, cb) {
         var callBack = dynamicEl[cb];
         callBack.call(dynamicEl);
     }
+    return dynamicEl;
 };
 
 PolymerD3.utilities._setProperty = function(arr, key) {

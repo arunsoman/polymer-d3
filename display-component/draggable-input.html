@@ -56,7 +56,12 @@
           <h4>
             {{input.txt}}
           </h4>
-          <sortable-js class="slaves" max-selectable="{{input.maxSelectableValues}}" no-duplicates="{{input.maxSelectableValues}}">
+          <sortable-js
+            class="slaves"
+            max-selectable="{{input.maxSelectableValues}}"
+            no-duplicates="{{input.maxSelectableValues}}"
+            group.name="{{uuid}}"
+          >
             <template is="dom-repeat" items="{{input.selectedObjs}}">
               <draggable-element current-input="{{input}}" current-item="{{item}}" index="{{index}}" class="list-item"></draggable-element>
             </template>
@@ -70,7 +75,7 @@
       is: 'draggable-input',
       properties: {
         inputs: {
-          value: [],
+          value: () => { return [];},
           notify: true,
           type: Array
         },
@@ -81,10 +86,29 @@
         },
         currentDrag: Object,
         group: {
-          type: Object
+          type: Object,
+          value: () => {return {};}
         },
         uuid: String
       },
+
+      observers: ['_inputsObserver(inputs)'],
+
+      _inputsObserver: function(inputs) {
+        if (inputs.length && inputs.length > 0) {
+          this.async(() => {
+            var slaves = this.querySelectorAll('.slaves');
+            for (var i = 0; i < slaves.length; i++) {
+              slaves[i].group = {
+                name: this.uuid
+              };
+              // For manual delete
+              slaves[i].addEventListener('itemSpliced', this._fireRem.bind(this));
+            }
+          });
+        }
+      },
+
       attached: function() {
         var me = this;
         me.uuid = PolymerD3.utilities.getUUID();
@@ -93,14 +117,6 @@
           name: me.uuid,
           pull: 'clone'
         };
-        var slaves = me.querySelectorAll('.slaves');
-        for (var i = 0; i < slaves.length; i++) {
-          slaves[i].group = {
-            name: me.uuid
-          };
-          // For manual delete
-          slaves[i].addEventListener('itemSpliced', this._fireRem.bind(me));
-        }
         this.$.inputWrap.addEventListener('add', this._addWatcher.bind(me));
         this.$.inputWrap.addEventListener('remove', this._remWatcher.bind(me));
       },

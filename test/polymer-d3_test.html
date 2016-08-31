@@ -5,28 +5,50 @@
     <title>polymer-d3 test</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="../../web-component-tester/browser.js"></script>
-
-    <link rel="import" href="../polymer-d3.html">
+    <script src="../namespace.js"></script>
+    <script src='../bower_components/d3/d3.min.js'></script>
+    <script src='../bower_components/d3-tip/index.js'></script>
+    <script src="../d3-time.v1.min.js"></script>
+    <link href="../bower_components/polymer/polymer.html" rel="import">
+    <link href="../bower_components/paper-icon-button/paper-icon-button.html" rel="import">
+    <link href="../behaviors/colorpicker-behavior.html" rel="import">
+    <link href="../polymer-d3.html" rel="import">
+    <link href="../behaviors/chart-behavior.html" rel="import">
+    <link href="../bar-chart/bar-chart.html" rel="import">
+    <link href="../area-chart/area-chart.html" rel="import">
+    <link href="../pie-chart/pie-chart.html" rel="import">
+    <link href="../parallel-coordinate/parallel-coordinate.html" rel="import">
+    <link href="../bullet-chart/bullet-chart.html" rel="import">
+    <link href="../sankey-chart/sankey-chart.html" rel="import">
+    <link href="../scatter-plot/scatter-plot.html" rel='import'>
+    <link href="../heat-map/heat-map.html" rel='import'>
+    <link href="../multi-line/multi-line.html" rel='import'>
   </head>
   <body>
-
-    <test-fixture id="basic">
-      <template>
-        <polymer-d3></polymer-d3>
-      </template>
-    </test-fixture>
-
+    <polymer-d3></polymer-d3>
     <script>
-      suite('polymer-d3', function() {
-
-        test('instantiating the element works', function() {
-          var element = fixture('basic');
-          assert.equal(element.is, 'polymer-d3');
-        });
-
-      });
+      var polymerd3 = document.querySelector('polymer-d3');
+      var setData = function(data) {
+        polymerd3.source = data;
+      }
+      polymerd3.externals = [{
+        key: 'date',
+        value: 0,
+        type: 'date'
+      }, {
+        key: 'd2',
+        value: 1,
+        type: 'number'
+      }, {
+        key: 'd3',
+        value: 2,
+        type: 'number'
+      }];
+      polymerd3.data = PolymerD3.fileReader(
+        '../diff-small.csv', [1, 2], [0], '%Y%m%d',
+        setData,
+        true
+      );
     </script>
   </body>
 </html>

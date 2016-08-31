@@ -12,39 +12,30 @@ Polymer({
         return [{
           input: 'x',
           txt: 'Pick a dimension',
-          selectedValue: 0,
+          selectedValue: [],
           scaleType: '',
           format: '',
-          selectedObjs: [{
-            key: 'state',
-            value: '0'
-          }],
+          selectedObjs: [],
           uitype: 'single-value',
           displayName: 'myXAxis',
           maxSelectableValues: 1
         }, {
           input: 'y',
           txt: 'Pick measures',
-          selectedValue: [1, 2],
+          selectedValue: [],
           format: '',
           scaleType: '',
-          selectedObjs: [{
-            key: 'Under Five Year',
-            value: '1'
-          }],
+          selectedObjs: [],
           uitype: 'multi-value',
           displayName: 'myYAxis',
           maxSelectableValues: 2
         }, {
           input: 'z',
           txt: 'Pick z',
-          selectedValue: [1, 2],
+          selectedValue: [],
           format: '',
           scaleType: '',
-          selectedObjs: [{
-            key: 'Under Five Year',
-            value: '1'
-          }],
+          selectedObjs: [],
           uitype: 'multi-value',
           displayName: 'myZAxis',
           maxSelectableValues: 2
@@ -85,9 +76,15 @@ Polymer({
     PolymerD3.chartBehavior
   ],
 
+  observers: ['_inputsObs(inputs.*)'],
+
+  _inputsObs: function(inputs) {
+    debugger;
+  },
+
   attached: function() {
     'use strict';
-    this._loadDiffdata();
+    // this._loadDiffdata();
     //  this._loadHeatmap();
     // this._loadWaterfall();
     // this._loadSingleCol();
@@ -157,18 +154,12 @@ Polymer({
 
     // requireed indices not selected
     if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data ||
-      PolymerD3.utilities.isEmptyObject(this.configurator)
+      PolymerD3.utilities.isEmptyObject(this.configurator || data.length < 1)
     ) {
       return false;
     }
     //
-    var conf = this.configurator.conf({
-      xIndex: xIndex,
-      yIndices: yIndices,
-      chartWidth: this.chartWidth,
-      chartHeight: this.chartHeight,
-      parentG: this.parentG
-    });
+    var conf = this.configurator.conf.call(this);
     /*
     var conf = {
       stackIndex: xIndex,
