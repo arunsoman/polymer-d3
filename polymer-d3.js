@@ -11,7 +11,7 @@ Polymer({
           label: 'Stacked Bar Chart',
           icon: 'icons:accessibility',
           element: 'bar-chart',
-          callBack: 'setStackedSettings'
+          callBack: 'initStackedBarChart'
         }, {
           label: 'Grouped Bar Chart',
           icon: 'icons:cloud-circle',
@@ -21,12 +21,12 @@ Polymer({
           label: 'Waterfall Chart',
           icon: 'icons:accessibility',
           element: 'bar-chart',
-          callBack: 'setWatefallSettings'
+          callBack: 'initWaterfallChart'
         }, {
           label: 'Difference',
           icon: 'icons:rowing',
           element: 'bar-chart',
-          callBack: 'setDiffrenceSettings'
+          callBack: 'initDiffrenceChart'
         }, {
           label: 'Pie Chart',
           icon: 'icons:content-cut',

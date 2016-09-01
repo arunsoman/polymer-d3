@@ -1,22 +1,22 @@
-PolymerD3.barChart.waterfall = function() {
+PolymerD3.barChart.heatMap = function() {
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
     return {
       stackIndex: xIndex,
-      chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
+      chartType: 'heatmap', //stack,group,diff,waterfall,heatmap
       containsHeader: true,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: 'string',
-      yFormat: 'number',
+      xFormat: 'time',
+      yFormat: 'string',
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',
-      yaxisType: 'linear',
+      yaxisType: 'ordinal',
       parentG: this.parentG
     };
   };
@@ -28,23 +28,19 @@ PolymerD3.barChart.waterfall = function() {
       barWidth: () => {
         return nChartConfig.getBarWidth() - 1;
       },
-      rectX: (d, i, j) => {
-        return j * (nChartConfig.getBarWidth() - 1);
+      rectX: d => {
+        return nChartConfig.getX(d[0]);
       },
-      rectY: (d) => {
-        if (d.y < 0) {
-          return nChartConfig.getY(d.y0);
-        }
-        return nChartConfig.getY(d.y + d.y0);
+      rectY: d => {
+        return nChartConfig.getY(d.y);
       },
-      rectHeight: (d) => {
-        return nChartConfig.getBarHeight((d.y < 0) ? -1 * (d.y) : (d.y));
+      rectHeight: () => {
+        return nChartConfig.getBarHeight();
       },
       legendF: (d, i, j) => {
-        console.log('d:' + d + ' i:' + i + ' j:' + j);
-        return d[0];
+        // console.log('d:' + d + ' i:' + i + ' j:' + j);
       }
-    };
+    }
   };
   return {
     conf: _conf,

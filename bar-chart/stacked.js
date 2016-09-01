@@ -17,26 +17,27 @@ PolymerD3.barChart.stacked = function(settings, conf) {
     parentG: this.parentG
   };
 
-  let _transformations = {
-    translate = () => {
-      return 'translate(0,0)';
-    };
-    barWidth = () => {
-      return conf.getBarWidth() - 1;
-    };
-    rectX = (d) => {
-      return conf.getX(d[0]);
-    };
-    rectY = (d) => {
-      return conf.getY(d.y0 + d.y);
-    };
-    rectHeight = (d) => {
-      return conf.getBarHeight(d.y);
-    };
-    legendF = (d, i, j) => {
-      console.log('d:' + d + ' i:' + i + ' j:' + j);
-    };
-    break;
+  let _transformations = () => {
+    return {
+      translate: () => {
+        return 'translate(0,0)';
+      },
+      barWidth: () => {
+        return conf.getBarWidth() - 1;
+      },
+      rectX: (d) => {
+        return conf.getX(d[0]);
+      },
+      rectY: (d) => {
+        return conf.getY(d.y0 + d.y);
+      },
+      rectHeight: (d) => {
+        return conf.getBarHeight(d.y);
+      },
+      legendF: (d, i, j) => {
+        console.log('d:' + d + ' i:' + i + ' j:' + j);
+      }
+    }
   };
 
   return {
