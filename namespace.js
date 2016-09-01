@@ -64,7 +64,7 @@ PolymerD3.utilities._getProperty = function(arr, key) {
 };
 
 // Utility to create event notifying dataMutation
-// To be abandoned when polymer notify-path is fixed
+// Can be removed
 PolymerD3.utilities.dataMutationEvent = function(data) {
     var params = {
         bubbles: true,

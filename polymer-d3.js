@@ -103,12 +103,15 @@ Polymer({
     // figureout a way to parse Object that has changed from path
     // And run the callBack in that object
     if (setting.path !== 'settings') {
-      var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
-      if (changed.callBack) {
-        changed.callBack.call(this.selectedChartObj);
-      }
+      this.debounce('settignsChangedDebounce', () => {
+        var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+        if (changed.callBack) {
+          changed.callBack.call(this.selectedChartObj);
+        } else {
+          this.selectedChartObj.resize();
+        }
+      }, 200);
     }
-    debugger;
   },
 
   _selectedChanged: function(selectedChart) {

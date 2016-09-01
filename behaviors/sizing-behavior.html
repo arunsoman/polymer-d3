@@ -13,7 +13,8 @@
                         if (this.parentG) {
                             var width = this._getWidth();
                             var height = this._getHeight();
-                            this.parentG.attr('viewBox', '0 0 ' + width +' ' + height +'');
+                            var svg = d3.select(this).selectAll('svg')
+                            svg.attr('viewBox', '0 0 ' + width +' ' + height +'');
                             this.draw();
                         }
                     }
@@ -100,6 +101,15 @@
         this._manageDom();
     },
 
+    // Resize chart container without redraw
+    resize: function() {
+        var outerWidth = this._getWidth();
+        var outerHeight = this._getHeight();
+
+        var chartContainer = this.querySelector('.chartContainer');
+        chartContainer.style.height = outerHeight + 'px';
+        chartContainer.style.width = outerWidth + 'px';
+    },
     _getHeight: function() {
         'use strict';
         return parseInt(this.area[0].selectedValue);
