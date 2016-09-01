@@ -30,7 +30,7 @@
     </div>
     <template is="dom-if" if="{{settingsVisible}}" restamp>
       <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-      <settings-component></settings-component>
+      <display-component settings="{{settings}}"></display-component>
     </template>
     <div class="chartHolder"></div>
   </template>

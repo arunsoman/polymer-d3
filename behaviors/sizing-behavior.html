@@ -11,9 +11,9 @@
                     selectedValue: 500,
                     callBack: function() {
                         if (this.parentG) {
-                            parentG.attr('viewBox',
-                                '0 0 ' + this._getWidth() +' ' + this._getHeight() +''
-                            );
+                            var width = this._getWidth();
+                            var height = this._getHeight();
+                            this.parentG.attr('viewBox', '0 0 ' + width +' ' + height +'');
                             this.draw();
                         }
                     }

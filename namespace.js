@@ -29,6 +29,16 @@ PolymerD3.utilities.attachElement = function(elem, container, cb) {
     return dynamicEl;
 };
 
+// Parses changed Object from Array, works with deep obeservers
+// Assumes arr is the array
+PolymerD3.utilities.parsePath = function(path, arr) {
+    var index = path.split('.');
+    if (index.length > 1) {
+        index = index[1].slice(1);
+        return arr[index];
+    }
+};
+
 PolymerD3.utilities._setProperty = function(arr, key) {
     if (arguments.length < 1) {
         return;

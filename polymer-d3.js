@@ -55,6 +55,10 @@ Polymer({
       type: Object,
       value: () => { return {};}
     },
+    selectedChartObj: {
+      type: Object,
+      value: () => { return {};}
+    },
     // Flag to display settngs components
     settingsVisible: {
       type: Boolean,
@@ -74,17 +78,37 @@ Polymer({
     source: {
       type: Array,
       value: () => {return [];}
+    },
+
+    // settings
+    settings: {
+      type: Array,
+      value: () => {return [];}
     }
   },
 
-  observers: ['_selectedChanged(selectedChart)', '_inputsChanged(inputs.*)'],
+  observers: [
+    '_selectedChanged(selectedChart)',
+    '_inputsChanged(inputs.*)',
+    '_settingsChanged(settings.*)'
+  ],
 
   _inputsChanged: function(i) {
-    this.debounce('inputschangedebounce', () => {
-      if (this.selectedChart && this.selectedChart.element) {
-        this.$$(this.selectedChart.element).draw();
+    if (this.selectedChart && this.selectedChart.element) {
+      this.$$(this.selectedChart.element).draw();
+    }
+  },
+
+  _settingsChanged: function(setting) {
+    // figureout a way to parse Object that has changed from path
+    // And run the callBack in that object
+    if (setting.path !== 'settings') {
+      var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+      if (changed.callBack) {
+        changed.callBack.call(this.selectedChartObj);
       }
-    }, 100);
+    }
+    debugger;
   },
 
   _selectedChanged: function(selectedChart) {
@@ -105,8 +129,9 @@ Polymer({
       // elem.set('externals');
 
       // Gets settings object from newly attached chart
-      this.set('settings', elem.settngs);
+      this.set('settings', elem.area);
       this.set('inputs', elem.inputs);
+      this.set('selectedChartObj', elem);
       elem.set('source', this.source);
     } else {
       console.info('Empyt Object');
