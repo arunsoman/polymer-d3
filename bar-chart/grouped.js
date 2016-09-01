@@ -1,21 +1,23 @@
 PolymerD3.barChart.grouped = function() {
-  let _conf = function(settings) {
+  let _conf = function() {
+    let xIndex = this.getInputsProperty('x');
+    let yIndices = this.getInputsProperty('y');
     return {
-      stackIndex: settings.xIndex,
+      stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
       containsHeader: true,
-      xheader: [settings.xIndex],
+      xheader: [xIndex],
       yOrign: 0,
-      yheader: settings.yIndices,
-      width: settings.chartWidth,
-      height: settings.chartHeight,
+      yheader: yIndices,
+      width: this.chartWidth,
+      height: this.chartHeight,
       xFormat: 'time',
       yFormat: 'number',
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',
       yaxisType: 'linear',
-      parentG: settings.parentG
+      parentG: this.parentG
     };
   };
   let _processors = function(nChartConfig) {

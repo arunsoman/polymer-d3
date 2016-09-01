@@ -145,12 +145,14 @@ Polymer({
     let z = d3.scale.category10();
     let data = this.source;
     var me = this;
-debugger;
     // requireed indices not selected
     if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data ||
       PolymerD3.utilities.isEmptyObject(this.configurator || data.length < 1)
     ) {
       return false;
+    }
+    if (this.parentG) {
+      this.parentG.html("");
     }
     //
     var conf = this.configurator.conf.call(this);
