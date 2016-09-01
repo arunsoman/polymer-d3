@@ -16,6 +16,7 @@
                             var svg = d3.select(this).selectAll('svg')
                             svg.attr('viewBox', '0 0 ' + width +' ' + height +'');
                             this.draw();
+                            this.resize();
                         }
                     }
                 }, {
@@ -105,10 +106,18 @@
     resize: function() {
         var outerWidth = this._getWidth();
         var outerHeight = this._getHeight();
-
+        var margin = this.getMargins();
         var chartContainer = this.querySelector('.chartContainer');
+
+        this.chartWidth  = outerWidth  - margin.left - margin.right;
+        this.chartHeight = outerHeight - margin.top  - margin.bottom;
+
         chartContainer.style.height = outerHeight + 'px';
         chartContainer.style.width = outerWidth + 'px';
+
+        this.parentG
+            .attr('height', this.chartHeight)
+            .attr('width', this.chartWidth);
     },
     _getHeight: function() {
         'use strict';
