@@ -2,61 +2,64 @@
   PolymerD3.sizingBehavior = {
     properties: {
         area: {
-            type: Array
+            type: Array,
+            value: () => {
+                return [{
+                    input: 'height',
+                    txt: 'Height of the chart',
+                    uitype: 'Number',
+                    selectedValue: 500,
+                    callBack: function() {
+                        if (this.parentG) {
+                            parentG.attr('viewBox',
+                                '0 0 ' + this._getWidth() +' ' + this._getHeight() +''
+                            );
+                            this.draw();
+                        }
+                    }
+                }, {
+                    input: 'width',
+                    txt: 'Width of the chart',
+                    uitype: 'Number',
+                    selectedValue: 960
+                }, {
+                    input: 'marginTop',
+                    txt: 'Top  margin',
+                    uitype: 'Number',
+                    selectedValue: 40
+                }, {
+                    input: 'marginRight',
+                    txt: 'Right margin',
+                    uitype: 'Number',
+                    selectedValue: 10
+                }, {
+                    input: 'marginBottom',
+                    txt: 'Bottom margin',
+                    uitype: 'Number',
+                    selectedValue: 20
+                }, {
+                    input: 'marginLeft',
+                    txt: 'Left margin',
+                    uitype: 'Number',
+                    selectedValue: 50
+                }];
+            }
         }
     },
     observers: ['_areaChanged(settings.area.*)'],
 
-    created: function() {
-        "use strict";
-        this.area = [
-            {
-                input: 'height',
-                txt: 'Height of the chart',
-                uitype: 'Number',
-                selectedValue: 500
-            }, {
-                input: 'width',
-                txt: 'Width of the chart',
-                uitype: 'Number',
-                selectedValue: 960
-            }, {
-                input: 'marginTop',
-                txt: 'Top  margin',
-                uitype: 'Number',
-                selectedValue: 40
-            }, {
-                input: 'marginRight',
-                txt: 'Right margin',
-                uitype: 'Number',
-                selectedValue: 10
-            }, {
-                input: 'marginBottom',
-                txt: 'Bottom margin',
-                uitype: 'Number',
-                selectedValue: 20
-            }, {
-                input: 'marginLeft',
-                txt: 'Left margin',
-                uitype: 'Number',
-                selectedValue: 50
-            }
-        ];
-      console.log('sizingBehavior: created');
-    },
-
     attached: function() {
-       "use strict";
+       'use strict';
         var container = document.createElement('div');
-            container.className = "chartContainer";
+            container.className = 'chartContainer';
             this.appendChild(container);
             //this.makeChartWrap();
             this.scopeSubtree(this.querySelector('.chartContainer'), true);
-        this._manageDom();  
+        this._manageDom();
     },
 
     _manageDom: function(){
-        "use strict";
+        'use strict';
         var outerWidth = this._getWidth();
         var outerHeight = this._getHeight();
         var margin = this.getMargins();
@@ -68,45 +71,45 @@
         chartContainer.style.width = outerWidth + 'px';
 
         var svg = d3.select(chartContainer).selectAll('svg').data([1]);
-        svg.enter().append("svg")
-            .attr("preserveAspectRatio", "xMinYMin meet")
-            .attr("viewBox", "0 0 " + outerWidth +" " + outerHeight +"")
-            .attr("class", "chartSvgClass");
+        svg.enter().append('svg')
+            .attr('preserveAspectRatio', 'xMinYMin meet')
+            .attr('viewBox', '0 0 ' + outerWidth +' ' + outerHeight +'')
+            .attr('class', 'chartSvgClass');
 
         svg.exit().remove();
 
-        this.parentG = svg.selectAll("g").data([1]);
+        this.parentG = svg.selectAll('g').data([1]);
         this.parentG.enter().append('g')
-            .attr("class" , "parentGClass")
-            .attr("height", this.chartHeight)
+            .attr('class' , 'parentGClass')
+            .attr('height', this.chartHeight)
             .attr('width', this.chartWidth)
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
         this.parentG
-            .attr("class" , "parentGClass")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+            .attr('class' , 'parentGClass')
+            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
         this.parentG.exit().remove();
     },
     _areaChanged:function(){
-        "use strict";
+        'use strict';
         if(this.querySelector('.chartSvgClass') === null){
-            console.log("chart container not ready yet");
+            console.log('chart container not ready yet');
             return;
         }
         this._manageDom();
     },
 
     _getHeight: function() {
-        "use strict";
+        'use strict';
         return parseInt(this.area[0].selectedValue);
     },
     _getWidth: function() {
-        "use strict";
+        'use strict';
         return parseInt(this.area[1].selectedValue);
     },
     alignAxis: function(axis, alignment) {
-        "use strict";
+        'use strict';
         var height = this._getHeight();
         var width = this._getWidth();
         var margin = this.getMargins();
@@ -140,7 +143,7 @@
         }
     },
     getMargins: function() {
-        "use strict";
+        'use strict';
         return {
             top: parseInt(this.area[2].selectedValue),
             right: parseInt(this.area[3].selectedValue),

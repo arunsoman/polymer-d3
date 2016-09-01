@@ -14,9 +14,7 @@
       if (inputs.path === 'inputs') {
         return;
       }
-      this.debounce('redrawInput', function() {
-        me.draw();
-      }, 1000);
+      me.draw();
     },
 
     // Draw when datasource is avialable
@@ -24,9 +22,7 @@
       "use strict";
       var me = this;
       if (source.path === 'source') {
-        this.debounce('redrawInput', function() {
-          me.draw();
-        }, 1000);
+        me.draw();
       }
     },
     addLegend: function(domain, color){
@@ -60,4 +56,4 @@
         });
     }
   };
-</script> 
+</script>

@@ -13,9 +13,7 @@
       "use strict";
       var me = this;
         if (source.length > 0) {
-          this.debounce('redrawSource', function() {
-            me.draw();
-          }, 1000);
+          me.draw();
         }
       }
   };
