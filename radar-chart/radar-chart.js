@@ -79,32 +79,32 @@ var margin = {top: 100, right: 100, bottom: 100, left: 100},
 
       var data = [
             [//iPhone
-            {axis:"Battery Life",value:0.22},
-            {axis:"Brand",value:0.28},
-            {axis:"Contract Cost",value:0.29},
-            {axis:"Design And Quality",value:0.17},
-            {axis:"Have Internet Connectivity",value:0.22},
-            {axis:"Large Screen",value:0.02},
-            {axis:"Price Of Device",value:0.21},
-            {axis:"To Be A Smartphone",value:0.50}      
+            ["Battery Life",0.22],
+            ["Brand",0.28],
+            ["Contract Cost",0.29],
+            ["Design And Quality",0.17],
+            ["Have Internet Connectivity",0.22],
+            ["Large Screen",0.02],
+            ["Price Of Device",0.21],
+            ["To Be A Smartphone",0.50]      
             ],[//Samsung
-            {axis:"Battery Life",value:0.27},
-            {axis:"Brand",value:0.16},
-            {axis:"Contract Cost",value:0.35},
-            {axis:"Design And Quality",value:0.13},
-            {axis:"Have Internet Connectivity",value:0.20},
-            {axis:"Large Screen",value:0.13},
-            {axis:"Price Of Device",value:0.35},
-            {axis:"To Be A Smartphone",value:0.38}
+            ["Battery Life",0.27],
+            ["Brand",0.16],
+            ["Contract Cost",0.35],
+            ["Design And Quality",0.13],
+            ["Have Internet Connectivity",0.20],
+            ["Large Screen",0.13],
+            ["Price Of Device",0.35],
+            ["To Be A Smartphone",0.38]
             ],[//Nokia Smartphone
-            {axis:"Battery Life",value:0.26},
-            {axis:"Brand",value:0.10},
-            {axis:"Contract Cost",value:0.30},
-            {axis:"Design And Quality",value:0.14},
-            {axis:"Have Internet Connectivity",value:0.22},
-            {axis:"Large Screen",value:0.04},
-            {axis:"Price Of Device",value:0.41},
-            {axis:"To Be A Smartphone",value:0.30}
+            ["Battery Life",0.26],
+            ["Brand",0.10],
+            ["Contract Cost",0.30],
+            ["Design And Quality",0.14],
+            ["Have Internet Connectivity",0.22],
+            ["Large Screen",0.04],
+            ["Price Of Device",0.41],
+            ["To Be A Smartphone",0.30]
             ]
           ];
       ////////////////////////////////////////////////////////////// 

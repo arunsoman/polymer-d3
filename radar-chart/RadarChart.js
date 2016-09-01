@@ -25,9 +25,9 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
 	var maxValue = Math.max(cfg.maxValue, 
 		d3.max(data, function(i){
-			return d3.max(i.map(function(o){return o.value;}));}));
+			return d3.max(i.map(function(o){return o[1];}));}));
 		
-	var allAxis = (data[0].map(function(i){return i.axis;})),	//Names of each axis
+	var allAxis = (data[0].map(function(i){return i[0];})),	//Names of each axis
 		total = allAxis.length,					//The number of different axes
 		radius = Math.min(cfg.w/2, cfg.h/2), 	//Radius of the outermost circle
 		Format = d3.format('%'),			 	//Percentage formatting
@@ -47,11 +47,13 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	/////////////////////////////////////////////////////////
 	
 	//Filter for the outside glow
-	var filter = g.append('defs').append('filter').attr('id','glow'),
-		feGaussianBlur = filter.append('feGaussianBlur').attr('stdDeviation','2.5').attr('result','coloredBlur'),
-		feMerge = filter.append('feMerge'),
-		feMergeNode_1 = feMerge.append('feMergeNode').attr('in','coloredBlur'),
-		feMergeNode_2 = feMerge.append('feMergeNode').attr('in','SourceGraphic');
+	var filter = g.append('defs').append('filter').attr('id','glow')
+		.append('feGaussianBlur')
+		.attr('stdDeviation','2.5')
+		.attr('result','coloredBlur');
+	filter.append('feMerge')
+		.append('feMergeNode').attr('in','coloredBlur')
+		.append('feMergeNode').attr('in','SourceGraphic');
 
 	/////////////////////////////////////////////////////////
 	/////////////// Draw the Circular grid //////////////////
@@ -131,7 +133,7 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	//The radial line function
 	var radarLine = d3.svg.line.radial()
 		.interpolate("linear-closed")
-		.radius(function(d) { return rScale(d.value); })
+		.radius(function(d) { return rScale(d[1]); })
 		.angle(function(d,i) {	return i*angleSlice; });
 		
 	if(cfg.roundStrokes) {
@@ -184,9 +186,9 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 		.attr("class", "radarCircle")
 		.attr("r", cfg.dotRadius)
 		.attr("cx", function(d,i){ 
-			return rScale(d.value) * Math.cos(angleSlice*i - constPIby2); })
+			return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
 		.attr("cy", function(d,i){ 
-			return rScale(d.value) * Math.sin(angleSlice*i - constPIby2); })
+			return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
 		.style("fill", function(d,i,j) { return cfg.color(j); })
 		.style("fill-opacity", 0.8);
 
@@ -207,9 +209,9 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 		.attr("class", "radarInvisibleCircle")
 		.attr("r", cfg.dotRadius*1.5)
 		.attr("cx", function(d,i){ 
-			return rScale(d.value) * Math.cos(angleSlice*i - constPIby2); })
+			return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
 		.attr("cy", function(d,i){ 
-			return rScale(d.value) * Math.sin(angleSlice*i - constPIby2); })
+			return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
 		.style("fill", "none")
 		.style("pointer-events", "all")
 		.on("mouseover", (d,i,j)=> {
@@ -220,7 +222,7 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 			tooltip
 				.attr('x', newX)
 				.attr('y', newY)
-				.text(Format(d.value))
+				.text(Format(d[1]))
 				.transition().duration(200)
 				.style('opacity', 1);
 		})
