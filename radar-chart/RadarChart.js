@@ -1,4 +1,4 @@
-PolymerD3.RadarChart = function (id, data, options, me) {
+PolymerD3.RadarChart = function ( data, options, me) {
 	var cfg = {
 	 w: me.chartWidth,				//Width of the circle
 	 h: me.chartHeight,				//Height of the circle
@@ -14,7 +14,7 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	 roundStrokes: false,	//If true the area and stroke will follow a round path (cardinal-closed)
 	 color: d3.scale.category10()	//Color function
 	};
-	
+
 	//Put all of the options into a variable called cfg
 	if('undefined' !== typeof options){
 	  for(var i in options){
@@ -23,29 +23,30 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	}//if
 	var constPIby2 =  Math.PI/2;
 	//If the supplied maxValue is smaller than the actual one, replace by the max in the data
-	var maxValue = Math.max(cfg.maxValue, 
+	var maxValue = Math.max(cfg.maxValue,
 		d3.max(data, function(i){
 			return d3.max(i.map(function(o){return o[1];}));}));
-		
+
 	var allAxis = (data[0].map(function(i){return i[0];})),	//Names of each axis
 		total = allAxis.length,					//The number of different axes
 		radius = Math.min(cfg.w/2, cfg.h/2), 	//Radius of the outermost circle
 		Format = d3.format('%'),			 	//Percentage formatting
 		angleSlice = Math.PI * 2 / total;		//The width in radians of each "slice"
-	
+
 	//Scale for the radius
 	var rScale = d3.scale.linear()
 		.range([0, radius])
 		.domain([0, maxValue]);
+
 	var g = me.parentG.append("g")
-			.attr("transform", 
+			.attr("transform",
 				"translate(" + (cfg.w/2) + "," +
 				(cfg.h/2)+')');
-	
+
 	/////////////////////////////////////////////////////////
 	////////// Glow filter for some extra pizzazz ///////////
 	/////////////////////////////////////////////////////////
-	
+
 	//Filter for the outside glow
 	var filter = g.append('defs').append('filter').attr('id','glow')
 		.append('feGaussianBlur')
@@ -58,10 +59,10 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	/////////////////////////////////////////////////////////
 	/////////////// Draw the Circular grid //////////////////
 	/////////////////////////////////////////////////////////
-	
+
 	//Wrapper for the grid & axes
 	var axisGrid = g.append("g").attr("class", "axisWrapper");
-	
+
 	var levelsArray = d3.range(1,(cfg.levels+1)).reverse();
 	//Draw the background circles
 	axisGrid.selectAll(".levels")
@@ -90,7 +91,7 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	/////////////////////////////////////////////////////////
 	//////////////////// Draw the axes //////////////////////
 	/////////////////////////////////////////////////////////
-	
+
 	//Create the straight lines radiating outward from the center
 	var axis = axisGrid.selectAll(".axis")
 		.data(allAxis)
@@ -102,9 +103,9 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	axis.append("line")
 		.attr("x1", 0)
 		.attr("y1", 0)
-		.attr("x2", function(d, i){ 
+		.attr("x2", function(d, i){
 			return const2 * Math.cos(angleSlice*i - constPIby2); })
-		.attr("y2", function(d, i){ 
+		.attr("y2", function(d, i){
 			return const2 * Math.sin(angleSlice*i - constPIby2); })
 		.attr("class", "line")
 		.style("stroke", "white")
@@ -117,11 +118,11 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 		.style("font-size", "11px")
 		.attr("text-anchor", "middle")
 		.attr("dy", "0.35em")
-		.attr("x", function(d, i){ 
-			return const1 * 
+		.attr("x", function(d, i){
+			return const1 *
 				Math.cos(angleSlice*i - constPIby2); })
-		.attr("y", function(d, i){ 
-			return const1 * 
+		.attr("y", function(d, i){
+			return const1 *
 				Math.sin(angleSlice*i - constPIby2); })
 		.text(function(d){return d;})
 		.call(wrap, cfg.wrapWidth);
@@ -129,24 +130,24 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	/////////////////////////////////////////////////////////
 	///////////// Draw the radar chart blobs ////////////////
 	/////////////////////////////////////////////////////////
-	
+
 	//The radial line function
 	var radarLine = d3.svg.line.radial()
 		.interpolate("linear-closed")
 		.radius(function(d) { return rScale(d[1]); })
 		.angle(function(d,i) {	return i*angleSlice; });
-		
+
 	if(cfg.roundStrokes) {
 		radarLine.interpolate("cardinal-closed");
 	}
-				
-	//Create a wrapper for the blobs	
+
+	//Create a wrapper for the blobs
 	var blobWrapper = g.selectAll(".radarWrapper")
 		.data(data)
 		.enter().append("g")
 		.attr("class", "radarWrapper");
-			
-	//Append the backgrounds	
+
+	//Append the backgrounds
 	blobWrapper
 		.append("path")
 		.attr("class", "radarArea")
@@ -157,11 +158,11 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 			//Dim all blobs
 			d3.selectAll(".radarArea")
 				.transition().duration(200)
-				.style("fill-opacity", 0.1); 
+				.style("fill-opacity", 0.1);
 			//Bring back the hovered over blob
 			d3.select(this)
 				.transition().duration(200)
-				.style("fill-opacity", 0.7);	
+				.style("fill-opacity", 0.7);
 		})
 		.on('mouseout', function(){
 			//Bring back all blobs
@@ -169,25 +170,25 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 				.transition().duration(200)
 				.style("fill-opacity", cfg.opacityArea);
 		});
-		
-	//Create the outlines	
+
+	//Create the outlines
 	blobWrapper.append("path")
 		.attr("class", "radarStroke")
 		.attr("d", function(d) { return radarLine(d); })
 		.style("stroke-width", cfg.strokeWidth + "px")
 		.style("stroke", function(d,i) { return cfg.color(i); })
 		.style("fill", "none")
-		.style("filter" , "url(#glow)");		
-	
+		.style("filter" , "url(#glow)");
+
 	//Append the circles
 	blobWrapper.selectAll(".radarCircle")
 		.data(function(d) { return d; })
 		.enter().append("circle")
 		.attr("class", "radarCircle")
 		.attr("r", cfg.dotRadius)
-		.attr("cx", function(d,i){ 
+		.attr("cx", function(d,i){
 			return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
-		.attr("cy", function(d,i){ 
+		.attr("cy", function(d,i){
 			return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
 		.style("fill", function(d,i,j) { return cfg.color(j); })
 		.style("fill-opacity", 0.8);
@@ -195,22 +196,22 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 	/////////////////////////////////////////////////////////
 	//////// Append invisible circles for tooltip ///////////
 	/////////////////////////////////////////////////////////
-	
+
 	//Wrapper for the invisible circles on top
 	var blobCircleWrapper = g.selectAll(".radarCircleWrapper")
 		.data(data)
 		.enter().append("g")
 		.attr("class", "radarCircleWrapper");
-		
+
 	//Append a set of invisible circles on top for the mouseover pop-up
 	var inC = blobCircleWrapper.selectAll(".radarInvisibleCircle")
 		.data(function(d) { return d; })
 		.enter().append("circle")
 		.attr("class", "radarInvisibleCircle")
 		.attr("r", cfg.dotRadius*1.5)
-		.attr("cx", function(d,i){ 
+		.attr("cx", function(d,i){
 			return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
-		.attr("cy", function(d,i){ 
+		.attr("cy", function(d,i){
 			return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
 		.style("fill", "none")
 		.style("pointer-events", "all")
@@ -218,11 +219,11 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 			var cir = d3.select(inC[j][i]);
 			var newX =  parseFloat(cir.attr('cx')) - 10;
 			var newY =  parseFloat(cir.attr('cy')) - 10;
-					
+
 			tooltip
 				.attr('x', newX)
 				.attr('y', newY)
-				.text(Format(d[1]))
+				.text('Segment:'+d[2]+'\nValue:'+Format(d[1]))
 				.transition().duration(200)
 				.style('opacity', 1);
 		})
@@ -230,18 +231,18 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 			tooltip.transition().duration(200)
 				.style("opacity", 0);
 		});
-		
+
 	//Set up the small tooltip for when you hover over a circle
 	var tooltip = g.append("text")
 		.attr("class", "tooltip")
 		.style("opacity", 0);
-	
+
 	/////////////////////////////////////////////////////////
 	/////////////////// Helper Function /////////////////////
 	/////////////////////////////////////////////////////////
 
 	//Taken from http://bl.ocks.org/mbostock/7555321
-	//Wraps SVG text	
+	//Wraps SVG text
 	function wrap(text, width) {
 	  text.each(function() {
 		var text = d3.select(this),
@@ -254,7 +255,7 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 			x = text.attr("x"),
 			dy = parseFloat(text.attr("dy")),
 			tspan = text.text(null).append("tspan").attr("x", x).attr("y", y).attr("dy", dy + "em");
-			
+
 		while (word = words.pop()) {
 		  line.push(word);
 		  tspan.text(line.join(" "));
@@ -266,6 +267,6 @@ PolymerD3.RadarChart = function (id, data, options, me) {
 		  }
 		}
 	  });
-	}//wrap	
-	
+	}//wrap
+
 };//RadarChart

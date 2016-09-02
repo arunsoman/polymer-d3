@@ -83,8 +83,9 @@ PolymerD3.utilities.dataMutationParam = function(path, data, callBack) {
 
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
     var arryadata = [];
+    var me = this;
     d3.text(name, function(error, text) {
-        d3.csv.parseRows(text, (aline, ind) =>{
+        d3.csv.parseRows(text, function(aline, ind) {
             if(ind == 0 && header === true){
                 arryadata.push(aline);
             } else {
@@ -98,7 +99,7 @@ PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, datePars
             }
         });
         // callback((header)? arryadata.splice(1):arryadata);
-        callback(arryadata);
+        callback.call(me,arryadata);
     });
 };
 
