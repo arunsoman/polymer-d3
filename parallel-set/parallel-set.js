@@ -26,6 +26,9 @@ Polymer({
             }]
         }
     },
+    behaviors: [
+        PolymerD3.chartBehavior,
+    ],
     attached: function(){
         this.draw();
     },
@@ -33,9 +36,7 @@ Polymer({
         var chart = d3.parsets()
             .dimensions(["Survived", "Sex", "Age", "Class"]);
 
-        var vis = d3.select("#vis").append("svg")
-            .attr("width", chart.width())
-            .attr("height", chart.height());
+        var vis = this.parentG;
 
         var partition = d3.layout.partition()
             .sort(null)
