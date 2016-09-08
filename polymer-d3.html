@@ -16,18 +16,20 @@
         top: 0;
       }
     </style>
-    <div class="tool-bar">
-      <chart-selector
-        charts="[[availableCharts]]"
-        selected="{{selectedChart}}"
-      ></chart-selector>
-      <paper-icon-button
-        class="settings-icon"
-        icon="icons:settings"
-        title="Settings"
-        on-tap="showSettings"
-      ></paper-icon-button>
-    </div>
+    <template is="dom-if" if="{{editMode}}" restamp>
+      <div class="tool-bar">
+        <chart-selector
+          charts="[[availableCharts]]"
+          selected="{{selectedChart}}"
+        ></chart-selector>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings"
+          title="Settings"
+          on-tap="showSettings"
+        ></paper-icon-button>
+      </div>
+    </template>
     <template is="dom-if" if="{{settingsVisible}}" restamp>
       <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
       <display-component settings="{{settings}}"></display-component>

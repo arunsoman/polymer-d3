@@ -1,23 +1,27 @@
-PolymerD3.barChart.stacked = function(settings, conf) {
-  let _conf = {
-    stackIndex: settings.xIndex,
-    chartType: 'stack', //stack,group,diff,waterfall
-    containsHeader: true,
-    xheader: [settings.xIndex],
-    yOrign: 0,
-    yheader: settings.yIndices,
-    width: this.chartWidth,
-    height: this.chartHeight,
-    xFormat: 'time',
-    yFormat: 'number',
-    xAlign: 'bottom',
-    yAlign: 'left',
-    xaxisType: 'ordinal',
-    yaxisType: 'linear',
-    parentG: this.parentG
+PolymerD3.barChart.stacked = function() {
+  let _conf = function() {
+    let xIndex = this.getInputsProperty('x');
+    let yIndices = this.getInputsProperty('y');
+    return {
+      stackIndex: xIndex,
+      chartType: 'stack', //stack,group,diff,waterfall
+      containsHeader: true,
+      xheader: [xIndex],
+      yOrign: 0,
+      yheader: yIndices,
+      width: this.chartWidth,
+      height: this.chartHeight,
+      xFormat: 'time',
+      yFormat: 'number',
+      xAlign: 'bottom',
+      yAlign: 'left',
+      xaxisType: 'ordinal',
+      yaxisType: 'linear',
+      parentG: this.parentG
+    };
   };
 
-  let _transformations = () => {
+  let _processors = (conf) => {
     return {
       translate: () => {
         return 'translate(0,0)';
@@ -41,7 +45,7 @@ PolymerD3.barChart.stacked = function(settings, conf) {
   };
 
   return {
-    configuration: _conf,
-    transformations: _transformations
+    conf: _conf,
+    processors: _processors
   }
 };

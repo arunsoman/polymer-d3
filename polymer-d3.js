@@ -84,14 +84,32 @@ Polymer({
     settings: {
       type: Array,
       value: () => {return [];}
+    },
+
+    // State container
+    stateContainer: {
+      type: Object,
+      value: () => {return {};}
+    },
+
+    editMode: {
+      type: Boolean,
+      value: true
     }
   },
 
   observers: [
     '_selectedChanged(selectedChart)',
     '_inputsChanged(inputs.*)',
-    '_settingsChanged(settings.*)'
+    '_settingsChanged(settings.*)',
+    '_modeObserver(editMode)'
   ],
+
+  _modeObserver: function(editMode) {
+    if (!editMode) {
+      this.set('settingsVisible', false);
+    }
+  },
 
   _inputsChanged: function(i) {
     if (this.selectedChart && this.selectedChart.element) {
@@ -149,16 +167,18 @@ Polymer({
     this.set('settingsVisible', !this.settingsVisible);
   },
 
-  attached: function() {
-    // Experimental to create a single change manager
-    // to handle deep data mutations
-    this.async(() => {
-      this.addEventListener('dataMutated', this._dataMutated.bind(this));
-    })
-  },
-
-  _dataMutated: function(e) {
-    console.log(e);
+  // Bootstraps element as per mode(view/edit)
+  bootstrapCharts: function(config) {
+    if (config.mode === 'edit') {
+      // Edit mode settings
+    } else {
+      this.set('source', config.source);
+      this.set('selectedChart', config.selectedChart);
+      this.set('externals', config.externals);
+      this.set('settings', config.settings);
+      this.selectedChartObj.set('inputs', config.inputs);
+      this.set('editMode', false);
+      this.selectedChartObj.draw();
+    }
   }
-
 });
