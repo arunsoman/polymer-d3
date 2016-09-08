@@ -169,19 +169,25 @@ Polymer({
 
   // Bootstraps element as per mode(view/edit)
   bootstrapCharts: function(config) {
-    this.set('source', config.source);
-    this.set('selectedChart', config.selectedChart);
+    // data and externals are always required
     this.set('externals', config.externals);
-    this.set('settings', config.settings);
-    this.set('inputs', config.inputs);
-    if (config.mode === 'edit') {
-      // Edit mode settings
+    this.set('source', config.source);
+    if (config.mode === 'create') {
+      // Fresh Polymer d3
       this.set('editMode', true);
     } else {
-      this.set('editMode', false);
+      this.set('selectedChart', config.selectedChart);
+      this.set('settings', config.settings);
+      this.set('inputs', config.inputs);
+      if (config.mode === 'edit') {
+        // Edit mode settings
+        this.set('editMode', true);
+      } else {
+        this.set('editMode', false);
+      }
+      // To set inputs to selected chart manually
+      this.selectedChartObj.set('inputs', config.inputs);
+      this.selectedChartObj.draw();
     }
-    // To set inputs to selected chart manually
-    this.selectedChartObj.set('inputs', config.inputs);
-    this.selectedChartObj.draw();
   }
 });
