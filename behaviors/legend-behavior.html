@@ -16,13 +16,19 @@
             posX: 50,
             posY: 30,
             text: 'blue',
-            colors: []
+            colors: [{
+              label: 'd2',
+              color: '#ff0000'
+            }, {
+              label: 'd3',
+              color: '#00ff00'
+            }]
           }
         },
         notify: true
       }
     },
-    attachLegend: (parentG) => {
+    attachLegend: function (parentG) {
       // let dr =dragRect( parentG);
       // removes previous legends
       parentG.selectAll(".legend").remove();
@@ -31,6 +37,9 @@
       .attr("transform","translate(50,30)")
       .style("font-size","12px")
       .call(d3.legend);
+      parentG.selectAll('.legend').on('click', () => {
+        this.fire('legend-clicked');
+      });
     }
   };
 </script>

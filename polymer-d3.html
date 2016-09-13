@@ -1,6 +1,7 @@
 <link rel="import" href="display-component/chart-selector.html">
 <link rel="import" href="display-component/chart-selector.html">
 <link rel="import" href="display-component/settings-component.html">
+<link rel="import" href="display-component/legends-component.html">
 <dom-module id="polymer-d3">
   <template>
     <style>
@@ -33,6 +34,9 @@
     <template is="dom-if" if="{{settingsVisible}}" restamp>
       <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
       <display-component settings="{{settings}}"></display-component>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
     </template>
     <div class="chartHolder"></div>
   </template>

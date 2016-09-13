@@ -1,0 +1,36 @@
+<!-- <link rel="import" href="../../paper-color-pallete/paper-color-pallete.html"> -->
+<dom-module id="legends-component">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <paper-dialog modal opened>
+      <h2>Choose your colors</h2>
+      <paper-color-pallete config-input="{{settings.colors}}" label-as="label" color-as="color"></paper-color-pallete>
+      <paper-button on-tap="closeLegends">Close</paper-button>
+    </paper-dialog>
+  </template>
+  <script>
+    Polymer({
+      is: 'legends-component',
+      properties: {
+        settings: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
+        opener: {
+          type: Boolean,
+          notify: true,
+          value:false
+        }
+      },
+      closeLegends: function() {
+        this.set('opener', false);
+      }
+    });
+  </script>
+</dom-module>

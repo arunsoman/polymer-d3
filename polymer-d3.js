@@ -95,6 +95,10 @@ Polymer({
     editMode: {
       type: Boolean,
       value: true
+    },
+    legendSettingsFlag: {
+      type: Boolean,
+      value: false
     }
   },
 
@@ -104,6 +108,14 @@ Polymer({
     '_settingsChanged(settings.*)',
     '_modeObserver(editMode)'
   ],
+
+  listeners: {
+    'legend-clicked': 'legendClicked'
+  },
+
+  legendClicked: function(e) {
+    this.set('legendSettingsFlag', true);
+  },
 
   _modeObserver: function(editMode) {
     if (!editMode) {
@@ -154,6 +166,7 @@ Polymer({
       this.set('inputs', elem.inputs);
       this.set('selectedChartObj', elem);
       elem.set('source', this.source);
+      this.set('legendSettings', elem.legendSettings);
     } else {
       console.info('Empyt Object');
     }
