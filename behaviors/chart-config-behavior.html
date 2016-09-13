@@ -156,7 +156,7 @@ PolymerD3.chartConfigBehavior = {
         if(conf.yOrigin !== undefined){
             yConf.domain[0] = conf.yOrigin;
         }
-        console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
+        // console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
         
         var _scaleFactory = (config) => {
             var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
@@ -279,7 +279,7 @@ PolymerD3.chartConfigBehavior = {
         };
         _createXAxis.call(this);
         _createYAxis.call(this);
-        console.log('post: xd:' + xConf.domain + ' yd:' + yConf.domain);
+        // console.log('post: xd:' + xConf.domain + ' yd:' + yConf.domain);
         return {
             getXAxisBehavior: xConf.axisBehavior,
             getYAxisBehavior: yConf.axisBehavior,

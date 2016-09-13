@@ -91,7 +91,8 @@ Polymer({
     let yIndices = this.getInputsProperty('y');
     let zGroup = this.getInputsProperty('z');
     let z = d3.scale.category10();
-    let data = this.source;
+    // To make sure that data is intact
+    let data = PolymerD3.utilities.clone(this.source);
     var me = this;
     // requireed indices not selected
     if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data ||
@@ -162,6 +163,9 @@ Polymer({
         .attr('class', 'layer')
         .style('fill', function(d, i) {
           return z(i);
+        })
+        .attr('data-legend', function(d, i, j) {
+          return d.key;
         });
       this.attachLegend(this.parentG);
 
@@ -174,11 +178,11 @@ Polymer({
         .attr('y', translations.rectY)
         .attr('height', translations.rectHeight)
         .attr('width', translations.barWidth)
-        .attr('data-legend', translations.legendF)
+        // .attr('data-legend', translations.legendF)
         .attr('class', translations.classF);
 
       this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
-
+      this.attachLegend(this.parentG);
       if (conf.chartType === 'heatmap') {
         var color = d3.scale.linear()
           .domain(d3.extent(stackData.map((aobj) => {

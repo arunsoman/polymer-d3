@@ -1,22 +1,36 @@
 <script>
 // http://bl.ocks.org/ZJONSSON/3918369
 // http://bl.ocks.org/mccannf/1629464
-    PolymerD3.legendBehavior = {
-        properties: {
-            xLocation: 0,
-            yLocation: 0,
-            fontSize: 20,
-            legendWidth: 300,
-            legendHeight: 200,
+  PolymerD3.legendBehavior = {
+    properties: {
+      xLocation: 0,
+      yLocation: 0,
+      fontSize: 20,
+      legendWidth: 300,
+      legendHeight: 200,
+      legendSettings: {
+        type: Object,
+        value: () => {
+          return {
+            background: 'white',
+            posX: 50,
+            posY: 30,
+            text: 'blue',
+            colors: []
+          }
         },
-        attachLegend: (parentG) => {
-            //let dr =dragRect( parentG);
-            "use strict";
-            parentG.append("g")
-            .attr("class","legend")
-            .attr("transform","translate(50,30)")
-            .style("font-size","12px");
-            // .call(d3.legend);
-        }
-    };
+        notify: true
+      }
+    },
+    attachLegend: (parentG) => {
+      // let dr =dragRect( parentG);
+      // removes previous legends
+      parentG.selectAll(".legend").remove();
+      parentG.append("g")
+      .attr("class","legend")
+      .attr("transform","translate(50,30)")
+      .style("font-size","12px")
+      .call(d3.legend);
+    }
+  };
 </script>
