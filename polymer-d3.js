@@ -99,6 +99,10 @@ Polymer({
     legendSettingsFlag: {
       type: Boolean,
       value: false
+    },
+    legendSettings: {
+      type: Object,
+      value: () => {return {};}
     }
   },
 
@@ -106,11 +110,21 @@ Polymer({
     '_selectedChanged(selectedChart)',
     '_inputsChanged(inputs.*)',
     '_settingsChanged(settings.*)',
-    '_modeObserver(editMode)'
+    '_modeObserver(editMode)',
+    '_legendSettingsObs(legendSettings.*)'
   ],
 
   listeners: {
     'legend-clicked': 'legendClicked'
+  },
+
+  _legendSettingsObs: function(legendSettings) {
+    console.log(legendSettings);
+    this.debounce('legendSettingsDebounce', () => {
+      if (legendSettings.path === 'legendSettings.colors.splices') {
+        this.selectedChartObj.redrawLegends();
+      }
+    }, 200);
   },
 
   legendClicked: function(e) {

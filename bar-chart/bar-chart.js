@@ -90,7 +90,7 @@ Polymer({
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
     let zGroup = this.getInputsProperty('z');
-    let z = d3.scale.category10();
+    let z = this.setLegendColor.bind(this);
     // To make sure that data is intact
     let data = PolymerD3.utilities.clone(this.source);
     var me = this;
@@ -161,13 +161,31 @@ Polymer({
         .enter().append('g')
         .attr('transform', translations.translate)
         .attr('class', 'layer')
-        .style('fill', function(d, i) {
-          return z(i);
+        .style('fill', function(d) {
+          // Logic to generate legends initialy
+          var color = z(d);
+          var keyPresent = false;
+          me.legendSettings.colors.forEach((c) => {
+            if (c.label == d.key) {
+              color = c.color;
+              keyPresent = true;
+            }
+          });
+          // Create new entry if legend isn't present
+          // TO do: remove &&d.key =>  something's wrong with generate stackData meathod
+          // d.key comes as undefined check `PolymerD3.groupingBehavior`
+          if (!keyPresent && d.key) {
+            me.legendSettings.colors.push({
+              color: color,
+              label: d.key
+            });
+          }
+          return color;
         })
-        .attr('data-legend', function(d, i, j) {
+        .attr('data-legend', function(d) {
           return d.key;
         });
-      this.attachLegend(this.parentG);
+      // this.attachLegend(this.parentG);
 
       var rects = layer.selectAll('rect')
         .data(function(d) {

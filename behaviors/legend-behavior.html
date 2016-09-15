@@ -18,16 +18,41 @@
             text: 'blue',
             colors: [{
               label: 'd2',
-              color: '#ff0000'
+              color: '#FFA000'
             }, {
               label: 'd3',
-              color: '#00ff00'
+              color: '#116B9F'
             }]
           }
         },
         notify: true
+      },
+      defaultColors: {
+        type: Array,
+        value: [
+          '#FBBD6D', '#4A78BC', '#116B9F', '#FFC107',
+          '#FFA000', '#FFECB3', '#FF5252', '#212121',
+          '#212121', '#BDBDBD'
+        ]
       }
     },
+
+    redrawLegends: function() {
+      this.debounce('legendsDebounce', () => {
+        var me = this;
+        // get data-attrs, change fill,  attachlegend
+        this.parentG.selectAll('[data-legend]').each( function(p) {
+          var key = d3.select(this).attr('data-legend');
+          me.legendSettings.colors.forEach((legend) => {
+            if (legend.label === key) {
+              d3.select(this).style('fill', legend.color);
+            }
+          });
+        });
+        me.attachLegend(me.parentG);
+      }, 200);
+    },
+
     attachLegend: function (parentG) {
       // let dr =dragRect( parentG);
       // removes previous legends
@@ -36,10 +61,77 @@
       .attr("class","legend")
       .attr("transform","translate(50,30)")
       .style("font-size","12px")
-      .call(d3.legend);
+      .call(this.d3Legends);
       parentG.selectAll('.legend').on('click', () => {
         this.fire('legend-clicked');
       });
+    },
+    setLegendColor: function(layer) {
+
+      // Search if layer.key is available in legendSettings.key
+      // Set fill as fill
+      this.legendSettings.colors.forEach((l) =>{
+        if (layer.key && (l.label == layer.key)) {
+          layer.fill = l.color;
+        }
+      });
+      if (!layer.fill) {
+        // selects a random color from pallete
+        layer.fill = this.defaultColors[Math.floor(Math.random() * 9) + 0];
+      }
+      // this.set();
+      return layer.fill;
+    },
+    d3Legends: function(g) {
+      var me = this;
+      g.each(function() {
+        var g = d3.select(this);
+        var items = {};
+        var svg = d3.select(g.property("nearestViewportElement"));
+        var legendPadding = g.attr("data-style-padding") || 5;
+        var lb = g.selectAll(".legend-box").data([true]);
+        var li = g.selectAll(".legend-items").data([true]);
+
+        lb.enter().append("rect").classed("legend-box", true);
+        li.enter().append("g").classed("legend-items", true);
+
+        svg.selectAll("[data-legend]").each(function() {
+            var self = d3.select(this)
+            items[self.attr("data-legend")] = {
+              pos : self.attr("data-legend-pos") || this.getBBox().y,
+              color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") : self.style("stroke")
+            }
+          })
+
+        items = d3.entries(items).sort(function(a,b) { return a.value.pos - b.value.pos;});
+
+        li.selectAll("text")
+            .data(items, function(d) { return d.key})
+            .call(function(d) { d.enter().append("text")})
+            .call(function(d) { d.exit().remove()})
+            .attr("y", function(d, i) { return i + "em";})
+            .attr("x", "1em")
+            .text(function(d) { ;return d.key});
+        li.selectAll("circle")
+            .data(items, function(d) { return d.key})
+            .call(function(d) { d.enter().append("circle")})
+            .call(function(d) { d.exit().remove()})
+            .attr("cy",function(d,i) { return i-0.25+"em"})
+            .attr("cx",0)
+            .attr("r","0.4em")
+            .style("fill", function(d) {return d.value.color});
+        // Reposition and resize the box
+        var lbbox = li[0][0].getBBox()
+        lb.attr("x",(lbbox.x-legendPadding))
+            .attr("y",(lbbox.y-legendPadding))
+            .attr("height",(lbbox.height+2*legendPadding))
+            .attr("width",(lbbox.width+2*legendPadding));
+      })
+      return g;
+    },
+    // utility to return random color from default colors
+    _getRandomColor: function() {
+      return this.defaultColors[Math.floor(Math.random() * 9) + 0];
     }
   };
 </script>
