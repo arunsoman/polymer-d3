@@ -8,8 +8,9 @@
     </style>
     <paper-dialog modal opened>
       <h2>Choose your colors</h2>
-      <paper-color-pallete config-input="{{settings.colors}}" label-as="label" color-as="color"></paper-color-pallete>
+      <paper-color-pallete config-input="{{_colors}}" label-as="label" color-as="color"></paper-color-pallete>
       <paper-button on-tap="closeLegends">Close</paper-button>
+      <paper-button on-tap="saveLegends">Save</paper-button>
     </paper-dialog>
   </template>
   <script>
@@ -26,10 +27,18 @@
           type: Boolean,
           notify: true,
           value: false
-        }
+        },
+        _colors: Object
+      },
+      initConfigurator: function() {
+        this.set('_colors', PolymerD3.utilities.clone(this.settings.colors));
       },
       closeLegends: function() {
         this.set('opener', false);
+      },
+      saveLegends: function() {
+        this.set('settings.colors', this._colors);
+        this.closeLegends();
       }
     });
   </script>
