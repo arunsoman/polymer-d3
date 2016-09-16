@@ -2,6 +2,8 @@ PolymerD3.barChart.stacked = function() {
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
+    var xObj = this.getInputsPropertyObj('x');
+    var yObj = this.getInputsPropertyObj('y');
     return {
       stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
@@ -11,8 +13,8 @@ PolymerD3.barChart.stacked = function() {
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: 'time',
-      yFormat: 'number',
+      xFormat: xObj.selectedObjs[0].type,
+      yFormat: yObj.selectedObjs[0].type,
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',
