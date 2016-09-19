@@ -11,6 +11,7 @@
     <script src="../d3-time.v1.min.js"></script>
     <script src="../d3.legend.js"></script>
     <link href="../bower_components/polymer/polymer.html" rel="import">
+    <link rel="import" href="../polymer-d3-imports-internal.html">
     <link href="../bower_components/paper-icon-button/paper-icon-button.html" rel="import">
     <link href="../bower_components/paper-color-pallete/paper-color-pallete.html" rel="import">
     <link href="../behaviors/colorpicker-behavior.html" rel="import">
@@ -34,7 +35,7 @@
         polymerd3.source = data;
       }
       polymerd3.externals = [{
-        key: 'date',
+        key: 'when',
         value: 0,
         type: 'time'
       }, {
