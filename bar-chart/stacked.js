@@ -35,6 +35,7 @@ PolymerD3.barChart.stacked = function() {
         return conf.getX(d[0]);
       },
       rectY: (d) => {
+        console.log(conf.getY(d.y0 + d.y));
         return conf.getY(d.y0 + d.y);
       },
       rectHeight: (d) => {
