@@ -2,6 +2,8 @@ PolymerD3.barChart.waterfall = function() {
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
     return {
       stackIndex: xIndex,
       chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
@@ -11,8 +13,8 @@ PolymerD3.barChart.waterfall = function() {
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: 'string',
-      yFormat: 'number',
+      xFormat: xObj.selectedObjs[0].type,
+      yFormat: yObj.selectedObjs[0].type,
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',

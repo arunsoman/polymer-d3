@@ -1,7 +1,10 @@
 PolymerD3.barChart.heatMap = function() {
   let _conf = function() {
+    // Abstarct this part
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
     return {
       stackIndex: xIndex,
       chartType: 'heatmap', //stack,group,diff,waterfall,heatmap
@@ -11,8 +14,8 @@ PolymerD3.barChart.heatMap = function() {
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: 'time',
-      yFormat: 'string',
+      xFormat: xObj.selectedObjs[0].type,
+      yFormat: yObj.selectedObjs[0].type,
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',

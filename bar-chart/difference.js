@@ -2,6 +2,8 @@ PolymerD3.barChart.difference = function() {
   let _conf = function(config) {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
     return {
       // for diff
       stackIndex: xIndex,
@@ -12,8 +14,8 @@ PolymerD3.barChart.difference = function() {
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: 'time',
-      yFormat: 'number',
+      xFormat: xObj.selectedObjs[0].type,
+      yFormat: yObj.selectedObjs[0].type,
       xAlign: 'bottom',
       yAlign: 'left',
       xaxisType: 'ordinal',
