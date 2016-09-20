@@ -7,7 +7,7 @@ PolymerD3.barChart.stacked = function() {
     return {
       stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
-      containsHeader: true,
+      containsHeader: false,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,

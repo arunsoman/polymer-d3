@@ -5,7 +5,7 @@ PolymerD3.barChart.waterfall = function() {
     return {
       stackIndex: xIndex,
       chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
-      containsHeader: true,
+      containsHeader: false,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,

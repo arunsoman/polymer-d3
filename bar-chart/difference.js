@@ -6,7 +6,7 @@ PolymerD3.barChart.difference = function() {
       // for diff
       stackIndex: xIndex,
       chartType: 'diff', // stack,group,diff,waterfall,heatmap
-      containsHeader: true,
+      containsHeader: false,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,

@@ -2,12 +2,12 @@ PolymerD3.barChart.grouped = function() {
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
-    var xObj = this.getInputsPropertyObj('x');
-    var yObj = this.getInputsPropertyObj('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
     return {
       stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
-      containsHeader: true,
+      containsHeader: false,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,

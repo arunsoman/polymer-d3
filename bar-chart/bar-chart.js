@@ -86,22 +86,22 @@ Polymer({
   },
 
   draw: function() {
-    'use strict';
-    let xIndex = this.getInputsProperty('x');
-    let yIndices = this.getInputsProperty('y');
-    let zGroup = this.getInputsProperty('z');
-    let z = this.setLegendColor.bind(this);
-    // To make sure that data is intact
-    let data = PolymerD3.utilities.clone(this.source);
     var me = this;
-    // requireed indices not selected
-    if (xIndex === -1 || !yIndices || yIndices.length < 1 || !data ||
-      PolymerD3.utilities.isEmptyObject(this.configurator || data.length < 1)
-    ) {
-      return false;
-    }
     // Experimental: Debounce draw, to avoid getting called multiple times
     this.debounce('darwDebounce', () => {
+      let xIndex = this.getInputsProperty('x');
+      let yIndices = this.getInputsProperty('y');
+      let zGroup = this.getInputsProperty('z');
+      let z = this.setLegendColor.bind(this);
+      // requireed indices not selected
+      if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source ||
+        PolymerD3.utilities.isEmptyObject(this.configurator) || this.source.length < 1
+      ) {
+        return false;
+      }
+      let headers = this.externals.map(e => {
+        return e.key;
+      });
       if (this.parentG) {
         this.parentG.html("");
       }
@@ -111,7 +111,7 @@ Polymer({
         .groupingBehavior
         .group_by(
           yIndices.length === 1 ? [zGroup] : yIndices,
-          xIndex, yIndices, this.source[0]
+          xIndex, yIndices, headers
         );
       var nChartConfig = this
         .chartConfig(conf, this.source, myGroup.process);

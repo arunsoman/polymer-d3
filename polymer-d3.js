@@ -188,6 +188,7 @@ Polymer({
       this.set('inputs', elem.inputs);
       this.set('selectedChartObj', elem);
       elem.set('source', this.source);
+      elem.set('externals', this.externals);
       this.set('legendSettings', elem.legendSettings);
     } else {
       console.info('Empyt Object');

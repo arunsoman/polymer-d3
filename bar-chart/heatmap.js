@@ -5,7 +5,7 @@ PolymerD3.barChart.heatMap = function() {
     return {
       stackIndex: xIndex,
       chartType: 'heatmap', //stack,group,diff,waterfall,heatmap
-      containsHeader: true,
+      containsHeader: false,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,
