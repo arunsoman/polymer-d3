@@ -2,7 +2,14 @@
 PolymerD3.groupingBehavior = {
     group_by : (indices, xIndex, yIndex, headers) => {
         "use strict";
-        var _stack = (groups) =>{
+        var _stack = (groups) => {
+            // Sets key if data isn't grouped
+            // @Arun Please verify if there's an easeier solution
+            groups.forEach((group, i) => {
+                if (!group.key) {
+                    group.key = headers[yIndex[i]]
+                }
+            });
             var stackl = d3.layout.stack()
                 .offset("zero")
                 .values(function(d) {
@@ -22,7 +29,7 @@ PolymerD3.groupingBehavior = {
             var datumIndex = indices[0];
             return {
                 process: (aRow) => {
-                    var groupName = aRow[datumIndex];
+                    var groupName = headers[datumIndex];
                     var aGroup = map.get(groupName);
                     if (!aGroup) {
                         aGroup = {
