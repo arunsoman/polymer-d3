@@ -1,52 +1,67 @@
 <link rel="import" href="draggable-input.html">
 
 <dom-module id='display-component' >
+    <style>
+        .no-settings {
+            height: 200px;
+        }
+    </style>
     <template>
-        <template is='dom-repeat' items="{{settings}}">
-            <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
-                        <template is="dom-repeat" items="[[item.options]]">
-                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                    <span>------------{{item.selectedValue}}' ,, '{{item.selectedName}}'</span>
-                </paper-dropdown-menu>
-            </template>
+        <paper-button on-tap="openModal">Open Settings</paper-button>
+        <paper-dialog id="settingsModal" modal>
+            <template is='dom-repeat' items="{{settings}}">
+                <template is="dom-if" if="{{isDropDown(item.uitype)}}">
+                    <paper-dropdown-menu label='[[ item.txt ]]'>
+                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
+                            <template is="dom-repeat" items="[[item.options]]">
+                                <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
+                            </template>
+                        </paper-listbox>
+                        <span>------------{{item.selectedValue}}' ,, '{{item.selectedName}}'</span>
+                    </paper-dropdown-menu>
+                </template>
 
-            <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
-            </template>
-            <template is="dom-if" if="{{isText(item.uitype)}}">
-                <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
-            </template>
+                <template is="dom-if" if="{{isNumber(item.uitype)}}">
+                    <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+                </template>
+                <template is="dom-if" if="{{isText(item.uitype)}}">
+                    <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
+                </template>
 
-            <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
-                        <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-            </template>
-            <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox multi attr-for-selected="value" class="dropdown-content"  selected-values='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
-                        <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-            </template>
+                <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
+                    <paper-dropdown-menu label='[[ item.txt ]]'>
+                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
+                            <template is="dom-repeat" items="[[external]]" >
+                                <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </template>
+                <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
+                    <paper-dropdown-menu label='[[ item.txt ]]'>
+                        <paper-listbox multi attr-for-selected="value" class="dropdown-content"  selected-values='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
+                            <template is="dom-repeat" items="[[external]]" >
+                                <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </template>
 
-            <template is="dom-if" if="{{isColorRangePicker(item.uitype)}}">
-                <span>from:</span>
-                <polymer-color-picker color="{{item.from}}"></polymer-color-picker>
-                <span>to:</span>
-                <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
+                <template is="dom-if" if="{{isColorRangePicker(item.uitype)}}">
+                    <span>from:</span>
+                    <polymer-color-picker color="{{item.from}}"></polymer-color-picker>
+                    <span>to:</span>
+                    <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
+                </template>
             </template>
-        </template>
+            <template is="dom-if" if="{{!settings.length}}">
+                <h3 class="no-settings">
+                    Sorry, no settings available
+                </h3>
+            </template>
+            <paper-button on-tap="commitChanges">Ok</paper-button>
+            <paper-button on-tap="cancelChanges">Cancel</paper-button>
+        </paper-dialog>
     </template>
     <script type="text/javascript">
         Polymer({
@@ -76,6 +91,23 @@
             },
             isText: function(argument) {
                 return argument === 'Text';
+            },
+            openModal: function() {
+                this.$.settingsModal.open();
+                // takes baclup of changes to revert if necessary
+                this['_bkup'] = PolymerD3.utilities.clone(this.settings);
+            },
+            commitChanges: function() {
+                this.$.settingsModal.close();
+            },
+            cancelChanges: function() {
+                // Sets backup data back into settings
+                // Normal this.set('settings') won't work because polymerd3.clone
+                // flattens away callback functions
+                this._bkup.forEach((bkup, i) => {
+                    this.set('settings.#' + i + '.selectedValue', bkup.selectedValue);
+                });
+                this.commitChanges();
             }
         });
     </script>
