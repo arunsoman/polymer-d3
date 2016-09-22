@@ -1,9 +1,9 @@
 <script>
     PolymerD3.toolTipBehavior = {
         attachToolTip: (parentG, elem, customClass, htmlCallback)=>{
-            "use strict";
             let tip = d3.tip()
-                .attr('class', 'd3-tip '+customClass)
+                .attr('class', 'd3-tip '+ customClass)
+                .offset([-8, 0])
                 .html(htmlCallback);
             parentG.call(tip);
 

@@ -1,3 +1,28 @@
 rect.legend-box {
   fill: white;
 }
+
+.d3-tip.vertalBars table{
+  background-color: #000000;
+  border-radius: 2px;
+  box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.29);
+  color: white;
+  font-size: 12px;
+  opacity: .8;
+  padding: 2px;
+}
+
+/* Triangle*/
+.d3-tip.vertalBars table:after {
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 8px solid black;
+  bottom: -8px;
+  content: "";
+  display: block;
+  left: calc(50% - 10px);
+  opacity: .95;
+  position: absolute;
+  width: 0;
+  height: 0;
+}
