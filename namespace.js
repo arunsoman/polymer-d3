@@ -10,7 +10,7 @@ PolymerD3.utilities.merge = function(from, to) {
 };
 
 PolymerD3.utilities.isEmptyObject = function(obj) {
-    return Object.keys(obj).length === 0 && obj.constructor === Object;
+    return obj.constructor === Object && Object.keys(obj).length === 0;
 };
 
 // Creates and attaches a dom node inside specific container and executes a meathod inside it

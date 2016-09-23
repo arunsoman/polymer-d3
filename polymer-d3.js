@@ -170,7 +170,7 @@ Polymer({
     console.log(this);
     let elem;
     this.set('settingsVisible', true);
-    if (!PolymerD3.utilities.isEmptyObject(selectedChart)) {
+    if (selectedChart && !PolymerD3.utilities.isEmptyObject(selectedChart)) {
       this.$$('.chartHolder').innerHTML = '';
       elem = PolymerD3.utilities.attachElement.call(
         this,
