@@ -221,6 +221,9 @@ Polymer({
       } else {
         this.set('editMode', false);
       }
+      // Find why legend settings has to added twice
+      this.set('legendSettings', config.legendSettings);
+      this.selectedChartObj.set('legendSettings', config.legendSettings);
       // To set inputs to selected chart manually
       this.selectedChartObj.set('inputs', config.inputs);
       this.selectedChartObj.draw();
