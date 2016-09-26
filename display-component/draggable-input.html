@@ -1,7 +1,7 @@
 <!--Abstracts drag and drop feature-->
 <!-- <link rel="import" href="../bower_components/polymer-sortablejs/polymer-sortablejs.html"> -->
 <link rel="import" href="draggable-element.html">
-
+<link rel="import" href="../behaviors/draggable-behavior.html">
 <dom-module id="draggable-input">
   <template>
     <style>
@@ -40,13 +40,32 @@
 
       #master .list-item {
         cursor: pointer;
+        height: 30px;
+        padding: 0;
       }
+      paper-icon-button {
+        height: 30px;
+      }
+      /*#master {
+        display: block;
+        height: 50px;
+      }*/
+      /*#master .list-item {
+        display: inline-block;
+        width: 80px;
+      }
+      .sortable-wrap.master-wrap {
+
+      }*/
     </style>
     <div uuid = [[getUUID]]></div>
-    <div class="sortable-wrap">
-      <sortable-js id="master" >
+    <div class="sortable-wrap master-wrap">
+      <sortable-js id="master">
         <template is="dom-repeat" items={{externals}}>
-          <div class="list-item" data-item="{{item}}">{{item.key}}</div>
+          <div class="list-item" data-item="{{item}}">
+            <paper-icon-button icon="[[_generateIcon(item.type)]]"></paper-icon-button>
+            {{item.key}}
+          </div>
         </template>
       </sortable-js>
     </div>
@@ -97,6 +116,8 @@
       },
 
       observers: ['_inputsObserver(inputs)'],
+
+      behaviors: [PolymerD3.draggableBehavior],
 
       _inputsObserver: function(inputs) {
         if (inputs.length && inputs.length > 0) {

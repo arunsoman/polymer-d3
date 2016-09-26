@@ -1,0 +1,18 @@
+<script>
+  PolymerD3.draggableBehavior = {
+    _generateIcon: function(type) {
+      switch(type.toLowerCase()) {
+        case 'number':
+          return 'icons:donut-large';
+        case 'currency':
+          return 'editor:attach-money';
+        case 'percent':
+          return 'icons:perm-scan-wifi';
+        case 'string':
+          return 'icons:book';
+        case 'time':
+          return 'icons:alarm';
+      }
+    }
+  };
+</script>
