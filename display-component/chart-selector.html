@@ -7,6 +7,12 @@
       :host {
         display: block;
       }
+      paper-icon-button {
+        transition: color .7s ease-in-out;
+      }
+      paper-icon-button:hover {
+        color: rgb(0, 101, 153);
+      }
     </style>
     <template is="dom-repeat" items="{{charts}}">
       <paper-icon-button

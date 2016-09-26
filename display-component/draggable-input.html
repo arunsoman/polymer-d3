@@ -22,6 +22,19 @@
         width: 200px;
       }
 
+      .sortable-wrap.master-wrap {
+        display: block;
+        height: 30px;
+        overflow-y: hidden;
+        width: auto;
+      }
+
+      .master-wrap .list-item.sortable-ghost.sortable.chosen:hover,
+      .master-wrap .list-item.sortable-ghost.sortable.chosen {
+        background-color: #CBE1E4;
+        opacity: .8;
+      }
+
       sortable-js {
         display: block;
         height: auto;
@@ -30,17 +43,19 @@
       }
 
       .list-item {
-        background-color: #c5cae9;
-        border-radius: 20px;
-        margin-bottom: 3px;
+        background-color: #97DBE6;
+        border-radius: 2px;
+        cursor: move;
         padding: 5px;
         font-size: 18px;
-        text-align: center;
+        text-align: left;
       }
 
       #master .list-item {
-        cursor: pointer;
+        display: inline-block;
+        font-size: 12px;
         height: 30px;
+        min-width: 100px;
         padding: 0;
       }
       paper-icon-button {
@@ -57,6 +72,22 @@
       .sortable-wrap.master-wrap {
 
       }*/
+
+      /* Micro animations list items*/
+      .master-wrap .list-item {
+        box-shadow: 0 2px 2px rgba(0,0,0,0.3);
+        transition: box-shadow 0.3s ease-in-out, background-color .3s ease-in-out;
+      }
+      .master-wrap .list-item:hover {
+        background-color: #23B1C7;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      }
+      .master-wrap .list-item paper-icon-button {
+        transition: all 1s ease;
+      }
+      .master-wrap .list-item:hover paper-icon-button {
+        transform: rotate(360deg);
+      }
     </style>
     <div uuid = [[getUUID]]></div>
     <div class="sortable-wrap master-wrap">
