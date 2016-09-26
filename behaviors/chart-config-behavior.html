@@ -217,7 +217,7 @@ PolymerD3.chartConfigBehavior = {
                 throw new Error('config.format undefined values{number, currency, percent, time}');
             }
             if (config.format) {
-                switch (config.format) {
+                switch (config.format.toLowerCase()) {
                 case 'number':
                     return (d3.format('.2s'));
                 case 'currency':
@@ -229,7 +229,7 @@ PolymerD3.chartConfigBehavior = {
                         if (config.dataType === 'data') {
                             var dd = new Date(d);
                             return d3.time.format('%d-%b-%y')(dd);
-                        } else{ 
+                        } else{
                             return d;
                         }
                     };
