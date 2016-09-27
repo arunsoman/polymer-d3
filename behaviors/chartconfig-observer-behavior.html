@@ -3,12 +3,10 @@
     observers: [ '_inputsWatcher(inputs.*)', '_sourceWatcher(source.*)'],
 
     _settingsWatcher: function() {
-      "use strict";
       throw Error('method not implemented yet');
     },
 
     _inputsWatcher: function(inputs) {
-      "use strict";
       let me = this;
       // To avoid calling draw on initation
       if (inputs.path === 'inputs') {
@@ -19,7 +17,6 @@
 
     // Draw when datasource is avialable
     _sourceWatcher: function(source) {
-      "use strict";
       var me = this;
       if (source.path === 'source') {
         me.draw();
@@ -27,7 +24,6 @@
     },
     addLegend: function(domain, color){
      // draw legend
-      "use strict";
       var legend = this.parentG.selectAll(".legend")
         .data(domain)
       //.data(color.domain())

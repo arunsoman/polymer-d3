@@ -4,13 +4,15 @@
             return{
                 tickRotation:{
                     tickRotation:0,
-                    rotateTicks: degree => {
+                    rotateTicks: (degree, ta) => {
+                        let textAnchor = ta || 'middle';
                         if (degree !== undefined) {
                             this.tickRotation = degree;
                         }
                         axis.selectAll('text')
-                        .attr("text-anchor", "left")
-                        .attr('transform', 'rotate(' + this.tickRotation + ')');
+                            .attr('transform', 'rotate(' + this.tickRotation + ')')
+                            .attr("text-anchor", textAnchor)
+                            .style("text-anchor", "");
                         return this.tickRotation;
                     }
                 },
