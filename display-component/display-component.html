@@ -73,7 +73,7 @@
                 <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
                     <span>[[item.txt]]</span>
                     <div class="slider-wrap">
-                        <paper-slider pin snaps min="-180" max="180" max-markers="10" step="45" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+                        <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
                         <span id="{{item.input}}" class="dummy-txt">TICK</span>
                     </div>
                 </template>

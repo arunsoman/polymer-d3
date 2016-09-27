@@ -49,6 +49,9 @@
                     txt: 'Rotate X-Axis Tick',
                     uitype: 'sliderInput',
                     selectedValue: 0,
+                    min: -90,
+                    max: 90,
+                    step: 15,
                     callBack: function() {
                         if (this.parentG) {
                             let xAxis = this.parentG.select('.x-axis');
@@ -63,12 +66,15 @@
                     txt: 'Rotate Y-Axis Tick',
                     uitype: 'sliderInput',
                     selectedValue: 0,
+                    min: -60,
+                    max: 60,
+                    step: 12,
                     callBack: function() {
                         if (this.parentG) {
                             let yAxis = this.parentG.select('.y-axis');
                             let yAxisCommander = this.attach(yAxis);
                             let toRotate = this._getAreaObj('yAxisRotation').selectedValue;
-                            let textAnchor = toRotate > 0 ? 'end': 'start';
+                            let textAnchor = 'end';
                             this.attach(yAxis).tickRotation.rotateTicks(toRotate, textAnchor);
                         }
                     }
