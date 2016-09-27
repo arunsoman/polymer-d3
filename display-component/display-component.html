@@ -5,6 +5,22 @@
         .no-settings {
             height: 200px;
         }
+        paper-dialog {
+            width: 80vw;
+        }
+        paper-slider {
+            width: 60%;
+        }
+        .slider-wrap {
+            display: flex;
+            flex-direction: row;
+        }
+        .dummy-txt {
+            display: block;
+            text-align:center;
+            transition: all 1s ease;
+            width: 35%;
+        }
     </style>
     <template>
         <paper-button on-tap="openModal">Open Settings</paper-button>
@@ -53,6 +69,14 @@
                     <span>to:</span>
                     <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
                 </template>
+
+                <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
+                    <span>[[item.txt]]</span>
+                    <div class="slider-wrap">
+                        <paper-slider pin snaps min="-180" max="180" max-markers="10" step="45" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+                        <span id="{{item.input}}" class="dummy-txt">TICK</span>
+                    </div>
+                </template>
             </template>
             <template is="dom-if" if="{{!settings.length}}">
                 <h3 class="no-settings">
@@ -74,6 +98,16 @@
                 }
             },
 
+            // On slider change, finds the sibling span with id
+            // Rotates the sibling span
+            _rotateTick: function(e) {
+                this.debounce('rotateDebounce', () => {
+                    var target = this.$$('#' + e.model.item.input);
+                    if (target) {
+                        target.style.transform = 'rotate(' + e.model.item.selectedValue + 'deg)'
+                    }
+                }, 500);
+            },
             isDropDown:function(name){
                 return name === 'dropDown';
             },
@@ -91,6 +125,9 @@
             },
             isText: function(argument) {
                 return argument === 'Text';
+            },
+            isSliderInput: function(argument) {
+                return argument === 'sliderInput'
             },
             openModal: function() {
                 this.$.settingsModal.open();
