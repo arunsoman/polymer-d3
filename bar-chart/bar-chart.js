@@ -11,7 +11,7 @@ Polymer({
       value: () => {
         return [{
           input: 'x',
-          txt: 'Pick a dimension',
+          txt: 'Pick Dimension',
           selectedValue: [],
           scaleType: '',
           format: '',
@@ -21,7 +21,7 @@ Polymer({
           maxSelectableValues: 1
         }, {
           input: 'y',
-          txt: 'Pick measures',
+          txt: 'Pick Measures',
           selectedValue: [],
           format: '',
           scaleType: '',
@@ -31,7 +31,7 @@ Polymer({
           maxSelectableValues: 2
         }, {
           input: 'z',
-          txt: 'Pick z',
+          txt: 'Pick Z',
           selectedValue: [],
           format: '',
           scaleType: '',

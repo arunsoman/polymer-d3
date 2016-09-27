@@ -8,6 +8,7 @@
     <style>
       :host {
         display: block;
+        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
       }
       .tool-bar {
         position: relative;
@@ -16,6 +17,10 @@
         position: absolute;
         right: 0;
         top: 0;
+      }
+      body {
+        background: #f6f6f6;
+        color: #333;
       }
     </style>
     <template is="dom-if" if="{{editMode}}" restamp>

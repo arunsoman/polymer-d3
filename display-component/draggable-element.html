@@ -4,13 +4,56 @@
   <template>
     <style>
       :host {
-        display: flex;
-        justify-content: space-around;
+        position: relative;
+        text-align: center;
+      }
+      paper-icon-button {
+        position: absolute;
+        height: 30px;
+      };
+      paper-icon-button.type {
+        cursor: move;
+        left: -5px;
+      }
+      paper-icon-button.del {
+        backface-visibility: hidden;
+        height: 32px;
+        left: auto;
+        margin-right: -3px;
+        perspective: 1000px;
+        right: 3px;
+        top: -1px;
+        transform: translate3d(0, 0, 0);
+      }
+      paper-icon-button.del:hover {
+        animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+        cursor: pointer;
+      }
+      .content {
+        display: inline-block;
+        margin-left: 30px;
+        margin-top: 8px;
+      }
+
+      /* Animation for delete button*/
+      @keyframes shake {
+        10%, 90% {
+          transform: translate3d(-1px, 0, 0);
+        }
+        20%, 80% {
+          transform: translate3d(1px, 0, 0);
+        }
+        30%, 50%, 70% {
+          transform: translate3d(-2px, 0, 0);
+        }
+        40%, 60% {
+          transform: translate3d(1px, 0, 0);
+        }
       }
     </style>
-    <paper-icon-button icon="[[_generateIcon(currentItem.type)]]"></paper-icon-button>
-    {{currentItem.key}}
-    <iron-icon on-tap="_delete" icon="icons:delete"></iron-icon>
+    <paper-icon-button icon="[[_generateIcon(currentItem.type)]]" class="type"></paper-icon-button>
+    <span class="content">{{currentItem.key}}</span>
+    <paper-icon-button on-tap="_delete" icon="icons:delete" class="del"></paper-icon-button>
   </template>
   <script>
     Polymer({
