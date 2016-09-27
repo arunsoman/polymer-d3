@@ -11,9 +11,9 @@
                     selectedValue: 500,
                     callBack: function() {
                         if (this.parentG) {
-                            var width = this._getWidth();
-                            var height = this._getHeight();
-                            var svg = d3.select(this).selectAll('svg')
+                            let width = this._getWidth();
+                            let height = this._getHeight();
+                            let svg = d3.select(this).selectAll('svg')
                             svg.attr('viewBox', '0 0 ' + width +' ' + height +'');
                             this.draw();
                             this.resize();
@@ -48,12 +48,28 @@
                     input: 'xAxisRotation',
                     txt: 'Rotate X-Axis Tick',
                     uitype: 'sliderInput',
-                    selectedValue: 0
+                    selectedValue: 0,
+                    callBack: function() {
+                        if (this.parentG) {
+                            let xAxis = this.parentG.select('.x-axis');
+                            let xAxisCommander = this.attach(xAxis);
+                            let toRotate = this._getAreaObj('xAxisRotation').selectedValue;
+                            this.attach(xAxis).tickRotation.rotateTicks(toRotate);
+                        }
+                    }
                 }, {
                     input: 'yAxisRotation',
                     txt: 'Rotate Y-Axis Tick',
                     uitype: 'sliderInput',
-                    selectedValue: 0
+                    selectedValue: 0,
+                    callBack: function() {
+                        if (this.parentG) {
+                            let yAxis = this.parentG.select('.y-axis');
+                            let yAxisCommander = this.attach(yAxis);
+                            let toRotate = this._getAreaObj('yAxisRotation').selectedValue;
+                            this.attach(yAxis).tickRotation.rotateTicks(toRotate);
+                        }
+                    }
                 }];
             }
         }
@@ -61,8 +77,7 @@
     observers: ['_areaChanged(settings.area.*)'],
 
     attached: function() {
-       'use strict';
-        var container = document.createElement('div');
+        let container = document.createElement('div');
             container.className = 'chartContainer';
             this.appendChild(container);
             //this.makeChartWrap();
@@ -70,19 +85,18 @@
         this._manageDom();
     },
 
-    _manageDom: function(){
-        'use strict';
-        var outerWidth = this._getWidth();
-        var outerHeight = this._getHeight();
-        var margin = this.getMargins();
+    _manageDom: function() {
+        let outerWidth = this._getWidth();
+        let outerHeight = this._getHeight();
+        let margin = this.getMargins();
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
 
-        var chartContainer = this.querySelector('.chartContainer');
+        let chartContainer = this.querySelector('.chartContainer');
         chartContainer.style.height = outerHeight + 'px';
         chartContainer.style.width = outerWidth + 'px';
 
-        var svg = d3.select(chartContainer).selectAll('svg').data([1]);
+        let svg = d3.select(chartContainer).selectAll('svg').data([1]);
         svg.enter().append('svg')
             .attr('preserveAspectRatio', 'xMinYMin meet')
             .attr('viewBox', '0 0 ' + outerWidth +' ' + outerHeight +'')
@@ -103,8 +117,7 @@
 
         this.parentG.exit().remove();
     },
-    _areaChanged:function(){
-        'use strict';
+    _areaChanged: function() {
         if(this.querySelector('.chartSvgClass') === null){
             console.log('chart container not ready yet');
             return;
@@ -114,10 +127,10 @@
 
     // Resize chart container without redraw
     resize: function() {
-        var outerWidth = this._getWidth();
-        var outerHeight = this._getHeight();
-        var margin = this.getMargins();
-        var chartContainer = this.querySelector('.chartContainer');
+        let outerWidth = this._getWidth();
+        let outerHeight = this._getHeight();
+        let margin = this.getMargins();
+        let chartContainer = this.querySelector('.chartContainer');
 
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
@@ -130,18 +143,24 @@
             .attr('width', this.chartWidth);
     },
     _getHeight: function() {
-        'use strict';
         return parseInt(this.area[0].selectedValue);
     },
     _getWidth: function() {
-        'use strict';
         return parseInt(this.area[1].selectedValue);
     },
+    _getAreaObj: function(prop) {
+        let obj;
+        this.area.forEach(a => {
+            if (a.input == prop) {
+                obj = a;
+            }
+        });
+        return obj;
+    },
     alignAxis: function(axis, alignment) {
-        'use strict';
-        var height = this._getHeight();
-        var width = this._getWidth();
-        var margin = this.getMargins();
+        let height = this._getHeight();
+        let width = this._getWidth();
+        let margin = this.getMargins();
         switch(alignment) {
             case 'top':
                 this.svg.select('g')
@@ -172,7 +191,6 @@
         }
     },
     getMargins: function() {
-        'use strict';
         return {
             top: parseInt(this.area[2].selectedValue),
             right: parseInt(this.area[3].selectedValue),
