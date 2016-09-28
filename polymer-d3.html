@@ -25,7 +25,8 @@
         padding: .5em;
         position: relative;
       }
-      .icons-wrap.right-icons {
+      .icons-wrap.right-icons,
+      .settings-icon {
         position: absolute;
         right: 0;
         top: 6px;
@@ -36,6 +37,12 @@
       bar-chart {
         display: inline-block;
       }
+      .draggable-areabtn-wrap {
+        position: relative;
+      }
+      .settings-icon {
+        right: 1em;
+      }
     </style>
     <template is="dom-if" if="{{editMode}}" restamp>
       <div class="tool-bar">
@@ -45,13 +52,6 @@
         ></chart-selector>
         <div class="icons-wrap right-icons">
           <paper-icon-button
-            class="settings-icon"
-            icon="icons:settings-overscan"
-            title="Area Settings"
-            on-tap="showAreaSettings"
-          ></paper-icon-button>
-          <paper-icon-button
-            class="settings-icon"
             icon="icons:settings"
             title="Input Settings"
             on-tap="showInputSettings"
@@ -61,7 +61,15 @@
     </template>
     <template is="dom-if" if="{{settingsVisible}}" restamp>
       <display-component settings="{{settings}}"></display-component>
-      <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+          <paper-icon-button
+            class="settings-icon"
+            icon="icons:settings-overscan"
+            title="Area Settings"
+            on-tap="showAreaSettings"
+          ></paper-icon-button>
+      </div>
       <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
         <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
       </template>
