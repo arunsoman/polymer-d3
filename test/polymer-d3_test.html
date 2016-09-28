@@ -27,7 +27,7 @@
     <link href="../heat-map/heat-map.html" rel='import'>
     <link href="../multi-line/multi-line.html" rel='import'>
   </head>
-  <body>
+  <body class="test-body">
     <polymer-d3></polymer-d3>
     <script>
       var polymerd3 = document.querySelector('polymer-d3');
@@ -54,5 +54,10 @@
       );
     </script>
     <span id="browser-sync-binding"></span>
+    <style>
+      .test-body {
+        background-color: #ededed;
+      }
+    </style>
   </body>
 </html>

@@ -9,7 +9,7 @@ Polymer({
       value: () => {
         return [{
           label: 'Stacked Bar Chart',
-          icon: 'icons:accessibility',
+          icon: 'editor:insert-chart',
           element: 'bar-chart',
           callBack: 'initStackedBarChart'
         }, {

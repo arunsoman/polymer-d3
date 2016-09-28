@@ -8,9 +8,15 @@
         display: block;
       }
       paper-icon-button {
-        transition: color .7s ease-in-out;
+        background-color: #fff;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.16), 0 1px 2px rgba(0,0,0,0.23);
+        margin: auto .3em;
+        transition: color .7s ease-in-out,
+                    box-shadow 1s ease;
       }
       paper-icon-button:hover {
+        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
         color: rgb(0, 101, 153);
       }
     </style>
