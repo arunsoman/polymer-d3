@@ -184,6 +184,7 @@ Polymer({
       // elem.set('externals');
 
       // Gets settings object from newly attached chart
+      this._mergeSettings(this.settings, elem.area);
       this.set('settings', elem.area);
       this.set('inputs', elem.inputs);
       this.set('selectedChartObj', elem);
@@ -192,6 +193,29 @@ Polymer({
       this.set('legendSettings', elem.legendSettings);
     } else {
       console.info('Empyt Object');
+    }
+  },
+
+  _mergeSettings: function(from, to) {
+    let mergeSettings = this._persistData('input', 'selectedValue');
+    mergeSettings(from, to);
+  },
+
+  // Creates a utility function that
+  // copies valueToChange from 'from' to 'to', both are array of objects
+  // identifier is the key which uniquely identifies objects
+  _persistData: function(identifier, valeToChange) {
+    return (from, to) => {
+      from.forEach(f => {
+        // Short circuits to.loop
+        // http://stackoverflow.com/a/2641374/5154397
+        to.some(t => {
+          if (t[identifier] == f[identifier]) {
+            t[valeToChange] = f[valeToChange];
+            return true;
+          }
+        });
+      });
     }
   },
 

@@ -6,6 +6,7 @@
     <style>
       :host {
         display: block;
+        position: relative;
       }
       paper-icon-button {
         background-color: #fff;
@@ -20,16 +21,35 @@
                     transform .5s ease-in-out;
         width: 20px;
       }
+      /*paper-icon-button:after {
+        background: black;
+        border-radius: 2px;
+        color: white;
+        content: attr(data-title);
+        font-size: 10px;
+        left: -50%;
+        opacity: 0.8;
+        padding: 2px;
+        position: absolute;
+        top: -10px;
+        transform: scale(0);
+        transition: all 1s ease;
+        white-space: nowrap;
+      }*/
       paper-icon-button:hover {
         box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
         color: #14892c;
         transform: scale(1.11);
       }
+      /*paper-icon-button:hover:after {
+        display: inline-block;
+        transform: scale(1);
+      }*/
     </style>
     <template is="dom-repeat" items="{{charts}}">
       <paper-icon-button
         icon="[[item.icon]]"
-        title="[[item.label]]"
+        data-title$="[[item.label]]"
         on-tap="notifyTap"
       ></paper-icon-button>
     </template>
