@@ -23,7 +23,6 @@
         }
     </style>
     <template>
-        <paper-button on-tap="openModal">Open Settings</paper-button>
         <paper-dialog id="settingsModal" modal>
             <template is='dom-repeat' items="{{settings}}">
                 <template is="dom-if" if="{{isDropDown(item.uitype)}}">

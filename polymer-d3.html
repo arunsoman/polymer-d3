@@ -8,23 +8,27 @@
     <style>
       :host {
         background-color: #fff;
-        box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
         display: block;
         font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         margin: 2em;
         padding: 1em;
+        transition: all .1s ease;
+      }
+      :host:hover {
+        box-shadow: 0 2px 4px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.24);
       }
       .tool-bar {
         background-color: #EDEDED;
         box-shadow: 0 1px 1px rgba(0,0,0,0.16), 0 1px 1px rgba(0,0,0,0.23);
-        margin: auto 1em;
+        margin: 1em;
         padding: .5em;
         position: relative;
       }
-      .settings-icon {
+      .icons-wrap.right-icons {
         position: absolute;
         right: 0;
-        top: 0;
+        top: 6px;
       }
       .chartHolder {
         text-align: center;
@@ -39,12 +43,20 @@
           charts="[[availableCharts]]"
           selected="{{selectedChart}}"
         ></chart-selector>
-        <paper-icon-button
-          class="settings-icon"
-          icon="icons:settings"
-          title="Settings"
-          on-tap="showSettings"
-        ></paper-icon-button>
+        <div class="icons-wrap right-icons">
+          <paper-icon-button
+            class="settings-icon"
+            icon="icons:settings-overscan"
+            title="Area Settings"
+            on-tap="showAreaSettings"
+          ></paper-icon-button>
+          <paper-icon-button
+            class="settings-icon"
+            icon="icons:settings"
+            title="Input Settings"
+            on-tap="showInputSettings"
+          ></paper-icon-button>
+        </div>
       </div>
     </template>
     <template is="dom-if" if="{{settingsVisible}}" restamp>

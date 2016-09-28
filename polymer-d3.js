@@ -199,8 +199,15 @@ Polymer({
     console.log(this);
   },
 
-  showSettings: function() {
+  showInputSettings: function() {
     this.set('settingsVisible', !this.settingsVisible);
+  },
+
+  showAreaSettings: function() {
+    let displayComponent = this.$$('display-component');
+    if (displayComponent) {
+      displayComponent.openModal();
+    }
   },
 
   // Bootstraps element as per mode(view/edit)
