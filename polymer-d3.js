@@ -109,7 +109,6 @@ Polymer({
   observers: [
     '_selectedChanged(selectedChart)',
     '_inputsChanged(inputs.*)',
-    '_settingsChanged(settings.*)',
     '_modeObserver(editMode)',
     '_legendSettingsObs(legendSettings.*)'
   ],
@@ -148,21 +147,6 @@ Polymer({
   _inputsChanged: function(i) {
     if (this.selectedChart && this.selectedChart.element) {
       this.$$(this.selectedChart.element).draw();
-    }
-  },
-
-  _settingsChanged: function(setting) {
-    // figureout a way to parse Object that has changed from path
-    // And run the callBack in that object
-    if (setting.path !== 'settings') {
-      this.debounce('settignsChangedDebounce', () => {
-        var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
-        if (changed.callBack) {
-          changed.callBack.call(this.selectedChartObj);
-        } else {
-          this.selectedChartObj.resize();
-        }
-      }, 200);
     }
   },
 
@@ -225,13 +209,6 @@ Polymer({
 
   showInputSettings: function() {
     this.set('settingsVisible', !this.settingsVisible);
-  },
-
-  showAreaSettings: function() {
-    let displayComponent = this.$$('display-component');
-    if (displayComponent) {
-      displayComponent.openModal();
-    }
   },
 
   // Bootstraps element as per mode(view/edit)

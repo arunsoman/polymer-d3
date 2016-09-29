@@ -82,7 +82,7 @@
             }
         }
     },
-    observers: ['_areaChanged(settings.area.*)'],
+    observers: ['_areaSettingsChanged(area.*)'],
 
     attached: function() {
         let container = document.createElement('div');
@@ -125,13 +125,13 @@
 
         this.parentG.exit().remove();
     },
-    _areaChanged: function() {
-        if(this.querySelector('.chartSvgClass') === null){
-            console.log('chart container not ready yet');
-            return;
-        }
-        this._manageDom();
-    },
+    // _areaChanged: function() {
+    //     if(this.querySelector('.chartSvgClass') === null){
+    //         console.log('chart container not ready yet');
+    //         return;
+    //     }
+    //     this._manageDom();
+    // },
 
     // Resize chart container without redraw
     resize: function() {
@@ -205,6 +205,28 @@
             bottom: parseInt(this.area[4].selectedValue),
             left: parseInt(this.area[5].selectedValue)
         };
-    }
+    },
+
+    // Opens area settings
+    showAreaSettings: function() {
+        let displayComponent = this.$$('display-component');
+        if (displayComponent) {
+            displayComponent.openModal();
+        }
+    },
+    _areaSettingsChanged: function(setting) {
+        // figureout a way to parse Object that has changed from path
+        // And run the callBack in that object
+        if (setting.path !== 'area') {
+            this.debounce('areaSettignsChangedDebounce', () => {
+                var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+                if (changed.callBack) {
+                    changed.callBack.call(this);
+                } else {
+                    this.resize();
+                }
+            }, 200);
+        }
+      },
 };
 </script>

@@ -37,12 +37,6 @@
       bar-chart {
         display: inline-block;
       }
-      .draggable-areabtn-wrap {
-        position: relative;
-      }
-      .settings-icon {
-        right: 1em;
-      }
       paper-icon-button {
        color: #868686;
        transition: all .3s ease;
@@ -66,7 +60,7 @@
         </div>
       </div>
     </template>
-    <template is="dom-if" if="{{settingsVisible}}" restamp>
+    <!-- <template is="dom-if" if="{{settingsVisible}}" restamp>
       <display-component settings="{{settings}}"></display-component>
       <div class="draggable-areabtn-wrap">
         <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
@@ -80,7 +74,7 @@
       <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
         <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
       </template>
-    </template>
+    </template> -->
     <div class="chartHolder"></div>
   </template>
   <script src="polymer-d3.js"></script>

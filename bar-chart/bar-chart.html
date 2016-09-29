@@ -7,7 +7,36 @@
       .chartContainer {
         max-width: 100%;
       }
+      .draggable-areabtn-wrap {
+        position: relative;
+      }
+      .icons-wrap.right-icons,
+      .settings-icon {
+        position: absolute;
+        right: 1em;
+        top: 6px;
+      }
+      paper-icon-button {
+       color: #868686;
+       transition: all .3s ease;
+      }
+      paper-icon-button:hover {
+        color: #454545;
+      }
     </style>
+    <display-component settings="{{area}}"></display-component>
+    <div class="draggable-areabtn-wrap">
+      <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+      <paper-icon-button
+        class="settings-icon"
+        icon="icons:settings-overscan"
+        title="Area Settings"
+        on-tap="showAreaSettings"
+      ></paper-icon-button>
+    </div>
+    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+      <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+    </template>
     <h4>Bar Chart New</h4>
     <template is="dom-if" if="[[editMode]]">
       <div class='mandatory'>
