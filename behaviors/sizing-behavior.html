@@ -146,9 +146,11 @@
         chartContainer.style.height = (outerHeight + 100) + 'px';
         chartContainer.style.width = (outerWidth + 100) + 'px';
 
-        this.parentG
-            .attr('height', this.chartHeight)
-            .attr('width', this.chartWidth);
+        if (this.parentG) {
+            this.parentG
+                .attr('height', this.chartHeight)
+                .attr('width', this.chartWidth);
+        }
     },
     _getHeight: function() {
         return parseInt(this.area[0].selectedValue);

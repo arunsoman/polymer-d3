@@ -93,6 +93,7 @@ Polymer({
       let yIndices = this.getInputsProperty('y');
       let zGroup = this.getInputsProperty('z');
       let z = this.setLegendColor.bind(this);
+      this.resize();
       // requireed indices not selected
       if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source ||
         PolymerD3.utilities.isEmptyObject(this.configurator) || this.source.length < 1

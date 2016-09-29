@@ -125,8 +125,10 @@ Polymer({
   },
 
   _selectedChanged: function(selectedChart) {
-    console.log(this);
     let elem;
+    if (this.selectedChartObj && !PolymerD3.utilities.isEmptyObject(this.selectedChartObj)) {
+      this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+    }
     this.set('settingsVisible', true);
     if (selectedChart && !PolymerD3.utilities.isEmptyObject(selectedChart)) {
       this.$$('.chartHolder').innerHTML = '';
@@ -142,13 +144,18 @@ Polymer({
       // elem.set('externals');
 
       // Gets settings object from newly attached chart
-      this._mergeSettings(this.settings, elem.area);
-      this.set('settings', elem.area);
-      this.set('inputs', elem.inputs);
-      this.set('selectedChartObj', elem);
+      // this._mergeSettings(this.settings, elem.area);
+      // this.set('settings', elem.area);
+      // this.set('inputs', elem.inputs);
+      // this.set('legendSettings', elem.legendSettings);
+
       elem.set('source', this.source);
       elem.set('externals', this.externals);
-      this.set('legendSettings', elem.legendSettings);
+      this.selectedChartObj = elem;
+      this.selectedChartObj.chartInfo = this.selectedChart;
+      if (selectedChart.settings) {
+        elem.setData(selectedChart.settings);
+      }
     } else {
       console.info('Empyt Object');
     }
