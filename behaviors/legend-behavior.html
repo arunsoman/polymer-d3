@@ -31,6 +31,33 @@
       }
     },
 
+    listeners: {
+      'legend-clicked': 'legendClicked'
+    },
+
+    observers: ['_legendSettingsObs(legendSettings.*)'],
+
+    // Gets notified when legends are clicked
+    legendClicked: function() {
+      this.set('legendSettingsFlag', true);
+      this.async(() => {
+        // Initiates configurator
+        var configElem = this.$$('legends-component');
+        if (configElem) {
+          configElem.initConfigurator();
+        }
+      });
+    },
+
+    // Listens to changes in legend settings and changes fill colors
+    _legendSettingsObs: function(legendSettings) {
+      this.debounce('legendSettingsDebounce', () => {
+        if (legendSettings.path === 'legendSettings.colors') {
+          this.redrawLegends();
+        }
+      }, 200);
+    },
+
     redrawLegends: function() {
       this.debounce('legendsDebounce', () => {
         var me = this;

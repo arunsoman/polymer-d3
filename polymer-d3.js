@@ -110,33 +110,7 @@ Polymer({
     '_selectedChanged(selectedChart)',
     '_inputsChanged(inputs.*)',
     '_modeObserver(editMode)',
-    '_legendSettingsObs(legendSettings.*)'
   ],
-
-  listeners: {
-    'legend-clicked': 'legendClicked'
-  },
-
-  // Listens to changes in legend settings and changes fill colors
-  _legendSettingsObs: function(legendSettings) {
-    this.debounce('legendSettingsDebounce', () => {
-      if (legendSettings.path === 'legendSettings.colors') {
-        this.selectedChartObj.redrawLegends();
-      }
-    }, 200);
-  },
-
-  // Gets notified when legends are clicked
-  legendClicked: function() {
-    this.set('legendSettingsFlag', true);
-    this.async(() => {
-      // Initiates configurator
-      var configElem = this.$$('legends-component');
-      if (configElem) {
-        configElem.initConfigurator();
-      }
-    });
-  },
 
   _modeObserver: function(editMode) {
     if (!editMode) {
