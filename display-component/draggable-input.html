@@ -100,7 +100,7 @@
       }
     </style>
     <div uuid = [[getUUID]]></div>
-    <div class="sortable-wrap master-wrap">
+    <div class="sortable-wrap master-wrap" id="master-holder">
       <sortable-js id="master">
         <template is="dom-repeat" items={{externals}}>
           <div class="list-item" data-item="{{item}}">
@@ -176,15 +176,16 @@
       },
 
       attached: function() {
-        var me = this;
-        me.uuid = PolymerD3.utilities.getUUID();
-        me.$.master.sort = false;
-        me.$.master.group = {
-          name: me.uuid,
+        this.uuid = PolymerD3.utilities.getUUID();
+        this.$.master.sort = false;
+        this.$.master.group = {
+          name: this.uuid,
           pull: 'clone'
         };
-        this.$.inputWrap.addEventListener('add', this._addWatcher.bind(me));
-        this.$.inputWrap.addEventListener('remove', this._remWatcher.bind(me));
+        // SortableJS on clone event is a bit buggy, so, remove is used
+        this.$['master-holder'].addEventListener('start', this._handleClone.bind(this));
+        this.$.inputWrap.addEventListener('add', this._addWatcher.bind(this));
+        this.$.inputWrap.addEventListener('remove', this._remWatcher.bind(this));
       },
 
       // Duplicate removing logic goes here
@@ -208,6 +209,26 @@
         var sortable = e.currentTarget;
         sortable.fire("remove");
         e.stopPropagation();
+      },
+
+      // to bring back icons on cloned items
+      _handleClone: function(e) {
+        var me = this;
+        var btns = e.target.querySelectorAll('paper-icon-button');
+        var items = e.target.querySelector('template[is="dom-repeat"]');
+        if (!btns || !items) {
+          return false;
+        }
+        items = items.items;
+        [].forEach.call(btns, (btn, index) => {
+          let icon = 'icons:help-outline';
+          if (items[index] && items[index].type) {
+            icon = me._generateIcon(items[index].type);
+          }
+          if (!btn.icon) {
+            btn.set('icon', icon);
+          }
+        });
       }
     });
   </script>
