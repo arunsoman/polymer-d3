@@ -77,7 +77,6 @@ Polymer({
   ],
 
   attached: function() {
-    'use strict';
     // this._loadDiffdata();
     //  this._loadHeatmap();
     // this._loadWaterfall();

@@ -24,21 +24,24 @@
         color: #454545;
       }
     </style>
-    <display-component settings="{{area}}"></display-component>
-    <div class="draggable-areabtn-wrap">
-      <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-      <paper-icon-button
-        class="settings-icon"
-        icon="icons:settings-overscan"
-        title="Area Settings"
-        on-tap="showAreaSettings"
-      ></paper-icon-button>
-    </div>
-    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
-      <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+    <!-- set true temporarly -->
+    <template is="dom-if" if="true">
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
     </template>
-    <h4>Bar Chart New</h4>
-    <template is="dom-if" if="[[editMode]]">
+    <!-- <h4>Bar Chart</h4> -->
+    <!-- <template is="dom-if" if="[[editMode]]">
       <div class='mandatory'>
         <display-component settings="{{inputs}}" external='[[external]]' draggable="true"></display-component>
       </div>
@@ -47,7 +50,7 @@
       <div class='optional' hidden="{{hideSettings}}">
         <display-component settings="{{settings}}" external='[[external]]'></display-component>
       </div>
-    </template>
+    </template> -->
 
   </template>
   <script src="bar-chart.js"></script>

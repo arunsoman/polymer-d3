@@ -193,7 +193,9 @@ Polymer({
   },
 
   showInputSettings: function() {
-    this.set('settingsVisible', !this.settingsVisible);
+    if (this.selectedChartObj) {
+      this.selectedChartObj.toggleSettingsVisibility();
+    }
   },
 
   // Bootstraps element as per mode(view/edit)
