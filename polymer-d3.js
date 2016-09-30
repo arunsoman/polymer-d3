@@ -6,48 +6,52 @@ Polymer({
     // List of available charts
     availableCharts: {
       type: Array,
-      value: () => {
-        return [{
-          label: 'Stacked Bar Chart',
-          icon: 'editor:insert-chart',
-          element: 'bar-chart',
-          callBack: 'initStackedBarChart'
-        }, {
-          label: 'Grouped Bar Chart',
-          icon: 'icons:cloud-circle',
-          element: 'bar-chart',
-          callBack: 'initGroupedBarChart'
-        }, {
-          label: 'Waterfall Chart',
-          icon: 'icons:accessibility',
-          element: 'bar-chart',
-          callBack: 'initWaterfallChart'
-        }, {
-          label: 'Difference',
-          icon: 'icons:rowing',
-          element: 'bar-chart',
-          callBack: 'initDiffrenceChart'
-        }, {
-          label: 'Pie Chart',
-          icon: 'icons:content-cut',
-          element: 'pie-chart',
-          callBack: 'setPieSettings'
-        }, {
-          label: 'Heat Map',
-          icon: 'icons:bug-report',
-          element: 'bar-chart',
-          callBack: 'setHeatMapSettings'
-        }, {
-          label: 'Area Chart',
-          icon: 'icons:dns',
-          element: 'area-chart',
-          callBack: 'setAreaSettings'
-        }, {
-          label: 'Sankey Chart',
-          icon: 'icons:check-circle',
-          element: 'sankey-chart',
-          callBack: 'setSankeySettings'
-        }];
+      value: function() {
+        // Creates these, if the available charts aren't ready by time
+        // later: merge new charts
+        if (!this.availableCharts) {
+          return [{
+            label: 'Stacked Bar Chart',
+            icon: 'editor:insert-chart',
+            element: 'bar-chart',
+            callBack: 'initStackedBarChart'
+          }, {
+            label: 'Grouped Bar Chart',
+            icon: 'icons:cloud-circle',
+            element: 'bar-chart',
+            callBack: 'initGroupedBarChart'
+          }, {
+            label: 'Waterfall Chart',
+            icon: 'icons:accessibility',
+            element: 'bar-chart',
+            callBack: 'initWaterfallChart'
+          }, {
+            label: 'Difference',
+            icon: 'icons:rowing',
+            element: 'bar-chart',
+            callBack: 'initDiffrenceChart'
+          }, {
+            label: 'Pie Chart',
+            icon: 'icons:content-cut',
+            element: 'pie-chart',
+            callBack: 'setPieSettings'
+          }, {
+            label: 'Heat Map',
+            icon: 'icons:bug-report',
+            element: 'bar-chart',
+            callBack: 'setHeatMapSettings'
+          }, {
+            label: 'Area Chart',
+            icon: 'icons:dns',
+            element: 'area-chart',
+            callBack: 'setAreaSettings'
+          }, {
+            label: 'Sankey Chart',
+            icon: 'icons:check-circle',
+            element: 'sankey-chart',
+            callBack: 'setSankeySettings'
+          }];
+        }
       }
     },
     // Object desctibing selected chart type
@@ -197,6 +201,9 @@ Polymer({
     // data and externals are always required
     this.set('externals', config.externals);
     this.set('source', config.source);
+    if (config.availableCharts) {
+      this.availableCharts = config.availableCharts;
+    }
     if (config.mode === 'create') {
       // Fresh Polymer d3
       this.set('editMode', true);
@@ -216,6 +223,16 @@ Polymer({
       // To set inputs to selected chart manually
       this.selectedChartObj.set('inputs', config.inputs);
       this.selectedChartObj.draw();
+      this.async(() => {
+        this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+      }, 500);
     }
+  },
+
+  getSettings: function() {
+    return {
+      selectedChart: this.selectedChart,
+      availableCharts: this.availableCharts
+    };
   }
 });
