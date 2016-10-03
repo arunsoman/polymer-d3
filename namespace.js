@@ -82,18 +82,23 @@ PolymerD3.utilities.dataMutationParam = function(path, data, callBack) {
 };
 
 PolymerD3.fileReader = function(name, numberIndexArray, dateIndexArray, dateParser, callback, header) {
-    var arryadata = [];
-    var me = this;
-    d3.text(name, function(error, text) {
-        d3.csv.parseRows(text, function(aline, ind) {
-            if(ind == 0 && header === true){
+    let arryadata = [];
+    let me = this;
+    d3.text(name, (error, text) => {
+        d3.csv.parseRows(text, (aline, ind) => {
+            if (ind == 0 && header === true) {
                 arryadata.push(aline);
             } else {
-                numberIndexArray.forEach((token) =>{
+                numberIndexArray.forEach(token => {
                     aline[token] = +aline[token];
                 });
-                dateIndexArray.forEach((token) =>{
+                dateIndexArray.forEach(token => {
+                    let tmp = aline[token];
                     aline[token]  = d3.time.format(dateParser).parse(aline[token]);
+                    // d3.parse not parsing date properly for _area.csv
+                    if (!aline[token]) {
+                        aline[token] = new Date(tmp);
+                    }
                 });
                 arryadata.push(aline);
             }

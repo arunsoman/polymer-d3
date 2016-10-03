@@ -34,21 +34,40 @@
       var setData = function(data) {
         polymerd3.source = data;
       }
+      // polymerd3.externals = [{
+      //   key: 'when',
+      //   value: 0,
+      //   type: 'time'
+      // }, {
+      //   key: 'd2',
+      //   value: 1,
+      //   type: 'number'
+      // }, {
+      //   key: 'd3',
+      //   value: 2,
+      //   type: 'number'
+      // }];
+      // polymerd3.data = PolymerD3.fileReader(
+      //   '../diff-small.csv', [1, 2], [0], '%Y%m%d',
+      //   setData,
+      //   false
+      // );
       polymerd3.externals = [{
-        key: 'when',
+        key: 'key',
         value: 0,
-        type: 'time'
+        type: 'string'
       }, {
-        key: 'd2',
+        key: 'value',
         value: 1,
         type: 'number'
       }, {
-        key: 'd3',
+        key: 'date',
         value: 2,
-        type: 'number'
+        type: 'time'
       }];
+      // @  params name, numberIndexArray, dateIndexArray, dateParser, callback, header
       polymerd3.data = PolymerD3.fileReader(
-        '../diff-small.csv', [1, 2], [0], '%Y%m%d',
+        '../_area.csv', [1], [2], '%Y%m%d',
         setData,
         false
       );
