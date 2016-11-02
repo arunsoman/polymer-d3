@@ -42,7 +42,7 @@ PolymerD3.barChart.stacked = function() {
         return conf.getBarHeight(d.y);
       },
       legendF: (d, i, j) => {
-        console.log('d:' + d + ' i:' + i + ' j:' + j);
+        // console.log('d:' + d + ' i:' + i + ' j:' + j);
       }
     }
   };

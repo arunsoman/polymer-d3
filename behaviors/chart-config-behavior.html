@@ -99,7 +99,11 @@ PolymerD3.chartConfigBehavior = {
             var myset = [];
             return {
                 process: (aRow) => {
-                    var aStr = aRow[index[0]].toString();
+                    try {
+                        var aStr = aRow[index[0]].toString();
+                    } catch (e) {
+                        console.warn(e, aRow);
+                    }
                     if(myset.filter((p)=>{
                             return p.toString() === aStr;
                         }).length === 0)
