@@ -76,6 +76,26 @@ Polymer({
     PolymerD3.chartBehavior
   ],
 
+  xAxisRotationCb: function() {
+    if (this.parentG) {
+        let xAxis = this.parentG.select('.x-axis');
+        let xAxisCommander = this.attach(xAxis);
+        let toRotate = this._getAreaObj('xAxisRotation').selectedValue;
+        let textAnchor = toRotate > 0 ? 'start': 'end';
+        this.attach(xAxis).tickRotation.rotateTicks(toRotate, textAnchor);
+    }
+  },
+
+  yAxisRotationCb: function() {
+    if (this.parentG) {
+      let yAxis = this.parentG.select('.y-axis');
+      let yAxisCommander = this.attach(yAxis);
+      let toRotate = this._getAreaObj('yAxisRotation').selectedValue;
+      let textAnchor = 'end';
+      this.attach(yAxis).tickRotation.rotateTicks(toRotate, textAnchor);
+    }
+  },
+
   attached: function() {
     // this._loadDiffdata();
     //  this._loadHeatmap();

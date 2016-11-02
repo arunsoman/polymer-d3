@@ -52,15 +52,7 @@
                     min: -90,
                     max: 90,
                     step: 15,
-                    callBack: function() {
-                        if (this.parentG) {
-                            let xAxis = this.parentG.select('.x-axis');
-                            let xAxisCommander = this.attach(xAxis);
-                            let toRotate = this._getAreaObj('xAxisRotation').selectedValue;
-                            let textAnchor = toRotate > 0 ? 'start': 'end';
-                            this.attach(xAxis).tickRotation.rotateTicks(toRotate, textAnchor);
-                        }
-                    }
+                    callBack: 'xAxisRotationCb'
                 }, {
                     input: 'yAxisRotation',
                     txt: 'Rotate Y-Axis Tick',
@@ -69,15 +61,7 @@
                     min: -60,
                     max: 60,
                     step: 12,
-                    callBack: function() {
-                        if (this.parentG) {
-                            let yAxis = this.parentG.select('.y-axis');
-                            let yAxisCommander = this.attach(yAxis);
-                            let toRotate = this._getAreaObj('yAxisRotation').selectedValue;
-                            let textAnchor = 'end';
-                            this.attach(yAxis).tickRotation.rotateTicks(toRotate, textAnchor);
-                        }
-                    }
+                    callBack: 'yAxisRotationCb'
                 }];
             }
         }
@@ -217,13 +201,11 @@
         }
     },
     _areaSettingsChanged: function(setting) {
-        // figureout a way to parse Object that has changed from path
-        // And run the callBack in that object
         if (setting.path !== 'area') {
             this.debounce('areaSettignsChangedDebounce', () => {
                 var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
                 if (changed.callBack) {
-                    changed.callBack.call(this);
+                    this[changed.callBack].call(this);
                 } else {
                     this.resize();
                 }
