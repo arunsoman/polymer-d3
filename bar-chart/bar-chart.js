@@ -154,7 +154,6 @@ Polymer({
 
       // For waterfall chart
       if (conf.chartType === 'waterfall') {
-        nChartConfig.stackDataLength = stackData[0].values.length
         var group = myGroup.getGroups();
         nChartConfig.setYDomain([0, group[group.length - 1].values[0].y0]);
         nChartConfig.setXDomain('Total');

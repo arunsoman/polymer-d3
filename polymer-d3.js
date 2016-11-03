@@ -23,7 +23,7 @@ Polymer({
           }, {
             label: 'Waterfall Chart',
             icon: 'icons:accessibility',
-            element: 'bar-chart',
+            element: 'waterfall-chart',
             callBack: 'initWaterfallChart'
           }, {
             label: 'Difference',
