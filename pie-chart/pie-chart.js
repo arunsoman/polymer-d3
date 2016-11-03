@@ -99,7 +99,6 @@ Polymer({
   innerRadiusCb: function() {
     this.parentG.innerHTML = '';
     this.draw();
-    debugger;
   },
 
   draw: function() {
@@ -143,7 +142,7 @@ Polymer({
       this.parentG.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
       let me = this;
       if (this.parentG) {
-        this.parentG.innerHTML = '';
+        this.parentG.html('');
       }
       let g = this.parentG.selectAll('.arc')
         .data(pie(me.source))
