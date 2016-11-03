@@ -227,13 +227,26 @@ Polymer({
       this.selectedChartObj.draw();
       this.async(() => {
         this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+        this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
       }, 500);
     }
   },
 
   getSettings: function() {
+    var selectedChart = this.selectedChart;
+    var extractedData = this.selectedChartObj.extractData();
+    for (var key in selectedChart) {
+      extractedData[key] = selectedChart[key];
+    }
+    // to do find and remove this redundancy
+    extractedData.settings = {
+      area: extractedData.area,
+      inputs: extractedData.inputs,
+      legendSettings: extractedData.legendSettings
+    }
     return {
-      selectedChart: this.selectedChart,
+      // selectedChart: this.selectedChart,
+      selectedChart: extractedData,
       availableCharts: this.availableCharts
     };
   }

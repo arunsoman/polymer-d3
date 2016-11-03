@@ -75,13 +75,17 @@
 
       // Sets current selected object
       notifyTap: function(e) {
-        console.log('tap');
         if (this.selectedBtn.style) {
           this.selectedBtn.style.color = '';
         }
         this.set('selectedBtn', e.target);
         this.selectedBtn.style.color = '#14892c';
         this.set('selected', e.model.item);
+      },
+
+      setSelectedChart: function(selectedBtnIdentifier) {
+        this.set('selectedBtn', this.$$(selectedBtnIdentifier));
+        this.selectedBtn.style.color = '#97DBE6';
       }
 
     });
