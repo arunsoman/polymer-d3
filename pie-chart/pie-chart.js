@@ -36,38 +36,71 @@ Polymer({
         }];
       }
     },
-    // settings: {
-    //   notify: true,
-    //   type: Array,
-    //   value: [{
-    //     input: 'displayTxt',
-    //     txt: 'Placement of lables',
-    //     uitype: 'dropDown',
-    //     selectedValue: Array,
-    //     selectedName: Array,
-    //     options: [{
-    //         key: 'None',
-    //         value: 0
-    //     }, {
-    //         key: 'inside',
-    //         value: 1
-    //     }, {
-    //         key: 'outside',
-    //         value: 2
-    //     }]
-    //   }, {
-    //     input: 'innerRadius',
-    //     txt: 'Inner radius',
-    //     uitype: 'Number',
-    //     selectedValue: 0
-    //   }]
-    // },
+    area: {
+      type: Array,
+      value: () => {
+        return [{
+          input: 'height',
+          txt: 'Height of the chart',
+          uitype: 'Number',
+          selectedValue: 500,
+          callBack: 'chartHeightCb'
+        }, {
+          input: 'width',
+          txt: 'Width of the chart',
+          uitype: 'Number',
+          selectedValue: 960
+        }, {
+          input: 'marginTop',
+          txt: 'Top  margin',
+          uitype: 'Number',
+          selectedValue: 40
+        }, {
+          input: 'marginRight',
+          txt: 'Right margin',
+          uitype: 'Number',
+          selectedValue: 10
+        }, {
+          input: 'marginBottom',
+          txt: 'Bottom margin',
+          uitype: 'Number',
+          selectedValue: 20
+        }, {
+          input: 'marginLeft',
+          txt: 'Left margin',
+          uitype: 'Number',
+          selectedValue: 50
+        }, {
+          input: 'innerRadius',
+          txt: 'Inner Radius',
+          uitype: 'Number',
+          selectedValue: 0,
+          callBack: 'innerRadiusCb'
+        }];
+      }
+    }
   },
 
   behaviors: [
     PolymerD3.chartBehavior
   ],
 
+  chartHeightCb: function() {
+    if (this.parentG) {
+      let width = this._getWidth();
+      let height = this._getHeight();
+      let svg = d3.select(this).selectAll('svg')
+      svg.attr('viewBox', '0 0 ' + (width + 50) +' ' + (height + 50) +'');
+      this.draw();
+      this.resize();
+    }
+  },
+
+  innerRadiusCb: function() {
+    this.parentG.innerHTML = '';
+    this.draw();
+    debugger;
+  },
 
   draw: function() {
     this.debounce('pieChartDrawDeounce', () => {
@@ -84,7 +117,7 @@ Polymer({
       let width = this.chartWidth,
         height = this.chartHeight,
         radius = Math.min(width, height) / 2;
-      let innerRadius = 10; //me.getSettingsProperty('innerRadius');
+      let innerRadius = this.area[6].selectedValue;
 
       let color = d3.scale.category20c();
 

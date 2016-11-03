@@ -96,6 +96,17 @@ Polymer({
     }
   },
 
+  chartHeightCb: function() {
+    if (this.parentG) {
+      let width = this._getWidth();
+      let height = this._getHeight();
+      let svg = d3.select(this).selectAll('svg')
+      svg.attr('viewBox', '0 0 ' + (width + 50) +' ' + (height + 50) +'');
+      this.draw();
+      this.resize();
+    }
+  },
+
   attached: function() {
     // this._loadDiffdata();
     //  this._loadHeatmap();
