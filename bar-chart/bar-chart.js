@@ -138,6 +138,21 @@ Polymer({
       }
       var conf = this.configurator.conf.call(this);
 
+      // cloning the source to keep it intact
+      let _src = JSON.parse(JSON.stringify(this.source));
+
+      // for waterfall chart
+      if (conf.chartType === 'waterfall') {
+        let sum = 0;
+        _src.forEach(value =>  {
+          sum += value[yIndices[0]];
+        });
+        var total = {};
+        total[xIndex] = 'Total';
+        total[yIndices[0]] = sum;
+        _src.push(total);
+      }
+
       var myGroup = PolymerD3
         .groupingBehavior
         .group_by(
@@ -145,32 +160,13 @@ Polymer({
           xIndex, yIndices, headers
         );
       var nChartConfig = this
-        .chartConfig(conf, this.source, myGroup.process);
+        .chartConfig(conf, _src, myGroup.process);
 
       let stackData = myGroup.getStack();
 
       // Temporary hack to pass stackData's length to processor
       nChartConfig.stackDataLength = stackData.length;
 
-      // For waterfall chart
-      if (conf.chartType === 'waterfall') {
-        nChartConfig.stackDataLength = stackData[0].values.length
-        var group = myGroup.getGroups();
-        nChartConfig.setYDomain([0, group[group.length - 1].values[0].y0]);
-        nChartConfig.setXDomain('Total');
-
-        // To replicate each element in stackData
-        let total = {
-          key: 'total',
-          values: [
-            ['total', stackData[stackData.length - 1].values[0][1]]
-          ]
-        };
-        total.values[0].y = (stackData[stackData.length - 1].values[0].y + stackData[stackData.length - 1].values[0].y0);
-        total.values[0].y0 = 0;
-        stackData.push(total);
-        // Replication - end
-      }
       var translations = this.configurator.processors(nChartConfig);
 
       var htmlCallback;

@@ -31,7 +31,7 @@ PolymerD3.barChart.waterfall = function() {
         return nChartConfig.getBarWidth() - 1;
       },
       rectX: (d, i, j) => {
-        return j * (nChartConfig.getBarWidth() - 1);
+        return i * (nChartConfig.getBarWidth() - 1);
       },
       rectY: (d) => {
         if (d.y < 0) {
@@ -40,6 +40,7 @@ PolymerD3.barChart.waterfall = function() {
         return nChartConfig.getY(d.y + d.y0);
       },
       rectHeight: (d) => {
+        console.log(d);
         return nChartConfig.getBarHeight((d.y < 0) ? -1 * (d.y) : (d.y));
       },
       legendF: (d, i, j) => {

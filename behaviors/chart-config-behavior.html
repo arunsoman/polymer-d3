@@ -27,7 +27,7 @@ PolymerD3.chartConfigBehavior = {
         var height = conf.height;
         var width = conf.width;
         var stackIndex = conf.stackIndex;
-        
+
         var temporal = (index)=>{
             var set = d3.set();
             var eng ={
@@ -44,7 +44,7 @@ PolymerD3.chartConfigBehavior = {
             };
             return eng;
         };
-        
+
         var nonOrdinal = (index) => {
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
@@ -139,7 +139,7 @@ PolymerD3.chartConfigBehavior = {
             case 'time':
                 return temporal(header);
             default:
-                return nonOrdinal(header);    
+                return nonOrdinal(header);
             }
         };
         if (!computex) {
