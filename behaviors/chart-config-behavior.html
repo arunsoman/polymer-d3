@@ -75,8 +75,18 @@ PolymerD3.chartConfigBehavior = {
                 },
                 getDomain: (forceToZero) => {
                     var dom = d3.extent(map.values());
-                    if (forceToZero) {
-                        return [0, dom[1]];
+                    // code for waterfall chart
+                    if (forceToZero && conf.isAggregate) {
+                        let tmp = map.values(); // collects all data
+                        let max = tmp.pop(); // total is the largest
+                        tmp.reduce((a, b) => {
+                            let sum = a + b;
+                            if (max < sum) {
+                                max = sum;
+                            }
+                            return sum;
+                        }, 0);
+                        return [0, max];
                     }
                     return dom;
                 }

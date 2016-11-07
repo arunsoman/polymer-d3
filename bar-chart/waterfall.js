@@ -8,6 +8,7 @@ PolymerD3.barChart.waterfall = function() {
       stackIndex: xIndex,
       chartType: 'waterfall', //stack,group,diff,waterfall,heatmap
       containsHeader: false,
+      isAggregate: true,
       xheader: [xIndex],
       yOrign: 0,
       yheader: yIndices,
@@ -37,7 +38,7 @@ PolymerD3.barChart.waterfall = function() {
         if (d.y < 0) {
           return nChartConfig.getY(d.y0);
         }
-        return nChartConfig.getY(d.y + d.y0);
+        return nChartConfig.getY(d.y);
       },
       rectHeight: d => {
         return nChartConfig.getBarHeight((d[1] < 0) ? -1 * (d[1]) : (d[1]));

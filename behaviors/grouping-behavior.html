@@ -101,14 +101,22 @@ PolymerD3.groupingBehavior = {
                     let _mapped = [];
                     _stacked.forEach((g, index) => {
                         let yAggregate = g[1];
+                        let nextY = yAggregate;
+                        // skips first, last(total) and negetive
                         if (index && index != _stacked.length - 1) {
-                            yAggregate = yAggregate + _mapped[index - 1].y;
+                            if (g[1] > 0) {
+                                yAggregate = yAggregate + _mapped[index - 1].y;
+                                nextY = yAggregate;
+                            } else {
+                                yAggregate = _mapped[index - 1].y0;
+                                nextY = yAggregate + g[1];
+                            }
                         }
                         _mapped.push({
                             0: g[0],
                             1: g[1],
                             y: yAggregate,
-                            y0: 0
+                            y0: nextY
                         });
                     });
                     group[0].values = _mapped;
