@@ -13,7 +13,7 @@ PolymerD3.barChart.waterfall = function() {
       yheader: yIndices,
       width: this.chartWidth,
       height: this.chartHeight,
-      xFormat: xObj.selectedObjs[0].type,
+      xFormat: 'string',
       yFormat: yObj.selectedObjs[0].type,
       xAlign: 'bottom',
       yAlign: 'left',
@@ -28,23 +28,21 @@ PolymerD3.barChart.waterfall = function() {
         return 'translate(0,0)';
       },
       barWidth: () => {
-        return nChartConfig.getBarWidth() - 1;
+        return nChartConfig.getBarWidth() - 1;;
       },
       rectX: (d, i, j) => {
-        return i * (nChartConfig.getBarWidth() - 1);
+        return nChartConfig.getX(d[0]);
       },
-      rectY: (d) => {
+      rectY: d => {
         if (d.y < 0) {
           return nChartConfig.getY(d.y0);
         }
         return nChartConfig.getY(d.y + d.y0);
       },
-      rectHeight: (d) => {
-        console.log(d);
-        return nChartConfig.getBarHeight((d.y < 0) ? -1 * (d.y) : (d.y));
+      rectHeight: d => {
+        return nChartConfig.getBarHeight((d[1] < 0) ? -1 * (d[1]) : (d[1]));
       },
       legendF: (d, i, j) => {
-        console.log('d:' + d + ' i:' + i + ' j:' + j);
         return d[0];
       }
     };

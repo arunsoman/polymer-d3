@@ -157,7 +157,7 @@ Polymer({
         .groupingBehavior
         .group_by(
           yIndices.length === 1 ? [zGroup] : yIndices,
-          xIndex, yIndices, headers
+          xIndex, yIndices, headers, conf.chartType
         );
       var nChartConfig = this
         .chartConfig(conf, _src, myGroup.process);

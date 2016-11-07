@@ -59,7 +59,7 @@ PolymerD3.chartConfigBehavior = {
                         min = datum[index[0]];
                     }
                 },
-                getDomain: () => {
+                getDomain: (forceToZero) => {
                     return [min, max];
                 }
             };
@@ -73,8 +73,11 @@ PolymerD3.chartConfigBehavior = {
                     counter += datum[index[0]];
                     map.set(stackKey, counter);
                 },
-                getDomain: () => {
+                getDomain: (forceToZero) => {
                     var dom = d3.extent(map.values());
+                    if (forceToZero) {
+                        return [0, dom[1]];
+                    }
                     return dom;
                 }
             };
@@ -148,15 +151,16 @@ PolymerD3.chartConfigBehavior = {
         if (!computey) {
             computey = findHandler(yConf.axisType,conf.yheader);
         }
-        data.forEach((aRow) => {
+        data.forEach((aRow, index) => {
             computex.process(aRow);
             computey.process(aRow);
             if (rowCallback) {
-                rowCallback(aRow);
+                rowCallback(aRow, index);
             }
         });
         xConf.domain = computex.getDomain();
-        yConf.domain = computey.getDomain();
+        // to force to zero for waterfall chart
+        yConf.domain = computey.getDomain(conf.chartType == 'waterfall' ? true : false);
         if(conf.yOrigin !== undefined){
             yConf.domain[0] = conf.yOrigin;
         }

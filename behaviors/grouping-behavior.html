@@ -1,6 +1,6 @@
 <script>
 PolymerD3.groupingBehavior = {
-    group_by : (indices, xIndex, yIndex, headers) => {
+    group_by : (indices, xIndex, yIndex, headers, type) => {
         var _stack = (groups) => {
             // Sets key if data isn't grouped
             // @Arun Please verify if there's an easeier solution
@@ -74,8 +74,53 @@ PolymerD3.groupingBehavior = {
                 getStack: () =>{return _stack(groups);}
             };
         };
+        var _waterFallStack = () => {
+            let group = [];
+            let map = d3.map();
+            let datumIndex = indices[0];
+            let groupName = headers[xIndex];
+            let aGroup = map.get(groupName);
+            if (!aGroup) {
+                aGroup = {
+                    key: groupName,
+                    values: [],
+                    fill: ''
+                };
+                group.push(aGroup);
+                map.set(groupName, aGroup);
+            }
+            return {
+                process: (aRow) => {
+                    aGroup.values.push([aRow[xIndex], aRow[yIndex]]);
+                },
+                getGroups: () => {
+                    return group;
+                },
+                getStack: () => {
+                    let _stacked = group[0].values;
+                    let _mapped = [];
+                    _stacked.forEach((g, index) => {
+                        let yAggregate = g[1];
+                        if (index && index != _stacked.length - 1) {
+                            yAggregate = yAggregate + _mapped[index - 1].y;
+                        }
+                        _mapped.push({
+                            0: g[0],
+                            1: g[1],
+                            y: yAggregate,
+                            y0: 0
+                        });
+                    });
+                    group[0].values = _mapped;
+                    return group;
+                }
+            }
+        };
         if (!indices) {
             throw new Error('indices argument mandatory');
+        }
+        if (type == 'waterfall') {
+            return _waterFallStack();
         }
         if (indices.length === 1) {
             return _group_by_col();
