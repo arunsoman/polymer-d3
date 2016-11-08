@@ -68,19 +68,21 @@ Polymer({
             if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source || this.source.length < 1 ) {
                 return false;
             }
+            let xObj = this.getInputsPropertyObj('x');
+            let yObj = this.getInputsPropertyObj('y');
             var conf = {
                 stackIndex: xIndex,
-                containsHeader: true,
+                containsHeader: false,
                 xheader: [0],
                 yheader: [1,2],
                 width: this.chartWidth,
                 height: this.chartHeight,
-                xFormat: 'time',
                 yOrigin:0,
-                yFormat: 'number',
+                xFormat: xObj.selectedObjs[0].type,
+                yFormat: yObj.selectedObjs[0].type,
                 xAlign: 'bottom',
                 yAlign: 'left',
-                xaxisType: 'time',
+                xaxisType: 'ordinal',
                 yaxisType: 'linear',
                 parentG: me.parentG
             };
@@ -94,25 +96,23 @@ Polymer({
                 let getY0;
                 let getY1;
                 if(me.isStack){
-                    getY1 = (d)=> {
-                        return cc.getY(d.y0 + d.y);};
-                    getY0 = (d)=> {
-                        return cc.getY(d.y0);};
+                    // Syntax for shorter arrow functions
+                    // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions#Shorter_functions
+                    getY1 = d => cc.getY(d.y0 + d.y);
+                    getY0 = d => cc.getY(d.y0);
                 }else{
-                    getY1 = (d)=> {
-                        return cc.getY(d.y);};
-                    getY0 = ()=> {
-                        return cc.getY(0);};
+                    getY1 = d => cc.getY(d.y);
+                    getY0 = ()=> cc.getY(0);
                 }
                 var area = d3.svg.area()
                     .interpolate("cardinal")
-                    .x((d)=> {return cc.getX(d[0]);})
+                    .x(d => cc.getX(d[0]))
                     .y0(getY0)
                     .y1(getY1);
 
                 var line = d3.svg.line().interpolate("basis")
-                    .x((d) => { return cc.getX(d[0]); } )
-                    .y((d) => { return cc.getY((me.isStack) ? (d.y + d.y0) : (d.y)); });
+                    .x(d => cc.getX(d[0]))
+                    .y(d => cc.getY((me.isStack) ? (d.y + d.y0) : (d.y)));
 
                 var display = (this.isArea) ? area : line;
                 if (me.isArea) {
@@ -126,37 +126,31 @@ Polymer({
                     .data(stack)
                     .enter().append("path")
                     .attr("class", pathClass)
-                    .attr("d", function(d) {
-                        return display(d.values);
-                    })
-                    .style("fill", function(d, i) {
-                        return (me.isArea) ? z(i) : 'none';
-                    })
-                    .style("stroke", function(d, i) {
-                        return (!me.isArea) ? z(i) : 'none';
-                   });
+                    .attr("d", d => display(d.values))
+                    .style("fill", (d, i) => (me.isArea) ? z(i) : 'none')
+                    .style("stroke", (d, i) => (!me.isArea) ? z(i) : 'none');
             };
             var drawDiff=()=>{
                 //http://jsfiddle.net/hrabinowitz/aZZSF/49/
                 var stackUtil ={
-                    X:  (i)=>{return stack[0].values[i][0];},
-                    Y1: (i)=>{return stack[0].values[i][1];},
-                    Y2: (i)=>{return stack[1].values[i][1];},
+                    X:  i => stack[0].values[i][0],
+                    Y1: i => stack[0].values[i][1],
+                    Y2: i => stack[1].values[i][1],
                 };
                 var line1 = d3.svg.area()
                     .interpolate("linear")
-                    .x(function(d,i) { return cc.getX(stackUtil.X(i)); })
-                    .y(function(d,i) { return cc.getY(stackUtil.Y1(i)); });
+                    .x((d, i) => cc.getX(stackUtil.X(i)))
+                    .y((d, i) => cc.getY(stackUtil.Y1(i)));
 
                 var line2 = d3.svg.area()
                     .interpolate("linear")
-                    .x(function(d,i) { return cc.getX(stackUtil.X(i)); })
-                    .y(function(d, i) { return cc.getY(stackUtil.Y2(i)); });
+                    .x((d, i) => cc.getX(stackUtil.X(i)))
+                    .y((d, i) => cc.getY(stackUtil.Y2(i)));
 
                 var area = d3.svg.area()
                     .interpolate("linear")
-                    .x(function(d,i) { return cc.getX(stackUtil.X(i)); })
-                    .y1(function(d,i) { return cc.getY(stackUtil.Y1(i)); });
+                    .x((d, i) => cc.getX(stackUtil.X(i)))
+                    .y1((d, i) => cc.getY(stackUtil.Y1(i)));
 
                 var renderDiff= ()=>{
                   this.parentG.datum(stack[0].values);
