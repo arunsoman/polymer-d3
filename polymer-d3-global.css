@@ -26,3 +26,9 @@ rect.legend-box {
   width: 0;
   height: 0;
 }
+polymer-d3 .x-axis path,
+polymer-d3 .y-axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
