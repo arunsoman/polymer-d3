@@ -105,7 +105,7 @@ PolymerD3.groupingBehavior = {
                         // skips first, last(total) and negetive
                         if (index && index != _stacked.length - 1) {
                             if (g[1] > 0) {
-                                yAggregate = yAggregate + _mapped[index - 1].y;
+                                yAggregate = yAggregate + _mapped[index - 1].y0;
                                 nextY = yAggregate;
                             } else {
                                 yAggregate = _mapped[index - 1].y0;
