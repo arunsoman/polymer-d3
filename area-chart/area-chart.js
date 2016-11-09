@@ -68,6 +68,9 @@ Polymer({
             if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source || this.source.length < 1 ) {
                 return false;
             }
+            if (this.parentG) {
+                this.parentG.html('');
+            }
             let xObj = this.getInputsPropertyObj('x');
             let yObj = this.getInputsPropertyObj('y');
             let z = this.setLegendColor.bind(this);
@@ -75,7 +78,7 @@ Polymer({
                 stackIndex: xIndex,
                 containsHeader: false,
                 isAggregate: yIndices.length > 1 ? true : false,
-                forceYtoZero: true,
+                forcetToZero: true,
                 xheader: [0],
                 yheader: [1,2],
                 width: this.chartWidth,

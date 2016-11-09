@@ -20,7 +20,9 @@ PolymerD3.barChart.waterfall = function() {
       yAlign: 'left',
       xaxisType: 'ordinal',
       yaxisType: 'linear',
-      parentG: this.parentG
+      parentG: this.parentG,
+      forcetToZero: true,
+      isAggregate: true
     };
   };
   let _processors = function(nChartConfig) {

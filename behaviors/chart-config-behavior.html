@@ -3,7 +3,7 @@
 <script>
 PolymerD3.chartConfigBehavior = {
     chartConfig : function (conf, data, rowCallback) {
-        "use strict";
+
         var xConf = {
             dataIndex: conf.xheader,
             domain: null,
@@ -73,12 +73,13 @@ PolymerD3.chartConfigBehavior = {
                     counter += datum[index[0]];
                     map.set(stackKey, counter);
                 },
-                getDomain: (forceToZero) => {
+                getDomain: (forceToZero, isAggregate) => {
                     var dom = d3.extent(map.values());
+                    let tmp = map.values(); // collects all data
+                    let max;
                     // code for waterfall chart
-                    if (forceToZero && conf.isAggregate) {
-                        let tmp = map.values(); // collects all data
-                        let max = tmp.pop(); // total is the largest
+                    if (isAggregate) {
+                        max = tmp.pop(); // assumes last element is the largest(total), shortcut for waterfall
                         tmp.reduce((a, b) => {
                             let sum = a + b;
                             if (max < sum) {
@@ -86,7 +87,10 @@ PolymerD3.chartConfigBehavior = {
                             }
                             return sum;
                         }, 0);
-                        return [0, max];
+                    }
+                    // forces domain to start from zero
+                    if (forceToZero) {
+                        return [0, dom[1]];
                     }
                     return dom;
                 }
@@ -156,10 +160,10 @@ PolymerD3.chartConfigBehavior = {
             }
         };
         if (!computex) {
-            computex = findHandler(xConf.axisType,conf.xheader);
+            computex = findHandler(xConf.axisType, conf.xheader);
         }
         if (!computey) {
-            computey = findHandler(yConf.axisType,conf.yheader);
+            computey = findHandler(yConf.axisType, conf.yheader);
         }
         data.forEach((aRow, index) => {
             computex.process(aRow);
@@ -170,12 +174,12 @@ PolymerD3.chartConfigBehavior = {
         });
         xConf.domain = computex.getDomain();
         // to force to zero for waterfall chart
-        yConf.domain = computey.getDomain(conf.chartType == 'waterfall' ? true : false);
+        yConf.domain = computey.getDomain(conf.forcetToZero, conf.isAggregate);
         if(conf.yOrigin !== undefined){
             yConf.domain[0] = conf.yOrigin;
         }
         // console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
-        
+
         var _scaleFactory = (config) => {
             var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
             var align = config.align;
