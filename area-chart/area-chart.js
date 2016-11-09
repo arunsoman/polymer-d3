@@ -77,7 +77,6 @@ Polymer({
             var conf = {
                 stackIndex: xIndex,
                 containsHeader: false,
-                isAggregate: yIndices.length > 1 ? true : false,
                 forcetToZero: true,
                 xheader: [0],
                 yheader: [1,2],
