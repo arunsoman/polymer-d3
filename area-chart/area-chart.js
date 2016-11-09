@@ -70,9 +70,12 @@ Polymer({
             }
             let xObj = this.getInputsPropertyObj('x');
             let yObj = this.getInputsPropertyObj('y');
+            let z = this.setLegendColor.bind(this);
             var conf = {
                 stackIndex: xIndex,
                 containsHeader: false,
+                isAggregate: yIndices.length > 1 ? true : false,
+                forceYtoZero: true,
                 xheader: [0],
                 yheader: [1,2],
                 width: this.chartWidth,
@@ -127,7 +130,26 @@ Polymer({
                     .enter().append("path")
                     .attr("class", pathClass)
                     .attr("d", d => display(d.values))
-                    .style("fill", (d, i) => (me.isArea) ? z(i) : 'none')
+                    .style("fill", (d, i) => {
+                        let color = z(d);
+                        let keyPresent = false;
+                        me.legendSettings.colors.forEach(c => {
+                            if (c.label == d.key) {
+                                color = c.color;
+                                keyPresent = true;
+                            }
+                        });
+                        if (!keyPresent && d.key) {
+                            me.legendSettings.colors.push({
+                                color: color,
+                                label: d.key
+                            });
+                        }
+                        return color;
+                    })
+                    .attr('data-legend', function(d) {
+                        return d.key;
+                    })
                     .style("stroke", (d, i) => (!me.isArea) ? z(i) : 'none');
             };
             var drawDiff=()=>{
