@@ -100,12 +100,12 @@ Polymer({
                 var pathClass;
                 let getY0;
                 let getY1;
-                if(me.isStack){
+                if(me.isStack) {
                     // Syntax for shorter arrow functions
                     // https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions#Shorter_functions
                     getY1 = d => cc.getY(d.y0 + d.y);
                     getY0 = d => cc.getY(d.y0);
-                }else{
+                } else {
                     getY1 = d => cc.getY(d.y);
                     getY0 = ()=> cc.getY(0);
                 }
@@ -212,6 +212,7 @@ Polymer({
             else{
                 drawArea();
             }
+            this.attachLegend(this.parentG);
         }, 500);
     }
 });
