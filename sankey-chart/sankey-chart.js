@@ -95,7 +95,7 @@ Polymer({
       if (this.getInputsProperty('source') === this.getInputsProperty('destination')) {
         return;
       }
-      this.makeChartWrap();
+      // this.makeChartWrap();
       this._createNodesAndLinks();
       var me = this;
       var units = this.getInputsProperty('units');
@@ -106,12 +106,8 @@ Polymer({
       var color = d3.scale.category20();
 
         var margin = this.getMargins();
-        var width = this.getWidth() - margin.left - margin.right;
-        var height = this.getHeight() - margin.top - margin.bottom;
-        var svg = this.svg
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom);
-        var graph = this.graph;
+        var width = this.chartWidth;
+        var height = this.chartHeight;
         var sankey = d3.sankey(me).nodeWidth(36)
             .nodePadding(40)
             .size([width, height]);
@@ -123,8 +119,8 @@ Polymer({
             .layout(32);
 
         // add in the links
-        var link = svg.append("g").selectAll(".link")
-            .data(graph.links)
+        var link = this.parentG.append("g").selectAll(".link")
+            .data(this.graph.links)
             .enter().append("path")
             .attr("class", "link")
             .attr("d", path)
@@ -134,19 +130,19 @@ Polymer({
         // add the link titles
         link.append("title")
             .text(function(d) {
-            return d.source.name + " → " + 
+            return d.source.name + " → " +
                 d.target.name + "\n" + format(d.value); });
 
         // add in the nodes
-        var node = svg.append("g").selectAll(".node")
-            .data(graph.nodes)
+        var node = this.parentG.append("g").selectAll(".node")
+            .data(this.graph.nodes)
             .enter().append("g")
             .attr("class", "node")
-            .attr("transform", function(d) { 
+            .attr("transform", function(d) {
                 return "translate(" + d.x + "," + d.y + ")"; })
             .call(d3.behavior.drag()
             .origin(function(d) { return d; })
-            .on("dragstart", function() { 
+            .on("dragstart", function() {
                 this.parentNode.appendChild(this); })
             .on("drag", dragmove));
 
@@ -154,12 +150,12 @@ Polymer({
         node.append("rect")
       .attr("height", function(d) { return d.dy; })
       .attr("width", sankey.nodeWidth())
-      .style("fill", function(d) { 
+      .style("fill", function(d) {
           return d.color = color(d.name.replace(/ .*/, "")); })
-      .style("stroke", function(d) { 
+      .style("stroke", function(d) {
           return d3.rgb(d.color).darker(2); })
             .append("title")
-      .text(function(d) { 
+      .text(function(d) {
           return d.name + "\n" + format(d.value); });
 
       // add in the title for the nodes

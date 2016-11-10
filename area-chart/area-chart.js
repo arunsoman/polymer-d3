@@ -152,7 +152,8 @@ Polymer({
                     .attr('data-legend', function(d) {
                         return d.key;
                     })
-                    .style("stroke", (d, i) => (!me.isArea) ? z(i) : 'none');
+                    .attr('class', 'stroked-elem');
+                    // .style("stroke", (d, i) => (!me.isArea) ? z(i) : 'none');
             };
             var drawDiff=()=>{
                 //http://jsfiddle.net/hrabinowitz/aZZSF/49/
@@ -213,5 +214,12 @@ Polymer({
             }
             this.attachLegend(this.parentG);
         }, 500);
+    },
+    strokeWidthCb: function() {
+        let stroke = this.getAreaProperty('strokeWidth');
+        let strokedElems = this.querySelectorAll('.stroked-elem');
+        [].forEach.call(strokedElems, se => {
+            se.style['stroke-width'] = stroke ? stroke.selectedValue + 'px' : 0;
+        });
     }
 });

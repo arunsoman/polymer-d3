@@ -128,7 +128,7 @@ d3.sankey = function(me) {
 
     //
     moveSinksRight(x);
-    scaleNodeBreadths((me.getSettingsProperty('width') - nodeWidth) / (x - 1));
+    scaleNodeBreadths((me._getWidth() - nodeWidth) / (x - 1));
   }
 
   function moveSourcesRight() {

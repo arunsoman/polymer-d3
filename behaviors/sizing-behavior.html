@@ -207,7 +207,7 @@
         if (setting.path !== 'area') {
             this.debounce('areaSettignsChangedDebounce', () => {
                 var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
-                if (changed.callBack) {
+                if (changed.callBack && this[changed.callBack]) {
                     this[changed.callBack].call(this);
                 } else {
                     this.resize();
