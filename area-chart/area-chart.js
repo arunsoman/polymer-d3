@@ -208,8 +208,7 @@ Polymer({
             };
             if(this.chartType === 'diff'){
                 drawDiff();
-            }
-            else{
+            } else {
                 drawArea();
             }
             this.attachLegend(this.parentG);

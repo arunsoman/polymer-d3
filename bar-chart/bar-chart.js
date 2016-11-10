@@ -107,6 +107,14 @@ Polymer({
     }
   },
 
+  strokeWidthCb: function() {
+    let stroke = this.getAreaProperty('strokeWidth');
+    let strokedElems = this.querySelectorAll('.stroked-elem');
+    [].forEach.call(strokedElems, se => {
+      se.style['stroke-width'] = stroke ? stroke.selectedValue + 'px' : 0;
+    });
+  },
+
   attached: function() {
     // this._loadDiffdata();
     //  this._loadHeatmap();
@@ -210,6 +218,7 @@ Polymer({
           }
           return color;
         })
+        .attr('class', 'stroked-elem') // to set stroke
         .attr('data-legend', function(d) {
           return d.key;
         });

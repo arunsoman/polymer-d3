@@ -32,3 +32,7 @@ polymer-d3 .y-axis path {
   stroke: #000;
   shape-rendering: crispEdges;
 }
+
+polymer-d3 .stroked-elem {
+  stroke: black;
+}
