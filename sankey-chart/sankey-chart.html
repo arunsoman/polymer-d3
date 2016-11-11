@@ -25,18 +25,20 @@
 </style>
 
     <template>
-    <h4>Sankey Chart</h4>
-      <template is="dom-if" if="[[editMode]]">
-          <div class='mandatory'>
-          <display-component settings="{{inputs}}" external='[[external]]' draggable></display-component>
-          </div>
-
-          <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-          <div class='optional' hidden="{{hideSettings}}">
-              <display-component settings="{{settings}}" external='[[external]]'></display-component>
-          </div>
+      <h4>Sankey Chart</h4>
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
       </template>
-        <div id="chartHolder"></div>
     </template>
 </dom-module>
 <script src='sankey.js'></script>

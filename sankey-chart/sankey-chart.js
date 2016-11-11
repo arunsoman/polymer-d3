@@ -1,99 +1,125 @@
 Polymer({
-    is: 'sankey-chart',
-    properties: {
-        title: '',
-        inputs: {
-            notify: true,
-            type: Array,
-            value: [{
-                input: 'source',
-                txt: 'Pick Source',
-                selectedValue: 0,
-                uitype: 'single-value',
-                notify: true,
-            }, {
-                input: 'destination',
-                txt: 'Pick Destination',
-                selectedValue: 1,
-                uitype: 'single-value',
-                notify: true
-            }, {
-                input: 'count',
-                txt: 'Pick count',
-                selectedValue: 2,
-                uitype: 'single-value',
-                notify: true
-            }, {
-                input: 'units',
-                txt: 'Enter unit',
-                selectedValue: "widget",
-                uitype: 'Text',
-                notify: true
-            }]
-        },
-        settings: {
-            notify: true,
-            type: Array,
-            value: []
-        },
-        source: {
+  is: 'sankey-chart',
+  properties: {
+      title: '',
+      inputs: {
+          notify: true,
           type: Array,
-          value: [],
-          notify: true
-        },
-        dataMutated: false,
-        hideSettings: true,
-        data: String,
-        external: Array
-    },
-    behaviors: [
-        PolymerD3.chartBehavior,
-        PolymerD3.colorPickerBehavior
-    ],
+          value: () => {
+            return [{
+              input: 'source',
+              txt: 'Pick Source',
+              selectedValue: [],
+              scaleType: '',
+              format: '',
+              selectedObjs: [],
+              uitype: 'single-value',
+              displayName: 'Source',
+              maxSelectableValues: 1
+            }, {
+              input: 'destination',
+              txt: 'Pick Destination',
+              selectedValue: [],
+              format: '',
+              scaleType: '',
+              selectedObjs: [],
+              uitype: 'multi-value',
+              displayName: 'Destination',
+              maxSelectableValues: 1
+            }, {
+              input: 'count',
+              txt: 'Pick Count',
+              selectedValue: [],
+              format: '',
+              scaleType: '',
+              selectedObjs: [],
+              uitype: 'multi-value',
+              displayName: 'Count',
+              maxSelectableValues: 1
+            }, {
+              input: 'units',
+              txt: 'Enter Count',
+              selectedValue: ['widget'],
+              format: '',
+              scaleType: '',
+              selectedObjs: [],
+              uitype: 'multi-value',
+              displayName: 'Units',
+              maxSelectableValues: 1
+            }];
+          }
+      },
+      settings: {
+          notify: true,
+          type: Array,
+          value: []
+      },
+      source: {
+        type: Array,
+        value: [],
+        notify: true
+      },
+      dataMutated: false,
+      hideSettings: true,
+      data: String,
+      external: Array
+  },
+  behaviors: [
+      PolymerD3.chartBehavior,
+      PolymerD3.colorPickerBehavior
+  ],
 
-    _toggleView: function() {
-        this.hideSettings = !this.hideSettings;
-        this.chart = this.draw();
-    },
+  _toggleView: function() {
+      this.hideSettings = !this.hideSettings;
+      this.chart = this.draw();
+  },
 
-    _createNodesAndLinks: function(){
-        if(!this.dataMutated){
-            var sourceIndex = this.getInputsProperty('source');
-            var destinationIndex = this.getInputsProperty('destination');
-            var countIndex = this.getInputsProperty('count');
-            this.graph = {"nodes" : [], "links" : []};
-            var graph = this.graph;
+  _createNodesAndLinks: function(){
+    if(!this.dataMutated){
+      var sourceIndex = this.getInputsProperty('source');
+      var destinationIndex = this.getInputsProperty('destination');
+      var countIndex = this.getInputsProperty('count');
+      this.graph = {
+        "nodes" : [],
+        "links" : []
+      };
+      var graph = this.graph;
 
-            this.source.forEach(function (d) {
-              graph.nodes.push({ "name": d[sourceIndex] });
-              graph.nodes.push({ "name": d[destinationIndex] });
-              graph.links.push({ "source": d[sourceIndex],
-                                 "target": d[destinationIndex],
-                                 "value": d[countIndex] });
-             });
-            // return only the distinct / unique nodes
-             graph.nodes = d3.keys(d3.nest()
-               .key(function (d) { return d.name; })
-               .map(graph.nodes));
+      this.source.forEach(function (d) {
+        graph.nodes.push({ "name": d[sourceIndex] });
+        graph.nodes.push({ "name": d[destinationIndex] });
+        graph.links.push({ "source": d[sourceIndex],
+                           "target": d[destinationIndex],
+                           "value": d[countIndex] });
+       });
+      // return only the distinct / unique nodes
+       graph.nodes = d3.keys(d3.nest()
+         .key(function (d) { return d.name; })
+         .map(graph.nodes));
 
-             // loop through each link replacing the text with its index from node
-             graph.links.forEach(function (d, i) {
-               graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
-               graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
-             });
+       // loop through each link replacing the text with its index from node
+       graph.links.forEach(function (d, i) {
+         graph.links[i].source = graph.nodes.indexOf(graph.links[i].source);
+         graph.links[i].target = graph.nodes.indexOf(graph.links[i].target);
+       });
 
-             //now loop through each nodes to make nodes an array of objects
-             // rather than an array of strings
-             graph.nodes.forEach(function (d, i) {
-               graph.nodes[i] = { "name": d };
-             });
-             this.dataMutated = true;
-         }
-    },
-    draw: function () {
+       //now loop through each nodes to make nodes an array of objects
+       // rather than an array of strings
+       graph.nodes.forEach(function (d, i) {
+         graph.nodes[i] = { "name": d };
+       });
+       this.dataMutated = true;
+    }
+  },
+  draw: function () {
+    this.debounce('drawDebounce', () => {
       // Sankey mapper function gets overflowed in this condition
       if (this.getInputsProperty('source') === this.getInputsProperty('destination')) {
         return;
+      }
+      if (this.getInputsProperty('source') == null || this.getInputsProperty('destination') == null ||
+        this.getInputsProperty('count') == null) {
+        return false;
       }
       // this.makeChartWrap();
       this._createNodesAndLinks();
@@ -176,5 +202,6 @@ Polymer({
             sankey.relayout();
             link.attr("d", path);
         }
+    }, 500);
   }
 });
