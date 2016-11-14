@@ -19,7 +19,8 @@ PolymerD3.barChart.stacked = function() {
       yAlign: 'left',
       xaxisType: 'ordinal',
       yaxisType: 'linear',
-      parentG: this.parentG
+      parentG: this.parentG,
+      forcetToZero: true
     };
   };
 
