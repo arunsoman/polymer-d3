@@ -244,44 +244,43 @@ d3.tip = function() {
   function getScreenBBox() {
     var targetel = target || d3.event.target;
     var screenPos = targetel.getBoundingClientRect();
-    var tooltipX = screenPos.left + (screenPos.width / 2);
-    console.log(node);
-        // bbox       = {},
-    //     matrix     = targetel.getScreenCTM(),
-    //     tbbox      = targetel.getBBox(),
-    //     width      = tbbox.width,
-    //     height     = tbbox.height,
-    //     x          = tbbox.x,
-    //     y          = tbbox.y,
-    //     scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
-    //     scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+    var xMiddile = screenPos.left + (screenPos.width / 2);
+    var yMiddile = screenPos.top + (screenPos.height / 2);
+    var bbox = {};
 
-
-    // point.x = x + scrollLeft
-    // point.y = y + scrollTop
-    // bbox.nw = point.matrixTransform(matrix)
-    // point.x += width
-    // bbox.ne = point.matrixTransform(matrix)
-    // point.y += height
-    // bbox.se = point.matrixTransform(matrix)
-    // point.x -= width
-    // bbox.sw = point.matrixTransform(matrix)
-    // point.y -= height / 2
-    // bbox.w  = point.matrixTransform(matrix)
-    // point.x += width
-    // bbox.e = point.matrixTransform(matrix)
-    // point.x -= width / 2
-    // point.y -= height / 2
-    // bbox.n = point.matrixTransform(matrix)
-    // point.y += height
-    // bbox.s = point.matrixTransform(matrix)
-
-    return {
-      n: {
-        x: tooltipX,
-        y: screenPos.top
-      }
-    }
+    bbox.n = {
+      x: xMiddile,
+      y: screenPos.top
+    };
+    bbox.e = {
+      x: screenPos.right,
+      y: yMiddile
+    };
+    bbox.w = {
+      x: screenPos.left,
+      y: yMiddile
+    };
+    bbox.s = {
+      x: xMiddile,
+      y: screenPos.bottom
+    };
+    bbox.nw = {
+      x: screenPos.left,
+      y: screenPos.top
+    };
+    bbox.ne = {
+      x: screenPos.right,
+      y: screenPos.top
+    };
+    bbox.se = {
+      x: screenPos.right,
+      y: screenPos.bottom
+    };
+    bbox.sw = {
+      x: screenPos.left,
+      y: screenPos.bottom
+    };
+    return bbox;
   }
 
   return tip
