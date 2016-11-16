@@ -234,19 +234,9 @@ Polymer({
 
   getSettings: function() {
     var selectedChart = this.selectedChart;
-    var extractedData = this.selectedChartObj.extractData();
-    for (var key in selectedChart) {
-      extractedData[key] = selectedChart[key];
-    }
-    // to do find and remove this redundancy
-    extractedData.settings = {
-      area: extractedData.area,
-      inputs: extractedData.inputs,
-      legendSettings: extractedData.legendSettings
-    }
+    selectedChart.settings = this.selectedChartObj.extractData();
     return {
-      // selectedChart: this.selectedChart,
-      selectedChart: extractedData,
+      selectedChart: selectedChart,
       availableCharts: this.availableCharts
     };
   }
