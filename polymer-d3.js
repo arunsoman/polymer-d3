@@ -42,7 +42,7 @@ Polymer({
             callBack: 'setHeatMapSettings'
           }, {
             label: 'Area Chart',
-            icon: 'icons:dns',
+            icon: 'chart:area-chart',
             element: 'area-chart',
             callBack: 'setAreaSettings'
           }, {

@@ -36,3 +36,7 @@ polymer-d3 .y-axis path {
 polymer-d3 .stroked-elem {
   stroke: black;
 }
+
+.chartContainer {
+  max-width: 100%;
+}
