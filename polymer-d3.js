@@ -17,27 +17,27 @@ Polymer({
             callBack: 'initStackedBarChart'
           }, {
             label: 'Grouped Bar Chart',
-            icon: 'icons:cloud-circle',
+            icon: 'editor:insert-chart',
             element: 'bar-chart',
             callBack: 'initGroupedBarChart'
           }, {
             label: 'Waterfall Chart',
-            icon: 'icons:accessibility',
+            icon: 'editor:insert-chart',
             element: 'bar-chart',
             callBack: 'initWaterfallChart'
           }, {
             label: 'Difference',
-            icon: 'icons:rowing',
+            icon: 'editor:insert-chart',
             element: 'bar-chart',
             callBack: 'initDiffrenceChart'
           }, {
             label: 'Pie Chart',
-            icon: 'icons:content-cut',
+            icon: 'chart:pieChart',
             element: 'pie-chart',
             callBack: 'setPieSettings'
           }, {
             label: 'Heat Map',
-            icon: 'icons:bug-report',
+            icon: 'chart:heatMap',
             element: 'bar-chart',
             callBack: 'setHeatMapSettings'
           }, {
