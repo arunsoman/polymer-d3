@@ -78,12 +78,12 @@ Polymer({
       let xObj = this.getInputsPropertyObj('x');
       let yObj = this.getInputsPropertyObj('y');
       let config = {
-        stackIndex: x,
+        stackIndex: undefined,
         chartType: 'group',
         containsHeader: false,
         xheader: [x],
         yOrign: 0,
-        yheader: y,
+        yheader: [y],
         width: this.chartWidth,
         height: this.chartHeight,
         xFormat: xObj.selectedObjs[0].type,
@@ -103,7 +103,7 @@ Polymer({
       let myGroup = PolymerD3
         .groupingBehavior
         .group_by(
-          [y], x, y, headers, config.chartType
+          [y], x, [y], headers, config.chartType
         );
       let nChartConfig = this.chartConfig(config, this.source, myGroup.process);
 
