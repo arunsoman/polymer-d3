@@ -50,6 +50,16 @@ Polymer({
             icon: 'icons:check-circle',
             element: 'sankey-chart',
             callBack: 'setSankeySettings'
+          }, {
+            label: 'Radar Chart',
+            icon: 'icons:check-circle',
+            element: 'radar-chart',
+            // callBack: 'radar'
+          }, {
+            label: 'Scatter Plot Chart',
+            icon: 'icons:check-circle',
+            element: 'scatter-plot',
+            // callBack: 'setSankeySettings'
           }];
         }
       }

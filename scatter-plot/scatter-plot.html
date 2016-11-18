@@ -23,14 +23,21 @@
 
   <template>
     <h4>Scatter Plot</h4>
-    <div class='mandatory'>
-      <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-    </div>
-
-    <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-    <div class='optional' hidden="{{hideSettings}}">
-      <display-component settings="{{settings}}" external='[[external]]'></display-component>
-    </div>
+    <template is="dom-if" if="true">
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
+    </template>
   </template>
 </dom-module>
 <script src='scatter-plot.js'></script>

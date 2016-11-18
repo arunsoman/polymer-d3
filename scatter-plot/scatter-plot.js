@@ -6,7 +6,8 @@ Polymer({
     inputs: {
       notify: true,
       type: Array,
-      value: [{
+      value: () => {
+        return [{
           input: 'x',
           txt: 'Pick a x',
           selectedValue: -1,
@@ -15,7 +16,7 @@ Polymer({
           scaleType: '',
           format:'',
           maxSelectableValues: 1,
-      }, {
+        }, {
           input: 'y',
           txt: 'Pick y',
           selectedValue: -1,
@@ -24,7 +25,7 @@ Polymer({
           scaleType: '',
           format:'',
           maxSelectableValues: 1
-      }, {
+        }, {
           input: 'z',
           txt: 'Pick dimension',
           selectedValue: -1,
@@ -33,7 +34,8 @@ Polymer({
           scaleType: '',
           format:'',
           maxSelectableValues: 1
-        }]
+        }];
+      }
     },
     settings: {
       notify: true,
@@ -51,68 +53,81 @@ Polymer({
     PolymerD3.colorPickerBehavior
   ],
 
-  attached: function() {
-        me = this;
-        function callme(data) {
-            me.source = data;
-        }
-        PolymerD3.fileReader('cereal.csv', [4,5], [], undefined, callme, true);
-        this.inputs[0].selectedValue = 4; 
-        this.inputs[1].selectedValue = 5;
-        this.inputs[2].selectedValue = 1;
-    },
-
   draw: function() {
-    var me = this;
+    let me = this;
+    this.debounce('drawDebounce', () => {
+      // reads x, y & z index
+      let x = this.getInputsProperty('x');
+      let y = this.getInputsProperty('y');
+      let z = this.getInputsProperty('z');
 
-    if (me.getInputsProperty('x') === -1 
-      || me.getInputsProperty('y') === -1 
-      || me.getInputsProperty('z') === -1) {
-      throw new Error('Input not selected');
-    }
-var x=  me.getInputsProperty('x');
-      var y =  me.getInputsProperty('y') ; 
-    var z = me.getInputsProperty('z');
-    var xInput, yInput, zInput;
+      // donot attempt to draw if x or y is empty
+      if (x == null || y == null) {
+        return false
+      }
 
-     var xDomain = d3.extent(me.source, (d) => {
-                    return (d[x]);
-                });
-        var yDomain = d3.extent(me.source, (d) => {
-                    return d[y];
-                });
+      // let xDomain = d3.extent(this.source, d => d[x]);
+      // let yDomain = d3.extent(this.source, d => d[y]);
 
-    var config = {'scaleType':"linear", 
-        'align':'h', 'format':'number', 'position':'bottom','domain':xDomain};
-    var xAxis = me.createAxis(config);
-    var xScale = xAxis.scale();
+      // clears the chart's inner SVGs
+      if (this.parentG) {
+        this.parentG.html("");
+      }
 
-    config = {'scaleType':"linear", 
-        'align':'v', 'format':'number', 'position':'left','domain':[yDomain[1] , yDomain[0]]};
-    var yAxis = me.createAxis(config);
-    var yScale = yAxis.scale();
-    
-    color = d3.scale.category10();
+      // creating config
+      let xObj = this.getInputsPropertyObj('x');
+      let yObj = this.getInputsPropertyObj('y');
+      let config = {
+        stackIndex: x,
+        chartType: 'group',
+        containsHeader: false,
+        xheader: [x],
+        yOrign: 0,
+        yheader: y,
+        width: this.chartWidth,
+        height: this.chartHeight,
+        xFormat: xObj.selectedObjs[0].type,
+        yFormat: yObj.selectedObjs[0].type,
+        xAlign: 'bottom',
+        yAlign: 'left',
+        xaxisType: 'ordinal',
+        yaxisType: 'linear',
+        parentG: this.parentG,
+        forcetToZero: true
+      };
 
-    // add the tooltip area to the webpage
-    var tooltip = d3.select("body").append("div")
-        .attr("class", "tooltip")
-        .style("opacity", 0);
-      
-      // draw dots
-      this.parentG.selectAll(".dot")
-        .data(me.source)
-      .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 3.5)
-        .attr("cx", (c)=>{
-              return xScale(c[x]);
-          })
-        .attr("cy", (c)=>{
-            return yScale(c[y]);
-          })
-        .style("fill", function(d) { 
-          return color(d[1]);
-        });
+      color = d3.scale.category10();
+
+      // groping and creating axis
+      let headers = this.externals.map(e => e.key);
+      let myGroup = PolymerD3
+        .groupingBehavior
+        .group_by(
+          [y], x, y, headers, config.chartType
+        );
+      let nChartConfig = this.chartConfig(config, this.source, myGroup.process);
+
+      // add the tooltip area to the webpage
+      var tooltip = d3.select('body').append('div')
+          .attr('class', 'tooltip')
+          .style('opacity', 0);
+
+        // draw dots
+        this.parentG.selectAll('.dot')
+          .data(me.source)
+          .enter().append('circle')
+          .attr('class', 'dot')
+          .attr('r', 3.5)
+          .attr('cx', (c)=>{
+                return nChartConfig.getX(c[x]);
+            })
+          .attr('cy', (c)=>{
+              return nChartConfig.getY(c[y]);
+            })
+          .style('fill', function(d) { 
+            return color(d[1]);
+          });
+
+    }, 500);
   }
 });
