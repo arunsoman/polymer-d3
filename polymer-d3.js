@@ -58,8 +58,11 @@ Polymer({
           }, {
             label: 'Scatter Plot Chart',
             icon: 'icons:check-circle',
-            element: 'scatter-plot',
-            // callBack: 'setSankeySettings'
+            element: 'scatter-plot'
+          }, {
+            label: 'Calendar View Chart',
+            icon: 'icons:check-circle',
+            element: 'calendar-chart'
           }];
         }
       }
@@ -105,7 +108,6 @@ Polymer({
       type: Object,
       value: () => {return {};}
     },
-
     editMode: {
       type: Boolean,
       value: true

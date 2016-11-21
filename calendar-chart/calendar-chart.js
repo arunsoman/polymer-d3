@@ -1,5 +1,5 @@
 Polymer({
-  is: 'pie-chart',
+  is: 'calendar-chart',
   properties: {
     title: '',
     inputs: {

@@ -9,27 +9,29 @@
         text-shadow: 0 1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff, 0 -1px 0 #fff;
         cursor: default;
       }
-      
       .legend {
         font-family: 'Raleway', sans-serif;
         fill: #333333;
       }
-      
       .tooltip {
         fill: #333333;
       }
   </style>
   <template>
-    <div class="radarChart"></div>
-    <template is="dom-if" if="[[editMode]]">
-      <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+    <template is="dom-if" if="true">
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
       </div>
-
-      <iron-icon on-tap="_toggleView" icon="icons:settings"></iron-icon>
-      <div class='optional' hidden="{{hideSettings}}">
-        <display-component settings="{{settings}}" external='[[external]]'></display-component>
-      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
     </template>
   </template>
 </dom-module>
