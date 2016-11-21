@@ -1,43 +1,51 @@
 <dom-module id="bar-chart">
-	<template>
-		<style>
-			body {
-			font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-			}
-			.box {
-			font: 10px sans-serif;
-			}
-			.box line,
-			.box rect,
-			.box circle {
-			fill: steelblue;
-			stroke: #000;
-			stroke-width: 1px;
-			}
-			.box .center {
-			stroke-dasharray: 3,3;
-			}
-			.box .outlier {
-			fill: none;
-			stroke: #000;
-			}
-			.axis {
-			font: 12px sans-serif;
-			}
-			.axis path,
-			.axis line {
-			fill: none;
-			stroke: #000;
-			shape-rendering: crispEdges;
-			}
-			.x.axis path {
-			fill: none;
-			stroke: #000;
-			shape-rendering: crispEdges;
-			}
-		</style>
-
-		<script src="box-plot.js"></script>
-		<script src="box.js"></script>
-	</template>
+  <template>
+    <style>
+      .box line,
+      .box rect,
+      .box circle {
+        fill: steelblue;
+        stroke: #000;
+        stroke-width: 1px;
+      }
+      .box .center {
+        stroke-dasharray: 3,3;
+      }
+      .box .outlier {
+        fill: none;
+        stroke: #000;
+      }
+      .axis {
+        font: 12px sans-serif;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+      .x.axis path {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+    </style>
+    <template is="dom-if" if="true">
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
+    </template>
+  </template>
+  <script src="box-plot.js"></script>
+  <script src="box.js"></script>
 </dom-module>

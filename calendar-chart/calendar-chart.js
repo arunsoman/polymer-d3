@@ -70,6 +70,7 @@ Polymer({
       let wrapper = this.querySelector('.chartContainer');
       wrapper.innerHTML = '';
       let svg = d3.select(wrapper).selectAll('svg').attr('class', 'papparazzi')
+          // d3.range plot from min >= n > max, so (d3.max + 1) is used
           .data(d3.range(d3.min(this.source, d => d[0].getFullYear()), d3.max(this.source, d => d[0].getFullYear()) + 1))
         .enter().append('svg')
           .attr('width', width)
