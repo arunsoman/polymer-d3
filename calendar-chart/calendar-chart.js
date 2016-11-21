@@ -7,63 +7,26 @@ Polymer({
       type: Array,
       value: () => {
         return [{
-          input: 'slice',
-          txt: 'Pick a date dimension',
-          selectedValue: null,
+          input: 'x',
+          txt: 'Pick Date Field',
+          selectedValue: [],
+          scaleType: '',
+          format: '',
           selectedObjs: [],
-          selectedName: 'label',
           uitype: 'single-value',
-          displayName: 'Diamension',
+          displayName: 'Date',
           maxSelectableValues: 1
         }, {
-          input: 'sliceSize',
-          txt: 'Pick a mesaure',
-          selectedValue: null,
+          input: 'y',
+          txt: 'Pick Value',
+          selectedValue: [],
+          format: '',
+          scaleType: '',
           selectedObjs: [],
-          selectedName: 'count',
           uitype: 'single-value',
           displayName: 'Value',
           maxSelectableValues: 1
-        }
-        ];
-      }
-    },
-    area: {
-      type: Array,
-      value: () => {
-        return [{
-          input: 'height',
-          txt: 'Height of the chart',
-          uitype: 'Number',
-          selectedValue: 500,
-          callBack: 'chartHeightCb'
-        }, {
-          input: 'width',
-          txt: 'Width of the chart',
-          uitype: 'Number',
-          selectedValue: 960
-        }, {
-          input: 'marginTop',
-          txt: 'Top  margin',
-          uitype: 'Number',
-          selectedValue: 40
-        }, {
-          input: 'marginRight',
-          txt: 'Right margin',
-          uitype: 'Number',
-          selectedValue: 10
-        }, {
-          input: 'marginBottom',
-          txt: 'Bottom margin',
-          uitype: 'Number',
-          selectedValue: 20
-        }, {
-          input: 'marginLeft',
-          txt: 'Left margin',
-          uitype: 'Number',
-          selectedValue: 50
-        }
-        ];
+        }];
       }
     }
   },
@@ -84,20 +47,87 @@ Polymer({
   },
 
   draw: function() {
-    this.debounce('pieChartDrawDeounce', () => {
-      let slice = this.inputs[0].selectedValue;
-      let sliceSize = this.inputs[1].selectedValue;
-      // if slice exists, it would be an array
-      if (!slice || !sliceSize) {
+    // data coming to date field must be of type date
+    this.debounce('calendarChartDrawDeounce', () => {
+      let dateField = this.getInputsProperty('x');
+      let valueField = this.getInputsProperty('y');
+
+      if (dateField == null || valueField == null) {
         return false;
       }
-      slice = slice[0];
-      sliceSize = sliceSize[0];
 
-      let width = this.chartWidth,
-        height = this.chartHeight,
-        radius = Math.min(width, height) / 2;
-      let innerRadius = this.area[6].selectedValue;
+      // to abstract out
+      let width = 960;
+      let height = 136;
+      let cellSize = 17;
+
+      let format = d3.time.format('%Y-%m-%d');
+
+      let color = d3.scale.quantize()
+          .domain([d3.min(this.source, d => d[valueField]), d3.max(this.source, d => d[valueField])])
+          .range(d3.range(11).map(d => 'q' + d + '-11'));
+
+      let wrapper = this.querySelector('.chartContainer');
+      wrapper.innerHTML = '';
+      let svg = d3.select(wrapper).selectAll('svg').attr('class', 'papparazzi')
+          .data(d3.range(d3.min(this.source, d => d[0].getFullYear()), d3.max(this.source, d => d[0].getFullYear()) + 1))
+        .enter().append('svg')
+          .attr('width', width)
+          .attr('height', height)
+          .attr('class', 'RdYlGn')
+          .append('g')
+          .attr('transform', 'translate(' + ((width - cellSize * 53) / 2) + ',' + (height - cellSize * 7 - 1) + ')');
+
+      svg.append('text')
+          .attr('transform', 'translate(-6,' + cellSize * 3.5 + ')rotate(-90)')
+          .style('text-anchor', 'middle')
+          .text(function(d) { return d; });
+
+      let rect = svg.selectAll('.day')
+          .data(function(d) { return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+        .enter().append('rect')
+          .attr('class', 'day')
+          .attr('width', cellSize)
+          .attr('height', cellSize)
+          .attr('x', function(d) { return d3.time.weekOfYear(d) * cellSize; })
+          .attr('y', function(d) { return d.getDay() * cellSize; })
+          .datum(format);
+
+      rect.append('title')
+          .text(function(d) { return d; });
+
+      svg.selectAll('.month')
+          .data(function(d) { return d3.time.months(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+        .enter().append('path')
+          .attr('class', 'month')
+          .attr('d', monthPath);
+
+      let data = d3.nest() // reurns data in the format [{date: value}]
+        // assumes d[dateField is date]
+        .key(function(d) { return format(d[dateField]); })
+        .rollup(function(d) {
+          // donot miss d[0]
+          return d[0][valueField];
+        })
+        .map(this.source);
+
+      rect.filter(function(d) { return d in data; })
+          .attr('class', function(d) {
+            return 'day ' + color(data[d]);
+          })
+        .select('title')
+          .text(function(d) { return d + ': ' + data[d]; });
+
+      function monthPath(t0) {
+        let t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
+            d0 = t0.getDay(), w0 = d3.time.weekOfYear(t0),
+            d1 = t1.getDay(), w1 = d3.time.weekOfYear(t1);
+        return 'M' + (w0 + 1) * cellSize + ',' + d0 * cellSize
+            + 'H' + w0 * cellSize + 'V' + 7 * cellSize
+            + 'H' + w1 * cellSize + 'V' + (d1 + 1) * cellSize
+            + 'H' + (w1 + 1) * cellSize + 'V' + 0
+            + 'H' + (w0 + 1) * cellSize + 'Z';
+      }
 
 
     }, 400);
