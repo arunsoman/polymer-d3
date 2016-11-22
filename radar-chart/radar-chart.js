@@ -8,47 +8,30 @@ Polymer({
       value: [{
         input: 'x',
         txt: 'Pick a dimension',
-        selectedValue: 0,
+        selectedValue: null,
+        selectedObjs: [],
         selectedName: 'label',
-        uitype: 'single-value'
+        uitype: 'single-value',
+        displayName: 'Diamension',
+        maxSelectableValues: 1
       }, {
         input: 'y',
-        txt: 'Pick a messure',
-        selectedValue: [1],
+        txt: 'Pick a mesaure',
+        selectedValue: null,
+        selectedObjs: [],
         selectedName: 'count',
-        uitype: 'single-value'
-      },{
-        input: 'z',
-        txt: 'Pick a group',
-        selectedValue: [2],
-        selectedName: 'count',
-        uitype: 'single-value'
-      }]
-    },
-    settings: {
-      notify: true,
-      type: Array,
-      value: [{
-        input: 'displayTxt',
-        txt: 'Placement of lables',
-        uitype: 'dropDown',
-        selectedValue: Array,
-        selectedName: Array,
-        options: [{
-            key: 'None',
-            value: 0
-        }, {
-            key: 'inside',
-            value: 1
-        }, {
-            key: 'outside',
-            value: 2
-        }]
+        uitype: 'single-value',
+        displayName: 'Value',
+        maxSelectableValues: 2
       }, {
-        input: 'innerRadius',
-        txt: 'Inner radius',
-        uitype: 'Number',
-        selectedValue: 0
+        input: 'z',
+        txt: 'Group By',
+        selectedValue: null,
+        selectedObjs: [],
+        selectedName: 'count',
+        uitype: 'single-value',
+        displayName: 'Group By',
+        maxSelectableValues: 1
       }]
     },
     hideSettings: true,
@@ -57,73 +40,79 @@ Polymer({
       value: []
     },
     external: Array,
-    svg: Object
+    svg: Object,
+    settings: {
+      notify: true,
+      type: Object,
+      value: () => {
+        return [];
+      }
+    }
   },
 
   behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.colorPickerBehavior
+    PolymerD3.chartBehavior
   ],
 
   _toggleView: function() {
     this.hideSettings = !this.hideSettings;
   },
 
-  attached: function() {
-    PolymerD3.fileReader.call(this,'radar-chart/data1.csv', [1], [], undefined, this.callme, true);
-
+  init: function() {
+    this.data = this.loadFromGroup(this.yIndex);
   },
-  callme(d){
-    this.source = d;
-    let yIndices = this.getInputsProperty('y');
-    this.data = this.loadFromGroup(yIndices);
-    this.draw();
-  },
-  loadFromMultiCol: function(yIndices){
-    let xIndex = this.getInputsProperty('x');
-  //  let zGroup = this.getInputsProperty('z');
 
-    var headers = this.source[0];
-    var data = [];
-    for(var i = 1; i < this.source.length; i++){
-      var data1 = [];
-      for(var j = 0; j <yIndices.length; j++){
-        var tA= [];
+  loadFromMultiCol: function(yIndices) {
+    let headers = this.source[0];
+    let data = [];
+    for(let i = 1; i < this.source.length; i++){
+      let data1 = [];
+      for(let j = 0; j <yIndices.length; j++){
+        let tA= [];
         tA.push(headers[yIndices[j]]);
         tA.push(this.source[i][j]);
-        tA.push(this.source[i][xIndex]);
+        tA.push(this.source[i][this.xIndex]);
         data1.push(tA);
       }
       data.push(data1);
     }
     return data;
   },
-  loadFromGroup: function(yIndices){
-    let xIndex = this.getInputsProperty('x');
-    //let yIndices = this.getInputsProperty('y');
-    let zGroup = this.getInputsProperty('z');
-    this.source.shift();
-    var layers = d3.nest()
-    .key((d)=>{console.log(d[zGroup]);return d[zGroup];})
-    .entries(this.source);
-    var data  = [];
+
+  loadFromGroup: function(yIndices) {
+    let layers = d3.nest()
+      .key(d => d[this.zIndex])
+      .entries(this.source);
+
+    let data  = [];
+
     layers.forEach((element)=>{
-      var data1 = [];
-      element.values.forEach((value)=>{
-        data1.push([value[xIndex],value[yIndices[0]], value[zGroup]]);
+      let data1 = [];
+      element.values.forEach(value => {
+        data1.push([value[this.xIndex],value[yIndices[0]], value[this.zIndex]]);
       });
       data.push(data1);
     });
+
     return data;
   },
 
   draw: function() {
-      if(this.data === undefined)
-        return;
-      var color = d3.scale.ordinal()
-        .range(["#EDC951","#CC333F","#00A0B0"]);
+    this.debounce('radarDrawDebounce', () => {
+      this.xIndex = this.getInputsProperty('x');
+      this.yIndex = this.getInputsProperty('y');
+      this.zIndex = this.getInputsProperty('z');
 
-      var radarChartOptions = {
+      if(this.xIndex == null || this.yIndex == null || this.zIndex == null) {
+        return false;
+      }
+
+      this.init();
+      this.parentG.html('');
+      let color = d3.scale.ordinal()
+        .range(['#EDC951','#CC333F','#00A0B0']);
+
+      let radarChartOptions = {
         w: this.chartWidth,
         h: this.chartHeight,
         margin: this.getMargins(),
@@ -132,7 +121,9 @@ Polymer({
         roundStrokes: true,
         color: color
       };
+
       //Call function to draw the Radar chart
-      PolymerD3.RadarChart( this.data, radarChartOptions, this);
+      PolymerD3.RadarChart(this.data, radarChartOptions, this);
+    }, 500);
   }
 });

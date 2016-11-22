@@ -37,6 +37,15 @@ polymer-d3 .stroked-elem {
   stroke: black;
 }
 
-.chartContainer {
+polymer-d3 .chartContainer {
   max-width: 100%;
+}
+polymer-d3 .draggable-areabtn-wrap {
+  position: relative;
+}
+polymer-d3 .icons-wrap.right-icons,
+polymer-d3 .settings-icon {
+  position: absolute;
+  right: 1em;
+  top: 6px;
 }
