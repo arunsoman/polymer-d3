@@ -27,7 +27,16 @@ Polymer({
           maxSelectableValues: 1
         }, {
           input: 'z',
-          txt: 'Pick dimension',
+          txt: 'Group',
+          selectedValue: -1,
+          uitype: 'single-value',
+          selectedObjs: [],
+          scaleType: '',
+          format:'',
+          maxSelectableValues: 1
+        }, {
+          input: 's',
+          txt: 'Size',
           selectedValue: -1,
           uitype: 'single-value',
           selectedObjs: [],
