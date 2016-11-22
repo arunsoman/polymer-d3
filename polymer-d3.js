@@ -7,8 +7,11 @@ Polymer({
     availableCharts: {
       type: Array,
       value: function() {
-        // Creates these, if the available charts aren't ready by time
-        // later: merge new charts
+        // This list if used when available charts aren' fed from zeppelin-viewer
+        // Callback defined in charts and are called after the chart is initated
+        // using PolymerD3.utilities.attachElement
+        // examples => @{{this._selectedChanged}}
+        // barchart.js@{{initStackedBarChart}}
         if (!this.availableCharts) {
           return [{
             label: 'Stacked Bar Chart',
@@ -128,18 +131,22 @@ Polymer({
     '_modeObserver(editMode)',
   ],
 
+  // edit mode
   _modeObserver: function(editMode) {
     if (!editMode) {
       this.set('settingsVisible', false);
     }
   },
 
+  // on inputs change
   _inputsChanged: function(i) {
     if (this.selectedChart && this.selectedChart.element) {
       this.$$(this.selectedChart.element).draw();
     }
   },
 
+  // on selected chart changed
+  // is also used to draw first chart
   _selectedChanged: function(selectedChart) {
     let elem;
     if (this.selectedChartObj && !PolymerD3.utilities.isEmptyObject(this.selectedChartObj)) {
@@ -154,16 +161,6 @@ Polymer({
         '.chartHolder',
         selectedChart.callBack
       );
-      // Data and headers(externals) should come from parent
-      // and should be set to new child element
-      // elem.set('source');
-      // elem.set('externals');
-
-      // Gets settings object from newly attached chart
-      // this._mergeSettings(this.settings, elem.area);
-      // this.set('settings', elem.area);
-      // this.set('inputs', elem.inputs);
-      // this.set('legendSettings', elem.legendSettings);
 
       elem.set('source', this.source);
       elem.set('externals', this.externals);
@@ -172,11 +169,11 @@ Polymer({
       if (selectedChart.settings) {
         elem.setData(selectedChart.settings);
       }
-    } else {
-      console.info('Empyt Object');
     }
   },
 
+  // might be dead code
+  // not deleted because this is a good utility to merge two objects
   _mergeSettings: function(from, to) {
     let mergeSettings = this._persistData('input', 'selectedValue');
     mergeSettings(from, to);
@@ -200,10 +197,6 @@ Polymer({
     }
   },
 
-  check: function() {
-    console.log(this);
-  },
-
   showInputSettings: function() {
     if (this.selectedChartObj) {
       this.selectedChartObj.toggleSettingsVisibility();
@@ -211,6 +204,7 @@ Polymer({
   },
 
   // Bootstraps element as per mode(view/edit)
+  // This meathod avoids crazy rwo-way binding side effects
   bootstrapCharts: function(config) {
     // data and externals are always required
     this.set('externals', config.externals);
@@ -239,11 +233,14 @@ Polymer({
       this.selectedChartObj.draw();
       this.async(() => {
         this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+        // gives color to selected chart
         this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
       }, 500);
     }
   },
 
+  // retrives current state of polymer-d3
+  // is used to save data back to zeppelin
   getSettings: function() {
     var selectedChart = this.selectedChart;
     selectedChart.settings = this.selectedChartObj.extractData();
