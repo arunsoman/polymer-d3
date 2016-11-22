@@ -1,6 +1,6 @@
 <script>
 PolymerD3.groupingBehavior = {
-    group_by : (indices, xIndex, yIndex, headers, type) => {
+    group_by : (indices, xIndex, yIndex, headers, type, isGrouped) => {
         var _stack = (groups) => {
             // Sets key if data isn't grouped
             // @Arun Please verify if there's an easeier solution
@@ -28,7 +28,7 @@ PolymerD3.groupingBehavior = {
             var datumIndex = indices[0];
             return {
                 process: (aRow) => {
-                    var groupName = headers[datumIndex];
+                    var groupName = aRow[datumIndex];
                     var aGroup = map.get(groupName);
                     if (!aGroup) {
                         aGroup = {
@@ -130,7 +130,7 @@ PolymerD3.groupingBehavior = {
         if (type == 'waterfall') {
             return _waterFallStack();
         }
-        if (indices.length === 1) {
+        if (isGrouped) {
             return _group_by_col();
         }else{
           return _group_by_cols();

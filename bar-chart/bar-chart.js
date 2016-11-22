@@ -150,16 +150,27 @@ Polymer({
         _src.push(total);
       }
 
+      // if z/group-by is selected, data should be grouped by values in coloumn zGroup
+      let _isGrouped = false;
+      if (zGroup && zGroup.length) {
+        _isGrouped = true;
+        conf.stackIndex = zGroup[0];
+      }
+
       var myGroup = PolymerD3
         .groupingBehavior
         .group_by(
-          yIndices.length === 1 ? [zGroup] : yIndices,
-          xIndex, yIndices, headers, conf.chartType
+          (_isGrouped) ? zGroup : yIndices,
+          xIndex, yIndices, headers, conf.chartType, _isGrouped
         );
-      var nChartConfig = this
-        .chartConfig(conf, _src, myGroup.process);
+      var nChartConfig = this.chartConfig(conf, _src, myGroup.process);
 
       let stackData = myGroup.getStack();
+      // if (_isGrouped) {
+      //   stackData = myGroup.getGroups();
+      // } else {
+      //   stackData = myGroup.getStack();
+      // }
 
       // Temporary hack to pass stackData's length to processor
       nChartConfig.stackDataLength = stackData.length;
