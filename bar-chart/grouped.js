@@ -4,6 +4,14 @@ PolymerD3.barChart.grouped = function() {
     let yIndices = this.getInputsProperty('y');
     let xObj = this.getInputsPropertyObj('x');
     let yObj = this.getInputsPropertyObj('y');
+    let zGroup = this.getInputsProperty('z');
+
+    let forcetToZero = false;
+
+    if (yIndices.length > 1 || zGroup.length) {
+      forcetToZero = true;
+    }
+
     return {
       stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
@@ -20,7 +28,7 @@ PolymerD3.barChart.grouped = function() {
       xaxisType: 'ordinal',
       yaxisType: 'linear',
       parentG: this.parentG,
-      forcetToZero: true
+      forcetToZero: forcetToZero
     };
   };
   let _processors = function(nChartConfig) {

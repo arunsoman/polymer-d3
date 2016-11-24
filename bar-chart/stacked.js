@@ -2,8 +2,16 @@ PolymerD3.barChart.stacked = function() {
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
-    var xObj = this.getInputsPropertyObj('x');
-    var yObj = this.getInputsPropertyObj('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
+    let zGroup = this.getInputsProperty('z');
+
+    let forcetToZero = false;
+
+    if (yIndices.length > 1 || zGroup.length) {
+      forcetToZero = true;
+    }
+
     return {
       stackIndex: xIndex,
       chartType: 'stack', //stack,group,diff,waterfall
@@ -20,7 +28,7 @@ PolymerD3.barChart.stacked = function() {
       xaxisType: 'ordinal',
       yaxisType: 'linear',
       parentG: this.parentG,
-      forcetToZero: true
+      forcetToZero: forcetToZero
     };
   };
 
