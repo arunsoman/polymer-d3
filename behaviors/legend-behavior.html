@@ -82,30 +82,19 @@
 
 
       parentG.selectAll(".legend").remove();
-      parentG.append("g")
-      .attr("class","legend")
-      .attr("transform","translate(50,30)")
-      .style("font-size","12px")
-      .call(this.d3Legends);
+      let chartLegend = parentG.append("g")
+        .attr("class","legend")
+        .attr('id', 'chart-legend')
+        .attr("transform","translate(50,30)")
+        .style("font-size","12px")
+        .data({'key': 'asdas'})
+        .call(this.d3Legends);
 
       parentG.selectAll('.legend circle').on('click', () => {
-          this.fire('legend-clicked');
+        this.fire('legend-clicked');
       });
 
-      console.log(parentG.selectAll(".legend"));
-      parentG.selectAll(".legend").call(d3.behavior.drag()
-        .origin(function(d) {
-          console.log(arguments);
-          return d;
-        })
-        .on("dragstart", function(d) {
-          console.log(arguments);
-            this.parentNode.appendChild(this); })
-        .on("drag", dragmove));
-      function dragmove(d) {
-        console.log(arguments, d3.event.y);
-          d3.select(this).attr("transform", "translate(" + d.x + "," + ( d.y = Math.max(0, Math.min(d3.event.y))) + ")");
-      }
+      this.registerDraggable(chartLegend);
     },
     setLegendColor: function(layer) {
 
