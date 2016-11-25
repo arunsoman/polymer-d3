@@ -69,6 +69,7 @@ Polymer({
       let x = this.getInputsProperty('x');
       let y = this.getInputsProperty('y');
       let z = this.getInputsProperty('z');
+      let group = this.getInputsProperty('s');
 
       // donot attempt to draw if x or y is empty
       if (x == null || y == null) {
@@ -121,12 +122,27 @@ Polymer({
           .attr('class', 'tooltip')
           .style('opacity', 0);
 
+      let radiusScale;
+
+      if (group) { // if grouped a linear scale is used to calculate radius of circle
+        const radiusRange = [3.5, 10];
+        const radiusDomain = me.source.map(row => row[group]);
+        radiusScale = d3.scale.linear()
+          .domain(radiusDomain)
+          .range(radiusRange);
+      } else { // radius is always 3 units
+        radiusScale = () => 3;
+      }
+
+      function getRadius(row) {
+        return radiusScale(row[group]);
+      }
         // draw dots
         this.parentG.selectAll('.dot')
           .data(me.source)
           .enter().append('circle')
           .attr('class', 'dot')
-          .attr('r', 3.5)
+          .attr('r', getRadius)
           .attr('cx', (c)=>{
                 return nChartConfig.getX(c[x]);
             })
