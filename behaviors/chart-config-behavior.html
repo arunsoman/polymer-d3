@@ -228,6 +228,14 @@ PolymerD3.chartConfigBehavior = {
             if (!config.align) {
                 throw new Error("config.align undefined, can't create axisGroup");
             }
+
+            // keeps track of what axis am I drawing
+            let _axisAligner;
+            if (config.clz == 'x-axis') {
+                _axisAligner = conf.yAxisConf.scale(0) || height;
+            } else {
+                _axisAligner = conf.xAxisConf.scale(0) || width;
+            }
             var axisG = conf.parentG.append('g');
             axisG.attr('class', config.align + ' axis');
             switch (config.align) {
@@ -236,10 +244,10 @@ PolymerD3.chartConfigBehavior = {
             case 'left':
                 break;
             case 'right':
-                axisG.attr('transform', 'translate(' + width + ', 0)');
+                axisG.attr('transform', 'translate(' + _axisAligner + ', 0)');
                 break;
             case 'bottom':
-                axisG.attr('transform', 'translate(0,' + height + ')');
+                axisG.attr('transform', 'translate(0,' + _axisAligner + ')');
                 break;
             }
             return axisG;
@@ -273,11 +281,14 @@ PolymerD3.chartConfigBehavior = {
         var _createAxis = (config, conf)=>{
             conf.scale = _scaleFactory(config);
             conf.axis = d3.svg.axis().orient(config.align);
-            conf.axisG = _createAxisGroup(config);
             conf.axis.tickFormat(_formateAxis(config));
             conf.axis.scale(conf.scale);
-            conf.axisG.attr('class',config.clz);
-            conf.axisG.call(conf.axis);
+            function drawAxis() {
+                conf.axisG = _createAxisGroup(config);
+                conf.axisG.attr('class',config.clz);
+                conf.axisG.call(conf.axis);
+            }
+            return drawAxis;
         };
         var _createXAxis = () => {
             var config = {
@@ -287,7 +298,8 @@ PolymerD3.chartConfigBehavior = {
                 clz:'x-axis',
                 scaleType: xConf.axisType
             };
-            _createAxis(config, xConf);
+            conf.xAxisConf = xConf;
+            xConf.draw = _createAxis(config, xConf);
             xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
             if (!this.settings.axis) {
                 this.settings.axis = {};
@@ -302,16 +314,22 @@ PolymerD3.chartConfigBehavior = {
                 clz:'y-axis',
                 scaleType: yConf.axisType
             };
-            _createAxis(config, yConf);
+            conf.yAxisConf = yConf;
+            yConf.draw = _createAxis(config, yConf);
             yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
             if (!this.settings.axis) {
                 this.settings.axis = {};
             }
             this.settings.axis.yConf= yConf.axisBehavior;
         };
+        // only creates necessary configuration to draw axes
         _createXAxis.call(this);
         _createYAxis.call(this);
-        // console.log('post: xd:' + xConf.domain + ' yd:' + yConf.domain);
+
+        // actually drawing axes
+        conf.xAxisConf.draw();
+        conf.yAxisConf.draw();
+
         return {
             getXAxisBehavior: xConf.axisBehavior,
             getYAxisBehavior: yConf.axisBehavior,

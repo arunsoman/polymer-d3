@@ -15,22 +15,22 @@ Polymer({
         if (!this.availableCharts) {
           return [{
             label: 'Stacked Bar Chart',
-            icon: 'editor:insert-chart',
+            icon: 'chart:stacked-bar-chart',
             element: 'bar-chart',
             callBack: 'initStackedBarChart'
           }, {
             label: 'Grouped Bar Chart',
-            icon: 'editor:insert-chart',
+            icon: 'chart:grouped-bar-chart',
             element: 'bar-chart',
             callBack: 'initGroupedBarChart'
           }, {
             label: 'Waterfall Chart',
-            icon: 'editor:insert-chart',
+            icon: 'chart:waterfall-chart',
             element: 'bar-chart',
             callBack: 'initWaterfallChart'
           }, {
             label: 'Difference',
-            icon: 'editor:insert-chart',
+            icon: 'chart:difference-chart',
             element: 'bar-chart',
             callBack: 'initDiffrenceChart'
           }, {
@@ -50,21 +50,21 @@ Polymer({
             callBack: 'setAreaSettings'
           }, {
             label: 'Sankey Chart',
-            icon: 'icons:check-circle',
+            icon: 'chart:sankey-chart',
             element: 'sankey-chart',
             callBack: 'setSankeySettings'
           }, {
             label: 'Radar Chart',
-            icon: 'icons:check-circle',
+            icon: 'chart:radar-chart',
             element: 'radar-chart',
             // callBack: 'radar'
           }, {
             label: 'Scatter Plot Chart',
-            icon: 'icons:check-circle',
+            icon: 'chart:scatter-plot',
             element: 'scatter-plot'
           }, {
             label: 'Calendar View Chart',
-            icon: 'icons:check-circle',
+            icon: 'chart:calendar-chart',
             element: 'calendar-chart'
           }];
         }
