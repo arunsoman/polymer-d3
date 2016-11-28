@@ -47,9 +47,79 @@ Polymer({
       }
     },
     settings: {
+      type: Array,
+      notify: true,
+      value: () => {
+        return [];
+      }
+    },
+    area: {
       notify: true,
       type: Array,
-      value: []
+      value: () => {
+        return [{
+          input: 'height',
+          txt: 'Height of the chart',
+          uitype: 'Number',
+          selectedValue: 500,
+          callBack: 'chartHeightCb'
+        }, {
+          input: 'width',
+          txt: 'Width of the chart',
+          uitype: 'Number',
+          selectedValue: 960
+        }, {
+          input: 'marginTop',
+          txt: 'Top  margin',
+          uitype: 'Number',
+          selectedValue: 40
+        }, {
+          input: 'marginRight',
+          txt: 'Right margin',
+          uitype: 'Number',
+          selectedValue: 10
+        }, {
+          input: 'marginBottom',
+          txt: 'Bottom margin',
+          uitype: 'Number',
+          selectedValue: 20
+        }, {
+          input: 'marginLeft',
+          txt: 'Left margin',
+          uitype: 'Number',
+          selectedValue: 50
+        }, {
+          input: 'strokeWidth',
+          txt: 'Stroke Width',
+          uitype: 'Number',
+          selectedValue: 0,
+          callBack: 'strokeWidthCb'
+        }, {
+          input: 'xAxisRotation',
+          txt: 'Rotate X-Axis Tick',
+          uitype: 'sliderInput',
+          selectedValue: 0,
+          min: -90,
+          max: 90,
+          step: 15,
+          callBack: 'xAxisRotationCb'
+        }, {
+          input: 'yAxisRotation',
+          txt: 'Rotate Y-Axis Tick',
+          uitype: 'sliderInput',
+          selectedValue: 0,
+          min: -60,
+          max: 60,
+          step: 12,
+          callBack: 'yAxisRotationCb'
+        }, {
+          input: 'opacity',
+          txt: 'Opacity',
+          uitype: 'Number',
+          selectedValue: 1,
+          callBack: 'opacityCb'
+        }];
+      }
     },
     hideSettings: true,
     data: String,
@@ -61,6 +131,11 @@ Polymer({
     PolymerD3.chartBehavior,
     PolymerD3.colorPickerBehavior
   ],
+
+  opacityCb: function() {
+    this.parentG.selectAll('.dot')
+      .style('opacity', this._getAreaObj('opacity').selectedValue);
+  },
 
   draw: function() {
     let me = this;
