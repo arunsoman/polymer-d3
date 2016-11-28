@@ -100,7 +100,11 @@ PolymerD3.chartConfigBehavior = {
                     }
                     // forces domain to start from zero
                     if (forceToZero) {
-                        return [0, max];
+                        let min = 0;
+                        if (dom[0] < 0) {
+                            min = dom[0]
+                        }
+                        return [min, max];
                     }
                     return [dom[0], max];
                 }
@@ -322,6 +326,21 @@ PolymerD3.chartConfigBehavior = {
             }
             this.settings.axis.yConf= yConf.axisBehavior;
         };
+
+        // to create and confiure height scale
+        var heightScale = {};
+        _createAxis({
+            domain: [0, yConf.domain[1]],
+            format: yConf.yFormat,
+            align: yConf.yAlign,
+            clz:'y-axis',
+            scaleType: yConf.axisType
+        }, heightScale);
+        heightScale.calculateHeight = function(h) {
+            var _computedHeight = h - yConf.domain[0];
+            return heightScale.scale(_computedHeight > 0 ? _computedHeight : -_computedHeight);
+        }
+
         // only creates necessary configuration to draw axes
         _createXAxis.call(this);
         _createYAxis.call(this);
@@ -343,6 +362,9 @@ PolymerD3.chartConfigBehavior = {
                 return xConf.scale(x);
             },
             getY: (y) => {
+                if (y < 0) {
+                    y = 0;
+                }
                 return yConf.scale(y);
             },
             setYDomain: (d)=>{
@@ -363,10 +385,12 @@ PolymerD3.chartConfigBehavior = {
                 case 'ordinal':
                     return yConf.scale.rangeBand();
                 default:
-                //console.log("h: "+ h +" scale:"+yConf.scale(h) +
-                //    " height:"+ height+
-                 //   " v:" +(height - yConf.scale(h)));
-                    return (height - yConf.scale(h));
+                    if (h < 0) {
+                        h = -h;
+                    }
+                    // to calculate the height from zero
+                    // helpful for charts with -x axis
+                    return ((yConf.scale(0) - yConf.scale(h)));
                 }
             },
             getBarWidth: (w) => {
@@ -390,5 +414,5 @@ PolymerD3.chartConfigBehaviorWithTime=[
     PolymerD3.chartConfigBehavior,
     PolymerD3.timeFormater,
     PolymerD3.axisBehavior
-    ];
+];
 </script>

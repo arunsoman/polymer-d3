@@ -8,9 +8,9 @@ PolymerD3.barChart.stacked = function() {
 
     let forcetToZero = false;
 
-    if (yIndices.length > 1 || zGroup.length) {
+    // if (yIndices.length > 1 || zGroup.length) {
       forcetToZero = true;
-    }
+    // }
 
     return {
       stackIndex: xIndex,
@@ -44,7 +44,6 @@ PolymerD3.barChart.stacked = function() {
         return conf.getX(d[0]);
       },
       rectY: (d) => {
-        console.log(conf.getY(d.y0 + d.y));
         return conf.getY(d.y0 + d.y);
       },
       rectHeight: (d) => {

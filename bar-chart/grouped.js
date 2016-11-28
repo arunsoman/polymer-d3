@@ -8,9 +8,9 @@ PolymerD3.barChart.grouped = function() {
 
     let forcetToZero = false;
 
-    if (yIndices.length > 1 || zGroup.length) {
+    // if (yIndices.length > 1 || zGroup.length) {
       forcetToZero = true;
-    }
+    // }
 
     return {
       stackIndex: xIndex,
