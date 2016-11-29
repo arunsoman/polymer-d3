@@ -14,6 +14,7 @@ PolymerD3.chartConfigBehavior = {
             xFormat: conf.xFormat,
             xAlign: conf.xAlign
         };
+
         var yConf = {
             dataIndex: conf.yheader,
             domain: null,
@@ -24,34 +25,35 @@ PolymerD3.chartConfigBehavior = {
             yFormat: conf.yFormat,
             yAlign: conf.yAlign
         };
+
         var height = conf.height;
         var width = conf.width;
         var stackIndex = conf.stackIndex;
 
-        var temporal = (index)=>{
+        function temporal(index) {
             var set = d3.set();
-            var eng ={
-                process:(datum)=>{
+            var eng = {
+                process: datum => {
                     var dateAsNumber = +datum[index[0]];
                     if(!set.has(dateAsNumber)){
                         set.add(dateAsNumber);
                     }
                 },
-                getDomain:()=>{
+                getDomain: () => {
                     var dom = d3.extent(set.values());
                     return [new Date(+dom[0]), new Date(+dom[1])];
                 }
             };
             return eng;
-        };
+        }
 
-        var nonOrdinal = (index) => {
+        function nonOrdinal(index) {
             var min = Number.MAX_VALUE;
             var max = Number.MIN_VALUE;
             var map = d3.map();
 
-            var group ={
-                process: (datum) => {
+            var group = {
+                process: datum => {
                     if (max < datum[index[0]]) {
                         max = datum[index[0]];
                     }
@@ -74,9 +76,13 @@ PolymerD3.chartConfigBehavior = {
                     map.set(stackKey, counter);
                 },
                 getDomain: (forceToZero, isAggregate, conf) => {
-                    var dom = d3.extent(map.values());
+                    let dom = d3.extent(map.values());
                     let tmp = map.values(); // collects all data
                     let max = dom[1];
+
+                    // experimental, for supporting -ve vales in domain
+                    // let max = Math.max(Math.abs(dom[0]), Math.abs(dom[1]));
+
                     // multiple stacks present
                     if (conf && conf.dataIndex.length > 1) {
                         data.forEach(d => {
@@ -109,9 +115,9 @@ PolymerD3.chartConfigBehavior = {
                     return [dom[0], max];
                 }
             };
-            return(stackIndex === undefined) ? group:stack;
+            return(stackIndex === undefined) ? group : stack;
         };
-        var findOrdinalFromHeader = (index) => {
+        function findOrdinalFromHeader(index) {
             var myset = null;
             return {
                 process: (aRow) => {
@@ -126,7 +132,7 @@ PolymerD3.chartConfigBehavior = {
                 }
             };
         };
-        var findOrdinalFromCol = (index) => {
+        function findOrdinalFromCol(index) {
             var myset = [];
             return {
                 process: (aRow) => {
@@ -147,8 +153,10 @@ PolymerD3.chartConfigBehavior = {
                 }
             };
         };
+
         var computex;
         var computey;
+
         if (conf.containsHeader) {
             var header = data.shift();
             let processHeader = (axisType, domainFrom)=>{
@@ -163,8 +171,9 @@ PolymerD3.chartConfigBehavior = {
             computex = processHeader(xConf.axisType, conf.xheader);
             computey = processHeader(yConf.axisType, conf.yheader);
         }
-        var findHandler =(axisType, header)=>{
-            switch(axisType){
+
+        function findHandler(axisType, header) {
+            switch(axisType) {
             case 'ordinal':
                 return findOrdinalFromCol(header);
             case 'time':
@@ -201,19 +210,23 @@ PolymerD3.chartConfigBehavior = {
                 throw new Error('config.align not defined values {v,h}');
             }
             var computeRange=()=>{
-                return ((align === 'right') || (align === 'left')) ? 
+                return ((align === 'right') || (align === 'left')) ?
                         [height, 0] : [0, width];
             };
             var scale;
             switch(config.scaleType){
-            case 'linear': 
+            case 'linear':
                 scale =  d3.scale.linear().range(computeRange());
                 break;
-            case 'time': 
+            case 'time':
                 scale =  d3.time.scale().range(computeRange());
                 break;
-            case 'ordinal':  
-                scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+            case 'ordinal':
+                if (conf.barInnerPadding == null) {
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+                } else { // for heat map
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), 0, conf.barInnerPadding);
+                }
                 break;
             default:
                 throw Error('invalid config.scaleType');

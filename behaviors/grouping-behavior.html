@@ -1,7 +1,7 @@
 <script>
 PolymerD3.groupingBehavior = {
     group_by : (indices, xIndex, yIndex, headers, type, isGrouped) => {
-        var _stack = (groups) => {
+        function _stack(groups) {
             // Sets key if data isn't grouped
             // @Arun Please verify if there's an easeier solution
             groups.forEach((group, i) => {
@@ -21,8 +21,8 @@ PolymerD3.groupingBehavior = {
                     return d[1];
                 });
             return stackl(groups);
-        };
-        var _group_by_col = () => {
+        }
+        function _group_by_col() {
             var group = [];
             var map = d3.map();
             var datumIndex = indices[0];
@@ -46,8 +46,8 @@ PolymerD3.groupingBehavior = {
                 },
                 getStack: () =>{return _stack(group);}
             };
-        };
-        var _group_by_cols = () => {
+        }
+        function _group_by_cols() {
             var groups = [];
             var map = d3.map();
             return {
@@ -56,7 +56,6 @@ PolymerD3.groupingBehavior = {
                         var groupName = headers[i];
                         var aGroup = map.get(groupName);
                         if(!aGroup){
-                            console.log(" no group:" + groupName);
                             aGroup = {
                                 key:groupName,
                                 values:[],
@@ -73,8 +72,8 @@ PolymerD3.groupingBehavior = {
                 },
                 getStack: () =>{return _stack(groups);}
             };
-        };
-        var _waterFallStack = () => {
+        }
+        function _waterFallStack() {
             let group = [];
             let map = d3.map();
             let datumIndex = indices[0];
@@ -124,11 +123,46 @@ PolymerD3.groupingBehavior = {
                 }
             }
         };
+
+        function _heatMapStack() {
+            let group = [];
+            let map = d3.map();
+            let datumIndex = indices[0];
+            let groupName = headers[2];
+            let aGroup = {
+                key:groupName,
+                values:[],
+                fill: ''
+            };
+            group.push(aGroup);
+            return {
+                process: (aRow) => {
+                    aGroup.values.push([aRow[xIndex], aRow[yIndex], aRow[datumIndex]]);
+                },
+                getStack: () => {
+                    let _stacked = group[0].values;
+                    let _mapped = _stacked.map((g, index) => {
+                        return {
+                            0: g[0], // x
+                            1: g[1], // y
+                            y: g[1],
+                            y0: g[1],
+                            z: g[2] // color
+                        };
+                    });
+                    group[0].values = _mapped;
+                    return group;
+                }
+            }
+        }
         if (!indices) {
             throw new Error('indices argument mandatory');
         }
         if (type == 'waterfall') {
             return _waterFallStack();
+        }
+        if (type == 'heatmap') {
+            return _heatMapStack();
         }
         if (isGrouped) {
             return _group_by_col();
