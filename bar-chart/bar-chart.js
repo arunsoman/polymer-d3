@@ -230,19 +230,29 @@ Polymer({
         .attr('class', translations.classF);
 
       if (conf.chartType === 'heatmap') {
+        var colorRange = this.getAreaProperty('colorRange')
+        if (!colorRange) {
+          colorRange = {
+            input: 'colorRange',
+            txt: 'Select color range',
+            uitype: 'colorRangePicker',
+            from: '#ffffff',
+            to: '#ff0000',
+            callBack: 'draw'
+          }
+          this.push('area', colorRange);
+        }
         var color = d3.scale.linear()
-          .domain(d3.extent(stackData[0].values.map(aobj => {
-            return aobj.z;
-          })))
-          .range(['white', 'red'])
+          .domain(d3.extent(stackData[0].values.map(aobj => aobj.z)))
+          .range([colorRange.from, colorRange.to])
           .interpolate(d3.interpolateLab);
-        rects.style('fill', (d, i, j) => color(d.z));
+        rects.style('fill', d => color(d.z));
       }
 
       function htmlCbForHeatMap(d) {
         return '<td>' + headers[zGroup[0]] + ':</td><td>' + d.z + '</td>';
       }
-      var htmlCallback = d => {
+      var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
         var str = '<table>' +
           '<tr>' +
           '<td>' + this.inputs[0].displayName + ':</td>' +

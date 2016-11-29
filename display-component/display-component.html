@@ -25,6 +25,15 @@
             transition: all 1s ease;
             width: 35%;
         }
+        .color-wrap {
+            align-items: flex-end;
+            display: flex;
+            justify-content: space-around;
+            width: 600px;
+        }
+        paper-color-input {
+            width: 200px;
+        }
     </style>
     <template>
         <paper-dialog id="settingsModal" modal>
@@ -65,12 +74,13 @@
                         </paper-listbox>
                     </paper-dropdown-menu>
                 </template>
-
                 <template is="dom-if" if="{{isColorRangePicker(item.uitype)}}">
-                    <span>from:</span>
-                    <polymer-color-picker color="{{item.from}}"></polymer-color-picker>
-                    <span>to:</span>
-                    <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
+                    <div class="color-wrap">
+                        <span>from:</span>
+                        <paper-color-input shape="square" type="hsv" value-as-hex="{{item.from}}"></paper-color-input>
+                        <span>to:</span>
+                        <paper-color-input shape="square" type="hsv" value-as-hex="{{item.to}}"></paper-color-input>
+                    </div>
                 </template>
 
                 <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
@@ -86,8 +96,10 @@
                     Sorry, no settings available
                 </h3>
             </template>
-            <paper-button on-tap="commitChanges">Ok</paper-button>
-            <paper-button on-tap="cancelChanges">Cancel</paper-button>
+            <div>
+                <paper-button on-tap="commitChanges">Ok</paper-button>
+                <paper-button on-tap="cancelChanges">Cancel</paper-button>
+            </div>
         </paper-dialog>
     </template>
     <script type="text/javascript">
@@ -110,6 +122,9 @@
                         target.style.transform = 'rotate(' + e.model.item.selectedValue + 'deg)'
                     }
                 }, 500);
+            },
+            openColorPicker: function(e) {
+                e.target.open();
             },
             isDropDown:function(name){
                 return name === 'dropDown';

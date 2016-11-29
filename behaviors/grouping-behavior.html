@@ -124,6 +124,8 @@ PolymerD3.groupingBehavior = {
             }
         };
 
+        // in heatMap, z is used to set color, but generally, z is used for group_by_col
+        // so, seperate grouping logic is implemented
         function _heatMapStack() {
             let group = [];
             let map = d3.map();
@@ -166,7 +168,7 @@ PolymerD3.groupingBehavior = {
         }
         if (isGrouped) {
             return _group_by_col();
-        }else{
+        } else {
           return _group_by_cols();
         }
     }
