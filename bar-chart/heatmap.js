@@ -20,7 +20,8 @@ PolymerD3.barChart.heatMap = function() {
       yAlign: 'left',
       xaxisType: 'ordinal',
       yaxisType: 'ordinal',
-      parentG: this.parentG
+      parentG: this.parentG,
+      barInnerPadding: 0
     };
   };
   let _processors = function(nChartConfig) {
@@ -29,7 +30,7 @@ PolymerD3.barChart.heatMap = function() {
         return 'translate(0,0)';
       },
       barWidth: () => {
-        return nChartConfig.getBarWidth() - 1;
+        return nChartConfig.getBarWidth();
       },
       rectX: d => {
         return nChartConfig.getX(d[0]);

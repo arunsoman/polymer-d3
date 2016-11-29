@@ -224,7 +224,7 @@ Polymer({
           .attr('cy', (c)=>{
               return nChartConfig.getY(c[y]);
             })
-          .style('fill', function(d) { 
+          .style('fill', function(d) {
             return color(d[1]);
           });
 

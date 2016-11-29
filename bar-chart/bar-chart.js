@@ -125,15 +125,23 @@ Polymer({
       if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source ||
         PolymerD3.utilities.isEmptyObject(this.configurator) || this.source.length < 1
       ) {
+        console.warn('Fill all required inputs using drag and drop');
         return false;
       }
+
       let headers = this.externals.map(e => {
         return e.key;
       });
+
       if (this.parentG) {
         this.parentG.html("");
       }
+
       var conf = this.configurator.conf.call(this);
+      if (conf.chartType == 'heatmap' && (!zGroup || !zGroup.length)) {
+        console.warn('Select z-attribute to select a fill color');
+        return false;
+      }
 
       // cloning the source to keep it intact
       let _src = JSON.parse(JSON.stringify(this.source));
@@ -176,21 +184,6 @@ Polymer({
       nChartConfig.stackDataLength = stackData.length;
 
       var translations = this.configurator.processors(nChartConfig);
-
-      var htmlCallback;
-      htmlCallback = d => {
-        var str = '<table>' +
-          '<tr>' +
-          '<td>' + this.inputs[0].displayName + ':</td>' +
-          '<td>' + nChartConfig.formatX(d[0]) + '</td>' +
-          '</tr>' +
-          '<tr>' +
-          '<td>' + this.inputs[1].displayName + ':</td>' +
-          '<td>' + nChartConfig.formatY(d[1]) + '</td>' +
-          '</tr>' +
-          '</table>';
-        return str;
-      };
 
       let layer = this.parentG.selectAll('.layer')
         .data(stackData)
@@ -236,19 +229,35 @@ Polymer({
         // .attr('data-legend', translations.legendF)
         .attr('class', translations.classF);
 
-      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
-      this.attachLegend(this.parentG);
       if (conf.chartType === 'heatmap') {
         var color = d3.scale.linear()
-          .domain(d3.extent(stackData.map((aobj) => {
-            return aobj.key;
+          .domain(d3.extent(stackData[0].values.map(aobj => {
+            return aobj.z;
           })))
           .range(['white', 'red'])
           .interpolate(d3.interpolateLab);
-        rects.style('fill', (d, i, j) => {
-          return color(stackData[j].key);
-        });
+        rects.style('fill', (d, i, j) => color(d.z));
       }
+
+      function htmlCbForHeatMap(d) {
+        return '<td>' + headers[zGroup[0]] + ':</td><td>' + d.z + '</td>';
+      }
+      var htmlCallback = d => {
+        var str = '<table>' +
+          '<tr>' +
+          '<td>' + this.inputs[0].displayName + ':</td>' +
+          '<td>' + nChartConfig.formatX(d[0]) + '</td>' +
+          '</tr>' +
+          '<tr>' +
+          '<td>' + this.inputs[1].displayName + ':</td>' +
+          '<td>' + nChartConfig.formatY(d[1]) + '</td>' +
+          '</tr>' + (conf.chartType == 'heatmap' ? htmlCbForHeatMap(d) : '') +
+          '</table>';
+        return str;
+      };
+      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
+
+      this.attachLegend(this.parentG);
     }, 500);
   },
 

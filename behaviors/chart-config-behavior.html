@@ -210,19 +210,23 @@ PolymerD3.chartConfigBehavior = {
                 throw new Error('config.align not defined values {v,h}');
             }
             var computeRange=()=>{
-                return ((align === 'right') || (align === 'left')) ? 
+                return ((align === 'right') || (align === 'left')) ?
                         [height, 0] : [0, width];
             };
             var scale;
             switch(config.scaleType){
-            case 'linear': 
+            case 'linear':
                 scale =  d3.scale.linear().range(computeRange());
                 break;
-            case 'time': 
+            case 'time':
                 scale =  d3.time.scale().range(computeRange());
                 break;
-            case 'ordinal':  
-                scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+            case 'ordinal':
+                if (conf.barInnerPadding == null) {
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+                } else { // for heat map
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), 0, conf.barInnerPadding);
+                }
                 break;
             default:
                 throw Error('invalid config.scaleType');
