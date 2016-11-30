@@ -21,6 +21,16 @@
         width: 180px;
       }
 
+      .Date {
+        background: #6e97d9 !important;
+      }
+      .Number {
+        background: #34c0cd !important;
+      }
+      .String {
+        background: #f86539 !important;
+      }
+
       .sortable-wrap.master-wrap {
         display: block;
         height: 30px;
@@ -104,7 +114,7 @@
     <div class="sortable-wrap master-wrap" id="master-holder">
       <sortable-js id="master">
         <template is="dom-repeat" items={{externals}}>
-          <div class="list-item" data-item="{{item}}">
+          <div data-item="{{item}}" class$="list-item {{item.type}}">
             <paper-icon-button icon="[[_generateIcon(item.type)]]"></paper-icon-button>
             {{item.key}}
           </div>
@@ -113,7 +123,8 @@
     </div>
     <div id="inputWrap">
       <template is="dom-repeat" items="{{inputs}}" as="input" index-as="inputIndex">
-        <div class="sortable-wrap">
+        <!-- Colors -->
+        <div class$="sortable-wrap {{input.supportedTypes}}">
           <h4>
             {{input.txt}}
           </h4>
@@ -173,6 +184,20 @@
               slaves[i].addEventListener('itemSpliced', this._fireRem.bind(this));
             }
           });
+        }
+      },
+
+      getColor: function(type) {
+        console.log(type, "asdasdsa");
+        if (type.length == 1) {
+          switch (type[0]) {
+            case 'DATE':
+              return 'green-bg';
+            case 'NUMBER':
+              return 'blue-bg';
+            case 'STRING':
+              return 'yellow-bg';
+          }
         }
       },
 

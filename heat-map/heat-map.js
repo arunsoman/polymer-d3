@@ -65,10 +65,9 @@ Polymer({
         this.makeChartWrap();
 
         //TODO change hardcoded values
-        var
-          gridSize = Math.floor(width / 24),
+        var gridSize = Math.floor(width / 24),
             legendElementWidth = gridSize * 2,
-            buckets = 9,
+            buckets = 9;
 
         var svg = this.svg;///d3.select("#chart").append("svg")
             svg.attr("width", width + margin.left + margin.right)

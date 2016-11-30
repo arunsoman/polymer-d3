@@ -15,7 +15,8 @@ Polymer({
           selectedObjs: [],
           uitype: 'single-value',
           displayName: 'Date',
-          maxSelectableValues: 1
+          maxSelectableValues: 1,
+          supportedTypes: ['Date']
         }, {
           input: 'y',
           txt: 'Pick Value',
