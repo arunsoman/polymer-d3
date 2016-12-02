@@ -1,0 +1,52 @@
+<!--
+An interactive component to simulate the diamensions of a chart.
+The changes made to this component can be propogated to settings attribute
+
+Example:
+
+    <chart-customizer settings="[[settings]]"></chart-customizer>
+-->
+
+<script type="text/javascript" src="drag-elem.js"></script>
+<dom-module id="chart-customizer">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+      .customizer-holder {
+        height: 400px;
+        width: 500px
+      }
+    </style>
+    <div class="customizer-holder">
+      <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 400" class="parent-svg"></svg>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'chart-customizer',
+      properties: {
+        settings: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
+        parentSVG: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        }
+      },
+      behaviors: [PolymerD3.dragElem],
+      attached: function() {
+        this.async(() => {
+          this.parentSVG = d3.select(this.$$('.parent-svg'));
+          this.initDragSettings(this.parentSVG);
+        });
+      }
+    });
+  </script>
+</dom-module>
