@@ -9,8 +9,9 @@
             height: 200px;
         }
         paper-dialog {
+            max-height: 50vh;
             overflow-y: auto;
-            width: 80vw;
+            width: 40vw;
         }
         paper-slider {
             width: 60%;
@@ -37,6 +38,7 @@
     </style>
     <template>
         <paper-dialog id="settingsModal" modal>
+            <h2>Settings</h2>
             <template is='dom-repeat' items="{{settings}}">
                 <template is="dom-if" if="{{isDropDown(item.uitype)}}">
                     <paper-dropdown-menu label='[[ item.txt ]]'>

@@ -28,7 +28,8 @@ Polymer({
           selectedObjs: [],
           uitype: 'multi-value',
           displayName: 'myYAxis',
-          maxSelectableValues: 2
+          maxSelectableValues: 2,
+          supportedType: ''
         }, {
           input: 'z',
           txt: 'Pick Z',
@@ -38,7 +39,8 @@ Polymer({
           selectedObjs: [],
           uitype: 'multi-value',
           displayName: 'myZAxis',
-          maxSelectableValues: 2
+          maxSelectableValues: 2,
+          supportedType: ''
         }];
       }
     },
