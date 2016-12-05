@@ -12,11 +12,12 @@ Example:
   <template>
     <style>
       :host {
+        border: 1px solid grey;
         display: inline-block;
       }
       .customizer-holder {
         height: 400px;
-        width: 500px
+        width: 700px
       }
     </style>
     <div class="customizer-holder">
@@ -33,6 +34,12 @@ Example:
             return {};
           }
         },
+        _settings: { // holds settings to not mutate original settings
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
         parentSVG: {
           type: Object,
           value: () => {
@@ -41,11 +48,27 @@ Example:
         }
       },
       behaviors: [PolymerD3.dragElem],
+      observers: ['settingsInit(settings)'],
+
+      settingsInit: function(setting) { // takes a deep copy of settings prop
+        this.set('_settings', PolymerD3.utilities.clone(setting));
+        this._initParentSVG();
+        this.debounce('drag-rect-debounce', () => {
+          this.initDragSettings(this.parentSVG, this._settings);
+        }, 500);
+      },
+
       attached: function() {
         this.async(() => {
-          this.parentSVG = d3.select(this.$$('.parent-svg'));
-          this.initDragSettings(this.parentSVG);
+          this._initParentSVG();
         });
+      },
+
+      // function to initalize parentSVG
+      _initParentSVG: function() {
+        if (!this.parentSVG) {
+          this.parentSVG = d3.select(this.$$('.parent-svg'));
+        }
       }
     });
   </script>

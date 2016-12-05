@@ -419,3 +419,16 @@ PolymerD3.rollupMultiValued = (columns, columnHeaders, xId, data)=>{
     });
     return multiValue;
 };
+
+PolymerD3.utilities.searchArr = function(arr, matchFn) {
+    return arr.reduce((accum, elem) => {
+        if (matchFn(elem)) {
+            return elem;
+        } else {
+            // just some FP craziness
+            // http://stackoverflow.com/a/30042948
+            // http://redux.js.org/docs/recipes/UsingObjectSpreadOperator.html
+            return Object.assign({}, accum);
+        }
+    }, {});;
+}
