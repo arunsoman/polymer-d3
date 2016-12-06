@@ -44,6 +44,22 @@ PolymerD3.dragElem = {
     this._makeScalable(areaRect, areaG, {
       scalability: this.DRAG_CONSTANTS.BOTH
     });
+
+    // inner rectangle
+    let innerG = areaG.append('g').data([{
+      x: width / 4,
+      y: height / 4
+    }]);
+    let innerRect = this._drawRect(innerG, {
+      width: width/2,
+      height: height/2,
+      scalability: this.DRAG_CONSTANTS.BOTH,
+      fillOpacity: rectFillOpacity
+    });
+    this._makeScalable(innerRect, innerG, {
+      scalability: this.DRAG_CONSTANTS.BOTH
+    });
+
   },
 
   // function to draw a rectangle with given config
@@ -269,7 +285,11 @@ PolymerD3.dragElem = {
     }
 
     return {
-
+      rectangle,
+      scaleBarleft,
+      scaleBarright,
+      scaleBartop,
+      scaleBarbottom
     }
   },
 
