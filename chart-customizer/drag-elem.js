@@ -19,7 +19,9 @@ PolymerD3.dragElem = {
     let scale = config.scale || .3;
     let width = _getSettingsProp('width').selectedValue * scale;
     let height = _getSettingsProp('height').selectedValue * scale;
-    let rectFillOpacity = config.areaRect.opacity || .5;
+    let rectFillOpacity = config.areaRect.opacity || .8;
+    let marginLeft = _getSettingsProp('marginLeft').selectedValue * scale;
+    let marginTop = _getSettingsProp('marginTop').selectedValue * scale;
 
     /* == Operation== */
     // clears SVG
@@ -42,7 +44,8 @@ PolymerD3.dragElem = {
 
     // make area rectangle scalable
     this._makeScalable(areaRect, areaG, {
-      scalability: this.DRAG_CONSTANTS.BOTH
+      scalability: this.DRAG_CONSTANTS.BOTH,
+      scale: scale
     });
 
     // inner rectangle
@@ -51,26 +54,31 @@ PolymerD3.dragElem = {
       y: height / 4
     }]);
     let innerRect = this._drawRect(innerG, {
-      width: width/2,
-      height: height/2,
+      width: width / 2,
+      height: height / 2,
+      x: marginLeft + (width * scale) / 2,
+      y: marginTop + (height * scale) / 2,
       scalability: this.DRAG_CONSTANTS.BOTH,
       fillOpacity: rectFillOpacity
     });
     this._makeScalable(innerRect, innerG, {
-      scalability: this.DRAG_CONSTANTS.BOTH
+      scalability: this.DRAG_CONSTANTS.BOTH,
+      scale: scale
     });
 
   },
 
   // function to draw a rectangle with given config
   _drawRect: function(parent, config) {
+    let x = config.x || 0;
+    let y = config.y || 0;
     let dragrect = parent.append('rect')
       .attr('id', 'active')
       .attr('x', function(d) {
-        return d.x;
+        return d.x + x;
       })
       .attr('y', function(d) {
-        return d.y;
+        return d.y + y;
       })
       .attr('height', config.height)
       .attr('width', config.width)
@@ -81,7 +89,9 @@ PolymerD3.dragElem = {
 
   // function to make a given rectangle inside a group scalable as per given config
   _makeScalable: function(rectangle, group, config) {
+    let me = this;
     let dragbarw = config.dragbarw == null ? 20 : settings.dragbarw;
+    let scale = config.scale || .3;
     let rectDiamensions = rectangle[0][0].getBBox();
     let height = rectDiamensions.height;
     let width = rectDiamensions.width;
@@ -120,7 +130,7 @@ PolymerD3.dragElem = {
       .attr('id', 'scaleleft')
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', .5)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ew-resize')
       .call(scaleleft);
 
@@ -135,7 +145,7 @@ PolymerD3.dragElem = {
       .attr('height', height - dragbarw)
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', .5)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ew-resize')
       .call(scaleright);
 
@@ -150,7 +160,7 @@ PolymerD3.dragElem = {
       .attr('id', 'scaleleft')
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', .5)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ns-resize')
       .call(scaletop);
 
@@ -165,7 +175,7 @@ PolymerD3.dragElem = {
       .attr('height', dragbarw)
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', .5)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ns-resize')
       .call(scalebottom);
 
@@ -197,6 +207,12 @@ PolymerD3.dragElem = {
             return d.x + (dragbarw / 2);
           })
           .attr('width', width - dragbarw)
+        reflectChange({
+          x: d.x + (dragbarw / 2),
+          y: d.y,
+          height: height,
+          width: width
+        });
       }
     }
 
@@ -223,6 +239,12 @@ PolymerD3.dragElem = {
           .attr('width', width - dragbarw)
         scaleBarbottom
           .attr('width', width - dragbarw)
+        reflectChange({
+          x: d.x + (dragbarw / 2),
+          y: d.y,
+          height: height,
+          width: width
+        });
       }
     }
 
@@ -255,6 +277,12 @@ PolymerD3.dragElem = {
             return d.y + (dragbarw / 2);
           })
           .attr('height', height - dragbarw);
+        reflectChange({
+          x: d.x,
+          y: d.y - (dragbarw / 2),
+          height: height,
+          width: width
+        });
       }
     }
 
@@ -281,7 +309,20 @@ PolymerD3.dragElem = {
           .attr('height', height - dragbarw);
         scaleBarright
           .attr('height', height - dragbarw);
+        reflectChange({
+          x: d.x,
+          y: d.y,
+          height: height,
+          width: width
+        });
       }
+    }
+
+    function reflectChange(d) {
+      me.$['mouse-pointer'].innerHTML = 'x: ' + Math.round(d.x) +
+        ',y: ' + Math.round(d.y) +
+        ',h: ' + Math.round(d.height / scale) +
+        ',w: ' + Math.round(d.width / scale);
     }
 
     return {
