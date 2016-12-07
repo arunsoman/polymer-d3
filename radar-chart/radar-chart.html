@@ -18,7 +18,7 @@
       }
   </style>
   <template>
-    <template is="dom-if" if="true">
+    <template is="dom-if" if="{{viewMode}}">
       <display-component settings="{{area}}"></display-component>
       <div class="draggable-areabtn-wrap">
         <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>

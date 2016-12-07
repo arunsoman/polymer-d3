@@ -134,7 +134,14 @@ Polymer({
   // edit mode
   _modeObserver: function(editMode) {
     if (!editMode) {
+      if (this.selectedChartObj && this.selectedChartObj.extractData) {
+        this.selectedChartObj.viewMode = false;
+      }
       this.set('settingsVisible', false);
+    } else {
+      if (this.selectedChartObj && this.selectedChartObj.extractData) {
+        this.selectedChartObj.viewMode = true;
+      }
     }
   },
 
