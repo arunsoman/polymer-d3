@@ -113,7 +113,7 @@ Polymer({
     },
     editMode: {
       type: Boolean,
-      value: true
+      value: false
     },
     legendSettingsFlag: {
       type: Boolean,
@@ -135,12 +135,12 @@ Polymer({
   _modeObserver: function(editMode) {
     if (!editMode) {
       if (this.selectedChartObj && this.selectedChartObj.extractData) {
-        this.selectedChartObj.viewMode = false;
+        this.selectedChartObj.viewMode = true;
       }
       this.set('settingsVisible', false);
     } else {
       if (this.selectedChartObj && this.selectedChartObj.extractData) {
-        this.selectedChartObj.viewMode = true;
+        this.selectedChartObj.viewMode = false;
       }
     }
   },
@@ -241,7 +241,9 @@ Polymer({
       this.async(() => {
         this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
         // gives color to selected chart
-        this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
+        if(!this.editMode){
+          this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
+        }
       }, 500);
     }
   },
