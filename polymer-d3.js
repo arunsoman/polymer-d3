@@ -66,6 +66,10 @@ Polymer({
             label: 'Calendar View Chart',
             icon: 'chart:calendar-chart',
             element: 'calendar-chart'
+          }, {
+            label: 'Pareto Chart',
+            icon: 'chart:calendar-chart',
+            element: 'pareto-chart'
           }];
         }
       }

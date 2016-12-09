@@ -49,3 +49,9 @@ polymer-d3 .settings-icon {
   right: 1em;
   top: 6px;
 }
+
+polymer-d3  pareto-chart .line {
+  fill: none;
+  stroke: purple;
+  stroke-width: 1.5px;
+}
