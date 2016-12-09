@@ -42,7 +42,7 @@
         color: #454545;
       }
     </style>
-    <template is="dom-if" if="{{editMode}}" restamp>
+    <template is="dom-if" if="[[ !editMode ]]" restamp>
       <div class="tool-bar">
         <chart-selector
           charts="[[availableCharts]]"
