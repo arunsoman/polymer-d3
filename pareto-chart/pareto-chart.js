@@ -120,12 +120,12 @@ Polymer({
 
       //Draw axes
       this.parentG.append('g')
-          .attr('class', 'x axis')
+          .attr('class', 'x-axis')
           .attr('transform', 'translate(0,' + this.chartHeight + ')')
           .call(xAxis);
 
       this.parentG.append('g')
-          .attr('class', 'y axis')
+          .attr('class', 'y-axis')
           .call(yAxis)
           .append('text')
           .attr('transform', 'rotate(-90)')
