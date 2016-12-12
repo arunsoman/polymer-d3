@@ -6,7 +6,7 @@ Polymer({
       const yInputs = this.inputs[1].selectedValue;
       const yLine = this.inputs[2].selectedValue;
       let z = this.setLegendColor.bind(this);
-
+      this.resize();
       if (!xInput || !xInput.length || !yInputs || !yInputs.length) {
         console.warn('Fill all inputs');
         return false;
@@ -33,11 +33,14 @@ Polymer({
         .scale(y)
         .orient('right');
 
+      let headers = this.externals.map(e => {
+        return e.key;
+      });
       // create layers
       let layers = d3.layout.stack()(yInputs.map(yInput => {
-        return dataset.map(d => {
-          return {x: d[xInput[0]], y: d[yInput]};
-        });
+        let layer = dataset.map(d => ({x: d[xInput[0]], y: d[yInput]}));
+        layer.key = headers[yInput];
+        return layer;
       }));
 
       x.domain(layers[0].map(d => d.x));
@@ -47,14 +50,38 @@ Polymer({
         .data(layers)
         .enter().append('g')
         .attr('class', 'layer')
-        .style('fill', (d, i) => z(i));
+        .style('fill', (d, i) => {
+          // Logic to generate legends initialy
+          let color = z(d);
+          let keyPresent = false;
+          this.legendSettings.colors.forEach(c => {
+            if (c.label == d.key) {
+              color = c.color;
+              keyPresent = true;
+            }
+          });
+          // Create new entry if legend isn't present
+          // TO do: remove &&d.key =>  something's wrong with generate stackData meathod
+          // d.key comes as undefined check `PolymerD3.groupingBehavior`
+          if (!keyPresent && d.key) {
+            this.legendSettings.colors.push({
+              color: color,
+              label: d.key
+            });
+          }
+          return color;
+        })
+        .attr('class', 'stroked-elem') // to set stroke
+        .attr('data-legend', function(d) {
+          return d.key;
+        });;
 
-      layer.selectAll('rect')
-        .data(function(d) { return d; })
+      let rects = layer.selectAll('rect')
+        .data(d => d)
         .enter().append('rect')
-        .attr('x', function(d) { return x(d.x); })
-        .attr('y', function(d) { return y(d.y + d.y0); })
-        .attr('height', function(d) { return y(d.y0) - y(d.y + d.y0); })
+        .attr('x', d => x(d.x))
+        .attr('y', d => (y(d.y + d.y0)))
+        .attr('height', d => (y(d.y0) - y(d.y + d.y0)))
         .attr('width', x.rangeBand() - 1);
 
       this.parentG.append('g')
@@ -67,6 +94,22 @@ Polymer({
         .attr('transform', 'translate(' + width + ',0)')
         .call(yAxis);
 
+      var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
+        var str = '<table>' +
+          '<tr>' +
+          '<td>' + this.inputs[0].displayName + ':</td>' +
+          '<td>' + d.x + '</td>' +
+          '</tr>' +
+          '<tr>' +
+          '<td>' + this.inputs[1].displayName + ':</td>' +
+          '<td>' + d.y + '</td>' +
+          '</tr>' +
+          '</table>';
+        return str;
+      };
+      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
+
+      this.attachLegend(this.parentG);
     }, 500);
   },
 

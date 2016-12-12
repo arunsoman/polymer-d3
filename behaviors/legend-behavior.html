@@ -96,7 +96,11 @@
       // this.registerDraggable(chartLegend);
     },
     setLegendColor: function(layer) {
-
+      // reset Array.fill function
+      // to do - change fill to fill color
+      if (typeof layer.fill == 'function') {
+        layer.fill = null;
+      }
       // Search if layer.key is available in legendSettings.key
       // Set fill as fill
       this.legendSettings.colors.forEach((l) =>{
