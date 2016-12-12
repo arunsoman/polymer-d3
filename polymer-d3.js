@@ -225,7 +225,7 @@ Polymer({
     }
     if (config.mode === 'create') {
       // Fresh Polymer d3
-      this.set('editMode', true);
+      this.set('editMode', false);
     } else {
       this.set('selectedChart', config.selectedChart);
       this.set('settings', config.settings);
