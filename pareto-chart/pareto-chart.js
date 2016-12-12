@@ -11,6 +11,7 @@ Polymer({
         return false;
       }
       // to create a clone of this.source
+      // to do => data formatting
       let dataset = this.source.slice(0);
       let totalAmount = 0;
       for(var i = 0; i < dataset.length; i++){
@@ -135,7 +136,7 @@ Polymer({
           .text('Amount');
 
       this.parentG.append('g')
-          .attr('class', 'y axis')
+          .attr('class', 'y-axis')
           .attr('transform', 'translate(' + [this.chartWidth, 0] + ')')
           .call(yAxis2)
           .append('text')
@@ -236,7 +237,8 @@ Polymer({
   },
 
   behaviors: [
-    PolymerD3.chartBehavior
+    PolymerD3.chartBehavior,
+    PolymerD3.chartConfigCbBehavior
   ],
 
   xAxisRotationCb: function() {

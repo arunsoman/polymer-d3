@@ -1,11 +1,14 @@
-<dom-module id="pareto-chart">
+<!--
+  A  stacked composite chart
+-->
+
+<dom-module id="stacked-composite-chart">
   <template>
     <style>
       :host {
         display: block;
       }
     </style>
-    <h5>Pareto Chart</h5>
     <template is="dom-if" if="{{viewMode}}">
       <display-component settings="{{area}}"></display-component>
       <div class="draggable-areabtn-wrap">
@@ -22,5 +25,5 @@
       </template>
     </template>
   </template>
-  <script src="pareto-chart.js"></script>
+  <script src="stacked-composite-chart.js"></script>
 </dom-module>

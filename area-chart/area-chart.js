@@ -57,7 +57,8 @@ Polymer({
         }
     },
     behaviors: [
-        PolymerD3.chartBehavior
+        PolymerD3.chartBehavior,
+        PolymerD3.chartConfigCbBehavior
     ],
     draw: function() {
         var me = this;

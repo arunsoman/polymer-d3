@@ -75,36 +75,9 @@ Polymer({
   },
 
   behaviors: [
-    PolymerD3.chartBehavior
+    PolymerD3.chartBehavior,
+    PolymerD3.chartConfigCbBehavior
   ],
-
-  xAxisRotationCb: function() {
-    if (this.parentG) {
-        let xAxis = this.parentG.select('.x-axis');
-        let xAxisCommander = this.attach(xAxis);
-        let toRotate = this._getAreaObj('xAxisRotation').selectedValue;
-        let textAnchor = toRotate > 0 ? 'start': 'end';
-        this.attach(xAxis).tickRotation.rotateTicks(toRotate, textAnchor);
-    }
-  },
-
-  yAxisRotationCb: function() {
-    if (this.parentG) {
-      let yAxis = this.parentG.select('.y-axis');
-      let yAxisCommander = this.attach(yAxis);
-      let toRotate = this._getAreaObj('yAxisRotation').selectedValue;
-      let textAnchor = 'end';
-      this.attach(yAxis).tickRotation.rotateTicks(toRotate, textAnchor);
-    }
-  },
-
-  strokeWidthCb: function() {
-    let stroke = this.getAreaProperty('strokeWidth');
-    let strokedElems = this.querySelectorAll('.stroked-elem');
-    [].forEach.call(strokedElems, se => {
-      se.style['stroke-width'] = stroke ? stroke.selectedValue + 'px' : 0;
-    });
-  },
 
   attached: function() {
     // this._loadDiffdata();

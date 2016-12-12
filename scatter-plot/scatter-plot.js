@@ -129,7 +129,8 @@ Polymer({
 
   behaviors: [
     PolymerD3.chartBehavior,
-    PolymerD3.colorPickerBehavior
+    PolymerD3.colorPickerBehavior,
+    PolymerD3.chartConfigCbBehavior
   ],
 
   opacityCb: function() {

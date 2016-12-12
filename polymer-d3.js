@@ -70,6 +70,10 @@ Polymer({
             label: 'Pareto Chart',
             icon: 'chart:calendar-chart',
             element: 'pareto-chart'
+          }, {
+            label: 'Stacked Composite Chart',
+            icon: 'chart:calendar-chart',
+            element: 'stacked-composite-chart'
           }];
         }
       }
@@ -225,7 +229,7 @@ Polymer({
     }
     if (config.mode === 'create') {
       // Fresh Polymer d3
-      this.set('editMode', false);
+      this.set('editMode', true);
     } else {
       this.set('selectedChart', config.selectedChart);
       this.set('settings', config.settings);
