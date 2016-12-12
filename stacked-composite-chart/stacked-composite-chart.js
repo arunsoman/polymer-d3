@@ -16,6 +16,13 @@ Polymer({
       const height = this.chartHeight;
       const width = this.chartWidth;
 
+      function mapYLine(row) { // extracts yLine prop from each row
+        return row[yLine[0]];
+      }
+
+      function mapXValue(row) { // extracts x prop from each row
+        return row[xInput[0]];
+      }
       // to do: format and beautify data
       let dataset = this.source.slice(0);
 
@@ -31,14 +38,14 @@ Polymer({
 
       let yAxis = d3.svg.axis()
         .scale(y)
-        .orient('right');
+        .orient('left');
 
       let headers = this.externals.map(e => {
         return e.key;
       });
       // create layers
       let layers = d3.layout.stack()(yInputs.map(yInput => {
-        let layer = dataset.map(d => ({x: d[xInput[0]], y: d[yInput]}));
+        let layer = dataset.map(d => ({x: mapXValue(d), y: d[yInput]}));
         layer.key = headers[yInput];
         return layer;
       }));
@@ -91,8 +98,33 @@ Polymer({
 
       this.parentG.append('g')
         .attr('class', 'y-axis')
-        .attr('transform', 'translate(' + width + ',0)')
+        .attr('transform', 'translate(' + 0 + ',0)')
         .call(yAxis);
+
+      // to draw line chart
+      if (yLine && yLine.length) {
+
+        let lineData = this.source.map(row => ({x: mapXValue(row), y: mapYLine(row)}));
+        console.log(lineData);
+
+        let guide = d3.svg.line()
+          .x(d => x(d.x))
+          .y(d => yLineScale(d.y))
+          .interpolate('basis');
+
+        let yLineScale = d3.scale.linear()
+          .domain([0, d3.max(lineData, row => row.y )])
+          .range([height, 0]);
+
+        let yAxis2 = d3.svg.axis()
+         .scale(yLineScale)
+         .orient('right');
+
+        let line = this.parentG.append('path')
+          .datum(lineData)
+          .attr('d', guide)
+          .attr('class', 'line');
+      }
 
       var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
         var str = '<table>' +

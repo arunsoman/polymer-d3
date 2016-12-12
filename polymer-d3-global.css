@@ -50,7 +50,8 @@ polymer-d3 .settings-icon {
   top: 6px;
 }
 
-polymer-d3  pareto-chart .line {
+polymer-d3  pareto-chart .line,
+polymer-d3  stacked-composite-chart .line {
   fill: none;
   stroke: purple;
   stroke-width: 1.5px;
