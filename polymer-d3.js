@@ -74,6 +74,10 @@ Polymer({
             label: 'Stacked Composite Chart',
             icon: 'chart:calendar-chart',
             element: 'stacked-composite-chart'
+          }, {
+            label: 'Grouped Composite Chart',
+            icon: 'chart:calendar-chart',
+            element: 'grouped-composite-chart'
           }];
         }
       }
