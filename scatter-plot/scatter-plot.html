@@ -19,7 +19,7 @@
 
   <template>
     <h4>Scatter Plot</h4>
-    <template is="dom-if" if="{{viewMode}}">
+    <template is="dom-if" if="{{editMode}}">
       <display-component settings="{{area}}"></display-component>
       <div class="draggable-areabtn-wrap">
         <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>

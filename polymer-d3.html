@@ -42,20 +42,20 @@
         color: #454545;
       }
     </style>
-    <div class="tool-bar">
-      <chart-selector
-        charts="[[availableCharts]]"
-        selected="{{selectedChart}}"
-      ></chart-selector>
-      <div class="icons-wrap right-icons">
-        <paper-icon-button
-          icon="icons:settings"
-          title="Input Settings"
-          on-tap="showInputSettings"
-        ></paper-icon-button>
+    <template is="dom-if" if="[[ editMode ]]" restamp>
+      <div class="tool-bar">
+        <chart-selector
+          charts="[[availableCharts]]"
+          selected="{{selectedChart}}"
+        ></chart-selector>
+        <div class="icons-wrap right-icons">
+          <paper-icon-button
+            icon="icons:settings"
+            title="Input Settings"
+            on-tap="showInputSettings"
+          ></paper-icon-button>
+        </div>
       </div>
-    </div>
-    <template is="dom-if" if="[[ !editMode ]]" restamp>
     </template>
     <!-- <template is="dom-if" if="{{settingsVisible}}" restamp>
       <display-component settings="{{settings}}"></display-component>

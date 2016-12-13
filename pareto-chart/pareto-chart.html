@@ -6,7 +6,7 @@
       }
     </style>
     <h5>Pareto Chart</h5>
-    <template is="dom-if" if="{{viewMode}}">
+    <template is="dom-if" if="{{editMode}}">
       <display-component settings="{{area}}"></display-component>
       <div class="draggable-areabtn-wrap">
         <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>

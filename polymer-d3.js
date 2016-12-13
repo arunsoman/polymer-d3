@@ -179,11 +179,15 @@ Polymer({
 
       elem.set('source', this.source);
       elem.set('externals', this.externals);
+
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
       if (selectedChart.settings) {
         elem.setData(selectedChart.settings);
       }
+      this.async(() => {
+        elem.set('editMode', this.editMode);
+      });
     }
   },
 
@@ -227,7 +231,12 @@ Polymer({
     if (config.availableCharts) {
       this.availableCharts = config.availableCharts;
     }
-    if (config.mode === 'create') {
+    if (config.mode == 'view') {
+      this.set('editMode', false);
+      this.set('selectedChart', config.selectedChart);
+      this.set('settings', config.settings);
+      this.set('inputs', config.inputs);
+    } else if (config.mode === 'create') {
       // Fresh Polymer d3
       this.set('editMode', true);
     } else {
