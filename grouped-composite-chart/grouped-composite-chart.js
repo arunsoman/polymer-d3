@@ -1,97 +1,101 @@
 Polymer({
   is: 'grouped-composite-chart',
-    draw: function() {
+  draw: function() {
     this.debounce('draw-debounce', () => {
-      const xInput = this.inputs[0].selectedValue;
-      const yInputs = this.inputs[1].selectedValue;
-      const yLine = this.inputs[2].selectedValue;
+      let xIndex = this.getInputsProperty('x');
+      let yIndices = this.getInputsProperty('y');
+      let yLine = this.getInputsProperty('z');
       let z = this.setLegendColor.bind(this);
       this.resize();
-      if (!xInput || !xInput.length || !yInputs || !yInputs.length) {
-        console.warn('Fill all inputs');
+      // requireed indices not selected
+      if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source || this.source.length < 1) {
+        console.warn('Fill all required inputs using drag and drop');
         return false;
       }
-      this.parentG.html('');
-
-      const height = this.chartHeight;
-      const width = this.chartWidth;
-
-      function mapYLine(row) { // extracts yLine prop from each row
-        return row[yLine[0]];
-      }
-
-      function mapXValue(row) { // extracts x prop from each row
-        return row[xInput[0]];
-      }
-      // to do: format and beautify data
-      let dataset = this.source.slice(0);
-
-      var x0 = d3.scale.ordinal()
-        .rangeRoundBands([0, width], .1);
-
-      var x1 = d3.scale.ordinal();
-
-      var y = d3.scale.linear()
-        .range([height, 0]);
-
-      var color = d3.scale.ordinal()
-        .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-      var xAxis = d3.svg.axis()
-        .scale(x0)
-        .orient("bottom");
-
-      var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .tickFormat(d3.format(".2s"));
 
       let headers = this.externals.map(e => {
         return e.key;
       });
 
-      x0.domain(dataset.map(function(d) { return d[0]; }));
-      // change dataset
-      x1.domain(dataset).rangeRoundBands([0, x0.rangeBand()]);
-      y.domain([0, d3.max(dataset, function(d) { return d3.max(d.ages, function(d) { return d.value; }); })]);
+      // cloning the source to keep it intact
+      let _src = JSON.parse(JSON.stringify(this.source));
 
-      this.parentG.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + this.chartHeight + ")")
-          .call(xAxis);
+      if (this.parentG) {
+        this.parentG.html("");
+      }
 
-      this.parentG.append("g")
-          .attr("class", "y axis")
-          .call(yAxis)
-        .append("text")
-          .attr("transform", "rotate(-90)")
-          .attr("y", 6)
-          .attr("dy", ".71em")
-          .style("text-anchor", "end")
-          .text("Population");
+      let conf = this._conf(); // generate config
+      let _isGrouped = false; // disable groupby z-input
 
-      var state = this.parentG.selectAll(".state")
-          .data(data)
-        .enter().append("g")
-          .attr("class", "state")
-          .attr("transform", function(d) { return "translate(" + x0(d.State) + ",0)"; });
+      let myGroup = PolymerD3
+        .groupingBehavior
+        .group_by(yIndices, xIndex, yIndices,
+          headers, conf.chartType, _isGrouped
+        );
+      let nChartConfig = this.chartConfig(conf, _src, myGroup.process);
 
-      state.selectAll("rect")
-          .data(function(d) { return d.ages; })
-        .enter().append("rect")
-          .attr("width", x1.rangeBand())
-          .attr("x", function(d) { return x1(d.name); })
-          .attr("y", function(d) { return y(d.value); })
-          .attr("height", function(d) { return this.chartHeight - y(d.value); })
-          .style("fill", function(d) { return color(d.name); });
+      let stackData = myGroup.getStack();
 
+      nChartConfig.stackDataLength = stackData.length;
 
+      let translations = this._processors(nChartConfig);
 
+      let layer = this.parentG.selectAll('.layer')
+        .data(stackData)
+        .enter().append('g')
+        .attr('transform', translations.translate)
+        .attr('class', 'layer')
+        .style('fill', d => {
+          // Logic to generate legends initialy
+          let color = z(d);
+          let keyPresent = false;
+          this.legendSettings.colors.forEach((c) => {
+            if (c.label == d.key) {
+              color = c.color;
+              keyPresent = true;
+            }
+          });
+          // Create new entry if legend isn't present
+          // TO do: remove &&d.key =>  something's wrong with generate stackData meathod
+          // d.key comes as undefined check `PolymerD3.groupingBehavior`
+          if (!keyPresent && d.key) {
+            this.legendSettings.colors.push({
+              color: color,
+              label: d.key
+            });
+          }
+          return color;
+        })
+        .attr('class', 'stroked-elem') // to set stroke
+        .attr('data-legend', function(d) {
+          return d.key;
+        });
+      // this.attachLegend(this.parentG);
+
+      let rects = layer.selectAll('rect')
+        .data(function(d) {
+          return d.values;
+        })
+        .enter().append('rect')
+        .attr('x', translations.rectX)
+        .attr('y', translations.rectY)
+        .attr('height', translations.rectHeight)
+        .attr('width', translations.barWidth)
+        // .attr('data-legend', translations.legendF)
+        .attr('class', translations.classF);
       // to draw line chart
       if (yLine && yLine.length) {
 
-        let lineData = this.source.map(row => ({x: mapXValue(row), y: mapYLine(row)}));
+        let lineData = this.source.map(row => ({
+          x: row[xIndex],
+          y: row[yLine[0]]
+        }));
         console.log(lineData);
+
+        let x = d3.scale.ordinal()
+          .rangeRoundBands([0, this.chartWidth]);
+
+        x.domain(lineData.map(d => d.x));
 
         let guide = d3.svg.line()
           .x(d => x(d.x))
@@ -99,12 +103,12 @@ Polymer({
           .interpolate('basis');
 
         let yLineScale = d3.scale.linear()
-          .domain([0, d3.max(lineData, row => row.y )])
-          .range([height, 0]);
+          .domain([0, d3.max(lineData, row => row.y)])
+          .range([this.chartHeight, 0]);
 
         let yAxis2 = d3.svg.axis()
-         .scale(yLineScale)
-         .orient('right');
+          .scale(yLineScale)
+          .orient('right');
 
         let line = this.parentG.append('path')
           .datum(lineData)
@@ -112,8 +116,8 @@ Polymer({
           .attr('class', 'line');
       }
 
-      var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
-        var str = '<table>' +
+      let htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
+        let str = '<table>' +
           '<tr>' +
           '<td>' + this.inputs[0].displayName + ':</td>' +
           '<td>' + d.x + '</td>' +
@@ -205,5 +209,61 @@ Polymer({
   behaviors: [
     PolymerD3.chartBehavior,
     PolymerD3.chartConfigCbBehavior
-  ]
+  ],
+
+  _conf: function() {
+    let xIndex = this.getInputsProperty('x');
+    let yIndices = this.getInputsProperty('y');
+    let xObj = this.getInputsPropertyObj('x');
+    let yObj = this.getInputsPropertyObj('y');
+    let zGroup = this.getInputsProperty('z');
+
+    let forcetToZero = false;
+
+    // if (yIndices.length > 1 || zGroup.length) {
+      // forcetToZero = true;
+    // }
+
+    return {
+      stackIndex: xIndex,
+      chartType: 'stack', //stack,group,diff,waterfall
+      containsHeader: false,
+      xheader: [xIndex],
+      yOrign: 0,
+      yheader: yIndices,
+      width: this.chartWidth,
+      height: this.chartHeight,
+      xFormat: xObj.selectedObjs[0].type,
+      yFormat: yObj.selectedObjs[0].type,
+      xAlign: 'bottom',
+      yAlign: 'left',
+      xaxisType: 'ordinal',
+      yaxisType: 'linear',
+      parentG: this.parentG,
+      forcetToZero: forcetToZero
+    };
+  },
+  _processors: function(nChartConfig) {
+    return {
+      translate: (d, i) => {
+        return 'translate(' + i * nChartConfig.getBarWidth() / nChartConfig.stackDataLength + ',0)';
+      },
+      barWidth: () => {
+        return nChartConfig.getBarWidth() / nChartConfig.stackDataLength - 1;
+      },
+      rectX: (d) => {
+        return nChartConfig.getX(d[0]);
+      },
+      rectY: (d) => {
+        return nChartConfig.getY(d[1]);
+      },
+      rectHeight: (d) => {
+        return nChartConfig.getBarHeight(d[1]);
+      },
+      legendF: (d, i, j) => {
+        // console.log('d:' + d + ' i:' + i + ' j:' + j);
+      }
+    }
+  }
+
 });
