@@ -14,11 +14,13 @@
 <link rel="import" href="chart-data-manager-behavior.html">
 <link rel="import" href="draggable-svg-behavior.html">
 <link rel="import" href="chart-config-cb-behaviour.html">
+
+<link rel="import" href="chart-scale-behaviour.html">
+<link rel="import" href="grouping-processor-behavior.html">
 <script>
   PolymerD3.chartBehavior = [
     PolymerD3.chartDataManagerBehavior,
     PolymerD3.timeFormater,
-    PolymerD3.chartConfigBehavior,
     PolymerD3.groupingBehavior,
     PolymerD3.chartInitBehavior,
     PolymerD3.chartconfigObserver,
@@ -30,6 +32,9 @@
     PolymerD3.toolTipBehavior,
     PolymerD3.legendBehavior,
     PolymerD3.draggableBehavior,
-    PolymerD3.draggableSvgBehavior
+    PolymerD3.draggableSvgBehavior,
+
+    PolymerD3.chartScaleBehavior,
+    PolymerD3.groupingProcessBehaviour
   ];
 </script>

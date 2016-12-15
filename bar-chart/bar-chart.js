@@ -146,8 +146,17 @@ Polymer({
           (_isGrouped) ? zGroup : yIndices,
           xIndex, yIndices, headers, conf.chartType, _isGrouped
         );
-      var nChartConfig = this.chartConfig(conf, _src, myGroup.process);
+      // var nChartConfig = this.chartConfig(conf, _src, myGroup.process);
+      var computeMeathods = this.groupsFactory(conf, _src, myGroup.process);
 
+      _src.forEach((aRow, index) => {
+        computeMeathods.computex.process(aRow);
+        computeMeathods.computey.process(aRow);
+        if (myGroup.process) {
+          myGroup.process(aRow, index);
+        }
+      });
+      debugger;
       let stackData = myGroup.getStack();
       // if (_isGrouped) {
       //   stackData = myGroup.getGroups();
