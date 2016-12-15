@@ -1,0 +1,29 @@
+{
+  "name": "paper-color-pallete",
+  "description": "An interactive color pallete",
+  "main": "paper-color-pallete.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "paper-color-picker": "^0.9.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "paper-styles": "~1.0.13",
+    "web-animations-js": "^2.2.0"
+  },
+  "homepage": "https://github.com/sravan-s/paper-color-pallete",
+  "_release": "a076302c4d",
+  "_resolution": {
+    "type": "branch",
+    "branch": "master",
+    "commit": "a076302c4d6eac0b4bf30d20ebe7174ef285000b"
+  },
+  "_source": "https://github.com/sravan-s/paper-color-pallete.git",
+  "_target": "*",
+  "_originalSource": "https://github.com/sravan-s/paper-color-pallete.git"
+}

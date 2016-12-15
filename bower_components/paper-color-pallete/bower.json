@@ -1,0 +1,19 @@
+{
+  "name": "paper-color-pallete",
+  "description": "An interactive color pallete",
+  "main": "paper-color-pallete.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "paper-color-picker": "^0.9.2"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "paper-styles": "~1.0.13",
+    "web-animations-js": "^2.2.0"
+  }
+}

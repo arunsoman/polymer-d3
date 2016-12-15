@@ -9,7 +9,6 @@ dist
 npm-debug.log
 
 # Dev directories
-bower_components
 node_modules
 .idea/
 .project

@@ -1,0 +1,105 @@
+<!--
+A comment describing this element
+
+Example:
+
+    <my-elem></my-elem>
+
+Example:
+
+    <my-elem>
+      <h2>Hello my-elem</h2>
+    </my-elem>
+
+@demo demo/index.html
+-->
+
+<dom-module id="label-color-group">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+      }
+      .color-picker-wrap {
+        border-radius: 10%;
+        cursor: pointer;
+        display: inline-block;
+        height: 50px;
+        transition: all 1s ease;
+        width: 50px;
+      }
+      .label {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .color-picker-wrap:hover {
+        -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+        box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+      }
+      .wrapper {
+        display: inline-block;
+        text-align: center;
+        width: 100px;
+      }
+    </style>
+    <div class="wrapper">
+      <div class="color-picker-wrap" on-tap="openColorPicker">
+      </div>
+      <span class="label" title="[[config.label]]">{{config.label}}</span>
+    </div>
+    <paper-color-picker shape="square" type="hsv" color="{{config.color}}"></paper-color-picker>
+  </template>
+  <script>
+    Polymer({
+      is: 'label-color-group',
+      properties: {
+        config: {
+          type: Object,
+          value: function() {
+            return {};
+          },
+          notify: true
+        },
+        index: Number,
+        parent: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {};
+          }
+        },
+        labelAs: String,
+        colorAs: String
+      },
+
+      observers: ['_colorObs(config.color.*)'],
+
+      _colorObs: function(color) {
+        this.debounce('colorDebounce', function() {
+          var bg = this.toHex(color.base);
+          this.$$('.color-picker-wrap').style.backgroundColor = bg;
+          var newColor = {};
+          newColor[this.colorAs] = bg;
+          newColor[this.labelAs] = this.parent[this.index][this.labelAs];
+          this.splice('parent', this.index, 1, newColor);
+        }.bind(this), 200);
+      },
+
+      openColorPicker: function() {
+        this.$$('paper-color-picker').open();
+      },
+
+      toHex: function(rgba) {
+        var colors = [rgba.red.toString(16), rgba.green.toString(16), rgba.blue.toString(16)];
+        var colorString = '#';
+        colors.forEach(function(color) {
+          colorString += color.length < 2 ? ('0' + color): (color);
+        });
+        return colorString;
+      }
+    });
+  </script>
+</dom-module>
