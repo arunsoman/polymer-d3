@@ -1,0 +1,200 @@
+<script>
+    // creates a processor function
+    PolymerD3.groupingProcessBehaviour = {
+        chartConfig : function (conf, data, rowCallback) {
+
+            // splitting config into x-config and y-config
+            let xConf = {
+                dataIndex: conf.xheader,
+                domain: null,
+                range: [0, conf.width],
+                scale: null,
+                axis: null,
+                axisType: conf.xaxisType,
+                xFormat: conf.xFormat,
+                xAlign: conf.xAlign
+            };
+
+            let yConf = {
+                dataIndex: conf.yheader,
+                domain: null,
+                range: [conf.height, 0],
+                scale: null,
+                axis: null,
+                axisType: conf.yaxisType,
+                yFormat: conf.yFormat,
+                yAlign: conf.yAlign
+            };
+
+            let height = conf.height;
+            let width = conf.width;
+            let stackIndex = conf.stackIndex;
+
+            function temporal(index) {
+                let set = d3.set();
+                let eng = {
+                    process: datum => {
+                        let dateAsNumber = +datum[index[0]];
+                        if(!set.has(dateAsNumber)){
+                            set.add(dateAsNumber);
+                        }
+                    },
+                    getDomain: () => {
+                        let dom = d3.extent(set.values());
+                        return [new Date(+dom[0]), new Date(+dom[1])];
+                    }
+                };
+                return eng;
+            }
+
+            function nonOrdinal(index) {
+                let min = Number.MAX_VALUE;
+                let max = Number.MIN_VALUE;
+                let map = d3.map();
+
+                let group = {
+                    process: datum => {
+                        if (max < datum[index[0]]) {
+                            max = datum[index[0]];
+                        }
+                        if (min > datum[index[0]]) {
+                            min = datum[index[0]];
+                        }
+                    },
+                    getDomain: (forceToZero) => {
+                        return [min, max];
+                    }
+                };
+                let stack ={
+                    process: (datum) => {
+                        let stackKey = datum[stackIndex];
+                        let counter = map.get(stackKey);
+                        if(!counter){
+                            counter = 0;
+                        }
+                        counter += datum[index[0]];
+                        map.set(stackKey, counter);
+                    },
+                    getDomain: (forceToZero, isAggregate, conf) => {
+                        let dom = d3.extent(map.values());
+                        let tmp = map.values(); // collects all data
+                        let max = dom[1];
+
+                        // experimental, for supporting -ve vales in domain
+                        // let max = Math.max(Math.abs(dom[0]), Math.abs(dom[1]));
+
+                        // multiple stacks present
+                        if (conf && conf.dataIndex.length > 1) {
+                            data.forEach(d => {
+                                let sum = 0;
+                                conf.dataIndex.forEach(di => {
+                                    sum += d[di];
+                                });
+                                if (sum > max) {
+                                    max = sum;
+                                }
+                            });
+                        } else if (isAggregate) { // For waterfall chart
+                            max = tmp.pop(); // assumes last element is the largest(total), shortcut for waterfall
+                            tmp.reduce((a, b) => {
+                                let sum = a + b;
+                                if (max < sum) {
+                                    max = sum;
+                                }
+                                return sum;
+                            }, 0);
+                        }
+                        // forces domain to start from zero
+                        if (forceToZero) {
+                            let min = 0;
+                            if (dom[0] < 0) {
+                                min = dom[0]
+                            }
+                            return [min, max];
+                        }
+                        return [dom[0], max];
+                    }
+                };
+                return(stackIndex === undefined) ? group : stack;
+            };
+
+            function findOrdinalFromHeader(index) {
+                let myset = null;
+                return {
+                    process: (aRow) => {
+                        if (myset === null) {
+                            myset = aRow.filter((d, i) => {
+                                return index.includes(i);
+                            });
+                        }
+                    },
+                    getDomain: () => {
+                        return myset;
+                    }
+                };
+            };
+
+            function findOrdinalFromCol(index) {
+                let myset = [];
+                return {
+                    process: (aRow) => {
+                        try {
+                            let aStr = aRow[index[0]].toString();
+                        } catch (e) {
+                            console.warn(e, aRow);
+                        }
+                        if(myset.filter((p)=>{
+                                return p.toString() === aStr;
+                            }).length === 0)
+                        {
+                            myset.push(aRow[index[0]]);
+                        }
+                    },
+                    getDomain: () => {
+                        return myset;
+                    }
+                };
+            };
+
+            let computex;
+            let computey;
+
+            if (conf.containsHeader) {
+                let header = data.shift();
+                let processHeader = (axisType, domainFrom)=>{
+                    if(axisType === 'ordinal' && domainFrom.length > 1) {
+                        let computer = findOrdinalFromHeader(domainFrom);
+                        computer.process(header);
+                        return computer;
+                    }
+                    return undefined;
+                };
+
+                computex = processHeader(xConf.axisType, conf.xheader);
+                computey = processHeader(yConf.axisType, conf.yheader);
+            }
+
+            function findHandler(axisType, header) {
+                switch(axisType) {
+                case 'ordinal':
+                    return findOrdinalFromCol(header);
+                case 'time':
+                    return temporal(header);
+                default:
+                    return nonOrdinal(header);
+                }
+            };
+            if (!computex) {
+                computex = findHandler(xConf.axisType, conf.xheader);
+            }
+            if (!computey) {
+                computey = findHandler(yConf.axisType, conf.yheader);
+            }
+
+            return {
+                computex: computex,
+                computey: computey
+            }
+        }
+    };
+</script>

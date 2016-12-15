@@ -1,0 +1,160 @@
+<link rel="import" href="timeFormater.html">
+<link rel="import" href="axis-behavior.html">
+<script>
+PolymerD3.chartScaleBehavior = {
+    scaleMaker : function(conf, compute) {
+        let xDomain = compute.computex.getDomain();
+        // to force to zero for waterfall chart
+        let yDomain = compute.computey.getDomain(conf.forcetToZero, conf.isAggregate, yConf);
+        if(conf.yOrigin !== undefined){
+            yConf.domain[0] = conf.yOrigin;
+        }
+
+        var height = conf.height;
+        var width = conf.width;
+
+        // console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
+
+        function _scaleFactory(config) {
+            var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
+            var align = config.align;
+            if (!align) {
+                throw new Error('config.align not defined values {v,h}');
+            }
+            var computeRange=()=>{
+                return ((align === 'right') || (align === 'left')) ?
+                        [height, 0] : [0, width];
+            };
+            var scale;
+            switch(config.scaleType){
+            case 'linear':
+                scale =  d3.scale.linear().range(computeRange());
+                break;
+            case 'time':
+                scale =  d3.time.scale().range(computeRange());
+                break;
+            case 'ordinal':
+                if (conf.barInnerPadding == null) {
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+                } else { // for heat map
+                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), 0, conf.barInnerPadding);
+                }
+                break;
+            default:
+                throw Error('invalid config.scaleType');
+            }
+            try {
+                scale.nice();
+            } catch (error) {
+                //TODO
+            }
+            if (config.domain){
+                scale.domain(config.domain);
+            }
+            return scale;
+        };
+        function _createAxisGroup(config) {
+            if (!config.align) {
+                throw new Error("config.align undefined, can't create axisGroup");
+            }
+
+            // keeps track of what axis am I drawing
+            let _axisAligner;
+            if (config.clz == 'x-axis') {
+                _axisAligner = conf.yAxisConf.scale(0) || height;
+            } else {
+                _axisAligner = conf.xAxisConf.scale(0) || width;
+            }
+            var axisG = conf.parentG.append('g');
+            axisG.attr('class', config.align + ' axis');
+            switch (config.align) {
+            case 'top':
+                break;
+            case 'left':
+                break;
+            case 'right':
+                axisG.attr('transform', 'translate(' + _axisAligner + ', 0)');
+                break;
+            case 'bottom':
+                axisG.attr('transform', 'translate(0,' + _axisAligner + ')');
+                break;
+            }
+            return axisG;
+        };
+        function _formateAxis(config) {
+            if (!config.format) {
+                throw new Error('config.format undefined values{number, currency, percent, time}');
+            }
+            if (config.format) {
+                switch (config.format.toLowerCase()) {
+                case 'number':
+                    return (d3.format('.2s'));
+                case 'currency':
+                    return (d3.format('$.2s'));
+                case 'percent':
+                    return (d3.format('.0%'));
+                case 'string':
+                    return (d) => {
+                        if (config.dataType === 'data') {
+                            var dd = new Date(d);
+                            return d3.time.format('%d-%b-%y')(dd);
+                        } else{
+                            return d;
+                        }
+                    };
+                case 'time':
+                    return PolymerD3.timeFormater.formater(config.domain);
+                }
+            }
+        };
+        function _createAxis(config, conf) {
+            conf.scale = _scaleFactory(config);
+            conf.axis = d3.svg.axis().orient(config.align);
+            conf.axis.tickFormat(_formateAxis(config));
+            conf.axis.scale(conf.scale);
+            function drawAxis() {
+                conf.axisG = _createAxisGroup(config);
+                conf.axisG.attr('class',config.clz);
+                conf.axisG.call(conf.axis);
+            }
+            return drawAxis;
+        };
+        function _createXAxis() {
+            var config = {
+                domain: xConf.domain,
+                format: xConf.xFormat,
+                align: xConf.xAlign,
+                clz:'x-axis',
+                scaleType: xConf.axisType
+            };
+            conf.xAxisConf = xConf;
+            xConf.draw = _createAxis(config, xConf);
+            xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
+            if (!this.settings.axis) {
+                this.settings.axis = {};
+            }
+            this.settings.axis.xConf= xConf.axisBehavior;
+        };
+        function _createYAxis() {
+            var config = {
+                domain: yConf.domain,
+                format: yConf.yFormat,
+                align: yConf.yAlign,
+                clz:'y-axis',
+                scaleType: yConf.axisType
+            };
+            conf.yAxisConf = yConf;
+            yConf.draw = _createAxis(config, yConf);
+            yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
+            if (!this.settings.axis) {
+                this.settings.axis = {};
+            }
+            this.settings.axis.yConf= yConf.axisBehavior;
+        };
+        return {
+            createXAxis: _createAxis,
+            createYAxis: _createYAxis
+        }
+    }
+};
+</script>

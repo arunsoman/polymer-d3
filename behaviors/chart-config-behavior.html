@@ -340,20 +340,6 @@ PolymerD3.chartConfigBehavior = {
             this.settings.axis.yConf= yConf.axisBehavior;
         };
 
-        // to create and confiure height scale
-        var heightScale = {};
-        _createAxis({
-            domain: [0, yConf.domain[1]],
-            format: yConf.yFormat,
-            align: yConf.yAlign,
-            clz:'y-axis',
-            scaleType: yConf.axisType
-        }, heightScale);
-        heightScale.calculateHeight = function(h) {
-            var _computedHeight = h - yConf.domain[0];
-            return heightScale.scale(_computedHeight > 0 ? _computedHeight : -_computedHeight);
-        }
-
         // only creates necessary configuration to draw axes
         _createXAxis.call(this);
         _createYAxis.call(this);
