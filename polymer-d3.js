@@ -233,7 +233,18 @@ Polymer({
     this.set('externals', config.externals);
     this.set('source', config.source);
     if (config.availableCharts) {
-      this.availableCharts = config.availableCharts;
+      // to support new charts added to polymer-d3
+      // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it
+      let cookedAvailableCharts = PolymerD3.utilities.compareAndMerge(config.availableCharts, this.availableCharts, elem => {
+        let avaiable = false;
+        for ( let i = 0; i < config.availableCharts.length; i++) {
+          if (config.availableCharts[i].label == elem.label) {
+            avaiable = true;
+          }
+        }
+        return !avaiable;
+      });
+      this.availableCharts = cookedAvailableCharts;
     }
     if (config.mode == 'view') {
       this.set('editMode', false);

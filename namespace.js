@@ -432,3 +432,24 @@ PolymerD3.utilities.searchArr = function(arr, matchFn) {
         }
     }, {});;
 }
+
+// compares and merges arays
+// example:
+// a => [1, 2, 3]; b => [2, 3, 5];
+// comparison() => (if b[i] not in a, return true);
+// f(a, b, comparison) = [1, 2, 3, 5]
+PolymerD3.utilities.compareAndMerge = function(from, to, comparison) {
+    let merged = to.reduce((accum, elem) => {
+        let _temp;
+        if (comparison(elem)){
+            _temp = [elem];
+        } else {
+            _temp = [];
+        }
+        // avoiding mutations with concat, slice and spreaf
+        // https://egghead.io/lessons/javascript-redux-avoiding-array-mutations-with-concat-slice-and-spread
+        return accum.concat(_temp);
+    }, []);
+
+    return from.concat(merged);
+}
