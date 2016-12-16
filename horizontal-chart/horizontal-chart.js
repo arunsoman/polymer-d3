@@ -8,8 +8,8 @@ Polymer({
       type: Array,
       value: () => {
         return [{
-          input: 'x',
-          txt: 'Pick Dimension',
+          input: 'domain',
+          txt: 'Domain Axis',
           selectedValue: [],
           scaleType: '',
           format: '',
@@ -18,26 +18,15 @@ Polymer({
           displayName: 'myXAxis',
           maxSelectableValues: 1
         }, {
-          input: 'y',
-          txt: 'Pick Measures',
+          input: 'range',
+          txt: 'Range Axis',
           selectedValue: [],
           format: '',
           scaleType: '',
           selectedObjs: [],
           uitype: 'multi-value',
           displayName: 'myYAxis',
-          maxSelectableValues: 2,
-          supportedType: ''
-        }, {
-          input: 'z',
-          txt: 'Pick Z',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myZAxis',
-          maxSelectableValues: 2,
+          maxSelectableValues: 5,
           supportedType: ''
         }];
       }
@@ -79,12 +68,12 @@ Polymer({
 
   draw: function() {
     this.debounce('draw-debounce', () => {
-      let xIndex = this.getInputsProperty('x');
-      let yIndices = this.getInputsProperty('y');
+      let domainIndex = this.getInputsProperty('domain');
+      let rangeIndices = this.getInputsProperty('range');
       let z = this.setLegendColor.bind(this);
       this.resize();
       // requireed indices not selected
-      if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source || this.source.length < 1) {
+      if (domainIndex === -1 || !rangeIndices || rangeIndices.length < 1 || !this.source || this.source.length < 1) {
         console.warn('Fill all required inputs using drag and drop');
         return false;
       }
@@ -97,36 +86,83 @@ Polymer({
         this.parentG.html("");
       }
 
-      let stackedData = d3.layout.stack()(yIndices.map(group => {
+      let stackedData = d3.layout.stack()(rangeIndices.map(group => {
         return this.source.map(row => {
           return {
-            x: row[xIndex],
+            x: row[domainIndex],
             y: row[group]
           }
         });
       }));
 
-      console.dir(stackedData);
+      // Inverting stacked data
+      stackedData = stackedData.map((group, index) => {
+        return {
+          key: headers[rangeIndices[index]],
+          data: group.map(row => {
+            return {
+              x: row.y,
+              y: row.x,
+              x0: row.y0
+            }
+          })
+        };
+      });
 
-      let x = d3.scale.ordinal()
-        .rangeRound([0, width]);
+      debugger;
+      // calculates max of range
+      let maxRange = d3.max(stackedData, group => {
+        return d3.max(group, data => {
+          return data.x + data.x0;
+        });
+      });
 
-      let y = d3.scale.linear()
-        .rangeRoundBands([height, 0]);
+      // to calculate domain
+      let domainSet = this.source.map(row => row[domainIndex]);
 
-      let xAxis = d3.svg.axis()
-        .scale(x)
-        .orient('bottom');
+      let rangeScale = d3.scale.linear()
+        .domain([0, maxRange])
+        .range([0, this.chartWidth]); // range is plotted on x-axis
 
-      let yAxis = d3.svg.axis()
-        .scale(y)
+      let domainScale = d3.scale.ordinal()
+        .domain(domainSet)
+        .range([0, this.chartHeight]); // domain is ploted on y-axis
+
+      let domainAxis = d3.svg.axis()
+        .scale(domainScale)
         .orient('left');
 
-        var layers = d3.layout.stack()(causes.map(function(c) {
-    return crimea.map(function(d) {
-      return {x: d.date, y: d[c]};
-    });
-  }));
+      let rangeAxis = d3.svg.axis()
+        .scale(rangeScale)
+        .orient('bottom');
+
+      let  groups = this.parentG.selectAll('g')
+        .data(stackedData)
+        .enter()
+        .append('g')
+        .style('fill', (d, i) => {
+          return '#f00';
+        });
+
+      let rects = groups.selectAll('rect')
+        .data(function (d) {
+          return d.data;
+        })
+        .enter()
+        .append('rect')
+        .attr('x', function (d) {
+          return rangeScale(d.x0);
+        })
+        .attr('y', function (d, i) {
+          return domainScale(d.y);
+        })
+        .attr('height', function (d) {
+          return domainScale.rangeBand();
+        })
+        .attr('width', function (d) {
+          return rangeScale(d.y);
+        });
+      console.dir(stackedData, maxRange);
 
     }, 500);
   }
