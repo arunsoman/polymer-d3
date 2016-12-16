@@ -101,9 +101,7 @@ Polymer({
           .y(d => yLineScale(d.y))
           .interpolate('basis');
 
-        let yLineScale = d3.scale.linear()
-          .domain([0, d3.max(lineData, row => row.y)])
-          .range([this.chartHeight, 0]);
+        let yLineScale = conf.yAxisConf.scale;
 
         let yAxis2 = d3.svg.axis()
           .scale(yLineScale)
