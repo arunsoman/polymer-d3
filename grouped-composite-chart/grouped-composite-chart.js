@@ -90,7 +90,6 @@ Polymer({
           x: row[xIndex],
           y: row[yLine[0]]
         }));
-        console.log(lineData);
 
         let x = d3.scale.ordinal()
           .rangeRoundBands([0, this.chartWidth]);
@@ -114,6 +113,16 @@ Polymer({
           .datum(lineData)
           .attr('d', guide)
           .attr('class', 'line');
+
+        this.parentG.append('g')
+          .attr('class', 'y-axis')
+          .attr('transform', 'translate(' + [this.chartWidth, 0] + ')')
+          .call(yAxis2)
+          .append('text')
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 4)
+          .attr('dy', '-.71em')
+          .style('text-anchor', 'end');
       }
 
       let htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
@@ -218,7 +227,7 @@ Polymer({
     let yObj = this.getInputsPropertyObj('y');
     let zGroup = this.getInputsProperty('z');
 
-    let forcetToZero = false;
+    let forcetToZero = true;
 
     // if (yIndices.length > 1 || zGroup.length) {
       // forcetToZero = true;
