@@ -2,7 +2,12 @@
 <link rel="import" href="axis-behavior.html">
 <script>
 PolymerD3.chartConfigBehavior = {
-    chartConfig : function (conf, data, rowCallback) {
+
+    // factory that creates computex and computey
+    _computeFactory: function(conf, data) {
+        var height = conf.height;
+        var width = conf.width;
+        var stackIndex = conf.stackIndex;
 
         var xConf = {
             dataIndex: conf.xheader,
@@ -25,10 +30,6 @@ PolymerD3.chartConfigBehavior = {
             yFormat: conf.yFormat,
             yAlign: conf.yAlign
         };
-
-        var height = conf.height;
-        var width = conf.width;
-        var stackIndex = conf.stackIndex;
 
         function temporal(index) {
             var set = d3.set();
@@ -116,7 +117,8 @@ PolymerD3.chartConfigBehavior = {
                 }
             };
             return(stackIndex === undefined) ? group : stack;
-        };
+        }
+
         function findOrdinalFromHeader(index) {
             var myset = null;
             return {
@@ -131,7 +133,8 @@ PolymerD3.chartConfigBehavior = {
                     return myset;
                 }
             };
-        };
+        }
+
         function findOrdinalFromCol(index) {
             var myset = [];
             return {
@@ -188,179 +191,219 @@ PolymerD3.chartConfigBehavior = {
         if (!computey) {
             computey = findHandler(yConf.axisType, conf.yheader);
         }
+        return {
+            computex: computex,
+            computey: computey
+        };
+    },
+
+    // process data object and helps calculate doamin of computeObj
+    _processDataWorker: function(data, computeObj, rowCallback) {
         data.forEach((aRow, index) => {
-            computex.process(aRow);
-            computey.process(aRow);
+            computeObj.computex.process(aRow);
+            computeObj.computey.process(aRow);
             if (rowCallback) {
                 rowCallback(aRow, index);
             }
         });
+    },
+
+    // returns a function that draws an axis
+    _createAxis: function(scaleConfig, conf, scaleFactory) {
+        console.log(this);
+        debugger;
+        let scaleMaker = scaleFactory.bind(this) || this._scaleFactory;
+        conf.scale = scaleMaker(scaleConfig, conf);
+        conf.axis = d3.svg.axis().orient(scaleConfig.align);
+        conf.axis.tickFormat(this._formateAxis(scaleConfig));
+        conf.axis.scale(conf.scale);
+        let drawAxis = () => {
+            conf.axisG = this._createAxisGroup(scaleConfig, conf);
+            conf.axisG.attr('class',scaleConfig.clz);
+            conf.axisG.call(conf.axis);
+        }
+        return drawAxis;
+    },
+
+    // creates a scale from the config
+    _scaleFactory: function(scaleConfig, conf) {
+        var barPadding = (!scaleConfig.barPadding) ? 0.1 : scaleConfig.barPadding;
+        var align = scaleConfig.align;
+        if (!align) {
+            throw new Error('scaleConfig.align not defined values {v,h}');
+        }
+        var computeRange=()=>{
+            return ((align === 'right') || (align === 'left')) ?
+                    [this.chartHeight, 0] : [0, this.chartWidth];
+        };
+        var scale;
+        switch(scaleConfig.scaleType){
+        case 'linear':
+            scale =  d3.scale.linear().range(computeRange());
+            break;
+        case 'time':
+            scale =  d3.time.scale().range(computeRange());
+            break;
+        case 'ordinal':
+            if (conf.barInnerPadding == null) {
+                scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
+            } else { // for heat map
+                scale = d3.scale.ordinal().rangeRoundBands(computeRange(), 0, conf.barInnerPadding);
+            }
+            break;
+        default:
+            throw Error('invalid scaleConfig.scaleType');
+        }
+        try {
+            scale.nice();
+        } catch (error) {
+            //TODO
+        }
+        if (scaleConfig.domain){
+            scale.domain(scaleConfig.domain);
+        }
+        return scale;
+    },
+
+    _createAxisGroup: function(scaleConfig, conf) {
+        if (!scaleConfig.align) {
+            throw new Error("scaleConfig.align undefined, can't create axisGroup");
+        }
+
+        // keeps track of what axis am I drawing
+        let _axisAligner;
+        if (scaleConfig.clz == 'x-axis') {
+            _axisAligner = conf.yAxisConf.scale(0) || height;
+        } else {
+            _axisAligner = conf.xAxisConf.scale(0) || width;
+        }
+        var axisG = conf.parentG.append('g');
+        axisG.attr('class', scaleConfig.align + ' axis');
+        switch (scaleConfig.align) {
+        case 'top':
+            break;
+        case 'left':
+            break;
+        case 'right':
+            axisG.attr('transform', 'translate(' + _axisAligner + ', 0)');
+            break;
+        case 'bottom':
+            axisG.attr('transform', 'translate(0,' + _axisAligner + ')');
+            break;
+        }
+        return axisG;
+    },
+
+    _formateAxis: function(scaleConfig) {
+        if (!scaleConfig.format) {
+            throw new Error('scaleConfig.format undefined values{number, currency, percent, time}');
+        }
+        if (scaleConfig.format) {
+            switch (scaleConfig.format.toLowerCase()) {
+            case 'number':
+                return (d3.format('.2s'));
+            case 'currency':
+                return (d3.format('$.2s'));
+            case 'percent':
+                return (d3.format('.0%'));
+            case 'string':
+                return (d) => {
+                    if (scaleConfig.dataType === 'data') {
+                        var dd = new Date(d);
+                        return d3.time.format('%d-%b-%y')(dd);
+                    } else{
+                        return d;
+                    }
+                };
+            case 'time':
+                return PolymerD3.timeFormater.formater(scaleConfig.domain);
+            }
+        }
+    },
+
+    _createXAxis: (xConf, chart) => {
+        var config = {
+            domain: xConf.domain,
+            format: xConf.xFormat,
+            align: xConf.xAlign,
+            clz:'x-axis',
+            scaleType: xConf.axisType
+        };
+        xConf.draw = chart._createAxis(config, xConf, chart._scaleFactory);
+        xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
+        if (!chart.settings.axis) {
+            chart.settings.axis = {};
+        }
+        chart.settings.axis.xConf= xConf.axisBehavior;
+        return xConf;
+    },
+
+    _createYAxis: (yConf, chart) => {
+        var config = {
+            domain: yConf.domain,
+            format: yConf.yFormat,
+            align: yConf.yAlign,
+            clz:'y-axis',
+            scaleType: yConf.axisType
+        };
+        yConf.draw = chart._createAxis(config, yConf, chart._scaleFactory);
+        yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
+        if (!chart.settings.axis) {
+            chart.settings.axis = {};
+        }
+        chart.settings.axis.yConf= yConf.axisBehavior;
+        return yConf;
+    },
+
+    chartConfig : function (conf, data, rowCallback) {
+        // todo:  remove xConf, yConf duplication
+        var xConf = {
+            dataIndex: conf.xheader,
+            domain: null,
+            range: [0, conf.width],
+            scale: null,
+            axis: null,
+            axisType: conf.xaxisType,
+            xFormat: conf.xFormat,
+            xAlign: conf.xAlign
+        };
+
+        var yConf = {
+            dataIndex: conf.yheader,
+            domain: null,
+            range: [conf.height, 0],
+            scale: null,
+            axis: null,
+            axisType: conf.yaxisType,
+            yFormat: conf.yFormat,
+            yAlign: conf.yAlign
+        };
+
+        var height = conf.height;
+        var width = conf.width;
+        var stackIndex = conf.stackIndex;
+
+        let _compute = this._computeFactory(conf, data);
+
+        let computex = _compute.computex;
+        let computey = _compute.computey;
+
+        this._processDataWorker(data, _compute, rowCallback);
+
         xConf.domain = computex.getDomain();
         // to force to zero for waterfall chart
         yConf.domain = computey.getDomain(conf.forcetToZero, conf.isAggregate, yConf);
         if(conf.yOrigin !== undefined){
             yConf.domain[0] = conf.yOrigin;
         }
-        // console.log('xDom: '+xConf.domain+ ' yDom: '+yConf.domain);
-
-        var _scaleFactory = (config) => {
-            var barPadding = (!config.barPadding) ? 0.1 : config.barPadding;
-            var align = config.align;
-            if (!align) {
-                throw new Error('config.align not defined values {v,h}');
-            }
-            var computeRange=()=>{
-                return ((align === 'right') || (align === 'left')) ?
-                        [height, 0] : [0, width];
-            };
-            var scale;
-            switch(config.scaleType){
-            case 'linear':
-                scale =  d3.scale.linear().range(computeRange());
-                break;
-            case 'time':
-                scale =  d3.time.scale().range(computeRange());
-                break;
-            case 'ordinal':
-                if (conf.barInnerPadding == null) {
-                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), barPadding);
-                } else { // for heat map
-                    scale = d3.scale.ordinal().rangeRoundBands(computeRange(), 0, conf.barInnerPadding);
-                }
-                break;
-            default:
-                throw Error('invalid config.scaleType');
-            }
-            try {
-                scale.nice();
-            } catch (error) {
-                //TODO
-            }
-            if (config.domain){
-                scale.domain(config.domain);
-            }
-            return scale;
-        };
-        var _createAxisGroup = (config) => {
-            if (!config.align) {
-                throw new Error("config.align undefined, can't create axisGroup");
-            }
-
-            // keeps track of what axis am I drawing
-            let _axisAligner;
-            if (config.clz == 'x-axis') {
-                _axisAligner = conf.yAxisConf.scale(0) || height;
-            } else {
-                _axisAligner = conf.xAxisConf.scale(0) || width;
-            }
-            var axisG = conf.parentG.append('g');
-            axisG.attr('class', config.align + ' axis');
-            switch (config.align) {
-            case 'top':
-                break;
-            case 'left':
-                break;
-            case 'right':
-                axisG.attr('transform', 'translate(' + _axisAligner + ', 0)');
-                break;
-            case 'bottom':
-                axisG.attr('transform', 'translate(0,' + _axisAligner + ')');
-                break;
-            }
-            return axisG;
-        };
-        var _formateAxis = (config) => {
-            if (!config.format) {
-                throw new Error('config.format undefined values{number, currency, percent, time}');
-            }
-            if (config.format) {
-                switch (config.format.toLowerCase()) {
-                case 'number':
-                    return (d3.format('.2s'));
-                case 'currency':
-                    return (d3.format('$.2s'));
-                case 'percent':
-                    return (d3.format('.0%'));
-                case 'string':
-                    return (d) => {
-                        if (config.dataType === 'data') {
-                            var dd = new Date(d);
-                            return d3.time.format('%d-%b-%y')(dd);
-                        } else{
-                            return d;
-                        }
-                    };
-                case 'time':
-                    return PolymerD3.timeFormater.formater(config.domain);
-                }
-            }
-        };
-        var _createAxis = (config, conf)=>{
-            conf.scale = _scaleFactory(config);
-            conf.axis = d3.svg.axis().orient(config.align);
-            conf.axis.tickFormat(_formateAxis(config));
-            conf.axis.scale(conf.scale);
-            function drawAxis() {
-                conf.axisG = _createAxisGroup(config);
-                conf.axisG.attr('class',config.clz);
-                conf.axisG.call(conf.axis);
-            }
-            return drawAxis;
-        };
-        var _createXAxis = () => {
-            var config = {
-                domain: xConf.domain,
-                format: xConf.xFormat,
-                align: xConf.xAlign,
-                clz:'x-axis',
-                scaleType: xConf.axisType
-            };
-            conf.xAxisConf = xConf;
-            xConf.draw = _createAxis(config, xConf);
-            xConf.axisBehavior = PolymerD3.axisBehavior.attach(xConf.axisG);
-            if (!this.settings.axis) {
-                this.settings.axis = {};
-            }
-            this.settings.axis.xConf= xConf.axisBehavior;
-        };
-        var _createYAxis = () => {
-            var config = {
-                domain: yConf.domain,
-                format: yConf.yFormat,
-                align: yConf.yAlign,
-                clz:'y-axis',
-                scaleType: yConf.axisType
-            };
-            conf.yAxisConf = yConf;
-            yConf.draw = _createAxis(config, yConf);
-            yConf.axisBehavior = PolymerD3.axisBehavior.attach(yConf.axisG);
-            if (!this.settings.axis) {
-                this.settings.axis = {};
-            }
-            this.settings.axis.yConf= yConf.axisBehavior;
-        };
-
-        // to create and confiure height scale
-        var heightScale = {};
-        _createAxis({
-            domain: [0, yConf.domain[1]],
-            format: yConf.yFormat,
-            align: yConf.yAlign,
-            clz:'y-axis',
-            scaleType: yConf.axisType
-        }, heightScale);
-        heightScale.calculateHeight = function(h) {
-            var _computedHeight = h - yConf.domain[0];
-            return heightScale.scale(_computedHeight > 0 ? _computedHeight : -_computedHeight);
-        }
 
         // only creates necessary configuration to draw axes
-        _createXAxis.call(this);
-        _createYAxis.call(this);
+        xConf = this._createXAxis(xConf, this);
+        yConf = this._createYAxis(yConf, this);
 
         // actually drawing axes
-        conf.xAxisConf.draw();
-        conf.yAxisConf.draw();
+        xConf.draw();
+        yConf.draw();
 
         return {
             getXAxisBehavior: xConf.axisBehavior,
