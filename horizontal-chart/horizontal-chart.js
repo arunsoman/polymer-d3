@@ -161,6 +161,23 @@ Polymer({
         .attr('width', function (d) {
           return rangeScale(d.x);
         });
+
+        this.parentG.append('g')
+          .attr('class', 'y-axis')
+          .attr('transform', 'translate(' + [0, 0] + ')')
+          .call(domainAxis)
+          .append('text')
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 4)
+          .attr('dy', '-.71em')
+          .style('text-anchor', 'end');
+
+        this.parentG.append('g')
+          .attr('class', 'x-axis')
+          .attr('transform', 'translate(' + [ 0, 0 ] + ')')
+          .call(rangeAxis)
+          .append('text')
+          .style('text-anchor', 'end');
     }, 500);
   }
 });
