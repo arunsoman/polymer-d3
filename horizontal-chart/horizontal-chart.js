@@ -109,10 +109,9 @@ Polymer({
         };
       });
 
-      debugger;
       // calculates max of range
       let maxRange = d3.max(stackedData, group => {
-        return d3.max(group, data => {
+        return d3.max(group.data, data => {
           return data.x + data.x0;
         });
       });
@@ -126,7 +125,7 @@ Polymer({
 
       let domainScale = d3.scale.ordinal()
         .domain(domainSet)
-        .range([0, this.chartHeight]); // domain is ploted on y-axis
+        .rangeBands([0, this.chartHeight]); // domain is ploted on y-axis
 
       let domainAxis = d3.svg.axis()
         .scale(domainScale)
@@ -160,10 +159,8 @@ Polymer({
           return domainScale.rangeBand();
         })
         .attr('width', function (d) {
-          return rangeScale(d.y);
+          return rangeScale(d.x);
         });
-      console.dir(stackedData, maxRange);
-
     }, 500);
   }
 });
