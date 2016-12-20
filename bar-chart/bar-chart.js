@@ -113,7 +113,7 @@ Polymer({
       }
 
       var conf = this.configurator.conf.call(this);
-      if (conf.chartType == 'heatmap' && (!zGroup || !zGroup.length)) {
+      if (conf.chartType == 'heatmap' && zGroup == null) {
         console.warn('Select z-attribute to select a fill color');
         return false;
       }
@@ -135,15 +135,15 @@ Polymer({
 
       // if z/group-by is selected, data should be grouped by values in coloumn zGroup
       let _isGrouped = false;
-      if (zGroup && zGroup.length) {
+      if (zGroup != null) {
         _isGrouped = true;
-        conf.stackIndex = zGroup[0];
+        conf.stackIndex = zGroup;
       }
 
       var myGroup = PolymerD3
         .groupingBehavior
         .group_by(
-          (_isGrouped) ? zGroup : yIndices,
+          (_isGrouped) ? [zGroup] : yIndices,
           xIndex, yIndices, headers, conf.chartType, _isGrouped
         );
       var nChartConfig = this.chartConfig(conf, _src, myGroup.process);
@@ -225,7 +225,7 @@ Polymer({
       }
 
       function htmlCbForHeatMap(d) {
-        return '<td>' + headers[zGroup[0]] + ':</td><td>' + d.z + '</td>';
+        return '<td>' + headers[zGroup] + ':</td><td>' + d.z + '</td>';
       }
       var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
         var str = '<table>' +
