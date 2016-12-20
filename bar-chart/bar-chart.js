@@ -247,22 +247,165 @@ Polymer({
   },
 
   initGroupedBarChart: function() {
+    this.set('inputs', [{
+      input: 'x',
+      txt: 'Pick Dimension',
+      selectedValue: [],
+      scaleType: '',
+      format: '',
+      selectedObjs: [],
+      uitype: 'single-value',
+      displayName: 'myXAxis',
+      maxSelectableValues: 1
+    }, {
+      input: 'y',
+      txt: 'Pick Measures',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myYAxis',
+      maxSelectableValues: 5,
+      supportedType: ''
+    }, {
+      input: 'z',
+      txt: 'Pick Z',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myZAxis',
+      maxSelectableValues: 1,
+      supportedType: ''
+    }]);
     this.set('configurator', new PolymerD3.barChart.grouped());
   },
 
   initStackedBarChart: function() {
+    this.set('inputs', [{
+      input: 'x',
+      txt: 'Pick Dimension',
+      selectedValue: [],
+      scaleType: '',
+      format: '',
+      selectedObjs: [],
+      uitype: 'single-value',
+      displayName: 'myXAxis',
+      maxSelectableValues: 1
+    }, {
+      input: 'y',
+      txt: 'Pick Measures',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myYAxis',
+      maxSelectableValues: 5,
+      supportedType: ''
+    }, {
+      input: 'z',
+      txt: 'Pick Z',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myZAxis',
+      maxSelectableValues: 1,
+      supportedType: ''
+    }]);
     this.set('configurator', new PolymerD3.barChart.stacked());
   },
 
   initWaterfallChart: function() {
+    this.set('inputs', [{
+      input: 'x',
+      txt: 'Pick Dimension',
+      selectedValue: [],
+      scaleType: '',
+      format: '',
+      selectedObjs: [],
+      uitype: 'single-value',
+      displayName: 'myXAxis',
+      maxSelectableValues: 1
+    }, {
+      input: 'y',
+      txt: 'Pick Measures',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myYAxis',
+      maxSelectableValues: 1,
+      supportedType: ''
+    }]);
     this.set('configurator', new PolymerD3.barChart.waterfall());
   },
 
   initDiffrenceChart: function() {
+    this.set('inputs', [{
+      input: 'x',
+      txt: 'Pick Dimension',
+      selectedValue: [],
+      scaleType: '',
+      format: '',
+      selectedObjs: [],
+      uitype: 'single-value',
+      displayName: 'myXAxis',
+      maxSelectableValues: 1
+    }, {
+      input: 'y',
+      txt: 'Pick Measures',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myYAxis',
+      maxSelectableValues: 2,
+      supportedType: ''
+    }]);
     this.set('configurator', new PolymerD3.barChart.difference());
   },
 
   initHeatMap: function() {
+    this.set('inputs', [{
+      input: 'x',
+      txt: 'Pick Dimension',
+      selectedValue: [],
+      scaleType: '',
+      format: '',
+      selectedObjs: [],
+      uitype: 'single-value',
+      displayName: 'myXAxis',
+      maxSelectableValues: 1
+    }, {
+      input: 'y',
+      txt: 'Pick Measures',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myYAxis',
+      maxSelectableValues: 1,
+      supportedType: ''
+    }, {
+      input: 'z',
+      txt: 'Pick Z',
+      selectedValue: [],
+      format: '',
+      scaleType: '',
+      selectedObjs: [],
+      uitype: 'multi-value',
+      displayName: 'myZAxis',
+      maxSelectableValues: 1,
+      supportedType: ''
+    }]);
     this.set('configurator', new PolymerD3.barChart.heatMap());
   }
 });
