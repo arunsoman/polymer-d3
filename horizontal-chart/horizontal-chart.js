@@ -15,7 +15,7 @@ Polymer({
           format: '',
           selectedObjs: [],
           uitype: 'single-value',
-          displayName: 'myXAxis',
+          displayName: 'Domain',
           maxSelectableValues: 1
         }, {
           input: 'range',
@@ -25,7 +25,7 @@ Polymer({
           scaleType: '',
           selectedObjs: [],
           uitype: 'multi-value',
-          displayName: 'myYAxis',
+          displayName: 'Range',
           maxSelectableValues: 5,
           supportedType: ''
         }];
@@ -139,10 +139,35 @@ Polymer({
         .data(stackedData)
         .enter()
         .append('g')
-        .style('fill', (d, i) => {
-          return '#f00';
+        .attr('class', 'layer')
+        .style('fill', d => {
+          // Logic to generate legends initialy
+          var color = z(d);
+          var keyPresent = false;
+          this.legendSettings.colors.forEach((c) => {
+            if (c.label == d.key) {
+              color = c.color;
+              keyPresent = true;
+            }
+          });
+          // Create new entry if legend isn't present
+          // TO do: remove &&d.key =>  something's wrong with generate stackData meathod
+          // d.key comes as undefined check `PolymerD3.groupingBehavior`
+          if (!keyPresent && d.key) {
+            this.legendSettings.colors.push({
+              color: color,
+              label: d.key
+            });
+          }
+          return color;
+        })
+        .attr('class', 'stroked-elem') // to set stroke
+        .attr('data-legend', function(d) {
+          return d.key;
         });
 
+
+      // draw rectangles
       let rects = groups.selectAll('rect')
         .data(function (d) {
           return d.data;
@@ -161,23 +186,40 @@ Polymer({
         .attr('width', function (d) {
           return rangeScale(d.x);
         });
+      // draw axes
+      this.parentG.append('g')
+        .attr('class', 'y-axis')
+        .attr('transform', 'translate(' + [0, 0] + ')')
+        .call(domainAxis)
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 4)
+        .attr('dy', '-.71em')
+        .style('text-anchor', 'end');
 
-        this.parentG.append('g')
-          .attr('class', 'y-axis')
-          .attr('transform', 'translate(' + [0, 0] + ')')
-          .call(domainAxis)
-          .append('text')
-          .attr('transform', 'rotate(-90)')
-          .attr('y', 4)
-          .attr('dy', '-.71em')
-          .style('text-anchor', 'end');
+      this.parentG.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(' + [ 0, 0 ] + ')')
+        .call(rangeAxis)
+        .append('text')
+        .style('text-anchor', 'end');
 
-        this.parentG.append('g')
-          .attr('class', 'x-axis')
-          .attr('transform', 'translate(' + [ 0, 0 ] + ')')
-          .call(rangeAxis)
-          .append('text')
-          .style('text-anchor', 'end');
+      var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
+        var str = '<table>' +
+          '<tr>' +
+          '<td>' + this.inputs[1].displayName + ':</td>' +
+          '<td>' + d.y + '</td>' +
+          '</tr>' +
+          '<tr>' +
+          '<td>' + this.inputs[0].displayName + ':</td>' +
+          '<td>' + d.x + '</td>' +
+          '</tr>' +
+          '</table>';
+        return str;
+      };
+      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
+
+      this.attachLegend(this.parentG);
     }, 500);
   }
 });
