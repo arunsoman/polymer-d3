@@ -1,0 +1,27 @@
+<!-- This chart is specifically built to be transformed into a 100% chart -->
+<dom-module id="horizontal-chart">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <template is="dom-if" if="{{editMode}}">
+      <display-component settings="{{area}}"></display-component>
+      <div class="draggable-areabtn-wrap">
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <paper-icon-button
+          class="settings-icon"
+          icon="icons:settings-overscan"
+          title="Area Settings"
+          on-tap="showAreaSettings"
+        ></paper-icon-button>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
+    </template>
+  </template>
+  <script src="horizontal-chart.js">
+  </script>
+</dom-module>
