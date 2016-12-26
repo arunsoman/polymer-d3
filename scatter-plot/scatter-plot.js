@@ -25,7 +25,7 @@ Polymer({
           scaleType: '',
           format:'',
           maxSelectableValues: 1
-        }, {
+        }, /*{
           input: 'z',
           txt: 'Group',
           selectedValue: -1,
@@ -34,7 +34,7 @@ Polymer({
           scaleType: '',
           format:'',
           maxSelectableValues: 1
-        }, {
+        },*/ {
           input: 's',
           txt: 'Size',
           selectedValue: -1,
