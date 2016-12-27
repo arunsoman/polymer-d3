@@ -15,42 +15,38 @@
       var externals = [{
         key: 'state',
         type: 'String',
-        value: 1
-      },{
+        value: 0
+      }, {
         key: 'l1',
         type: 'Number',
-        value: 2
-      },{
+        value: 1
+      }, {
         key: 'l2',
         type: 'Number',
-        value: 3
-      },{
+        value: 2
+      }, {
         key: 'l3',
         type: 'Number',
-        value: 4
-      },{
+        value: 3
+      }, {
         key: 'l4',
         type: 'Number',
-        value: 5
-      },{
+        value: 4
+      }, {
         key: 'l5',
         type: 'Number',
-        value: 6
-      },{
+        value: 5
+      }, {
         key: 'l6',
         type: 'Number',
-        value: 7
-      },{
-        key: 'l7',
-        type: 'Number',
-        value: 8
+        value: 6
       }]
       d3.csv("data/bar-data.csv", function(error, csv) {
         var data = csv.map(function(row) {
           return [
             row.state, Number(row.l1), Number(row.l2),
             Number(row.l3), Number(row.l4), Number(row.l5),
-            Number(row.l6), Number(row.l7)
+            Number(row.l6)
           ];
         });
         console.log(data);
