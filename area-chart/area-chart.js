@@ -21,8 +21,8 @@ Polymer({
                 selectedObjs: [],
                 scaleType: '',
                 format: '',
-                maxSelectableValues: 2
-            }, {
+                maxSelectableValues: 4
+            }, /* {
                 input: 'z',
                 txt: 'Pick a dimension',
                 selectedValue: 1,
@@ -31,7 +31,7 @@ Polymer({
                 scaleType: '',
                 format: '',
                 maxSelectableValues: 1
-            }]
+            } */]
         },
         settings: {
             notify: true,

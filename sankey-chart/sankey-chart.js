@@ -36,7 +36,7 @@ Polymer({
               uitype: 'multi-value',
               displayName: 'Count',
               maxSelectableValues: 1
-            }, {
+            }, /*{
               input: 'units',
               txt: 'Enter Count',
               selectedValue: ['widget'],
@@ -46,7 +46,7 @@ Polymer({
               uitype: 'multi-value',
               displayName: 'Units',
               maxSelectableValues: 1
-            }];
+            }*/];
           }
       },
       settings: {

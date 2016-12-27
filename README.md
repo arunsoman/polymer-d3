@@ -1,6 +1,7 @@
 # \<polymer-d3\>
 
 polymer web components for d3 charts
+Take it out for a [spin](https://arunsoman.github.io/polymer-d3)
 
 ## Install the Polymer-CLI
 

@@ -22,12 +22,6 @@
         padding: .5em;
         position: relative;
       }
-      .icons-wrap.right-icons,
-      .settings-icon {
-        position: absolute;
-        right: 0;
-        top: 6px;
-      }
       .chartHolder {
         text-align: center;
       }
@@ -48,30 +42,8 @@
           charts="[[availableCharts]]"
           selected="{{selectedChart}}"
         ></chart-selector>
-        <div class="icons-wrap right-icons">
-          <paper-icon-button
-            icon="icons:settings"
-            title="Input Settings"
-            on-tap="showInputSettings"
-          ></paper-icon-button>
-        </div>
       </div>
     </template>
-    <!-- <template is="dom-if" if="{{settingsVisible}}" restamp>
-      <display-component settings="{{settings}}"></display-component>
-      <div class="draggable-areabtn-wrap">
-        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-          <paper-icon-button
-            class="settings-icon"
-            icon="icons:settings-overscan"
-            title="Area Settings"
-            on-tap="showAreaSettings"
-          ></paper-icon-button>
-      </div>
-      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
-        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
-      </template>
-    </template> -->
     <div class="chartHolder"></div>
   </template>
   <script src="polymer-d3.js"></script>

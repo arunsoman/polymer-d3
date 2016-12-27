@@ -94,11 +94,11 @@ Polymer({
     this.debounce('pieChartDrawDeounce', () => {
       let slice = this.inputs[0].selectedValue;
       let sliceSize = this.inputs[1].selectedValue;
-      let groupBy = this.inputs[2].selectedValue;
       // if slice exists, it would be an array
       if (!slice || !sliceSize) {
         return false;
       }
+      let groupBy = this.inputs[2].selectedValue;
       slice = slice[0];
       sliceSize = sliceSize[0];
 

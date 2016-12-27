@@ -5,6 +5,9 @@
     },
     getInputsProperty: function(key) {
         var result = PolymerD3.utilities._getProperty.call(this, 'inputs', key);
+        if (!result) {
+            return false;
+        }
         // Returns single result instead of array,
         // if max selectable values is 1s
         if (result.maxSelectableValues === 1) {
