@@ -72,7 +72,7 @@ Could also be used as a custom visualization
           </tr>
         </thead>
         <tbody>
-          <template is="dom-repeat" items="{{datum}}" as="row">
+          <template is="dom-repeat" items="{{source}}" as="row">
             <tr>
               <template is="dom-repeat" items="{{row}}">
                 <th>{{item}}</th>
@@ -87,7 +87,7 @@ Could also be used as a custom visualization
     Polymer({
       is: 'polymerd3-table',
       properties: {
-        datum: {
+        source: {
           type: Array,
           value: () => {
             return [];
