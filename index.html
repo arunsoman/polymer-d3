@@ -10,10 +10,10 @@
   </head>
   <body>
     <polymer-d3></polymer-d3>
-    <polymerd3-table></polymerd3-table>
+    <!-- <polymerd3-table></polymerd3-table> -->
     <script type="text/javascript">
       var pd3 = document.querySelector('polymer-d3');
-      var table = document.querySelector('polymerd3-table');
+      // var table = document.querySelector('polymerd3-table');
       var externals = [{
         key: 'state',
         type: 'String',
@@ -58,8 +58,8 @@
           mode: 'create'
         }
         pd3.bootstrapCharts(config);
-        table.source = data;
-        table.externals = externals;
+        // table.source = data;
+        // table.externals = externals;
       });
     </script>
   </body>
