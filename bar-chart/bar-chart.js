@@ -97,7 +97,7 @@ Polymer({
       let z = this.setLegendColor.bind(this);
       this.resize();
       // requireed indices not selected
-      if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source ||
+      if (xIndex === -1 || yIndices == null || yIndices.length < 1 || !this.source ||
         PolymerD3.utilities.isEmptyObject(this.configurator) || this.source.length < 1
       ) {
         console.warn('Fill all required inputs using drag and drop');
@@ -123,6 +123,7 @@ Polymer({
 
       // for waterfall chart
       if (conf.chartType === 'waterfall') {
+        yIndices = [yIndices];
         let sum = 0;
         _src.forEach(value =>  {
           sum += value[yIndices[0]];

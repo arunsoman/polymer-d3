@@ -11,7 +11,7 @@ PolymerD3.barChart.waterfall = function() {
       isAggregate: true,
       xheader: [xIndex],
       yOrign: 0,
-      yheader: yIndices,
+      yheader: [yIndices],
       width: this.chartWidth,
       height: this.chartHeight,
       xFormat: 'string',
