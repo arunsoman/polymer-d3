@@ -124,6 +124,16 @@ Polymer({
           .attr('d', guide)
           .attr('class', 'line')
           .attr('transform', 'translate(' + ((x.rangeBand() - 1) / 2) + ',' + 0 + ')');
+
+        this.parentG.append('g')
+          .attr('class', 'y-axis')
+          .attr('transform', 'translate(' + [this.chartWidth, 0] + ')')
+          .call(yAxis2)
+          .append('text')
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 4)
+          .attr('dy', '-.71em')
+          .style('text-anchor', 'end');
       }
 
       var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
