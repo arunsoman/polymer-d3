@@ -105,7 +105,6 @@ Polymer({
       if (yLine && yLine.length) {
 
         let lineData = this.source.map(row => ({x: mapXValue(row), y: mapYLine(row)}));
-        console.log(lineData);
 
         let guide = d3.svg.line()
           .x(d => x(d.x))
@@ -123,7 +122,8 @@ Polymer({
         let line = this.parentG.append('path')
           .datum(lineData)
           .attr('d', guide)
-          .attr('class', 'line');
+          .attr('class', 'line')
+          .attr('transform', 'translate(' + ((x.rangeBand() - 1) / 2) + ',' + 0 + ')');
       }
 
       var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
