@@ -136,7 +136,7 @@ Polymer({
 
       // if z/group-by is selected, data should be grouped by values in coloumn zGroup
       let _isGrouped = false;
-      if (zGroup != null) {
+      if (zGroup != null && zGroup != false) {
         _isGrouped = true;
         conf.stackIndex = zGroup;
       }
