@@ -14,6 +14,11 @@ Polymer({
         // barchart.js@{{initStackedBarChart}}
         if (!this.availableCharts) {
           return [{
+            label: 'Table',
+            icon: 'chart:stacked-bar-chart',
+            element: 'polymerd3-table',
+            callBack: 'initTable'
+          }, {
             label: 'Stacked Bar Chart',
             icon: 'chart:stacked-bar-chart',
             element: 'bar-chart',
