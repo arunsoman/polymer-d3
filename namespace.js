@@ -453,3 +453,14 @@ PolymerD3.utilities.compareAndMerge = function(from, to, comparison) {
 
     return from.concat(merged);
 }
+
+// 'mutates' the object statisying 'condition' in the array of a objects 'arr'
+PolymerD3.utilities.mutateObjInArr = function(arr, condition, mutation) {
+    var newArr = arr.map(elem => {
+        if (condition(elem)) {
+            return mutation(elem);
+        }
+        return elem;
+    });
+    return newArr;
+}
