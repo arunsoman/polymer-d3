@@ -22,6 +22,8 @@ PolymerD3.dragElem = {
     let rectFillOpacity = config.areaRect.opacity || .8;
     let marginLeft = _getSettingsProp('marginLeft').selectedValue * scale;
     let marginTop = _getSettingsProp('marginTop').selectedValue * scale;
+    let marginRight = _getSettingsProp('marginRight').selectedValue * scale;
+    let marginBottom = _getSettingsProp('marginBottom').selectedValue * scale;
 
     /* == Operation== */
     // clears SVG
@@ -30,8 +32,8 @@ PolymerD3.dragElem = {
     // creates area group
     let areaG = svg.append('g')
       .data([{
-        x: width / 2,
-        y: height / 2
+        x: width / 4,
+        y: height / 4
       }]);
 
     // create area rectangle
@@ -54,10 +56,10 @@ PolymerD3.dragElem = {
       y: height / 4
     }]);
     let innerRect = this._drawRect(innerG, {
-      width: width / 2,
-      height: height / 2,
-      x: marginLeft + (width * scale) / 2,
-      y: marginTop + (height * scale) / 2,
+      width: width - (marginLeft + marginRight),
+      height: height - (marginTop + marginBottom),
+      x: marginLeft,
+      y: marginTop,
       scalability: this.DRAG_CONSTANTS.BOTH,
       fillOpacity: rectFillOpacity
     });
@@ -66,6 +68,10 @@ PolymerD3.dragElem = {
       scale: scale
     });
 
+    return {
+      innerRect: innerRect,
+      areaRect: areaRect
+    }
   },
 
   // function to draw a rectangle with given config
@@ -121,61 +127,61 @@ PolymerD3.dragElem = {
     // scale bars
     var scaleBarleft = group.append('rect')
       .attr('x', function(d) {
-        return d.x - (dragbarw / 2);
+        return rectDiamensions.x - (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + (dragbarw / 2);
+        return rectDiamensions.y + (dragbarw / 2);
       })
       .attr('height', height - dragbarw)
       .attr('id', 'scaleleft')
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', 0)
+      .attr('fill-opacity', .6)
       .attr('cursor', 'ew-resize')
       .call(scaleleft);
 
     var scaleBarright = group.append('rect')
       .attr('x', function(d) {
-        return d.x + width - (dragbarw / 2);
+        return rectDiamensions.x + width - (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + (dragbarw / 2);
+        return rectDiamensions.y + (dragbarw / 2);
       })
       .attr('id', 'scaleright')
       .attr('height', height - dragbarw)
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', 0)
+      .attr('fill-opacity', .6)
       .attr('cursor', 'ew-resize')
       .call(scaleright);
 
     var scaleBartop = group.append('rect')
       .attr('x', function(d) {
-        return d.x + (dragbarw / 2);
+        return rectDiamensions.x + (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y - (dragbarw / 2);
+        return rectDiamensions.y - (dragbarw / 2);
       })
       .attr('height', dragbarw)
       .attr('id', 'scaleleft')
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', 0)
+      .attr('fill-opacity', .6)
       .attr('cursor', 'ns-resize')
       .call(scaletop);
 
     var scaleBarbottom = group.append('rect')
       .attr('x', function(d) {
-        return d.x + (dragbarw / 2);
+        return rectDiamensions.x + (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + height - (dragbarw / 2);
+        return rectDiamensions.y + height - (dragbarw / 2);
       })
       .attr('id', 'scaleright')
       .attr('height', dragbarw)
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', 0)
+      .attr('fill-opacity', .6)
       .attr('cursor', 'ns-resize')
       .call(scalebottom);
 
