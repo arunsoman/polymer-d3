@@ -70,7 +70,8 @@ PolymerD3.dragElem = {
 
     return {
       innerRect: innerRect,
-      areaRect: areaRect
+      areaRect: areaRect,
+      scale: scale
     }
   },
 
@@ -136,7 +137,7 @@ PolymerD3.dragElem = {
       .attr('id', 'scaleleft')
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', .6)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ew-resize')
       .call(scaleleft);
 
@@ -151,7 +152,7 @@ PolymerD3.dragElem = {
       .attr('height', height - dragbarw)
       .attr('width', dragbarw)
       .attr('fill', 'lightblue')
-      .attr('fill-opacity', .6)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ew-resize')
       .call(scaleright);
 
@@ -166,7 +167,7 @@ PolymerD3.dragElem = {
       .attr('id', 'scaleleft')
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', .6)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ns-resize')
       .call(scaletop);
 
@@ -181,7 +182,7 @@ PolymerD3.dragElem = {
       .attr('height', dragbarw)
       .attr('width', width - dragbarw)
       .attr('fill', 'lightgreen')
-      .attr('fill-opacity', .6)
+      .attr('fill-opacity', 0)
       .attr('cursor', 'ns-resize')
       .call(scalebottom);
 

@@ -23,7 +23,14 @@ Example:
     <div class="customizer-holder">
       <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 400" class="parent-svg"></svg>
     </div>
-    <span id="mouse-pointer"></span>
+    <div>
+      <span id="mouse-pointer"></span>
+      <div>
+        <paper-button on-tap="applySettings">Apply</paper-button>
+        <paper-button on-tap="resetSettings">Cancel</paper-button>
+      </div>
+    </div>
+
   </template>
   <script>
     Polymer({
@@ -55,7 +62,7 @@ Example:
         this.set('_settings', PolymerD3.utilities.clone(setting));
         this._initParentSVG();
         this.debounce('drag-rect-debounce', () => {
-          this.initDragSettings(this.parentSVG, this._settings);
+          this.rects = this.initDragSettings(this.parentSVG, this._settings);
         }, 500);
       },
 
@@ -70,6 +77,31 @@ Example:
         if (!this.parentSVG) {
           this.parentSVG = d3.select(this.$$('.parent-svg'));
         }
+      },
+
+      setSettings: function(input, newSelectedVal) {
+        let setting;
+        let index;
+        this.settings.forEach((s, i) => {
+          if (s.input == input) {
+            setting = s;
+            index = i;
+          }
+        });
+        setting.selectedValue = newSelectedVal;
+        this.splice('settings', index, 1, setting);
+      },
+
+      //To apply settings
+      applySettings: function() {
+        let areaBounds = this.rects.areaRect[0][0].getBoundingClientRect();
+        let innerBounds = this.rects.innerRect[0][0].getBoundingClientRect();
+
+        let width = areaBounds.width / this.rects.scale;
+        let height = areaBounds.height / this.rects.scale;
+
+        this.setSettings('height', height);
+        this.setSettings('width', width);
       }
     });
   </script>
