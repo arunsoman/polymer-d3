@@ -94,14 +94,39 @@ Example:
 
       //To apply settings
       applySettings: function() {
+        // checks height and width
         let areaBounds = this.rects.areaRect.getDiamensions();
         let innerBounds = this.rects.innerRect.getDiamensions();
 
         let width = areaBounds.width / this.rects.scale;
         let height = areaBounds.height / this.rects.scale;
 
+        let innerWidth = innerBounds.width / this.rects.scale;
+        let innerHeight = innerBounds.height / this.rects.scale;
+
+        if (width < innerWidth || height < innerHeight) {
+          console.warn('Check diamensions');
+          return false;
+        }
+
+        // checks if innerRect is inside outerRect
+        let areaRect = this.rects.areaRect.rectangle[0][0].getBBox();
+        let innerRect = this.rects.innerRect.rectangle[0][0].getBBox();
+
+        let marginLeft = (innerRect.x - areaRect.x) / this.rects.scale;
+        let marginTop = (innerRect.y - areaRect.y) / this.rects.scale;
+        let marginRight = width - (innerWidth + marginLeft);
+        let marginBottom = height - (innerHeight + marginTop);
+
+        if (marginLeft < 0 || marginTop < 0 || marginRight < 0 || marginBottom < 0) {
+          console.warn('Drawable region is outside main area');
+        }
         this.setSettings('height', height);
         this.setSettings('width', width);
+        this.setSettings('marginTop', marginTop);
+        this.setSettings('marginRight', marginRight);
+        this.setSettings('marginBottom', marginBottom);
+        this.setSettings('marginLeft', marginLeft);
       }
     });
   </script>
