@@ -94,8 +94,8 @@ Example:
 
       //To apply settings
       applySettings: function() {
-        let areaBounds = this.rects.areaRect[0][0].getBoundingClientRect();
-        let innerBounds = this.rects.innerRect[0][0].getBoundingClientRect();
+        let areaBounds = this.rects.areaRect.getDiamensions();
+        let innerBounds = this.rects.innerRect.getDiamensions();
 
         let width = areaBounds.width / this.rects.scale;
         let height = areaBounds.height / this.rects.scale;

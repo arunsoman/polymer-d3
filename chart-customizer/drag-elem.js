@@ -45,7 +45,7 @@ PolymerD3.dragElem = {
     });
 
     // make area rectangle scalable
-    this._makeScalable(areaRect, areaG, {
+    let areaRectSettings = this._makeScalable(areaRect, areaG, {
       scalability: this.DRAG_CONSTANTS.BOTH,
       scale: scale
     });
@@ -63,14 +63,14 @@ PolymerD3.dragElem = {
       scalability: this.DRAG_CONSTANTS.BOTH,
       fillOpacity: rectFillOpacity
     });
-    this._makeScalable(innerRect, innerG, {
+    let innerRectSettings = this._makeScalable(innerRect, innerG, {
       scalability: this.DRAG_CONSTANTS.BOTH,
       scale: scale
     });
 
     return {
-      innerRect: innerRect,
-      areaRect: areaRect,
+      areaRect: areaRectSettings,
+      innerRect: innerRectSettings,
       scale: scale
     }
   },
@@ -337,7 +337,13 @@ PolymerD3.dragElem = {
       scaleBarleft,
       scaleBarright,
       scaleBartop,
-      scaleBarbottom
+      scaleBarbottom,
+      getDiamensions: () => {
+        return {
+          height,
+          width
+        }
+      }
     }
   },
 
