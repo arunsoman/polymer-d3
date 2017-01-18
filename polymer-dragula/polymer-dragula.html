@@ -1,0 +1,91 @@
+<!--
+A polymer wrapper for Dragula: 'Drag and drop so simple it hurts'
+https://github.com/bevacqua/dragula
+-->
+
+<dom-module id="polymer-dragula">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #main-container {
+        background-color: grey;
+        margin: 0px 15px;
+        padding: 8px;
+      }
+      span.drag-rect {
+        background-color: aliceblue;
+        display: inline-block;
+        padding: 6px;
+        width: 80px;
+      }
+    </style>
+    <div id="main-container">
+      <template
+        is="dom-repeat"
+        items={{externals}}
+        as=item
+        index-as=index>
+        <span class="drag-rect">{{item.key}}</span>
+      </template>
+    </div>
+    <div id="inputWrap">
+      <template is="dom-repeat" items="{{inputs}}" as="input" index-as="inputIndex">
+        <!-- Colors -->
+        <div class$="sortable-wrap {{input.supportedTypes}}" class="child-container">
+          <h4>
+            {{input.txt}}
+          </h4>
+          <span>input</span>
+      </template>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: 'polymer-dragula',
+      properties: {
+        inputs: {
+          value: () => { return [];},
+          notify: true,
+          type: Array
+        },
+        externals: {
+          value: () => { return [];},
+          notify: true,
+          type: Array
+        },
+        master: {
+          type: Object,
+          value: () => { return {};}
+        },
+        slaves: {
+          type: Array,
+          value: () => { return [];}
+        }
+      },
+
+      observers: ['_inputsObserver(inputs)'],
+
+      _inputsObserver: function(inputs) {
+        if (inputs.length && inputs.length > 0) {
+          this.async(() => {
+            this.master = dragula({
+              copy: true
+            });
+            this.master.containers.push(this.querySelector('#main-container'));
+
+            dragula([
+              this.querySelector('#main-container'),
+              this.querySelector('.child-container')
+            ]);
+            // for (var i = 0; i < slaves.length; i++) {
+              // For manual delete
+              // slaves[i].addEventListener('itemSpliced', this._fireRem.bind(this));
+            // }
+          }, 1000);
+        }
+      }
+    });
+  </script>
+</dom-module>

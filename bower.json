@@ -16,7 +16,8 @@
     "paper-icon-button": "^1.1.2",
     "paper-color-pallete": "https://github.com/sravan-s/paper-color-pallete.git",
     "paper-slider": "PolymerElements/paper-slider#^1.0.11",
-    "neon-animation": "v1.2.4"
+    "neon-animation": "v1.2.4",
+    "dragula.js": "dragula#^3.7.2"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

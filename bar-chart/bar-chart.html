@@ -29,7 +29,8 @@
     <template is="dom-if" if="{{editMode}}">
       <display-component settings="{{area}}"></display-component>
       <div class="draggable-areabtn-wrap">
-        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+        <!-- <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input> -->
+        <polymer-dragula externals="[[externals]]" inputs="{{inputs}}"></polymer-dragula>
         <paper-icon-button
           class="settings-icon"
           icon="icons:settings-overscan"
