@@ -19,9 +19,29 @@ Example:
         height: 400px;
         width: 700px
       }
+      .dummy-txt {
+        display: inline-block;
+        transition: all 400ms ease;
+      }
+      .tick-rotation {
+        display: flex;
+      }
     </style>
     <div class="customizer-holder">
       <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 400" class="parent-svg"></svg>
+    </div>
+
+    <!-- Tick rotation -->
+    <div class="tick-rotation">
+      <template is='dom-repeat' items="{{_settings}}">
+        <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
+          <span>[[item.txt]]</span>
+          <div class="slider-wrap">
+              <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+              <span id="{{item.input}}" class="dummy-txt">TICK</span>
+          </div>
+        </template>
+      </template>
     </div>
     <div>
       <span id="mouse-pointer"></span>
@@ -39,13 +59,14 @@ Example:
         settings: {
           type: Object,
           value: () => {
-            return {};
-          }
+            return [];
+          },
+          notify: true
         },
         _settings: { // holds settings to not mutate original settings
           type: Object,
           value: () => {
-            return {};
+            return [];
           }
         },
         parentSVG: {
@@ -82,14 +103,16 @@ Example:
       setSettings: function(input, newSelectedVal) {
         let setting;
         let index;
-        this.settings.forEach((s, i) => {
+        this._settings.forEach((s, i) => {
           if (s.input == input) {
             setting = s;
             index = i;
           }
         });
-        setting.selectedValue = newSelectedVal;
-        this.splice('settings', index, 1, setting);
+        if (setting) {
+          setting.selectedValue = newSelectedVal;
+          this.splice('_settings', index, 1, setting);
+        }
       },
 
       //To apply settings
@@ -121,13 +144,33 @@ Example:
         if (marginLeft < 0 || marginTop < 0 || marginRight < 0 || marginBottom < 0) {
           console.warn('Drawable region is outside main area');
         }
+
+
+        // sets new values to _settings
         this.setSettings('height', height);
         this.setSettings('width', width);
         this.setSettings('marginTop', marginTop);
         this.setSettings('marginRight', marginRight);
         this.setSettings('marginBottom', marginBottom);
         this.setSettings('marginLeft', marginLeft);
-      }
+
+        this._settings.forEach((_setting, index) => {
+          this.set('setting#' + index + '.selectedValue', _setting.selectedValue);
+        });
+      },
+
+      isSliderInput: function(argument) {
+        return argument === 'sliderInput';
+      },
+
+      _rotateTick: function(e) {
+        this.debounce('rotateDebounce', () => {
+            var target = this.$$('#' + e.model.item.input);
+            if (target) {
+              target.style.transform = 'rotate(' + e.model.item.selectedValue + 'deg)'
+            }
+        }, 500);
+      },
     });
   </script>
 </dom-module>
