@@ -121,11 +121,11 @@ Example:
         let areaBounds = this.rects.areaRect.getDiamensions();
         let innerBounds = this.rects.innerRect.getDiamensions();
 
-        let width = areaBounds.width / this.rects.scale;
-        let height = areaBounds.height / this.rects.scale;
+        let width = Math.floor(areaBounds.width / this.rects.scale);
+        let height = Math.floor(areaBounds.height / this.rects.scale);
 
-        let innerWidth = innerBounds.width / this.rects.scale;
-        let innerHeight = innerBounds.height / this.rects.scale;
+        let innerWidth = Math.floor(innerBounds.width / this.rects.scale);
+        let innerHeight = Math.floor(innerBounds.height / this.rects.scale);
 
         if (width < innerWidth || height < innerHeight) {
           console.warn('Check diamensions');
@@ -136,10 +136,10 @@ Example:
         let areaRect = this.rects.areaRect.rectangle[0][0].getBBox();
         let innerRect = this.rects.innerRect.rectangle[0][0].getBBox();
 
-        let marginLeft = (innerRect.x - areaRect.x) / this.rects.scale;
-        let marginTop = (innerRect.y - areaRect.y) / this.rects.scale;
-        let marginRight = width - (innerWidth + marginLeft);
-        let marginBottom = height - (innerHeight + marginTop);
+        let marginLeft = Math.floor((innerRect.x - areaRect.x) / this.rects.scale);
+        let marginTop = Math.floor((innerRect.y - areaRect.y) / this.rects.scale);
+        let marginRight = Math.floor(width - (innerWidth + marginLeft));
+        let marginBottom = Math.floor(height - (innerHeight + marginTop));
 
         if (marginLeft < 0 || marginTop < 0 || marginRight < 0 || marginBottom < 0) {
           console.warn('Drawable region is outside main area');
@@ -155,7 +155,10 @@ Example:
         this.setSettings('marginLeft', marginLeft);
 
         this._settings.forEach((_setting, index) => {
-          this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
+          // trigger change only if values are different
+          if (_setting.selectedValue != this.area[index].selectedValue) {
+            this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
+          }
         });
       },
 
