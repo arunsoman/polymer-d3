@@ -56,7 +56,7 @@ Example:
     Polymer({
       is: 'chart-customizer',
       properties: {
-        settings: {
+        area: {
           type: Object,
           value: () => {
             return [];
@@ -77,7 +77,7 @@ Example:
         }
       },
       behaviors: [PolymerD3.dragElem],
-      observers: ['settingsInit(settings)'],
+      observers: ['settingsInit(area)'],
 
       settingsInit: function(setting) { // takes a deep copy of settings prop
         this.set('_settings', PolymerD3.utilities.clone(setting));
@@ -155,7 +155,7 @@ Example:
         this.setSettings('marginLeft', marginLeft);
 
         this._settings.forEach((_setting, index) => {
-          this.splice('settings', index, 1, _setting);
+          this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
         });
       },
 
