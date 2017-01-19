@@ -215,16 +215,26 @@
         }
     },
     _areaSettingsChanged: function(setting) {
-        if (setting.path !== 'area') {
-            this.debounce('areaSettignsChangedDebounce', () => {
-                var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
-                if (changed && changed.callBack && this[changed.callBack]) {
-                    this[changed.callBack].call(this);
-                } else {
-                    this.resize();
-                }
-            }, 200);
+        // handling changes made via chart-customizer
+        if (setting.path == 'area.splices') {
+            let changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+            if (changed && changed.callBack && this[changed.callBack]) {
+                this[changed.callBack].call(this);
+            } else {
+                this.resize();
+            }
+            return;
         }
+        // if (setting.path !== 'area') {
+        //     this.debounce('areaSettignsChangedDebounce', () => {
+        //         var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+        //         if (changed && changed.callBack && this[changed.callBack]) {
+        //             this[changed.callBack].call(this);
+        //         } else {
+        //             this.resize();
+        //         }
+        //     }, 200);
+        // }
       },
 };
 </script>

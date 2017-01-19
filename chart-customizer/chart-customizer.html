@@ -155,7 +155,7 @@ Example:
         this.setSettings('marginLeft', marginLeft);
 
         this._settings.forEach((_setting, index) => {
-          this.set('setting#' + index + '.selectedValue', _setting.selectedValue);
+          this.splice('settings', index, 1, _setting);
         });
       },
 
