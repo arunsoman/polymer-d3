@@ -61,6 +61,9 @@ Example:
         </template>
       </template>
     </div>
+    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+      </template>
     <div>
       <span id="mouse-pointer"></span>
       <div>
@@ -87,14 +90,29 @@ Example:
             return [];
           }
         },
+        legendSettings: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
         parentSVG: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
+        parentG: { // to handle legend clicks
           type: Object,
           value: () => {
             return {};
           }
         }
       },
-      behaviors: [PolymerD3.dragElem],
+      behaviors: [
+        PolymerD3.dragElem,
+        PolymerD3.legendBehavior
+      ],
       observers: ['settingsInit(area)'],
 
       settingsInit: function(setting) { // takes a deep copy of settings prop
@@ -102,6 +120,7 @@ Example:
         this._initParentSVG();
         this.debounce('drag-rect-debounce', () => {
           this.rects = this.initDragSettings(this.parentSVG, this._settings);
+          this.attachLegend(this.parentSVG, this.legendSettings);
         }, 500);
       },
 

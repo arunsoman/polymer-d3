@@ -61,8 +61,11 @@
     redrawLegends: function() {
       this.debounce('legendsDebounce', () => {
         var me = this;
+        if (!this.parentG) {
+          return false;
+        }
         // get data-attrs, change fill,  attachlegend
-        this.parentG.selectAll('[data-legend]').each( function(p) {
+        this.parentG.selectAll('[data-legend]').each(function(p) {
           var key = d3.select(this).attr('data-legend');
           me.legendSettings.colors.forEach((legend) => {
             // the value extracted as key is always string
@@ -76,10 +79,9 @@
       }, 200);
     },
 
-    attachLegend: function (parentG) {
+    attachLegend: function (parentG, legendSettings) {
       // let dr =dragRect( parentG);
       // removes previous legends
-
 
       parentG.selectAll(".legend").remove();
       let chartLegend = parentG.append("g")
@@ -87,7 +89,7 @@
         .attr('id', 'chart-legend')
         .attr("transform","translate(50,30)")
         .style("font-size","12px")
-        .call(this.d3Legends);
+        .call(this.d3Legends, legendSettings, this);
 
       parentG.selectAll('.legend circle').on('click', () => {
         this.fire('legend-clicked');
@@ -115,7 +117,7 @@
       // this.set();
       return layer.fill;
     },
-    d3Legends: function(g) {
+    d3Legends: function(g, legendSettings, context) {
       var me = this;
       g.each(function() {
         var g = d3.select(this);
@@ -128,13 +130,22 @@
         lb.enter().append("rect").classed("legend-box", true);
         li.enter().append("g").classed("legend-items", true);
 
-        svg.selectAll("[data-legend]").each(function() {
-            var self = d3.select(this)
-            items[self.attr("data-legend")] = {
-              pos : self.attr("data-legend-pos") || this.getBBox().y,
-              color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") : self.style("stroke")
+        if (legendSettings) { // build items from @param legendSettings
+          legendSettings.colors.forEach(function(color, index) {
+            items[color.label] = {
+              pos: index, // not sure about this
+              color: color.color
             }
-          })
+          });
+        } else { // conventional meathod, fetch data from SVG
+          svg.selectAll("[data-legend]").each(function() {
+              var self = d3.select(this);
+                items[self.attr("data-legend")] = {
+                  pos : self.attr("data-legend-pos") || this.getBBox().y,
+                  color : self.attr("data-legend-color") != undefined ? self.attr("data-legend-color") : self.style("fill") != 'none' ? self.style("fill") : self.style("stroke")
+                }
+            })
+        }
 
         items = d3.entries(items).sort(function(a,b) { return a.value.pos - b.value.pos;});
 
@@ -158,7 +169,7 @@
         lb.attr("x",(lbbox.x-legendPadding))
             .attr("y",(lbbox.y-legendPadding))
             .attr("height",(lbbox.height+2*legendPadding))
-            .attr("width",(lbbox.width+2*legendPadding));
+            .attr("width",(lbbox.width +2*legendPadding));
       })
       return g;
     },
