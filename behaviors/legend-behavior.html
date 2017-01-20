@@ -79,7 +79,7 @@
       }, 200);
     },
 
-    attachLegend: function (parentG, legendSettings) {
+    attachLegend: function (parentG, legendSettings, click) {
       // let dr =dragRect( parentG);
       // removes previous legends
 
@@ -91,10 +91,11 @@
         .style("font-size","12px")
         .call(this.d3Legends, legendSettings, this);
 
-      parentG.selectAll('.legend circle').on('click', () => {
-        this.fire('legend-clicked');
-      });
-
+      if (click) {
+        parentG.selectAll('.legend circle').on('click', () => {
+          this.fire('legend-clicked');
+        });
+      }
       // this.registerDraggable(chartLegend);
     },
     setLegendColor: function(layer) {

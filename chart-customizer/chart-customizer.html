@@ -120,7 +120,7 @@ Example:
         this._initParentSVG();
         this.debounce('drag-rect-debounce', () => {
           this.rects = this.initDragSettings(this.parentSVG, this._settings);
-          this.attachLegend(this.parentSVG, this.legendSettings);
+          this.attachLegend(this.parentSVG, this.legendSettings, true);
         }, 500);
       },
 
