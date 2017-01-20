@@ -23,8 +23,14 @@ Example:
         display: inline-block;
         transition: all 400ms ease;
       }
-      .tick-rotation {
+      .flex {
         display: flex;
+      }
+      .inputs.flex {
+        justify-content: center;
+      }
+      .inputs.flex paper-input{
+        margin-left: 5px;
       }
     </style>
     <div class="customizer-holder">
@@ -32,7 +38,7 @@ Example:
     </div>
 
     <!-- Tick rotation -->
-    <div class="tick-rotation">
+    <div class="tick-rotation flex">
       <template is='dom-repeat' items="{{_settings}}">
         <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
           <span>[[item.txt]]</span>
@@ -42,6 +48,11 @@ Example:
           </div>
         </template>
       </template>
+    </div>
+    <div class="inputs flex">
+      <div></div>
+      <paper-input value="{{ height }}" label="Chart Height"></paper-input>
+      <paper-input value="{{ height }}" label="Chart Width"></paper-input>
     </div>
     <div>
       <span id="mouse-pointer"></span>
