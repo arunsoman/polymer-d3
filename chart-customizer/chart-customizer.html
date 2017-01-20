@@ -50,9 +50,16 @@ Example:
       </template>
     </div>
     <div class="inputs flex">
-      <div></div>
-      <paper-input value="{{ height }}" label="Chart Height"></paper-input>
-      <paper-input value="{{ height }}" label="Chart Width"></paper-input>
+      <template is='dom-repeat' items="{{_settings}}">
+        <template is="dom-if" if="{{isVisibleInput(item.input)}}">
+          <template is="dom-if" if="{{isNumber(item.uitype)}}">
+            <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+          </template>
+          <template is="dom-if" if="{{isText(item.uitype)}}">
+            <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
+          </template>
+        </template>
+      </template>
     </div>
     <div>
       <span id="mouse-pointer"></span>
@@ -177,6 +184,17 @@ Example:
         return argument === 'sliderInput';
       },
 
+      isVisibleInput: function(argument) {
+        var visibleInputs = ['height', 'width'];
+        return (visibleInputs.indexOf(argument) != -1);
+      },
+
+      isNumber:function(argument) {
+        return argument === 'Number';
+      },
+      isText: function(argument) {
+        return argument === 'Text';
+      },
       _rotateTick: function(e) {
         this.debounce('rotateDebounce', () => {
             var target = this.$$('#' + e.model.item.input);
