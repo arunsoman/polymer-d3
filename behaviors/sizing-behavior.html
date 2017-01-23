@@ -169,7 +169,7 @@
         this.set('chartCustomizerFlag', true);
         if (dialog) {
             dialog.open();
-        } else { // for charts without chart-customizer
+        } else { // for charts without chart-customizer, radar, pie etc.
             let displayComponent = this.$$('display-component');
             if (displayComponent) {
                 displayComponent.openModal();

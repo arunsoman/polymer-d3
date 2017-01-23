@@ -115,7 +115,7 @@ Example:
         PolymerD3.dragElem,
         PolymerD3.legendBehavior
       ],
-      observers: ['settingsInit(area)'],
+      observers: ['settingsInit(area)', 'legendSettingsObs(legendSettingsFlag)'],
 
       settingsInit: function(setting) { // takes a deep copy of settings prop
         this.set('_settings', PolymerD3.utilities.clone(setting));
@@ -126,12 +126,35 @@ Example:
         }, 500);
       },
 
+      // To handle overlay z-index getting a higher value,
+      // in modal inside modal scenarios
+      legendSettingsObs: function(flag) {
+        this.async(() => {
+          if (!flag) { // to avoid multiple event listeners
+            return false;
+          }
+          let colorGroup = this.querySelector('label-color-group');
+          if (colorGroup) {
+            colorGroup.addEventListener('click', this._handleOverlay.bind(this));
+          }
+          this._handleOverlay();
+        }, 500);
+      },
+
       attached: function() {
         this.async(() => {
           this._initParentSVG();
         });
       },
 
+      _handleOverlay: function() {
+        this.async(() => {
+          let overlay = document.querySelector('iron-overlay-backdrop');
+          if (overlay) {
+            overlay.style['z-index'] = 104;
+          }
+        }, 300);
+      },
       // function to initalize parentSVG
       _initParentSVG: function() {
         if (!this.parentSVG) {
