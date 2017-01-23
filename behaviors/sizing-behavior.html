@@ -169,6 +169,11 @@
         this.set('chartCustomizerFlag', true);
         if (dialog) {
             dialog.open();
+        } else { // for charts without chart-customizer
+            let displayComponent = this.$$('display-component');
+            if (displayComponent) {
+                displayComponent.openModal();
+            }
         }
     },
     hideAreaSettings: function() {
