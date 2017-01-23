@@ -83,16 +83,16 @@
       // let dr =dragRect( parentG);
       // removes previous legends
 
-      parentG.selectAll(".legend").remove();
-      let chartLegend = parentG.append("g")
-        .attr("class","legend")
+      parentG.selectAll('.legend').remove();
+      let chartLegend = parentG.append('g')
+        .attr('class', 'legend')
         .attr('id', 'chart-legend')
-        .attr("transform","translate(50,30)")
-        .style("font-size","12px")
+        .style('font-size', '12px')
         .call(this.d3Legends, legendSettings, this);
 
-      function dragstartedABC(d) {
-        d3.select(this).classed("active", true);
+      this.moveLegend(chartLegend, legendSettings ? legendSettings.pos : {});
+      function dragstarted(d) {
+        d3.select(this).classed('active', true);
       }
 
       function dragged(d) {
@@ -108,15 +108,20 @@
       }
 
       if (click) {
+        let x = (legendSettings && legendSettings.pos) ? legendSettings.pos.x : 0;
+        let y = (legendSettings && legendSettings.pos) ? legendSettings.pos.y : 0;
         let drag = d3.behavior.drag()
             .origin(function(d) {
               console.log(d);
               return d;
             })
-            .on("dragstart", dragstartedABC)
-            .on("drag", dragged)
-            .on("dragend", dragended);
-
+            .on('dragstart', dragstarted)
+            .on('drag', dragged)
+            .on('dragend', dragended);
+        chartLegend[0][0].__data__ = {
+          x: x,
+          y: y
+        }
         chartLegend.call(drag);
         parentG.selectAll('.legend circle').on('click', () => {
           this.fire('legend-clicked');
@@ -203,6 +208,16 @@
     // utility to return random color from default colors
     _getRandomColor: function() {
       return this.defaultColors[Math.floor(Math.random() * 9) + 0];
+    },
+    moveLegend(g, pos) {
+      (pos || (pos = {}));
+      if (!pos.x) {
+        pos.x = 50;
+      }
+      if (!pos.y) {
+        pos.y = 30;
+      }
+      return g.attr('transform', 'translate(' + pos.x + ',' + pos.y + ')');
     }
   };
 </script>
