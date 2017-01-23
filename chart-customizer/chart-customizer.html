@@ -12,7 +12,6 @@ Example:
   <template>
     <style>
       :host {
-        border: 1px solid grey;
         display: inline-block;
       }
       .customizer-holder {
@@ -107,6 +106,9 @@ Example:
           value: () => {
             return {};
           }
+        },
+        chartCustomizerFlag: {
+          type: Boolean
         }
       },
       behaviors: [
@@ -197,6 +199,7 @@ Example:
             this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
           }
         });
+        this.closeDialog();
       },
 
       isSliderInput: function(argument) {
@@ -222,6 +225,13 @@ Example:
             }
         }, 500);
       },
+      resetSettings: function() {
+        this.closeDialog();
+      },
+      closeDialog: function() {
+        this.set('_settings', []);
+        this.set('chartCustomizerFlag', false);
+      }
     });
   </script>
 </dom-module>
