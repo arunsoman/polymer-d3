@@ -91,7 +91,33 @@
         .style("font-size","12px")
         .call(this.d3Legends, legendSettings, this);
 
+      function dragstartedABC(d) {
+        d3.select(this).classed("active", true);
+      }
+
+      function dragged(d) {
+        d.x = d3.event.x;
+        d.y = d3.event.y;
+        d3.select(this).attr(
+          'transform', 'translate(' + d.x + ',' + d.y + ')'
+        );
+      }
+
+      function dragended(d) {
+        d3.select(this).classed('active', false);
+      }
+
       if (click) {
+        let drag = d3.behavior.drag()
+            .origin(function(d) {
+              console.log(d);
+              return d;
+            })
+            .on("dragstart", dragstartedABC)
+            .on("drag", dragged)
+            .on("dragend", dragended);
+
+        chartLegend.call(drag);
         parentG.selectAll('.legend circle').on('click', () => {
           this.fire('legend-clicked');
         });
