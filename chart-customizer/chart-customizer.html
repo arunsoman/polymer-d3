@@ -254,6 +254,7 @@ Example:
       closeDialog: function() {
         this.set('_settings', []);
         this.set('chartCustomizerFlag', false);
+        this.notifyPath('chartCustomizerFlag'); // somehow normal set isn't working
       }
     });
   </script>
