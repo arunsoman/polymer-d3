@@ -90,7 +90,10 @@
         .style('font-size', '12px')
         .call(this.d3Legends, legendSettings, this);
 
-      this.moveLegend(chartLegend, legendSettings ? legendSettings.pos : {});
+      this.moveLegend(chartLegend, legendSettings ? {
+        x: legendSettings.posX,
+        y: legendSettings.posY
+      } : {});
       function dragstarted(d) {
         d3.select(this).classed('active', true);
       }
@@ -108,8 +111,8 @@
       }
 
       if (click) {
-        let x = (legendSettings && legendSettings.pos) ? legendSettings.pos.x : 0;
-        let y = (legendSettings && legendSettings.pos) ? legendSettings.pos.y : 0;
+        let x = (legendSettings && legendSettings.posX) ? legendSettings.posX : 0;
+        let y = (legendSettings && legendSettings.posY) ? legendSettings.posY : 0;
         let drag = d3.behavior.drag()
             .origin(function(d) {
               console.log(d);
@@ -127,6 +130,7 @@
           this.fire('legend-clicked');
         });
       }
+      return this.chartLegend;
       // this.registerDraggable(chartLegend);
     },
     setLegendColor: function(layer) {

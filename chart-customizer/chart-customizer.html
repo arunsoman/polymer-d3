@@ -61,7 +61,7 @@ Example:
       </template>
     </div>
     <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
-        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{_legendSettings}}"></legends-component>
       </template>
     <div>
       <span id="mouse-pointer"></span>
@@ -95,6 +95,12 @@ Example:
             return {};
           }
         },
+        _legendSettings: {
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
         parentSVG: {
           type: Object,
           value: () => {
@@ -115,20 +121,41 @@ Example:
         PolymerD3.dragElem,
         PolymerD3.legendBehavior
       ],
-      observers: ['settingsInit(area)', 'legendSettingsObs(legendSettingsFlag)'],
+      observers: [
+        'settingsInit(area)',
+        'legendSettingsFlagObs(legendSettingsFlag)'
+      ],
 
       settingsInit: function(setting) { // takes a deep copy of settings prop
         this.set('_settings', PolymerD3.utilities.clone(setting));
         this._initParentSVG();
         this.debounce('drag-rect-debounce', () => {
           this.rects = this.initDragSettings(this.parentSVG, this._settings);
-          this.attachLegend(this.parentSVG, this.legendSettings, true);
-        }, 500);
+
+          this.set('_legendSettings', this.legendSettings);
+          this._legendSettings.pos = {};
+
+          let posX = this.rects.areaRect.rectangle.attr('x');
+          let posY = this.rects.areaRect.rectangle.attr('y');
+          this._legendSettings.posX = parseInt(posX) + parseInt(this.legendSettings.posX * this.rects.scale);
+          this._legendSettings.posY = parseInt(posY) + parseInt(this.legendSettings.posY * this.rects.scale);
+
+          // saving for diff checking at saving time
+          // the posX and posY are transformed values, so instead of calculations,
+          // keeping a copy is better
+          this._intialLegendSettings = PolymerD3.utilities.clone(this._legendSettings);
+
+          this.chartLegend = this.attachLegend(
+            this.parentSVG,
+            this._legendSettings,
+            true
+          );
+        }, 300);
       },
 
       // To handle overlay z-index getting a higher value,
       // in modal inside modal scenarios
-      legendSettingsObs: function(flag) {
+      legendSettingsFlagObs: function(flag) {
         this.async(() => {
           if (!flag) { // to avoid multiple event listeners
             return false;
@@ -138,7 +165,7 @@ Example:
             colorGroup.addEventListener('click', this._handleOverlay.bind(this));
           }
           this._handleOverlay();
-        }, 500);
+        }, 50);
       },
 
       attached: function() {
@@ -222,9 +249,29 @@ Example:
             this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
           }
         });
+        this.set('legendSettings', this._legendSettings);
+
+        let legendDirtyFlag = this._checkLegendDelta(this._legendSettings, this._intialLegendSettings);
+        if (legendDirtyFlag) {
+          this.notifyPath('legendSettings.colors');
+        }
         this.closeDialog();
       },
 
+      // returns a dirty flag
+      _checkLegendDelta: function(currentSettings, initialSettings) {
+        let dirty = false;
+        if ((currentSettings.posX != initialSettings.posX) ||(currentSettings.posY != initialSettings.posY)) {
+          dirty = true;
+        }
+        currentSettings.colors.forEach((color, index) => {
+          if (color.color != initialSettings.colors[index].color) {
+            dirty = true;
+          }
+        });
+
+        return dirty;
+      },
       isSliderInput: function(argument) {
         return argument === 'sliderInput';
       },
@@ -253,6 +300,7 @@ Example:
       },
       closeDialog: function() {
         this.set('_settings', []);
+        this.set('_legendSettings', {});
         this.set('chartCustomizerFlag', false);
         this.notifyPath('chartCustomizerFlag'); // somehow normal set isn't working
       }
