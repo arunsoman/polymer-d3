@@ -249,10 +249,14 @@ Example:
             this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
           }
         });
-        this.set('legendSettings', this._legendSettings);
+        let cords = this.chartLegend.data()[0];
 
+        this._legendSettings.posX = Math.floor((cords.x - areaRect.x) / this.rects.scale);
+        this._legendSettings.posY = Math.floor((cords.y - areaRect.y) / this.rects.scale);
         let legendDirtyFlag = this._checkLegendDelta(this._legendSettings, this._intialLegendSettings);
+
         if (legendDirtyFlag) {
+          this.set('legendSettings', this._legendSettings);
           this.notifyPath('legendSettings.colors');
         }
         this.closeDialog();

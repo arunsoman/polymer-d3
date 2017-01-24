@@ -75,7 +75,7 @@
             }
           });
         });
-        me.attachLegend(me.parentG);
+        me.attachLegend(me.parentG, me.legendSettings);
       }, 200);
     },
 
@@ -115,7 +115,6 @@
         let y = (legendSettings && legendSettings.posY) ? legendSettings.posY : 0;
         let drag = d3.behavior.drag()
             .origin(function(d) {
-              console.log(d);
               return d;
             })
             .on('dragstart', dragstarted)
@@ -130,7 +129,7 @@
           this.fire('legend-clicked');
         });
       }
-      return this.chartLegend;
+      return chartLegend;
       // this.registerDraggable(chartLegend);
     },
     setLegendColor: function(layer) {
