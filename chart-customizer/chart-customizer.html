@@ -12,30 +12,90 @@ Example:
   <template>
     <style>
       :host {
-        border: 1px solid grey;
         display: inline-block;
       }
       .customizer-holder {
         height: 400px;
         width: 700px
       }
+      .dummy-txt {
+        display: inline-block;
+        transition: all 400ms ease;
+      }
+      .flex {
+        display: flex;
+      }
+      .inputs.flex {
+        justify-content: center;
+      }
+      .inputs.flex paper-input{
+        margin-left: 5px;
+      }
     </style>
     <div class="customizer-holder">
       <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 400" class="parent-svg"></svg>
     </div>
-    <span id="mouse-pointer"></span>
+
+    <!-- Tick rotation -->
+    <div class="tick-rotation flex">
+      <template is='dom-repeat' items="{{_settings}}">
+        <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
+          <span>[[item.txt]]</span>
+          <div class="slider-wrap">
+              <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+              <span id="{{item.input}}" class="dummy-txt">TICK</span>
+          </div>
+        </template>
+      </template>
+    </div>
+    <div class="inputs flex">
+      <template is='dom-repeat' items="{{_settings}}">
+        <template is="dom-if" if="{{isVisibleInput(item.input)}}">
+          <template is="dom-if" if="{{isNumber(item.uitype)}}">
+            <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+          </template>
+          <template is="dom-if" if="{{isText(item.uitype)}}">
+            <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
+          </template>
+        </template>
+      </template>
+    </div>
+    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+        <legends-component opener="{{legendSettingsFlag}}" settings="{{_legendSettings}}"></legends-component>
+      </template>
+    <div>
+      <span id="mouse-pointer"></span>
+      <div>
+        <paper-button on-tap="applySettings">Apply</paper-button>
+        <paper-button on-tap="resetSettings">Cancel</paper-button>
+      </div>
+    </div>
+
   </template>
   <script>
     Polymer({
       is: 'chart-customizer',
       properties: {
-        settings: {
+        area: {
+          type: Object,
+          value: () => {
+            return [];
+          },
+          notify: true
+        },
+        _settings: { // holds settings to not mutate original settings
+          type: Object,
+          value: () => {
+            return [];
+          }
+        },
+        legendSettings: {
           type: Object,
           value: () => {
             return {};
           }
         },
-        _settings: { // holds settings to not mutate original settings
+        _legendSettings: {
           type: Object,
           value: () => {
             return {};
@@ -46,17 +106,66 @@ Example:
           value: () => {
             return {};
           }
+        },
+        parentG: { // to handle legend clicks
+          type: Object,
+          value: () => {
+            return {};
+          }
+        },
+        chartCustomizerFlag: {
+          type: Boolean
         }
       },
-      behaviors: [PolymerD3.dragElem],
-      observers: ['settingsInit(settings)'],
+      behaviors: [
+        PolymerD3.dragElem,
+        PolymerD3.legendBehavior
+      ],
+      observers: [
+        'settingsInit(area)',
+        'legendSettingsFlagObs(legendSettingsFlag)'
+      ],
 
       settingsInit: function(setting) { // takes a deep copy of settings prop
         this.set('_settings', PolymerD3.utilities.clone(setting));
         this._initParentSVG();
         this.debounce('drag-rect-debounce', () => {
-          this.initDragSettings(this.parentSVG, this._settings);
-        }, 500);
+          this.rects = this.initDragSettings(this.parentSVG, this._settings);
+
+          this.set('_legendSettings', this.legendSettings);
+          this._legendSettings.pos = {};
+
+          let posX = this.rects.areaRect.rectangle.attr('x');
+          let posY = this.rects.areaRect.rectangle.attr('y');
+          this._legendSettings.posX = parseInt(posX) + parseInt(this.legendSettings.posX * this.rects.scale);
+          this._legendSettings.posY = parseInt(posY) + parseInt(this.legendSettings.posY * this.rects.scale);
+
+          // saving for diff checking at saving time
+          // the posX and posY are transformed values, so instead of calculations,
+          // keeping a copy is better
+          this._intialLegendSettings = PolymerD3.utilities.clone(this._legendSettings);
+
+          this.chartLegend = this.attachLegend(
+            this.parentSVG,
+            this._legendSettings,
+            true
+          );
+        }, 300);
+      },
+
+      // To handle overlay z-index getting a higher value,
+      // in modal inside modal scenarios
+      legendSettingsFlagObs: function(flag) {
+        this.async(() => {
+          if (!flag) { // to avoid multiple event listeners
+            return false;
+          }
+          let colorGroup = this.querySelector('label-color-group');
+          if (colorGroup) {
+            colorGroup.addEventListener('click', this._handleOverlay.bind(this));
+          }
+          this._handleOverlay();
+        }, 50);
       },
 
       attached: function() {
@@ -65,11 +174,139 @@ Example:
         });
       },
 
+      _handleOverlay: function() {
+        this.async(() => {
+          let overlay = document.querySelector('iron-overlay-backdrop');
+          if (overlay) {
+            overlay.style['z-index'] = 104;
+          }
+        }, 300);
+      },
       // function to initalize parentSVG
       _initParentSVG: function() {
         if (!this.parentSVG) {
           this.parentSVG = d3.select(this.$$('.parent-svg'));
         }
+      },
+
+      setSettings: function(input, newSelectedVal) {
+        let setting;
+        let index;
+        this._settings.forEach((s, i) => {
+          if (s.input == input) {
+            setting = s;
+            index = i;
+          }
+        });
+        if (setting) {
+          setting.selectedValue = newSelectedVal;
+          this.splice('_settings', index, 1, setting);
+        }
+      },
+
+      //To apply settings
+      applySettings: function() {
+        // checks height and width
+        let areaBounds = this.rects.areaRect.getDiamensions();
+        let innerBounds = this.rects.innerRect.getDiamensions();
+
+        let width = Math.floor(areaBounds.width / this.rects.scale);
+        let height = Math.floor(areaBounds.height / this.rects.scale);
+
+        let innerWidth = Math.floor(innerBounds.width / this.rects.scale);
+        let innerHeight = Math.floor(innerBounds.height / this.rects.scale);
+
+        if (width < innerWidth || height < innerHeight) {
+          console.warn('Check diamensions');
+          return false;
+        }
+
+        // checks if innerRect is inside outerRect
+        let areaRect = this.rects.areaRect.rectangle[0][0].getBBox();
+        let innerRect = this.rects.innerRect.rectangle[0][0].getBBox();
+
+        let marginLeft = Math.floor((innerRect.x - areaRect.x) / this.rects.scale);
+        let marginTop = Math.floor((innerRect.y - areaRect.y) / this.rects.scale);
+        let marginRight = Math.floor(width - (innerWidth + marginLeft));
+        let marginBottom = Math.floor(height - (innerHeight + marginTop));
+
+        if (marginLeft < 0 || marginTop < 0 || marginRight < 0 || marginBottom < 0) {
+          console.warn('Drawable region is outside main area');
+        }
+
+
+        // sets new values to _settings
+        this.setSettings('height', height);
+        this.setSettings('width', width);
+        this.setSettings('marginTop', marginTop);
+        this.setSettings('marginRight', marginRight);
+        this.setSettings('marginBottom', marginBottom);
+        this.setSettings('marginLeft', marginLeft);
+
+        this._settings.forEach((_setting, index) => {
+          // trigger change only if values are different
+          if (_setting.selectedValue != this.area[index].selectedValue) {
+            this.set('area.#' + index + '.selectedValue', _setting.selectedValue);
+          }
+        });
+        let cords = this.chartLegend.data()[0];
+
+        this._legendSettings.posX = Math.floor((cords.x - areaRect.x) / this.rects.scale);
+        this._legendSettings.posY = Math.floor((cords.y - areaRect.y) / this.rects.scale);
+        let legendDirtyFlag = this._checkLegendDelta(this._legendSettings, this._intialLegendSettings);
+
+        if (legendDirtyFlag) {
+          this.set('legendSettings', this._legendSettings);
+          this.notifyPath('legendSettings.colors');
+        }
+        this.closeDialog();
+      },
+
+      // returns a dirty flag
+      _checkLegendDelta: function(currentSettings, initialSettings) {
+        let dirty = false;
+        if ((currentSettings.posX != initialSettings.posX) ||(currentSettings.posY != initialSettings.posY)) {
+          dirty = true;
+        }
+        currentSettings.colors.forEach((color, index) => {
+          if (color.color != initialSettings.colors[index].color) {
+            dirty = true;
+          }
+        });
+
+        return dirty;
+      },
+      isSliderInput: function(argument) {
+        return argument === 'sliderInput';
+      },
+
+      isVisibleInput: function(argument) {
+        var visibleInputs = ['height', 'width'];
+        return (visibleInputs.indexOf(argument) != -1);
+      },
+
+      isNumber:function(argument) {
+        return argument === 'Number';
+      },
+      isText: function(argument) {
+        return argument === 'Text';
+      },
+      _rotateTick: function(e) {
+        this.debounce('rotateDebounce', () => {
+            var target = this.$$('#' + e.model.item.input);
+            if (target) {
+              target.style.transform = 'rotate(' + e.model.item.selectedValue + 'deg)'
+            }
+        }, 500);
+      },
+      resetSettings: function() {
+        this.closeDialog();
+      },
+      closeDialog: function() {
+        this.set('_settings', []);
+        this.set('_legendSettings', {});
+        this.set('chartCustomizerFlag', false);
+        this.notifyPath('chartCustomizerFlag'); // somehow normal set isn't working
       }
     });
   </script>

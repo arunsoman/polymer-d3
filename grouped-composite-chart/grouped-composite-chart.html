@@ -10,7 +10,12 @@ A grouped bar chart
       }
     </style>
     <template is="dom-if" if="{{editMode}}">
-      <display-component settings="{{area}}"></display-component>
+      <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
+        <paper-dialog id="display-component" opened>
+          <h2>Settings</h2>
+          <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
+        </paper-dialog>
+      </template>
       <div class="draggable-areabtn-wrap">
         <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
         <paper-icon-button
@@ -20,9 +25,6 @@ A grouped bar chart
           on-tap="showAreaSettings"
         ></paper-icon-button>
       </div>
-      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
-        <legends-component opener="{{legendSettingsFlag}}" settings="{{legendSettings}}"></legends-component>
-      </template>
     </template>
   </template>
   <script src="grouped-composite-chart.js">

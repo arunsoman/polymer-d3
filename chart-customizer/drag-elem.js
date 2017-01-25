@@ -1,14 +1,14 @@
 PolymerD3.dragElem = {
+
+  /* == Helper Functions == */
+  // function to access properties from settings
+  _getSettingsProp: function(prop, setting) {
+    return PolymerD3.utilities.searchArr(setting, function(elem) {
+      return elem.input == prop;
+    });
+  },
+
   initDragSettings: function(svg, settings, config) {
-
-    /* == Helper Functions == */
-    // function to access properties from settings
-    let _getSettingsProp = function(prop) {
-      return PolymerD3.utilities.searchArr(settings, function(elem) {
-        return elem.input == prop;
-      })
-    };
-
     /* == Configuration Cooking == */
     if (!config) {
       config = {
@@ -17,11 +17,13 @@ PolymerD3.dragElem = {
       };
     }
     let scale = config.scale || .3;
-    let width = _getSettingsProp('width').selectedValue * scale;
-    let height = _getSettingsProp('height').selectedValue * scale;
+    let width = this._getSettingsProp('width', settings).selectedValue * scale;
+    let height = this._getSettingsProp('height', settings).selectedValue * scale;
     let rectFillOpacity = config.areaRect.opacity || .8;
-    let marginLeft = _getSettingsProp('marginLeft').selectedValue * scale;
-    let marginTop = _getSettingsProp('marginTop').selectedValue * scale;
+    let marginLeft = this._getSettingsProp('marginLeft', settings).selectedValue * scale;
+    let marginTop = this._getSettingsProp('marginTop', settings).selectedValue * scale;
+    let marginRight = this._getSettingsProp('marginRight', settings).selectedValue * scale;
+    let marginBottom = this._getSettingsProp('marginBottom', settings).selectedValue * scale;
 
     /* == Operation== */
     // clears SVG
@@ -30,8 +32,8 @@ PolymerD3.dragElem = {
     // creates area group
     let areaG = svg.append('g')
       .data([{
-        x: width / 2,
-        y: height / 2
+        x: width / 4,
+        y: height / 4
       }]);
 
     // create area rectangle
@@ -43,7 +45,7 @@ PolymerD3.dragElem = {
     });
 
     // make area rectangle scalable
-    this._makeScalable(areaRect, areaG, {
+    let areaRectSettings = this._makeScalable(areaRect, areaG, {
       scalability: this.DRAG_CONSTANTS.BOTH,
       scale: scale
     });
@@ -54,17 +56,27 @@ PolymerD3.dragElem = {
       y: height / 4
     }]);
     let innerRect = this._drawRect(innerG, {
-      width: width / 2,
-      height: height / 2,
-      x: marginLeft + (width * scale) / 2,
-      y: marginTop + (height * scale) / 2,
+      width: width - (marginLeft + marginRight),
+      height: height - (marginTop + marginBottom),
+      x: marginLeft,
+      y: marginTop,
       scalability: this.DRAG_CONSTANTS.BOTH,
       fillOpacity: rectFillOpacity
     });
-    this._makeScalable(innerRect, innerG, {
+    let innerRectSettings = this._makeScalable(innerRect, innerG, {
       scalability: this.DRAG_CONSTANTS.BOTH,
       scale: scale
     });
+
+    return {
+      areaRect: areaRectSettings,
+      innerRect: innerRectSettings,
+      scale: scale
+    }
+  },
+
+  // creates a symmetrically scalable shape
+  initSymmetric: function(svg, settings, config) {
 
   },
 
@@ -121,10 +133,10 @@ PolymerD3.dragElem = {
     // scale bars
     var scaleBarleft = group.append('rect')
       .attr('x', function(d) {
-        return d.x - (dragbarw / 2);
+        return rectDiamensions.x - (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + (dragbarw / 2);
+        return rectDiamensions.y + (dragbarw / 2);
       })
       .attr('height', height - dragbarw)
       .attr('id', 'scaleleft')
@@ -136,10 +148,10 @@ PolymerD3.dragElem = {
 
     var scaleBarright = group.append('rect')
       .attr('x', function(d) {
-        return d.x + width - (dragbarw / 2);
+        return rectDiamensions.x + width - (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + (dragbarw / 2);
+        return rectDiamensions.y + (dragbarw / 2);
       })
       .attr('id', 'scaleright')
       .attr('height', height - dragbarw)
@@ -151,10 +163,10 @@ PolymerD3.dragElem = {
 
     var scaleBartop = group.append('rect')
       .attr('x', function(d) {
-        return d.x + (dragbarw / 2);
+        return rectDiamensions.x + (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y - (dragbarw / 2);
+        return rectDiamensions.y - (dragbarw / 2);
       })
       .attr('height', dragbarw)
       .attr('id', 'scaleleft')
@@ -166,10 +178,10 @@ PolymerD3.dragElem = {
 
     var scaleBarbottom = group.append('rect')
       .attr('x', function(d) {
-        return d.x + (dragbarw / 2);
+        return rectDiamensions.x + (dragbarw / 2);
       })
       .attr('y', function(d) {
-        return d.y + height - (dragbarw / 2);
+        return rectDiamensions.y + height - (dragbarw / 2);
       })
       .attr('id', 'scaleright')
       .attr('height', dragbarw)
@@ -330,7 +342,13 @@ PolymerD3.dragElem = {
       scaleBarleft,
       scaleBarright,
       scaleBartop,
-      scaleBarbottom
+      scaleBarbottom,
+      getDiamensions: () => {
+        return {
+          height,
+          width
+        }
+      }
     }
   },
 
