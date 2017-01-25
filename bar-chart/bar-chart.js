@@ -245,7 +245,7 @@ Polymer({
       // boiler plate code
       this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback); // attach tooltip
 
-      this.attachLegend(this.parentG); // attach legend
+      this.attachLegend(this.parentG, this.legendSettings); // attach legend
       this.xAxisRotationCb(); // axis rotation
       this.yAxisRotationCb();
     }, 500);

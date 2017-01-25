@@ -213,7 +213,7 @@ Polymer({
             } else {
                 drawArea();
             }
-            this.attachLegend(this.parentG);
+            this.attachLegend(this.parentG, this.legendSettings);
         }, 500);
     },
     strokeWidthCb: function() {

@@ -139,7 +139,7 @@ Polymer({
       };
       this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
 
-      this.attachLegend(this.parentG);
+      this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
   },
 
