@@ -1,14 +1,14 @@
 PolymerD3.dragElem = {
+
+  /* == Helper Functions == */
+  // function to access properties from settings
+  _getSettingsProp: function(prop, setting) {
+    return PolymerD3.utilities.searchArr(setting, function(elem) {
+      return elem.input == prop;
+    });
+  },
+
   initDragSettings: function(svg, settings, config) {
-
-    /* == Helper Functions == */
-    // function to access properties from settings
-    let _getSettingsProp = function(prop) {
-      return PolymerD3.utilities.searchArr(settings, function(elem) {
-        return elem.input == prop;
-      })
-    };
-
     /* == Configuration Cooking == */
     if (!config) {
       config = {
@@ -17,13 +17,13 @@ PolymerD3.dragElem = {
       };
     }
     let scale = config.scale || .3;
-    let width = _getSettingsProp('width').selectedValue * scale;
-    let height = _getSettingsProp('height').selectedValue * scale;
+    let width = this._getSettingsProp('width', settings).selectedValue * scale;
+    let height = this._getSettingsProp('height', settings).selectedValue * scale;
     let rectFillOpacity = config.areaRect.opacity || .8;
-    let marginLeft = _getSettingsProp('marginLeft').selectedValue * scale;
-    let marginTop = _getSettingsProp('marginTop').selectedValue * scale;
-    let marginRight = _getSettingsProp('marginRight').selectedValue * scale;
-    let marginBottom = _getSettingsProp('marginBottom').selectedValue * scale;
+    let marginLeft = this._getSettingsProp('marginLeft', settings).selectedValue * scale;
+    let marginTop = this._getSettingsProp('marginTop', settings).selectedValue * scale;
+    let marginRight = this._getSettingsProp('marginRight', settings).selectedValue * scale;
+    let marginBottom = this._getSettingsProp('marginBottom', settings).selectedValue * scale;
 
     /* == Operation== */
     // clears SVG
@@ -73,6 +73,11 @@ PolymerD3.dragElem = {
       innerRect: innerRectSettings,
       scale: scale
     }
+  },
+
+  // creates a symmetrically scalable shape
+  initSymmetric: function(svg, settings, config) {
+
   },
 
   // function to draw a rectangle with given config
