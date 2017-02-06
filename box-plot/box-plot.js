@@ -24,29 +24,17 @@ Polymer({
       notify: true,
       type: Array,
       value: () => {
-        return [
-        // {
-        //   input: 'x',
-        //   txt: 'Pick Dimension',
-        //   selectedValue: [],
-        //   scaleType: '',
-        //   format: '',
-        //   selectedObjs: [],
-        //   uitype: 'single-value',
-        //   displayName: 'myXAxis',
-        //   maxSelectableValues: 1
-        // }, {
-        //   input: 'y',
-        //   txt: 'Pick Measures',
-        //   selectedValue: [],
-        //   format: '',
-        //   scaleType: '',
-        //   selectedObjs: [],
-        //   uitype: 'multi-value',
-        //   displayName: 'myYAxis',
-        //   maxSelectableValues: 2
-        // }
-        ];
+        return [{
+          input: 'x',
+          txt: 'Coloumns',
+          selectedValue: [],
+          scaleType: '',
+          format: '',
+          selectedObjs: [],
+          uitype: 'single-value',
+          displayName: 'coloumn',
+          maxSelectableValues: 8
+        }];
       }
     },
     settings: {
@@ -94,8 +82,12 @@ Polymer({
     }
 
     this.debounce('drawDebounce', () => {
-      let usableCols = this.externals.filter(external => external.type == 'Number');
 
+      let usableCols = this.inputs[0].selectedObjs.filter(external => external.type == 'Number');
+
+      if (!usableCols || !usableCols.length) {
+        return false;
+      }
       // creates box plot data structure
       // boxplot = [[x1, d1], [x2, d2] ... [xn, dn]]
       // d1 = [val1, val2 ... valn] + quartiles
@@ -114,6 +106,18 @@ Polymer({
         .height(this.chartHeight)
         .domain([min, max])
         .showLabels(true);
+
+      // init colors, if not present
+      let z = this.setLegendColor.bind(this);
+      if (!this.legendSettings.colors || !this.legendSettings.colors.length) {
+        this.legendSettings.colors = usableCols.map(col => {
+          return {
+            // generate color from default pallete
+            color: this.defaultColors[Math.floor(Math.random() * 9) + 0],
+            label: col.key
+          }
+        });
+      }
 
       // the x-axis
       let x = d3.scale.ordinal()
@@ -163,6 +167,8 @@ Polymer({
         .attr('x', (this.chartWidth / 2))
         .attr('y', 10)
         .attr('dy', '.71em');
+
+      this.attachLegend(this.parentG, this.legendSettings);
 
     }, 500);
 
