@@ -1,3 +1,20 @@
+/*
+
+Accepts data in the format:
+  Q1,Q2,Q3,Q4
+  20000,15000,8000,20000
+  9879,9323,3294,5629
+  5070,9395,17633,5752
+  7343,8675,12121,7557
+  9136,5354,4319,5125
+  7943,6725,18712,5116
+  4000,7446,16754,8905
+  10546,10899,17270,5828
+  9385,9365,13676,6014
+  8669,8238,6587,5995
+
+where, Q1, Q2, Q3 and Q4 are plotted at xaxix
+*/
 Polymer({
   is: 'box-plot',
 
@@ -29,112 +46,124 @@ Polymer({
           maxSelectableValues: 2
         }];
       }
+    },
+    settings: {
+      notify: true,
+      type: Object,
+      value: () => {
+        return [];
+      }
+    },
+    chartType: {
+      type: Object,
+      value: () => {
+        return [];
+      }
+    },
+    hideSettings: true,
+    source: Array,
+    external: Array,
+    chart: Object,
+    dataMutated: false,
+    isStacked: {
+      type: Boolean,
+      value: true
+    },
+    configurator: {
+      type: Object,
+      value: function() {
+        return {};
+      }
     }
   },
 
   behaviors: [
-    PolymerD3.chartBehavior
+    PolymerD3.chartBehavior,
+    PolymerD3.chartConfigCbBehavior
   ],
 
   draw: function() {
-    csv.forEach(function(x) {
-      var v1 = Math.floor(x.Q1),
-        v2 = Math.floor(x.Q2),
-        v3 = Math.floor(x.Q3),
-        v4 = Math.floor(x.Q4);
-      // add more variables if your csv file has more columns
+    // find maximum in an array of arrays
+    function findMax(arr) {
+      return d3.max(arr, innerArray => d3.max(innerArray[1]));
+    }
+    function findMin(arr) {
+      return d3.min(arr, innerArray => d3.min(innerArray[1]));
+    }
 
-      var rowMax = Math.max(v1, Math.max(v2, Math.max(v3, v4)));
-      var rowMin = Math.min(v1, Math.min(v2, Math.min(v3, v4)));
+    this.debounce('drawDebounce', () => {
+      let usableCols = this.externals.filter(external => external.type == 'Number');
 
-      data[0][1].push(v1);
-      data[1][1].push(v2);
-      data[2][1].push(v3);
-      data[3][1].push(v4);
-      // add more rows if your csv file has more columns
+      // creates box plot data structure
+      // boxplot = [[x1, d1], [x2, d2] ... [xn, dn]]
+      // d1 = [val1, val2 ... valn] + quartiles
+      let boxPlotData = usableCols.map(col => {
+        let node = [col.key, this.source.map(row => PolymerD3.utilities.truncateFloat(row[col.value]))];
+        return node;
+      });
 
-      if (rowMax > max) max = rowMax;
-      if (rowMin < min) min = rowMin;
-    });
+      let margin = this.getMargins();
 
-    var chart = d3.box()
-      .whiskers(iqr(1.5))
-      .height(height)
-      .domain([min, max])
-      .showLabels(labels);
+      let max = findMax(boxPlotData);
+      let min = findMin(boxPlotData);
 
-    var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .attr("class", "box")
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      let chart = d3.box()
+        .whiskers(iqr(1.5))
+        .height(this.chartHeight)
+        .domain([min, max])
+        .showLabels(true);
 
-    // the x-axis
-    var x = d3.scale.ordinal()
-      .domain(data.map(function(d) {
-        console.log(d);
-        return d[0];
-      }))
-      .rangeRoundBands([0, width], 0.7, 0.3);
+      // the x-axis
+      let x = d3.scale.ordinal()
+        .domain(usableCols.map(col => col.key))
+        .rangeRoundBands([0, this.chartWidth], 0.7, 0.3);
 
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
+      let xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom');
 
-    // the y-axis
-    var y = d3.scale.linear()
-      .domain([min, max])
-      .range([height + margin.top, 0 + margin.top]);
+      // the y-axis
+      let y = d3.scale.linear()
+        .domain([min, max])
+        .range([this.chartHeight, 0]);
 
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
+      let yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left');
 
-    // draw the boxplots
-    svg.selectAll(".box")
-      .data(data)
-      .enter().append("g")
-      .attr("transform", function(d) {
-        return "translate(" + x(d[0]) + "," + margin.top + ")";
-      })
-      .call(chart.width(x.rangeBand()));
+      // draw the boxplots
+      this.parentG.selectAll('.box')
+        .data(boxPlotData)
+        .enter().append('g')
+        .attr('transform', function(d) {
+          return 'translate(' + x(d[0]) + ',' + margin.top + ')';
+        })
+        .call(chart.width(x.rangeBand()));
 
+      this.parentG.attr('class', 'box');
 
-    // add a title
-    svg.append("text")
-      .attr("x", (width / 2))
-      .attr("y", 0 + (margin.top / 2))
-      .attr("text-anchor", "middle")
-      .style("font-size", "18px")
-      //.style("text-decoration", "underline")
-      .text("Revenue 2012");
+      // draw y axis
+      this.parentG.append('g')
+        .attr('class', 'y-axis')
+        .call(yAxis)
+        .append('text') // and text1
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .style('font-size', '16px')
+        .text('Revenue in €');
 
-    // draw y axis
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text") // and text1
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .style("font-size", "16px")
-      .text("Revenue in €");
+      // draw x axis
+      this.parentG.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(0,' + (this.chartHeight) + ')')
+        .call(xAxis)
+        .append('text') // text label for the x axis
+        .attr('x', (this.chartWidth / 2))
+        .attr('y', 10)
+        .attr('dy', '.71em');
 
-    // draw x axis
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + (height + margin.top + 10) + ")")
-      .call(xAxis)
-      .append("text") // text label for the x axis
-      .attr("x", (width / 2))
-      .attr("y", 10)
-      .attr("dy", ".71em")
-      .style("text-anchor", "middle")
-      .style("font-size", "16px")
-      .text("Quarter");
-
+    }, 500);
 
     // Returns a function to compute the interquartile range.
     function iqr(k) {

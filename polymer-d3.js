@@ -87,6 +87,10 @@ Polymer({
             label: 'Horizontal Chart',
             icon: 'chart:calendar-chart',
             element: 'horizontal-chart'
+          }, {
+            label: 'Box plot',
+            icon: 'chart:calendar-chart',
+            element: 'box-plot'
           }];
         }
       }
