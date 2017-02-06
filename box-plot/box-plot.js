@@ -24,27 +24,29 @@ Polymer({
       notify: true,
       type: Array,
       value: () => {
-        return [{
-          input: 'x',
-          txt: 'Pick Dimension',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'myXAxis',
-          maxSelectableValues: 1
-        }, {
-          input: 'y',
-          txt: 'Pick Measures',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myYAxis',
-          maxSelectableValues: 2
-        }];
+        return [
+        // {
+        //   input: 'x',
+        //   txt: 'Pick Dimension',
+        //   selectedValue: [],
+        //   scaleType: '',
+        //   format: '',
+        //   selectedObjs: [],
+        //   uitype: 'single-value',
+        //   displayName: 'myXAxis',
+        //   maxSelectableValues: 1
+        // }, {
+        //   input: 'y',
+        //   txt: 'Pick Measures',
+        //   selectedValue: [],
+        //   format: '',
+        //   scaleType: '',
+        //   selectedObjs: [],
+        //   uitype: 'multi-value',
+        //   displayName: 'myYAxis',
+        //   maxSelectableValues: 2
+        // }
+        ];
       }
     },
     settings: {
@@ -150,8 +152,7 @@ Polymer({
         .attr('y', 6)
         .attr('dy', '.71em')
         .style('text-anchor', 'end')
-        .style('font-size', '16px')
-        .text('Revenue in €');
+        .style('font-size', '16px');
 
       // draw x axis
       this.parentG.append('g')
