@@ -464,3 +464,15 @@ PolymerD3.utilities.mutateObjInArr = function(arr, condition, mutation) {
     });
     return newArr;
 }
+
+// https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
+// polyfill for math.trunc
+PolymerD3.utilities.truncateFloat = Math.trunc || function(x) {
+    if (isNaN(x)) {
+      return NaN;
+    }
+    if (x > 0) {
+      return Math.floor(x);
+    }
+    return Math.ceil(x);
+};
