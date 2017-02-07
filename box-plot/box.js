@@ -1,7 +1,7 @@
 (function() {
 
   // Inspired by http://informationandvisualization.de/blog/box-plot
-  d3.box = function() {
+  d3.box = function(config) {
     var width = 1,
       height = 1,
       duration = 0,
@@ -46,9 +46,10 @@
           d3.range(n);
 
         // Compute the new x-scale.
-        var x1 = d3.scale.linear()
-          .domain(domain && domain.call(this, d, i) || [min, max])
-          .range([height, 0]);
+        // var x1 = d3.scale.linear()
+        //   .domain(domain && domain.call(this, d, i) || [min, max])
+        //   .range([height, 0]);
+        var x1 = config.y;
 
         // Retrieve the old x-scale, if this is an update.
         var x0 = this.__chart__ || d3.scale.linear()

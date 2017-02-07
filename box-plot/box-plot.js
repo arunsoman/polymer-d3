@@ -101,11 +101,6 @@ Polymer({
       let max = findMax(boxPlotData);
       let min = findMin(boxPlotData);
 
-      let chart = d3.box()
-        .whiskers(iqr(1.5))
-        .height(this.chartHeight)
-        .domain([min, max])
-        .showLabels(true);
 
       // init colors, if not present
       let z = this.setLegendColor.bind(this);
@@ -134,6 +129,14 @@ Polymer({
         .domain([min, max])
         .range([this.chartHeight, 0]);
 
+      let chart = d3.box({
+          y: y
+        })
+        .whiskers(iqr(1.5))
+        .height(this.chartHeight)
+        .domain([min, max])
+        .showLabels(true);
+
       let yAxis = d3.svg.axis()
         .scale(y)
         .orient('left');
@@ -143,7 +146,7 @@ Polymer({
         .data(boxPlotData)
         .enter().append('g')
         .attr('transform', function(d) {
-          return 'translate(' + x(d[0]) + ',' + margin.top + ')';
+          return 'translate(' + x(d[0]) + ',' + 0 + ')';
         })
         .call(chart.width(x.rangeBand()));
 
