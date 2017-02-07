@@ -104,15 +104,15 @@ Polymer({
 
       // init colors, if not present
       let z = this.setLegendColor.bind(this);
-      if (!this.legendSettings.colors || !this.legendSettings.colors.length) {
-        this.legendSettings.colors = usableCols.map(col => {
-          return {
-            // generate color from default pallete
-            color: this.defaultColors[Math.floor(Math.random() * 9) + 0],
-            label: col.key
-          }
-        });
-      }
+      this.legendSettings.colors = usableCols.map((col, index) => {
+        let current = this.legendSettings.colors ? this.legendSettings.colors[index]: {};
+        if (!current) { current = {}}
+        return {
+          // generate color from default pallete
+          color: current.color ? current.color: this.defaultColors[Math.floor(Math.random() * 9) + 0],
+          label: col.key
+        }
+      });
 
       this.parentG.html('');
       // the x-axis
@@ -147,6 +147,17 @@ Polymer({
         .enter().append('g')
         .attr('transform', function(d) {
           return 'translate(' + x(d[0]) + ',' + 0 + ')';
+        })
+        .attr('class', 'box-g')
+        .attr('data-legend', d => d[0])
+        .style('fill', d => {
+          let color;
+          this.legendSettings.colors.forEach(legend => {
+            if (legend.label == d[0]) {
+              color = legend.color;
+            }
+          });
+          return color;
         })
         .call(chart.width(x.rangeBand()));
 
