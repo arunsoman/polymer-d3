@@ -138,6 +138,13 @@ Polymer({
         }
       });
 
+      // todo: format later
+      function formatNumber(d) {
+        d = d3.format('s')(d);
+        let sufix = d.slice(-1);
+        let num = parseFloat(d.slice(0, d.length)).toFixed(2);
+        return  num + sufix;
+      }
       this.parentG.html('');
       // the x-axis
       let x = d3.scale.ordinal()
@@ -154,7 +161,8 @@ Polymer({
         .range([this.chartHeight, 0]);
 
       let chart = d3.box({
-          y: y
+          y: y,
+          formatNumber: formatNumber
         })
         .whiskers(iqr(1.5))
         .height(this.chartHeight)

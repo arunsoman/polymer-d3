@@ -248,14 +248,17 @@
             .attr("text-anchor", function(d, i) {
               return i & 1 ? "start" : "end";
             })
-            .text(format)
+            .text(d => {
+              console.log(config.formatNumber(d))
+              return config.formatNumber(d);
+            })
             .transition()
             .duration(duration)
             .attr("y", x1);
         }
         boxTick.transition()
           .duration(duration)
-          .text(format)
+          .text(config.formatNumber)
           .attr("y", x1);
 
         // Update whisker ticks. These are handled separately from the box
@@ -270,7 +273,7 @@
             .attr("dx", 6)
             .attr("x", width)
             .attr("y", x0)
-            .text(format)
+            .text(config.formatNumber)
             .style("opacity", 1e-6)
             .transition()
             .duration(duration)
@@ -279,7 +282,7 @@
         }
         whiskerTick.transition()
           .duration(duration)
-          .text(format)
+          .text(config.formatNumber)
           .attr("y", x1)
           .style("opacity", 1);
 
