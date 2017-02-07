@@ -34,6 +34,16 @@ Polymer({
           uitype: 'single-value',
           displayName: 'coloumn',
           maxSelectableValues: 8
+        }, {
+          input: 'y',
+          txt: 'Group By',
+          selectedValue: [],
+          scaleType: '',
+          format: '',
+          selectedObjs: [],
+          uitype: 'single-value',
+          displayName: 'coloumn',
+          maxSelectableValues: 1
         }];
       }
     },
@@ -84,17 +94,31 @@ Polymer({
     this.debounce('drawDebounce', () => {
 
       let usableCols = this.inputs[0].selectedObjs.filter(external => external.type == 'Number');
+      let group = this.inputs[1].selectedObjs;
 
       if (!usableCols || !usableCols.length) {
         return false;
       }
+      let _src = this.source.slice();
+      let boxPlotData;
       // creates box plot data structure
       // boxplot = [[x1, d1], [x2, d2] ... [xn, dn]]
       // d1 = [val1, val2 ... valn] + quartiles
-      let boxPlotData = usableCols.map(col => {
-        let node = [col.key, this.source.map(row => PolymerD3.utilities.truncateFloat(row[col.value]))];
-        return node;
-      });
+      if (group.length) {
+        // transpose data
+        usableCols = _src.map(row => row[group[0].value]);
+        boxPlotData = usableCols.map((col, index) => {
+          let node = [col, _src[index].filter((cell, index) => {
+            return index != group[0].value;
+          })]
+          return node;
+        });
+      } else {
+        boxPlotData = usableCols.map(col => {
+          let node = [col.key, _src.map(row => PolymerD3.utilities.truncateFloat(row[col.value]))];
+          return node;
+        });
+      }
 
       let margin = this.getMargins();
 
@@ -117,7 +141,7 @@ Polymer({
       this.parentG.html('');
       // the x-axis
       let x = d3.scale.ordinal()
-        .domain(usableCols.map(col => col.key))
+        .domain(boxPlotData.map(col => col[0]))
         .rangeRoundBands([0, this.chartWidth], 0.7, 0.3);
 
       let xAxis = d3.svg.axis()
