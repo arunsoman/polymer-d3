@@ -119,6 +119,7 @@ Polymer({
         });
       }
 
+      this.parentG.html('');
       // the x-axis
       let x = d3.scale.ordinal()
         .domain(usableCols.map(col => col.key))
