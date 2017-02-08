@@ -249,7 +249,6 @@
               return i & 1 ? "start" : "end";
             })
             .text(d => {
-              console.log(config.formatNumber(d))
               return config.formatNumber(d);
             })
             .transition()
