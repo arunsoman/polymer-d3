@@ -140,6 +140,9 @@ Polymer({
 
       // todo: format later
       function formatNumber(d) {
+        if (d < 1000) {
+          return d;
+        }
         d = d3.format('s')(d);
         let sufix = d.slice(-1);
         let num = parseFloat(d.slice(0, d.length)).toFixed(2);
