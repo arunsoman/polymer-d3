@@ -8,7 +8,7 @@ Polymer({
       value: [{
         input: 'x',
         txt: 'Pick a dimension',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'label',
         uitype: 'single-value',
@@ -17,7 +17,7 @@ Polymer({
       }, {
         input: 'y',
         txt: 'Pick a mesaure',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'count',
         uitype: 'single-value',
@@ -26,7 +26,7 @@ Polymer({
       }, {
         input: 'z',
         txt: 'Group By',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'count',
         uitype: 'single-value',
@@ -58,9 +58,10 @@ Polymer({
     this.hideSettings = !this.hideSettings;
   },
 
-  init: function() {
-    this.data = this.loadFromGroup(this.yIndex);
-  },
+  // init: function() {
+  //   debugger;
+  //   this.data = this.loadFromGroup(this.yIndex);
+  // },
 
   loadFromMultiCol: function(yIndices) {
     let headers = this.source[0];
@@ -101,7 +102,11 @@ Polymer({
     this.debounce('radarDrawDebounce', () => {
       this.xIndex = this.getInputsProperty('x');
       this.yIndex = this.getInputsProperty('y');
-      this.zIndex = this.getInputsProperty('z');
+      try {
+        this.zIndex = this.getInputsProperty('z');
+      } catch (e) {
+        console.warn(e)
+      }
 
       if(this.xIndex == null || this.yIndex == null || this.zIndex == null) {
         return false;
