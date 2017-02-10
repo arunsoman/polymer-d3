@@ -23,14 +23,12 @@ PolymerD3.RadarChart = function(data, options, me) {
   }//if
   var constPIby2 =  Math.PI/2;
   //If the supplied maxValue is smaller than the actual one, replace by the max in the data
-  var maxValue = Math.max(cfg.maxValue,
-    d3.max(data, function(i){
-      return d3.max(i.map(function(o){return o[1];}));}));
+  var maxValue = d3.max(data.map(axis => d3.max(axis, row => row.value)));
 
-  var allAxis = (data[me.xIndex].map(function(i){return i[me.xIndex];})), //Names of each axis
+  var allAxis = data[0].map(row => row.axis), //Names of each axis
     total = allAxis.length,         //The number of different axes
     radius = Math.min(cfg.w/2, cfg.h/2),  //Radius of the outermost circle
-    Format = d3.format('%'),        //Percentage formatting
+    Format = d3.format('.2s'),        //Percentage formatting
     angleSlice = Math.PI * 2 / total;   //The width in radians of each "slice"
 
   //Scale for the radius
@@ -134,7 +132,7 @@ PolymerD3.RadarChart = function(data, options, me) {
   //The radial line function
   var radarLine = d3.svg.line.radial()
     .interpolate("linear-closed")
-    .radius(function(d) { return rScale(d[1]); })
+    .radius(function(d) { return rScale(d.value); })
     .angle(function(d,i) {  return i*angleSlice; });
 
   if(cfg.roundStrokes) {

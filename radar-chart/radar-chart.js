@@ -22,7 +22,7 @@ Polymer({
         selectedName: 'count',
         uitype: 'single-value',
         displayName: 'Value',
-        maxSelectableValues: 2
+        maxSelectableValues: 10
       }, {
         input: 'z',
         txt: 'Group By',
@@ -63,24 +63,30 @@ Polymer({
   //   this.data = this.loadFromGroup(this.yIndex);
   // },
 
-  loadFromMultiCol: function(yIndices) {
-    let headers = this.source[0];
-    let data = [];
-    for(let i = 1; i < this.source.length; i++){
-      let data1 = [];
-      for(let j = 0; j <yIndices.length; j++){
-        let tA= [];
-        tA.push(headers[yIndices[j]]);
-        tA.push(this.source[i][j]);
-        tA.push(this.source[i][this.xIndex]);
-        data1.push(tA);
-      }
-      data.push(data1);
-    }
+  loadFromMultiCol: function(xIndex, yIndices, source) {
+    let data = yIndices.map(yIndex => {
+      return source.map(row => {
+        return {axis: row[xIndex], value: row[yIndex]}
+      });
+    });
     return data;
+    // let headers = this.source[0];
+    // let data = [];
+    // for(let i = 1; i < this.source.length; i++){
+    //   let data1 = [];
+    //   for(let j = 0; j <yIndices.length; j++){
+    //     let tA= [];
+    //     tA.push(headers[yIndices[j]]);
+    //     tA.push(this.source[i][j]);
+    //     tA.push(this.source[i][this.xIndex]);
+    //     data1.push(tA);
+    //   }
+    //   data.push(data1);
+    // }
+    // return data;
   },
 
-  loadFromGroup: function(yIndices) {
+  loadFromGroup: function(xIndex, yIndices, source) {
     let layers = d3.nest()
       .key(d => d[this.zIndex])
       .entries(this.source);
@@ -102,17 +108,17 @@ Polymer({
     this.debounce('radarDrawDebounce', () => {
       this.xIndex = this.getInputsProperty('x');
       this.yIndex = this.getInputsProperty('y');
-      try {
-        this.zIndex = this.getInputsProperty('z');
-      } catch (e) {
-        console.warn(e)
-      }
+      this.zIndex = this.getInputsProperty('z');
 
-      if(this.xIndex == null || this.yIndex == null || this.zIndex == null) {
+      if(this.xIndex == null || !this.yIndex.length) {
         return false;
       }
 
-      this.init();
+      if (this.zIndex == null) {
+        this.data = this.loadFromMultiCol(this.xIndex, this.yIndex, this.source);
+      } else {
+        this.data = this.loadFromGroup(this.yIndex, this.source);
+      }
       this.parentG.html('');
       let color = d3.scale.ordinal()
         .range(['#EDC951','#CC333F','#00A0B0']);
