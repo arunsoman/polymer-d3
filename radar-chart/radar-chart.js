@@ -58,49 +58,30 @@ Polymer({
     this.hideSettings = !this.hideSettings;
   },
 
-  // init: function() {
-  //   debugger;
-  //   this.data = this.loadFromGroup(this.yIndex);
-  // },
-
   loadFromMultiCol: function(xIndex, yIndices, source) {
     let data = yIndices.map(yIndex => {
       return source.map(row => {
-        return {axis: row[xIndex], value: row[yIndex]}
+        return {
+          axis: row[xIndex.value],
+          value: row[yIndex.value],
+          segment: yIndex.key
+        }
       });
     });
     return data;
-    // let headers = this.source[0];
-    // let data = [];
-    // for(let i = 1; i < this.source.length; i++){
-    //   let data1 = [];
-    //   for(let j = 0; j <yIndices.length; j++){
-    //     let tA= [];
-    //     tA.push(headers[yIndices[j]]);
-    //     tA.push(this.source[i][j]);
-    //     tA.push(this.source[i][this.xIndex]);
-    //     data1.push(tA);
-    //   }
-    //   data.push(data1);
-    // }
-    // return data;
   },
 
-  loadFromGroup: function(xIndex, yIndices, source) {
-    let layers = d3.nest()
-      .key(d => d[this.zIndex])
-      .entries(this.source);
-
-    let data  = [];
-
-    layers.forEach((element)=>{
-      let data1 = [];
-      element.values.forEach(value => {
-        data1.push([value[this.xIndex],value[yIndices[0]], value[this.zIndex]]);
+  loadFromGroup: function(groupIndex, yIndices, source) {
+    let data = source.map(row => {
+      let segment = row[groupIndex.value];
+      return yIndices.map(yIndex => {
+        return {
+          axis: yIndex.key,
+          value: row[yIndex.value],
+          segment: segment
+        }
       });
-      data.push(data1);
     });
-
     return data;
   },
 
@@ -110,18 +91,21 @@ Polymer({
       this.yIndex = this.getInputsProperty('y');
       this.zIndex = this.getInputsProperty('z');
 
-      if(this.xIndex == null || !this.yIndex.length) {
+      if((this.xIndex == null && this.zIndex == null) || !this.yIndex.length) {
         return false;
       }
 
+      let yObj = this.getInputsPropertyObj('y').selectedObjs;
       if (this.zIndex == null) {
-        this.data = this.loadFromMultiCol(this.xIndex, this.yIndex, this.source);
+        let xObj = this.getInputsPropertyObj('x').selectedObjs[0];
+        this.data = this.loadFromMultiCol(xObj, yObj, this.source);
       } else {
-        this.data = this.loadFromGroup(this.yIndex, this.source);
+        let zObj = this.getInputsPropertyObj('z').selectedObjs[0];
+        this.data = this.loadFromGroup(zObj, yObj, this.source);
       }
       this.parentG.html('');
       let color = d3.scale.ordinal()
-        .range(['#EDC951','#CC333F','#00A0B0']);
+        .range(this.defaultColors);
 
       let radarChartOptions = {
         w: this.chartWidth,

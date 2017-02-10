@@ -185,9 +185,9 @@ PolymerD3.RadarChart = function(data, options, me) {
     .attr("class", "radarCircle")
     .attr("r", cfg.dotRadius)
     .attr("cx", function(d,i){
-      return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
+      return rScale(d.value) * Math.cos(angleSlice*i - constPIby2); })
     .attr("cy", function(d,i){
-      return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
+      return rScale(d.value) * Math.sin(angleSlice*i - constPIby2); })
     .style("fill", function(d,i,j) { return cfg.color(j); })
     .style("fill-opacity", 0.8);
 
@@ -208,9 +208,9 @@ PolymerD3.RadarChart = function(data, options, me) {
     .attr("class", "radarInvisibleCircle")
     .attr("r", cfg.dotRadius*1.5)
     .attr("cx", function(d,i){
-      return rScale(d[1]) * Math.cos(angleSlice*i - constPIby2); })
+      return rScale(d.value) * Math.cos(angleSlice*i - constPIby2); })
     .attr("cy", function(d,i){
-      return rScale(d[1]) * Math.sin(angleSlice*i - constPIby2); })
+      return rScale(d.value) * Math.sin(angleSlice*i - constPIby2); })
     .style("fill", "none")
     .style("pointer-events", "all")
     .on("mouseover", (d,i,j)=> {
@@ -221,7 +221,7 @@ PolymerD3.RadarChart = function(data, options, me) {
       tooltip
         .attr('x', newX)
         .attr('y', newY)
-        .text('Segment:'+d[2]+'\nValue:'+Format(d[1]))
+        .text('Segment: ' + d.segment + '; Value: ' + Format(d.value))
         .transition().duration(200)
         .style('opacity', 1);
     })
