@@ -322,7 +322,7 @@ Polymer({
       maxSelectableValues: 1,
       supportedType: ''
     }]);
-    this.set('configurator', new PolymerD3.barChart.stacked());
+    this.set('configurator', new PolymerD3.barChart.stacked(this));
   },
 
   initWaterfallChart: function() {

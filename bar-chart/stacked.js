@@ -1,4 +1,5 @@
-PolymerD3.barChart.stacked = function() {
+PolymerD3.barChart.stacked = function(chart) {
+  const STACK_CLASS = 'stacked-rect';
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
@@ -51,9 +52,32 @@ PolymerD3.barChart.stacked = function() {
       },
       legendF: (d, i, j) => {
         // console.log('d:' + d + ' i:' + i + ' j:' + j);
-      }
+      },
+      classF: () => STACK_CLASS
     }
   };
+
+  if (chart) {
+    chart.addEventListener('tap', e => {
+      console.log(e);
+      let targetElem = d3.select(e.target);
+      // logic for basic bar chart
+      if (targetElem.classed(STACK_CLASS)) {
+        let data = targetElem.data();
+        if (data.length) {
+          targetElem.classed('opacity-none', !targetElem.classed('opacity-none'));
+          chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row) {
+            var selected = [];
+            d3.select(chart).selectAll('.opacity-none').each(s => {
+              selected.push(s[0]);
+            });
+            return (selected.indexOf(row[0]) != -1);
+          }});
+        }
+      }
+
+    });
+  }
 
   return {
     conf: _conf,
