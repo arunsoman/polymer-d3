@@ -19,15 +19,25 @@
   </style>
   <template>
     <template is="dom-if" if="{{editMode}}">
-      <display-component settings="{{area}}"></display-component>
-      <div class="draggable-areabtn-wrap">
-        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+      <div class="settings-wrap">
         <paper-icon-button
-          class="settings-icon"
-          icon="icons:settings-overscan"
-          title="Area Settings"
-          on-tap="showAreaSettings"
-        ></paper-icon-button>
+            class="settings-icon outer"
+            icon="icons:settings"
+            title="View Settings"
+            on-tap="toggleSettingsVisibility"
+          ></paper-icon-button>
+        <template is="dom-if" if="{{settingsVisibility}}">
+          <display-component settings="{{area}}"></display-component>
+          <div class="draggable-areabtn-wrap">
+            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+            <paper-icon-button
+              class="settings-icon inner"
+              icon="icons:settings-overscan"
+              title="Area Settings"
+              on-tap="showAreaSettings"
+            ></paper-icon-button>
+          </div>
+        </template>
       </div>
     </template>
   </template>

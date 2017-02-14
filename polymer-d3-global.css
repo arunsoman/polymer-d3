@@ -48,6 +48,7 @@ polymer-d3 .settings-icon {
   position: absolute;
   right: 1em;
   top: 6px;
+  z-index: 9;
 }
 
 polymer-d3  pareto-chart .line,
@@ -60,4 +61,12 @@ polymer-d3  grouped-composite-chart .line {
 
 polymer-d3 #display-component {
   z-index: 110;
+}
+
+polymer-d3 .settings-wrap {
+  position: relative;
+}
+
+polymer-d3 .settings-icon.inner {
+  right: 50px;
 }

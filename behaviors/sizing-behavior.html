@@ -164,6 +164,9 @@
         });
         return obj;
     },
+    toggleSettingsVisibility: function() {
+        this.set('settingsVisibility', !this.settingsVisibility);
+    },
     showAreaSettings: function() {
         let dialog = this.querySelector('#display-component');
         this.set('chartCustomizerFlag', true);

@@ -242,16 +242,17 @@ Polymer({
     'reset': 'resetGenerator'
   },
   toggleGenerator: function(e) {
-    var elem = d3.select(e.target.parentNode);
-    var me = this;
+    let elem = d3.select(e.target.parentNode);
+    let me = this;
+    let filterCol = this.getInputsProperty('y');
     if (elem.classed('box-g')) {
       elem.classed('opacity-none', !elem.classed('opacity-none'));
       this.fire('TOGGLE', {toggle: 'ON', chart: this, element: e.target, filter: function(row) {
-        var selected = [];
+        let selected = [];
         d3.select(me).selectAll('g.box-g.opacity-none').each(s => {
           selected.push(s[0])
         });
-        return (selected.indexOf(row[0]) != -1);
+        return (selected.indexOf(row[filterCol]) != -1);
       }});
     }
   },
