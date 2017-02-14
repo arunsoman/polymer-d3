@@ -101,6 +101,19 @@ PolymerD3.barChart.stacked = function(chart) {
         let fileredDomain = chart.source.filter((row, index) => {
           return (index >= padding && index < (chart.source.length - padding))
         }).map(row => row[xIndex]);
+
+        // add class to filtered elements
+        let rects = d3.select(chart).selectAll('.stacked-rect');
+        [].forEach.call(rects[0], rect => {
+          let elem = d3.select(rect);
+          let data = elem.data();
+          if (data != null && fileredDomain.indexOf(data[0][xIndex]) != -1) {
+            elem.classed('opacity-none', true);
+          } else {
+            elem.classed('opacity-none', false);
+          }
+        });
+
         chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row, index) {
           return (fileredDomain.indexOf(row[xIndex]) != -1);
         }});
