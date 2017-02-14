@@ -64,6 +64,7 @@ PolymerD3.barChart.stacked = function(chart) {
       // logic for basic bar chart
       if (targetElem.classed(STACK_CLASS)) {
         let data = targetElem.data();
+        let xIndex = chart.getInputsProperty('x');
         if (data.length) {
           targetElem.classed('opacity-none', !targetElem.classed('opacity-none'));
           chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row) {
@@ -71,11 +72,40 @@ PolymerD3.barChart.stacked = function(chart) {
             d3.select(chart).selectAll('.opacity-none').each(s => {
               selected.push(s[0]);
             });
-            return (selected.indexOf(row[0]) != -1);
+            return (selected.indexOf(row[xIndex]) != -1);
           }});
         }
       }
-
+    });
+    let chartContainer = chart.querySelector('.chartContainer');
+    chart.scrollVal = 0; // variable that ditactes filterPadding
+    chartContainer.addEventListener('wheel', e => {
+      function preventDefault(e) {
+        e = e || window.event;
+        if (e.preventDefault)
+            e.preventDefault();
+        e.returnValue = false;
+      }
+      window.onwheel = preventDefault; // disables window scroll
+      // debounces scroll events
+      chart.debounce('scrollDebounce', () => {
+        window.onwheel = null; // enable windw scroll
+        if (e.deltaY > 0) { // filter padding mustn't be less than 0
+          (chart.scrollVal > 0) ? chart.scrollVal -= 1 : chart.scrollVal = 0;
+        } else {
+          chart.scrollVal += 1;
+        }
+        let xIndex = chart.getInputsProperty('x');
+        let padding = chart.scrollVal;
+        // creates a filtered domain
+        let fileredDomain = chart.source.filter((row, index) => {
+          return (index >= padding && index < (chart.source.length - padding))
+        }).map(row => row[xIndex]);
+        chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row, index) {
+          return (fileredDomain.indexOf(row[xIndex]) != -1);
+        }});
+        console.log('scroll re-enabled');
+      }, 500);
     });
   }
 
