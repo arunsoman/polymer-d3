@@ -48,12 +48,22 @@
     <h4>Area Chart</h4>
     <template is="dom-if" if="{{editMode}}">
       <div class="settings-wrap">
-        <paper-icon-button
+        <template is="dom-if" if={{!settingsVisibility}}>
+          <paper-icon-button
+              class="settings-icon outer"
+              icon="icons:expand-more"
+              title="View Settings"
+              on-tap="toggleSettingsVisibility"
+          ></paper-icon-button>
+        </template>
+        <template is="dom-if" if={{settingsVisibility}}>
+          <paper-icon-button
             class="settings-icon outer"
-            icon="icons:settings"
-            title="View Settings"
+            icon="icons:expand-less"
+            title="Hide Settings"
             on-tap="toggleSettingsVisibility"
           ></paper-icon-button>
+        </template>
         <template is="dom-if" if="{{settingsVisibility}}">
           <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
             <paper-dialog id="display-component" opened>
@@ -65,7 +75,7 @@
             <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
             <paper-icon-button
               class="settings-icon inner"
-              icon="icons:settings-overscan"
+              icon="icons:build"
               title="Area Settings"
               on-tap="showAreaSettings"
             ></paper-icon-button>
