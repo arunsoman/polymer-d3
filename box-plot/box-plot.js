@@ -238,8 +238,11 @@ Polymer({
   },
   events: ['TOGGLE', 'RESET'],
   listeners: {
-    'tap': 'toggleGenerator',
-    'reset': 'resetGenerator'
+    // 'tap': 'toggleGenerator',
+    // 'reset': 'resetGenerator'
+  },
+  attachListeners: function() {
+    this.addEventListener('tap', this.toggleGenerator.bind(this));
   },
   toggleGenerator: function(e) {
     let elem = d3.select(e.target.parentNode);
