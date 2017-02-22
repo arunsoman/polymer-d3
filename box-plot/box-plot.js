@@ -247,6 +247,11 @@ Polymer({
   cookQuery: function() {
     let rows = d3.select(this).selectAll('g.box-g.opacity-none');
     let col = this.getInputsPropertyObj('y');
+
+    // this chart isn't drawn yet
+    if (!col || !col.selectedObjs.length) {
+      return [];
+    }
     let coloumn = col.selectedObjs[0].key;
     let coloumnId = col.selectedObjs[0].value;
     let type = col.selectedObjs[0].type;

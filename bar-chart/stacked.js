@@ -69,9 +69,9 @@ PolymerD3.barChart.stacked = function(chart) {
           if (data.length) {
             targetElem.classed('opacity-none', !targetElem.classed('opacity-none'));
             chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row) {
-              var selected = [];
+              let selected = [];
               d3.select(chart).selectAll('.opacity-none').each(s => {
-                selected.push(s[0]);
+                selected.push(s[xIndex]);
               });
               return (selected.indexOf(row[xIndex]) != -1);
             }});
@@ -121,6 +121,36 @@ PolymerD3.barChart.stacked = function(chart) {
           console.log('scroll re-enabled');
         }, 500);
       });
+      chart.cookQuery = function() {
+        let col = chart.getInputsPropertyObj('x');
+
+        if (!col || !col.selectedObjs.length) {
+          return [];
+        }
+
+        let coloumn = col.selectedObjs[0].key;
+        let coloumnId = col.selectedObjs[0].value;
+        let type = col.selectedObjs[0].type;
+
+        let selected = [];
+        d3.select(chart).selectAll('.opacity-none').each(s => {
+          selected.push(s[coloumnId]);
+        });
+
+        // to do: move to utilities
+        function beautifiedValue(val, type) {
+          if (type == 'Number') {
+            return val;
+          } else { // enclose in quotes, if type isn't a number
+            return '"' + val + '"';
+          }
+        }
+
+        let queryArray = selected.map(value => {
+          return coloumn + '=' + beautifiedValue(value, type);
+        });
+        return queryArray;
+      }
     }
   }
 
