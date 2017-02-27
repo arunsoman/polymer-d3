@@ -168,9 +168,16 @@
         uuid: String
       },
 
-      observers: ['_inputsObserver(inputs)'],
+      observers: ['_inputsObserver(inputs)', '_externalsObs(externals)'],
 
       behaviors: [PolymerD3.draggableBehavior],
+
+      _externalsObs: function(externals) {
+        console.log('externals');
+        if (externals.length) {
+          this._externals = PolymerD3.utilities.clone(externals);
+        }
+      },
 
       _inputsObserver: function(inputs) {
         if (inputs.length && inputs.length > 0) {
@@ -255,6 +262,15 @@
             btn.set('icon', icon);
           }
         });
+        // hacky fix:
+        // polymer-sortable cannot clone model.item.data from an item in a template-repeat
+        // so, keeping a copy of the externals and using it to re-rendering the UI
+        this.async(() => {
+          this.set('externals', []);
+        }, 100);
+        this.async(() => {
+          this.set('externals', this._externals);
+        }, 200);
       }
     });
   </script>

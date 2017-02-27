@@ -144,7 +144,6 @@ Polymer({
       // reads x, y & z index
       let x = this.getInputsProperty('x');
       let y = this.getInputsProperty('y');
-      let z = this.getInputsProperty('z');
       let group = this.getInputsProperty('s');
 
       // donot attempt to draw if x or y is empty

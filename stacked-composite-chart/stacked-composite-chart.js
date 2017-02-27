@@ -105,7 +105,6 @@ Polymer({
       if (yLine && yLine.length) {
 
         let lineData = this.source.map(row => ({x: mapXValue(row), y: mapYLine(row)}));
-        console.log(lineData);
 
         let guide = d3.svg.line()
           .x(d => x(d.x))
@@ -123,7 +122,18 @@ Polymer({
         let line = this.parentG.append('path')
           .datum(lineData)
           .attr('d', guide)
-          .attr('class', 'line');
+          .attr('class', 'line')
+          .attr('transform', 'translate(' + ((x.rangeBand() - 1) / 2) + ',' + 0 + ')');
+
+        this.parentG.append('g')
+          .attr('class', 'y-axis')
+          .attr('transform', 'translate(' + [this.chartWidth, 0] + ')')
+          .call(yAxis2)
+          .append('text')
+          .attr('transform', 'rotate(-90)')
+          .attr('y', 4)
+          .attr('dy', '-.71em')
+          .style('text-anchor', 'end');
       }
 
       var htmlCallback = d => { // retained as arrow function to access `this.inputs[]`
@@ -141,7 +151,7 @@ Polymer({
       };
       this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
 
-      this.attachLegend(this.parentG);
+      this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
   },
 

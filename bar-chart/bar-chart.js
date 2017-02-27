@@ -241,9 +241,13 @@ Polymer({
           '</table>';
         return str;
       };
-      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
 
-      this.attachLegend(this.parentG);
+      // boiler plate code
+      this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback); // attach tooltip
+
+      this.attachLegend(this.parentG, this.legendSettings); // attach legend
+      this.xAxisRotationCb(); // axis rotation
+      this.yAxisRotationCb();
     }, 500);
   },
 
@@ -318,7 +322,7 @@ Polymer({
       maxSelectableValues: 1,
       supportedType: ''
     }]);
-    this.set('configurator', new PolymerD3.barChart.stacked());
+    this.set('configurator', new PolymerD3.barChart.stacked(this));
   },
 
   initWaterfallChart: function() {

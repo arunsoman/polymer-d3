@@ -15,7 +15,7 @@ Polymer({
         if (!this.availableCharts) {
           return [{
             label: 'Table',
-            icon: 'chart:stacked-bar-chart',
+            icon: 'chart:table-icon',
             element: 'polymerd3-table',
             callBack: 'initTable'
           }, {
@@ -73,20 +73,28 @@ Polymer({
             element: 'calendar-chart'
           }, {
             label: 'Pareto Chart',
-            icon: 'chart:calendar-chart',
+            icon: 'chart:pareto-chart',
             element: 'pareto-chart'
           }, {
             label: 'Stacked Composite Chart',
-            icon: 'chart:calendar-chart',
+            icon: 'chart:composite-stacked',
             element: 'stacked-composite-chart'
           }, {
             label: 'Grouped Composite Chart',
-            icon: 'chart:calendar-chart',
+            icon: 'chart:composite-grouped',
             element: 'grouped-composite-chart'
           }, {
             label: 'Horizontal Chart',
-            icon: 'chart:calendar-chart',
+            icon: 'chart:horizontal-bar',
             element: 'horizontal-chart'
+          }, {
+            label: 'Box plot',
+            icon: 'chart:calendar-chart',
+            element: 'box-plot'
+          }, {
+            label: 'Composite Canvas',
+            icon: 'icons:dashboard',
+            element: 'composite-canvas'
           }];
         }
       }

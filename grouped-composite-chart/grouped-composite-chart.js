@@ -110,7 +110,8 @@ Polymer({
         let line = this.parentG.append('path')
           .datum(lineData)
           .attr('d', guide)
-          .attr('class', 'line');
+          .attr('class', 'line')
+          .attr('transform', 'translate(' + (translations.barWidth() / 2) + ',' + 0 + ')');
 
         this.parentG.append('g')
           .attr('class', 'y-axis')
@@ -138,7 +139,7 @@ Polymer({
       };
       this.attachToolTip(this.parentG, rects, 'vertalBars', htmlCallback);
 
-      this.attachLegend(this.parentG);
+      this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
   },
 

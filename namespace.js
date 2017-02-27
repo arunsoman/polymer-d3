@@ -453,3 +453,26 @@ PolymerD3.utilities.compareAndMerge = function(from, to, comparison) {
 
     return from.concat(merged);
 }
+
+// 'mutates' the object statisying 'condition' in the array of a objects 'arr'
+PolymerD3.utilities.mutateObjInArr = function(arr, condition, mutation) {
+    var newArr = arr.map(elem => {
+        if (condition(elem)) {
+            return mutation(elem);
+        }
+        return elem;
+    });
+    return newArr;
+}
+
+// https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Global_Objects/Math/trunc
+// polyfill for math.trunc
+PolymerD3.utilities.truncateFloat = Math.trunc || function(x) {
+    if (isNaN(x)) {
+      return NaN;
+    }
+    if (x > 0) {
+      return Math.floor(x);
+    }
+    return Math.ceil(x);
+};

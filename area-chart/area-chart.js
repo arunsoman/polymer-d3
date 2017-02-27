@@ -65,7 +65,6 @@ Polymer({
         this.debounce('darwDebounce', () => {
             var xIndex = this.getInputsProperty('x');
             var yIndices = this.getInputsProperty('y');
-            var zIndex = this.getInputsProperty('z');
             if (xIndex === -1 || !yIndices || yIndices.length < 1 || !this.source || this.source.length < 1 ) {
                 return false;
             }
@@ -93,7 +92,7 @@ Polymer({
                 parentG: me.parentG
             };
             let myGroup = PolymerD3.groupingBehavior.group_by(yIndices.length === 1 ?
-                [zIndex] : yIndices, xIndex, yIndices, this.source[0]);
+                [yIndices] : yIndices, xIndex, yIndices, this.source[0]);
             let cc = this.chartConfig(conf, this.source, myGroup.process);
             let stack = myGroup.getStack();
             var drawArea = ()=>{
@@ -153,7 +152,8 @@ Polymer({
                     .attr('data-legend', function(d) {
                         return d.key;
                     })
-                    .attr('class', 'stroked-elem');
+                    .attr('class', 'stroked-elem')
+                    .attr('transform', 'translate(' + (cc.getBarWidth() / 2) + ',' + 0 + ')');
                     // .style("stroke", (d, i) => (!me.isArea) ? z(i) : 'none');
             };
             var drawDiff=()=>{
@@ -213,7 +213,7 @@ Polymer({
             } else {
                 drawArea();
             }
-            this.attachLegend(this.parentG);
+            this.attachLegend(this.parentG, this.legendSettings);
         }, 500);
     },
     strokeWidthCb: function() {

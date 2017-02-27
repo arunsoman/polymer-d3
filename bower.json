@@ -12,11 +12,13 @@
     "paper-item": "^1.2.1",
     "polymer-color-picker": "^1.0.1",
     "d3-tip": "v0.6.3",
-    "polymer-sortablejs": "https://github.com/SortableJS/polymer-sortablejs.git#master",
+    "polymer-sortablejs": "https://github.com/SortableJS/polymer-sortablejs.git#5b7f08a",
     "paper-icon-button": "^1.1.2",
     "paper-color-pallete": "https://github.com/sravan-s/paper-color-pallete.git",
     "paper-slider": "PolymerElements/paper-slider#^1.0.11",
-    "neon-animation": "v1.2.4"
+    "neon-animation": "v1.2.4",
+    "crossfilter": "1.x",
+    "iron-ajax": "^1.4.3"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
@@ -25,7 +27,7 @@
     "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
   },
   "resolutions": {
-    "polymer-sortablejs": "master",
+    "polymer-sortablejs": "5b7f08a",
     "web-animations-js": "^2.2.0",
     "paper-styles": "^1.1.4",
     "neon-animation": "v1.2.4"

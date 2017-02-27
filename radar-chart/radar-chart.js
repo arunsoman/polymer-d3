@@ -8,7 +8,7 @@ Polymer({
       value: [{
         input: 'x',
         txt: 'Pick a dimension',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'label',
         uitype: 'single-value',
@@ -17,16 +17,16 @@ Polymer({
       }, {
         input: 'y',
         txt: 'Pick a mesaure',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'count',
         uitype: 'single-value',
         displayName: 'Value',
-        maxSelectableValues: 2
+        maxSelectableValues: 10
       }, {
         input: 'z',
         txt: 'Group By',
-        selectedValue: null,
+        selectedValue: [],
         selectedObjs: [],
         selectedName: 'count',
         uitype: 'single-value',
@@ -58,42 +58,30 @@ Polymer({
     this.hideSettings = !this.hideSettings;
   },
 
-  init: function() {
-    this.data = this.loadFromGroup(this.yIndex);
-  },
-
-  loadFromMultiCol: function(yIndices) {
-    let headers = this.source[0];
-    let data = [];
-    for(let i = 1; i < this.source.length; i++){
-      let data1 = [];
-      for(let j = 0; j <yIndices.length; j++){
-        let tA= [];
-        tA.push(headers[yIndices[j]]);
-        tA.push(this.source[i][j]);
-        tA.push(this.source[i][this.xIndex]);
-        data1.push(tA);
-      }
-      data.push(data1);
-    }
+  loadFromMultiCol: function(xIndex, yIndices, source) {
+    let data = yIndices.map(yIndex => {
+      return source.map(row => {
+        return {
+          axis: row[xIndex.value],
+          value: row[yIndex.value],
+          segment: yIndex.key
+        }
+      });
+    });
     return data;
   },
 
-  loadFromGroup: function(yIndices) {
-    let layers = d3.nest()
-      .key(d => d[this.zIndex])
-      .entries(this.source);
-
-    let data  = [];
-
-    layers.forEach((element)=>{
-      let data1 = [];
-      element.values.forEach(value => {
-        data1.push([value[this.xIndex],value[yIndices[0]], value[this.zIndex]]);
+  loadFromGroup: function(groupIndex, yIndices, source) {
+    let data = source.map(row => {
+      let segment = row[groupIndex.value];
+      return yIndices.map(yIndex => {
+        return {
+          axis: yIndex.key,
+          value: row[yIndex.value],
+          segment: segment
+        }
       });
-      data.push(data1);
     });
-
     return data;
   },
 
@@ -103,14 +91,21 @@ Polymer({
       this.yIndex = this.getInputsProperty('y');
       this.zIndex = this.getInputsProperty('z');
 
-      if(this.xIndex == null || this.yIndex == null || this.zIndex == null) {
+      if((this.xIndex == null && this.zIndex == null) || !this.yIndex.length) {
         return false;
       }
 
-      this.init();
+      let yObj = this.getInputsPropertyObj('y').selectedObjs;
+      if (this.zIndex == null) {
+        let xObj = this.getInputsPropertyObj('x').selectedObjs[0];
+        this.data = this.loadFromMultiCol(xObj, yObj, this.source);
+      } else {
+        let zObj = this.getInputsPropertyObj('z').selectedObjs[0];
+        this.data = this.loadFromGroup(zObj, yObj, this.source);
+      }
       this.parentG.html('');
       let color = d3.scale.ordinal()
-        .range(['#EDC951','#CC333F','#00A0B0']);
+        .range(this.defaultColors);
 
       let radarChartOptions = {
         w: this.chartWidth,

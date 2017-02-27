@@ -1,3 +1,20 @@
+/*
+
+Accepts data in the format:
+  Q1,Q2,Q3,Q4
+  20000,15000,8000,20000
+  9879,9323,3294,5629
+  5070,9395,17633,5752
+  7343,8675,12121,7557
+  9136,5354,4319,5125
+  7943,6725,18712,5116
+  4000,7446,16754,8905
+  10546,10899,17270,5828
+  9385,9365,13676,6014
+  8669,8238,6587,5995
+
+where, Q1, Q2, Q3 and Q4 are plotted at xaxix
+*/
 Polymer({
   is: 'box-plot',
 
@@ -9,132 +26,201 @@ Polymer({
       value: () => {
         return [{
           input: 'x',
-          txt: 'Pick Dimension',
+          txt: 'Coloumns',
           selectedValue: [],
           scaleType: '',
           format: '',
           selectedObjs: [],
           uitype: 'single-value',
-          displayName: 'myXAxis',
-          maxSelectableValues: 1
+          displayName: 'coloumn',
+          maxSelectableValues: 8
         }, {
           input: 'y',
-          txt: 'Pick Measures',
+          txt: 'Group By',
           selectedValue: [],
-          format: '',
           scaleType: '',
+          format: '',
           selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myYAxis',
-          maxSelectableValues: 2
+          uitype: 'single-value',
+          displayName: 'coloumn',
+          maxSelectableValues: 1
         }];
+      }
+    },
+    settings: {
+      notify: true,
+      type: Object,
+      value: () => {
+        return [];
+      }
+    },
+    chartType: {
+      type: Object,
+      value: () => {
+        return [];
+      }
+    },
+    hideSettings: true,
+    source: Array,
+    external: Array,
+    chart: Object,
+    dataMutated: false,
+    isStacked: {
+      type: Boolean,
+      value: true
+    },
+    configurator: {
+      type: Object,
+      value: function() {
+        return {};
       }
     }
   },
 
   behaviors: [
-    PolymerD3.chartBehavior
+    PolymerD3.chartBehavior,
+    PolymerD3.chartConfigCbBehavior
   ],
 
   draw: function() {
-    csv.forEach(function(x) {
-      var v1 = Math.floor(x.Q1),
-        v2 = Math.floor(x.Q2),
-        v3 = Math.floor(x.Q3),
-        v4 = Math.floor(x.Q4);
-      // add more variables if your csv file has more columns
+    // find maximum in an array of arrays
+    function findMax(arr) {
+      return d3.max(arr, innerArray => d3.max(innerArray[1]));
+    }
+    function findMin(arr) {
+      return d3.min(arr, innerArray => d3.min(innerArray[1]));
+    }
 
-      var rowMax = Math.max(v1, Math.max(v2, Math.max(v3, v4)));
-      var rowMin = Math.min(v1, Math.min(v2, Math.min(v3, v4)));
+    this.debounce('drawDebounce', () => {
 
-      data[0][1].push(v1);
-      data[1][1].push(v2);
-      data[2][1].push(v3);
-      data[3][1].push(v4);
-      // add more rows if your csv file has more columns
+      let usableCols = this.inputs[0].selectedObjs.filter(external => external.type == 'Number');
+      let group = this.inputs[1].selectedObjs;
 
-      if (rowMax > max) max = rowMax;
-      if (rowMin < min) min = rowMin;
-    });
+      if (!usableCols || !usableCols.length) {
+        return false;
+      }
+      let _src = this.source.slice();
+      let boxPlotData;
+      // creates box plot data structure
+      // boxplot = [[x1, d1], [x2, d2] ... [xn, dn]]
+      // d1 = [val1, val2 ... valn] + quartiles
+      if (group.length) {
+        // transpose data
+        usableCols = _src.map(row => row[group[0].value]);
+        boxPlotData = usableCols.map((col, index) => {
+          let node = [col, _src[index].filter((cell, index) => {
+            return index != group[0].value;
+          })]
+          return node;
+        });
+      } else {
+        boxPlotData = usableCols.map(col => {
+          let node = [col.key, _src.map(row => PolymerD3.utilities.truncateFloat(row[col.value]))];
+          return node;
+        });
+      }
 
-    var chart = d3.box()
-      .whiskers(iqr(1.5))
-      .height(height)
-      .domain([min, max])
-      .showLabels(labels);
+      let margin = this.getMargins();
 
-    var svg = d3.select("body").append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .attr("class", "box")
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // the x-axis
-    var x = d3.scale.ordinal()
-      .domain(data.map(function(d) {
-        console.log(d);
-        return d[0];
-      }))
-      .rangeRoundBands([0, width], 0.7, 0.3);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("bottom");
-
-    // the y-axis
-    var y = d3.scale.linear()
-      .domain([min, max])
-      .range([height + margin.top, 0 + margin.top]);
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("left");
-
-    // draw the boxplots
-    svg.selectAll(".box")
-      .data(data)
-      .enter().append("g")
-      .attr("transform", function(d) {
-        return "translate(" + x(d[0]) + "," + margin.top + ")";
-      })
-      .call(chart.width(x.rangeBand()));
+      let max = findMax(boxPlotData);
+      let min = findMin(boxPlotData);
 
 
-    // add a title
-    svg.append("text")
-      .attr("x", (width / 2))
-      .attr("y", 0 + (margin.top / 2))
-      .attr("text-anchor", "middle")
-      .style("font-size", "18px")
-      //.style("text-decoration", "underline")
-      .text("Revenue 2012");
+      // init colors, if not present
+      let z = this.setLegendColor.bind(this);
+      this.legendSettings.colors = usableCols.map((col, index) => {
+        let current = this.legendSettings.colors ? this.legendSettings.colors[index]: {};
+        if (!current) { current = {}}
+        return {
+          // generate color from default pallete
+          color: current.color ? current.color: this.defaultColors[Math.floor(Math.random() * 9) + 0],
+          label: col.key
+        }
+      });
 
-    // draw y axis
-    svg.append("g")
-      .attr("class", "y axis")
-      .call(yAxis)
-      .append("text") // and text1
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .style("font-size", "16px")
-      .text("Revenue in €");
+      // todo: format later
+      function formatNumber(d) {
+        if (d < 1000) {
+          return d;
+        }
+        d = d3.format('s')(d);
+        let sufix = d.slice(-1);
+        let num = parseFloat(d.slice(0, d.length)).toFixed(2);
+        return  num + sufix;
+      }
+      this.parentG.html('');
+      // the x-axis
+      let x = d3.scale.ordinal()
+        .domain(boxPlotData.map(col => col[0]))
+        .rangeRoundBands([0, this.chartWidth], 0.7, 0.3);
 
-    // draw x axis
-    svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0," + (height + margin.top + 10) + ")")
-      .call(xAxis)
-      .append("text") // text label for the x axis
-      .attr("x", (width / 2))
-      .attr("y", 10)
-      .attr("dy", ".71em")
-      .style("text-anchor", "middle")
-      .style("font-size", "16px")
-      .text("Quarter");
+      let xAxis = d3.svg.axis()
+        .scale(x)
+        .orient('bottom');
 
+      // the y-axis
+      let y = d3.scale.linear()
+        .domain([min, max])
+        .range([this.chartHeight, 0]);
+
+      let chart = d3.box({
+          y: y,
+          formatNumber: formatNumber
+        })
+        .whiskers(iqr(1.5))
+        .height(this.chartHeight)
+        .domain([min, max])
+        .showLabels(true);
+
+      let yAxis = d3.svg.axis()
+        .scale(y)
+        .orient('left');
+
+      // draw the boxplots
+      this.parentG.selectAll('.box')
+        .data(boxPlotData)
+        .enter().append('g')
+        .attr('transform', function(d) {
+          return 'translate(' + x(d[0]) + ',' + 0 + ')';
+        })
+        .attr('class', 'box-g')
+        .attr('data-legend', d => d[0])
+        .style('fill', d => {
+          let color;
+          this.legendSettings.colors.forEach(legend => {
+            if (legend.label == d[0]) {
+              color = legend.color;
+            }
+          });
+          return color;
+        })
+        .call(chart.width(x.rangeBand()));
+
+      this.parentG.attr('class', 'box');
+
+      // draw y axis
+      this.parentG.append('g')
+        .attr('class', 'y-axis')
+        .call(yAxis)
+        .append('text') // and text1
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .style('font-size', '16px');
+
+      // draw x axis
+      this.parentG.append('g')
+        .attr('class', 'x-axis')
+        .attr('transform', 'translate(0,' + (this.chartHeight) + ')')
+        .call(xAxis)
+        .append('text') // text label for the x axis
+        .attr('x', (this.chartWidth / 2))
+        .attr('y', 10)
+        .attr('dy', '.71em');
+
+      this.attachLegend(this.parentG, this.legendSettings);
+
+    }, 500);
 
     // Returns a function to compute the interquartile range.
     function iqr(k) {
@@ -149,5 +235,74 @@ Polymer({
         return [i, j];
       };
     }
-  }
+  },
+  events: ['TOGGLE', 'RESET'],
+  listeners: {
+    // 'tap': 'toggleGenerator',
+    // 'reset': 'resetGenerator'
+  },
+  attachListeners: function() {
+    this.addEventListener('tap', this.toggleGenerator.bind(this));
+  },
+  cookQuery: function() {
+    let rows = d3.select(this).selectAll('g.box-g.opacity-none');
+    let col = this.getInputsPropertyObj('y');
+
+    // this chart isn't drawn yet
+    if (!col || !col.selectedObjs.length) {
+      return [];
+    }
+    let coloumn = col.selectedObjs[0].key;
+    let coloumnId = col.selectedObjs[0].value;
+    let type = col.selectedObjs[0].type;
+
+    let selected = [];
+    rows.each(row => selected.push(row[coloumnId]));
+
+
+    function beautifiedValue(val, type) {
+      if (type == 'Number') {
+        return val;
+      } else { // enclose in quotes, if type isn't a number
+        return '"' + val + '"';
+      }
+    }
+
+    let queryArray = selected.map(value => {
+      return coloumn + '=' + beautifiedValue(value, type);
+    });
+    return queryArray;
+  },
+  toggleGenerator: function(e) {
+    let elem = d3.select(e.target.parentNode);
+    let me = this;
+    let filterCol = this.getInputsProperty('y');
+    if (elem.classed('box-g')) {
+      elem.classed('opacity-none', !elem.classed('opacity-none'));
+      let rows = d3.select(me).selectAll('g.box-g.opacity-none');
+      // create an array of selected x-axis values
+      let _selected = [];
+      rows.each(row => _selected.push(row[filterCol]));
+      this.fire('TOGGLE', {
+        toggle: 'ON',
+        chart: this,
+        element: e.target,
+        filter: function(row) {
+          // filter away, if value isn't present in filtered rows
+          return (_selected.indexOf(row[filterCol]) != -1);
+        }
+      });
+    }
+  },
+  toggle: function(g) {
+    g.classList.indexOf(opacity)
+  },
+  resetGenerator: function(e) {
+    this.fire('RESET', {chartId: this});
+  },
+  reset: function() {
+    var groups = d3.select(this).selectAll('g.box-g').classed('opacity-none', false);
+    console.log(groups);
+  },
+
 });

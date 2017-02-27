@@ -62,6 +62,14 @@
                     callBack: 'yAxisRotationCb'
                 }];
             }
+        },
+        chartCustomizerFlag: {
+            type: Boolean,
+            value: false
+        },
+        settingsVisibility: {
+            type: Boolean,
+            value: false
         }
     },
     // chart height callback is common
@@ -69,7 +77,7 @@
         if (this.parentG) {
             let width = this._getWidth();
             let height = this._getHeight();
-            let svg = d3.select(this).selectAll('svg')
+            let svg = d3.select(this).selectAll('.chartSvgClass')
             svg.attr('viewBox', '0 0 ' + (width + 50) +' ' + (height + 50) +'');
             this.draw();
             this.resize();
@@ -160,6 +168,27 @@
         });
         return obj;
     },
+    toggleSettingsVisibility: function() {
+        this.set('settingsVisibility', !this.settingsVisibility);
+    },
+    showAreaSettings: function() {
+        let dialog = this.querySelector('#display-component');
+        this.set('chartCustomizerFlag', true);
+        if (dialog) {
+            dialog.open();
+        } else { // for charts without chart-customizer, radar, pie etc.
+            let displayComponent = this.$$('display-component');
+            if (displayComponent) {
+                displayComponent.openModal();
+            }
+        }
+    },
+    hideAreaSettings: function() {
+        let dialog = this.querySelector('#display-component');
+        if (dialog) {
+            dialog.close();
+        }
+    },
     alignAxis: function(axis, alignment) {
         let height = this._getHeight();
         let width = this._getWidth();
@@ -208,22 +237,22 @@
     },
 
     // Opens area settings
-    showAreaSettings: function() {
-        let displayComponent = this.$$('display-component');
-        if (displayComponent) {
-            displayComponent.openModal();
-        }
-    },
+    // showAreaSettings: function() {
+    //     let displayComponent = this.$$('display-component');
+    //     if (displayComponent) {
+    //         displayComponent.openModal();
+    //     }
+    // },
     _areaSettingsChanged: function(setting) {
+        // handling changes made via chart-customizer
         if (setting.path !== 'area') {
-            this.debounce('areaSettignsChangedDebounce', () => {
-                var changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
-                if (changed && changed.callBack && this[changed.callBack]) {
-                    this[changed.callBack].call(this);
-                } else {
-                    this.resize();
-                }
-            }, 200);
+            let changed = PolymerD3.utilities.parsePath(setting.path, setting.base);
+            if (changed && changed.callBack && this[changed.callBack]) {
+                this[changed.callBack].call(this);
+            } else {
+                this.resize();
+            }
+            return;
         }
       },
 };

@@ -1,0 +1,33 @@
+box-plot .box line,
+box-plot .box rect,
+box-plot .box circle {
+  stroke: #000;
+  stroke-width: 1px;
+}
+box-plot .box-g {
+  fill: steelblue;
+}
+box-plot .box text {
+  fill: #000;
+}
+box-plot .box .center {
+  stroke-dasharray: 3,3;
+}
+box-plot .box .outlier {
+  fill: none;
+  stroke: #000;
+}
+box-plot .axis {
+  font: 12px sans-serif;
+}
+box-plot .axis path,
+box-plot .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+box-plot .x-axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
