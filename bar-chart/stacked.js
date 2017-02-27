@@ -1,4 +1,5 @@
-PolymerD3.barChart.stacked = function() {
+PolymerD3.barChart.stacked = function(chart) {
+  const STACK_CLASS = 'stacked-rect';
   let _conf = function() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
@@ -51,9 +52,107 @@ PolymerD3.barChart.stacked = function() {
       },
       legendF: (d, i, j) => {
         // console.log('d:' + d + ' i:' + i + ' j:' + j);
-      }
+      },
+      classF: () => STACK_CLASS
     }
   };
+
+  if (chart) {
+    chart.attachListeners = function() {
+      chart.addEventListener('tap', e => {
+        console.log(e);
+        let targetElem = d3.select(e.target);
+        // logic for basic bar chart
+        if (targetElem.classed(STACK_CLASS)) {
+          let data = targetElem.data();
+          let xIndex = chart.getInputsProperty('x');
+          if (data.length) {
+            targetElem.classed('opacity-none', !targetElem.classed('opacity-none'));
+            chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row) {
+              let selected = [];
+              d3.select(chart).selectAll('.opacity-none').each(s => {
+                selected.push(s[xIndex]);
+              });
+              return (selected.indexOf(row[xIndex]) != -1);
+            }});
+          }
+        }
+      });
+      let chartContainer = chart.querySelector('.chartContainer');
+      chart.scrollVal = 0; // variable that ditactes filterPadding
+      chartContainer.addEventListener('wheel', e => {
+        function preventDefault(e) {
+          e = e || window.event;
+          if (e.preventDefault)
+              e.preventDefault();
+          e.returnValue = false;
+        }
+        window.onwheel = preventDefault; // disables window scroll
+        // debounces scroll events
+        chart.debounce('scrollDebounce', () => {
+          window.onwheel = null; // enable windw scroll
+          if (e.deltaY > 0) { // filter padding mustn't be less than 0
+            (chart.scrollVal > 0) ? chart.scrollVal -= 1 : chart.scrollVal = 0;
+          } else {
+            chart.scrollVal += 1;
+          }
+          let xIndex = chart.getInputsProperty('x');
+          let padding = chart.scrollVal;
+          // creates a filtered domain
+          let fileredDomain = chart.source.filter((row, index) => {
+            return (index >= padding && index < (chart.source.length - padding))
+          }).map(row => row[xIndex]);
+
+          // add class to filtered elements
+          let rects = d3.select(chart).selectAll('.stacked-rect');
+          [].forEach.call(rects[0], rect => {
+            let elem = d3.select(rect);
+            let data = elem.data();
+            if (data != null && fileredDomain.indexOf(data[0][xIndex]) != -1) {
+              elem.classed('opacity-none', true);
+            } else {
+              elem.classed('opacity-none', false);
+            }
+          });
+
+          chart.fire('TOGGLE', {toggle: 'ON', chart: chart, element: e.target, filter: function(row, index) {
+            return (fileredDomain.indexOf(row[xIndex]) != -1);
+          }});
+          console.log('scroll re-enabled');
+        }, 500);
+      });
+      chart.cookQuery = function() {
+        let col = chart.getInputsPropertyObj('x');
+
+        if (!col || !col.selectedObjs.length) {
+          return [];
+        }
+
+        let coloumn = col.selectedObjs[0].key;
+        let coloumnId = col.selectedObjs[0].value;
+        let type = col.selectedObjs[0].type;
+
+        let selected = [];
+        d3.select(chart).selectAll('.opacity-none').each(s => {
+          selected.push(s[coloumnId]);
+        });
+
+        // to do: move to utilities
+        function beautifiedValue(val, type) {
+          if (type == 'Number') {
+            return val;
+          } else { // enclose in quotes, if type isn't a number
+            return '"' + val + '"';
+          }
+        }
+
+        let queryArray = selected.map(value => {
+          return coloumn + '=' + beautifiedValue(value, type);
+        });
+        return queryArray;
+      }
+    }
+  }
 
   return {
     conf: _conf,

@@ -66,6 +66,10 @@
         chartCustomizerFlag: {
             type: Boolean,
             value: false
+        },
+        settingsVisibility: {
+            type: Boolean,
+            value: false
         }
     },
     // chart height callback is common
@@ -163,6 +167,9 @@
             }
         });
         return obj;
+    },
+    toggleSettingsVisibility: function() {
+        this.set('settingsVisibility', !this.settingsVisibility);
     },
     showAreaSettings: function() {
         let dialog = this.querySelector('#display-component');

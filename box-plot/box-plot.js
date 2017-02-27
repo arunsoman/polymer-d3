@@ -235,5 +235,74 @@ Polymer({
         return [i, j];
       };
     }
-  }
+  },
+  events: ['TOGGLE', 'RESET'],
+  listeners: {
+    // 'tap': 'toggleGenerator',
+    // 'reset': 'resetGenerator'
+  },
+  attachListeners: function() {
+    this.addEventListener('tap', this.toggleGenerator.bind(this));
+  },
+  cookQuery: function() {
+    let rows = d3.select(this).selectAll('g.box-g.opacity-none');
+    let col = this.getInputsPropertyObj('y');
+
+    // this chart isn't drawn yet
+    if (!col || !col.selectedObjs.length) {
+      return [];
+    }
+    let coloumn = col.selectedObjs[0].key;
+    let coloumnId = col.selectedObjs[0].value;
+    let type = col.selectedObjs[0].type;
+
+    let selected = [];
+    rows.each(row => selected.push(row[coloumnId]));
+
+
+    function beautifiedValue(val, type) {
+      if (type == 'Number') {
+        return val;
+      } else { // enclose in quotes, if type isn't a number
+        return '"' + val + '"';
+      }
+    }
+
+    let queryArray = selected.map(value => {
+      return coloumn + '=' + beautifiedValue(value, type);
+    });
+    return queryArray;
+  },
+  toggleGenerator: function(e) {
+    let elem = d3.select(e.target.parentNode);
+    let me = this;
+    let filterCol = this.getInputsProperty('y');
+    if (elem.classed('box-g')) {
+      elem.classed('opacity-none', !elem.classed('opacity-none'));
+      let rows = d3.select(me).selectAll('g.box-g.opacity-none');
+      // create an array of selected x-axis values
+      let _selected = [];
+      rows.each(row => _selected.push(row[filterCol]));
+      this.fire('TOGGLE', {
+        toggle: 'ON',
+        chart: this,
+        element: e.target,
+        filter: function(row) {
+          // filter away, if value isn't present in filtered rows
+          return (_selected.indexOf(row[filterCol]) != -1);
+        }
+      });
+    }
+  },
+  toggle: function(g) {
+    g.classList.indexOf(opacity)
+  },
+  resetGenerator: function(e) {
+    this.fire('RESET', {chartId: this});
+  },
+  reset: function() {
+    var groups = d3.select(this).selectAll('g.box-g').classed('opacity-none', false);
+    console.log(groups);
+  },
+
 });
