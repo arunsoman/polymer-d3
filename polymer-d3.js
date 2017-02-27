@@ -91,6 +91,10 @@ Polymer({
             label: 'Box plot',
             icon: 'chart:calendar-chart',
             element: 'box-plot'
+          }, {
+            label: 'Composite Canvas',
+            icon: 'icons:dashboard',
+            element: 'composite-canvas'
           }];
         }
       }
