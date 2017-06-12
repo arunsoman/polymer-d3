@@ -1,9 +1,9 @@
 <dom-module id="bar-chart">
   <template>
     <style>
-      :host {
+      /*:host {
         margin: 14px;
-      }
+      }*/
       .chartContainer {
         max-width: 100%;
       }
@@ -25,56 +25,7 @@
       }
     </style>
     <!-- set true temporarly -->
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-            <paper-dialog id="display-component" opened>
-              <h2>Settings</h2>
-              <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-            </paper-dialog>
-          </template>
-          <!-- <display-component settings="{{area}}"></display-component> -->
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
-    <!-- <h4>Bar Chart</h4> -->
-    <!-- <template is="dom-if" if="[[editMode]]">
-      <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]' draggable="true"></display-component>
-      </div>
-
-      <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-      <div class='optional' hidden="{{hideSettings}}">
-        <display-component settings="{{settings}}" external='[[external]]'></display-component>
-      </div>
-    </template> -->
-
+    <settings-component externals="[[externals]]" inputs="{{inputs}}"></settings-component>
   </template>
   <script src="bar-chart.js"></script>
   <script src="difference.js"></script>
