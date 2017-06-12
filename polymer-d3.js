@@ -95,6 +95,10 @@ Polymer({
             label: 'Composite Canvas',
             icon: 'icons:dashboard',
             element: 'composite-canvas'
+          },{
+            label: 'Emailer',
+            icon: 'icons:dashboard',
+            element: 'email-list'
           }];
         }
       }
@@ -134,7 +138,12 @@ Polymer({
       type: Array,
       value: () => {return [];}
     },
-
+    // chart response data
+    chartResponse: {
+      type: String,
+      value:'',
+      notify:true
+    },
     // State container
     stateContainer: {
       type: Object,
@@ -200,6 +209,12 @@ Polymer({
 
       elem.set('source', this.source);
       elem.set('externals', this.externals);
+      // polymer dynamic element two way binding is not working. Added vanila js to catch polymer events
+      elem.addEventListener('chart-response-changed',function(e){
+        this.set('chartResponse',e.detail.value);
+      }.bind(this));
+      // set chartResponse as two way binding
+      elem.set('chartResponse',this.chartResponse);
 
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
