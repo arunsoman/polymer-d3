@@ -42,6 +42,11 @@ polymer-d3 .chartContainer {
 }
 polymer-d3 .draggable-areabtn-wrap {
   position: relative;
+  margin-left: -1em;
+  margin-right: -1em;
+  overflow: hidden;
+  background: #eaecec;
+  border-bottom: solid 1px #e4e4e4;
 }
 polymer-d3 .icons-wrap.right-icons,
 polymer-d3 .settings-icon {
@@ -49,6 +54,44 @@ polymer-d3 .settings-icon {
   right: 1em;
   top: 6px;
   z-index: 9;
+}
+polymer-d3 .sortable-wrap.master-wrap.draggable-input {
+    display: block;
+    overflow-y: hidden;
+    max-width: 25%;
+    float: left;
+    background: transparent;
+    border: none;
+    color: #bf934a;
+}
+
+
+polymer-d3 .Number.draggable-input {
+    background: #fffde4 !important;
+}
+
+polymer-d3 .list-item.draggable-input {
+    background-color: #97DBE6;
+    border-radius: 4px;
+    cursor: move;
+    font-size: 12px;
+    height: 30px;
+    min-width: 100px;
+    padding: 0;
+    text-align: left;
+    margin-bottom: 3px;
+    border: solid 1px #efddbd;
+}
+polymer-d3 .sortable-wrap.draggable-input {
+    background: #ffffff;
+    height: 180px;
+    padding: .5em;
+    vertical-align: bottom;
+    width: 180px;
+    float: left;
+    border: solid 1px #ececec;
+    color: #868686;
+    margin: 0.2em;
 }
 
 polymer-d3  pareto-chart .line,

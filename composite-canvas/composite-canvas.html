@@ -1,5 +1,6 @@
 <link rel="import" href="helpers/crossfilter-frontend/crossfilter-frontend.html">
 <link rel="import" href="helpers/crossfilter-backend/crossfilter-backend.html">
+<link rel="import" href="../display-component/layout-component.html">
 
 <link rel="stylesheet" type="text/css" href="composite-canvas-global.css">
 <dom-module id="composite-canvas">
@@ -13,7 +14,8 @@
     <crossfilter-frontend id="cf-fe"></crossfilter-frontend>
     <crossfilter-backend crossfilter-external="[[crossfilterExternal]]" id="cf-be"></crossfilter-backend>
     <!-- <zeppelin-cacher crossfilter-api="/url" threshold="1000"></zeppelin-cacher> -->
-    <h2>Composite Canvas</h2>
+    <!-- <h2>Composite Canvas</h2> -->
+    <layout-component></layout-component>
     <paper-button on-tap="remTwoRows">Reset All</paper-button>
     <box-plot externals="{{externals}}"></box-plot>
     <bar-chart externals="{{externals}}"></bar-chart>
