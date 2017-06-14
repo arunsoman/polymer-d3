@@ -1,0 +1,30 @@
+.editable-input .tags {margin-bottom: 1px;margin-right: 2px;background: #a2e656;}
+.editable-input.hover{
+  background: #e9f9d7;
+}
+:host {
+  text-align: left;
+}
+.editable-input {
+    border-bottom: solid 1px #ccc;
+    margin-bottom: 1em;
+    padding-top: 1em;
+    outline:none;
+    transition: all 0.1s linear;
+}
+.email-form {
+    width: 80%;
+    margin: 0 auto 3em;
+    text-align: left;
+    box-shadow: 1px 2px 11px rgba(0,0,0,0.1);
+    padding: 1em;
+}
+.title {
+    padding: 1em;
+    background: #d8dad9;
+    margin: -1em -1em 1em;
+    border: solid 1px #d2d2d2;
+}
+#mailContent{
+  min-height: 250px;
+}

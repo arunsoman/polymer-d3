@@ -1,0 +1,43 @@
+<link rel="stylesheet" type="text/css" href="email-list.css">
+<dom-module id="email-list">
+<template>
+<paper-dialog modal id="dialog" dynamic-align>
+                <h2>Set Mail configuration</h2>
+                <paper-dialog-scrollable>
+                    <paper-input value="{{ smtp }}" required placeholder="SMTP"></paper-input>
+                    <paper-input value="{{ port }}" required placeholder="PORT"></paper-input>
+                    <paper-input value="{{ useremail }}" required placeholder="Email address"></paper-input>
+                    <paper-input value="{{ password }}" type="password" required placeholder="Password"></paper-input>
+                </paper-dialog-scrollable>
+                <div class="buttons">
+                    <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+                    <paper-button on-tap="sendMail">Send</paper-button>
+                </div>
+            </paper-dialog>
+
+  <div class="input-drag-wrapper">
+    <template is="dom-repeat" items="[[externals]]">
+      <span class="tags" draggable="true" data-target$="[[ item.key ]]" data-index$="[[item.value]]">
+        [[ item.key ]]
+        <small>[[ item.type ]]</small>
+      </span>
+    </template>
+  </div>
+  <div class="email-form">
+    <div class="title">Compose Email</div>
+    <label>To</label>
+    <div class="editable-input" contenteditable="true" on-drop="drop" on-dragover="allowDrop" id="mailTo" on-dragleave="dragLeave"></div>
+    
+    <label>Subject</label>
+    <div class="editable-input" contenteditable="true"  contenteditable="true" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave" id="mailSubject"></div>
+
+    <label>Content</label>
+    <div class="editable-input" contenteditable="true"  contenteditable="true" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave" id="mailContent"></div>
+    <paper-button raised on-tap="showConfig">
+    <paper-spinner id="spinner" hidden></paper-spinner>Send</paper-button>
+  </div>
+
+
+</template>
+<script src="email-list.js"></script>
+</dom-module>
