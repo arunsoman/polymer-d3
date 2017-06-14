@@ -1,217 +1,169 @@
 "use strict";
 
-  properties: {
+class polymerD3 extends Polymer.mixinBehaviors([], Polymer.Element) {
+  static get is() {
+    return "polymer-d3"
+  }
+  static get properties() {
     // List of available charts
-    availableCharts: {
-      type: Array,
-      value: function() {
-        // This list if used when available charts aren' fed from zeppelin-viewer
-        // Callback defined in charts and are called after the chart is initated
-        // using PolymerD3.utilities.attachElement
-        // examples => @{{this._selectedChanged}}
-        // barchart.js@{{initStackedBarChart}}
-        if (!this.availableCharts) {
-          return [{
-            label: 'Table',
-            icon: 'chart:table-icon',
-            element: 'polymerd3-table',
-            callBack: 'initTable'
-          }, {
-            label: 'Stacked Bar Chart',
-            icon: 'chart:stacked-bar-chart',
-            element: 'bar-chart',
-            callBack: 'initStackedBarChart'
-          }, {
-            label: 'Grouped Bar Chart',
-            icon: 'chart:grouped-bar-chart',
-            element: 'bar-chart',
-            callBack: 'initGroupedBarChart'
-          }, {
-            label: 'Waterfall Chart',
-            icon: 'chart:waterfall-chart',
-            element: 'bar-chart',
-            callBack: 'initWaterfallChart'
-          }, {
-            label: 'Difference',
-            icon: 'chart:difference-chart',
-            element: 'bar-chart',
-            callBack: 'initDiffrenceChart'
-          }, {
-            label: 'Pie Chart',
-            icon: 'chart:pieChart',
-            element: 'pie-chart',
-            callBack: 'setPieSettings'
-          }, {
-            label: 'Heat Map',
-            icon: 'chart:heatMap',
-            element: 'bar-chart',
-            callBack: 'initHeatMap'
-          }, {
-            label: 'Area Chart',
-            icon: 'chart:area-chart',
-            element: 'area-chart',
-            callBack: 'setAreaSettings'
-          }, {
-            label: 'Sankey Chart',
-            icon: 'chart:sankey-chart',
-            element: 'sankey-chart',
-            callBack: 'setSankeySettings'
-          }, {
-            label: 'Radar Chart',
-            icon: 'chart:radar-chart',
-            element: 'radar-chart',
-            // callBack: 'radar'
-          }, {
-            label: 'Scatter Plot Chart',
-            icon: 'chart:scatter-plot',
-            element: 'scatter-plot'
-          }, {
-            label: 'Calendar View Chart',
-            icon: 'chart:calendar-chart',
-            element: 'calendar-chart'
-          }, {
-            label: 'Pareto Chart',
-            icon: 'chart:pareto-chart',
-            element: 'pareto-chart'
-          }, {
-            label: 'Stacked Composite Chart',
-            icon: 'chart:composite-stacked',
-            element: 'stacked-composite-chart'
-          }, {
-            label: 'Grouped Composite Chart',
-            icon: 'chart:composite-grouped',
-            element: 'grouped-composite-chart'
-          }, {
-            label: 'Horizontal Chart',
-            icon: 'chart:horizontal-bar',
-            element: 'horizontal-chart'
-          }, {
-            label: 'Box plot',
-            icon: 'chart:calendar-chart',
-            element: 'box-plot'
-          }, {
-            label: 'Composite Canvas',
-            icon: 'icons:dashboard',
-            element: 'composite-canvas'
-          },{
-            label: 'Emailer',
-            icon: 'icons:dashboard',
-            element: 'email-list'
-          }];
+    return {
+      availableCharts: {
+        type: Array,
+        value: () =>{
+          // This list if used when available charts aren' fed from zeppelin-viewer
+          // Callback defined in charts and are called after the chart is initated
+          // using PolymerD3.utilities.attachElement
+          // examples => @{{this._selectedChanged}}
+          // barchart.js@{{initStackedBarChart}}
+            if (!this.availableCharts) {
+              return [{
+                label: 'Table',
+                icon: 'chart:table-icon',
+                element: 'polymerd3-table',
+                callBack: 'initTable'
+              }, {
+                label: 'Stacked Bar Chart',
+                icon: 'chart:stacked-bar-chart',
+                element: 'bar-chart',
+                callBack: 'initStackedBarChart'
+              }, {
+                label: 'Grouped Bar Chart',
+                icon: 'chart:grouped-bar-chart',
+                element: 'bar-chart',
+                callBack: 'initGroupedBarChart'
+              }, {
+                label: 'Waterfall Chart',
+                icon: 'chart:waterfall-chart',
+                element: 'bar-chart',
+                callBack: 'initWaterfallChart'
+              }, {
+                label: 'Difference',
+                icon: 'chart:difference-chart',
+                element: 'bar-chart',
+                callBack: 'initDiffrenceChart'
+              }, {
+                label: 'Pie Chart',
+                icon: 'chart:pieChart',
+                element: 'pie-chart',
+                callBack: 'setPieSettings'
+              }, {
+                label: 'Heat Map',
+                icon: 'chart:heatMap',
+                element: 'bar-chart',
+                callBack: 'initHeatMap'
+              }, {
+                label: 'Area Chart',
+                icon: 'chart:area-chart',
+                element: 'area-chart',
+                callBack: 'setAreaSettings'
+              }, {
+                label: 'Sankey Chart',
+                icon: 'chart:sankey-chart',
+                element: 'sankey-chart',
+                callBack: 'setSankeySettings'
+              }, {
+                label: 'Radar Chart',
+                icon: 'chart:radar-chart',
+                element: 'radar-chart',
+                // callBack: 'radar'
+              }, {
+                label: 'Scatter Plot Chart',
+                icon: 'chart:scatter-plot',
+                element: 'scatter-plot'
+              }, {
+                label: 'Calendar View Chart',
+                icon: 'chart:calendar-chart',
+                element: 'calendar-chart'
+              }, {
+                label: 'Pareto Chart',
+                icon: 'chart:pareto-chart',
+                element: 'pareto-chart'
+              }, {
+                label: 'Stacked Composite Chart',
+                icon: 'chart:composite-stacked',
+                element: 'stacked-composite-chart'
+              }, {
+                label: 'Grouped Composite Chart',
+                icon: 'chart:composite-grouped',
+                element: 'grouped-composite-chart'
+              }, {
+                label: 'Horizontal Chart',
+                icon: 'chart:horizontal-bar',
+                element: 'horizontal-chart'
+              }, {
+                label: 'Box plot',
+                icon: 'chart:calendar-chart',
+                element: 'box-plot'
+              }, {
+                label: 'Composite Canvas',
+                icon: 'icons:dashboard',
+                element: 'composite-canvas'
+              },{
+                label: 'Emailer',
+                icon: 'icons:dashboard',
+                element: 'email-list'
+              }];
+            }
+          }
+        },
+        // Object desctibing selected chart type
+        selectedChart: {
+          type: Object,
+          value: () => { return {};}
+        },
+        selectedChartObj: {
+          type: Object,
+          value: () => { return {};}
+        },
+        // Flag to display settngs components
+        settingsVisible: {
+          type: Boolean,
+          value: false
+        },
+        // Inputs
+        externals: {
+          type: Array,
+          value: () => { return [];}
+        },
+        inputs: {
+          type:Array,
+          notify: true,
+          value: () => {return [];}
+        },
+        // Data
+        source: {
+          type: Array,
+          value: () => {return [];}
+        },
+
+        // settings
+        settings: {
+          type: Array,
+          value: () => {return [];}
+        },
+
+        // State container
+        stateContainer: {
+          type: Object,
+          value: () => {return {};}
+        },
+        editMode: {
+          type: Boolean,
+          value: false
+        },
+        legendSettingsFlag: {
+          type: Boolean,
+          value: false
+        },
+        legendSettings: {
+          type: Object,
+          value: () => {return {};}
         }
-      },
-      // Object desctibing selected chart type
-      selectedChart: {
-        type: Object,
-        value: () => { return {};}
-      },
-      selectedChartObj: {
-        type: Object,
-        value: () => { return {};}
-      },
-      // Flag to display settngs components
-      settingsVisible: {
-        type: Boolean,
-        value: false
-      },
-      // Inputs
-      externals: {
-        type: Array,
-        value: () => { return [];}
-      },
-      inputs: {
-        type:Array,
-        notify: true,
-        value: () => {return [];}
-      },
-      // Data
-      source: {
-        type: Array,
-        value: () => {return [];}
-      },
-
-      // settings
-      settings: {
-        type: Array,
-        value: () => {return [];}
-      },
-
-      // State container
-      stateContainer: {
-        type: Object,
-        value: () => {return {};}
-      },
-      editMode: {
-        type: Boolean,
-        value: false
-      },
-      legendSettingsFlag: {
-        type: Boolean,
-        value: false
-      },
-      legendSettings: {
-        type: Object,
-        value: () => {return {};}
       }
-    },
-    // Object desctibing selected chart type
-    selectedChart: {
-      type: Object,
-      value: () => { return {};}
-    },
-    selectedChartObj: {
-      type: Object,
-      value: () => { return {};}
-    },
-    // Flag to display settngs components
-    settingsVisible: {
-      type: Boolean,
-      value: false
-    },
-    // Inputs
-    externals: {
-      type: Array,
-      value: () => { return [];}
-    },
-    inputs: {
-      type:Array,
-      notify: true,
-      value: () => {return [];}
-    },
-    // Data
-    source: {
-      type: Array,
-      value: () => {return [];}
-    },
-
-    // settings
-    settings: {
-      type: Array,
-      value: () => {return [];}
-    },
-    // chart response data
-    chartResponse: {
-      type: String,
-      value:'',
-      notify:true
-    },
-    // State container
-    stateContainer: {
-      type: Object,
-      value: () => {return {};}
-    },
-    editMode: {
-      type: Boolean,
-      value: false
-    },
-    legendSettingsFlag: {
-      type: Boolean,
-      value: false
-    },
-    legendSettings: {
-      type: Object,
-      value: () => {return {};}
     }
+
+  constructor() {
+    super()
   }
 
   static get observers(){
@@ -242,13 +194,6 @@
       this.$$(this.selectedChart.element).draw();
     }
   }
-
-  _findTextNodes () {
-  // childNodes *might* be a NodeList
-  var nodes = Polymer.dom(this).childNodes;
-  return Array.prototype.filter.call(nodes,
-      (n) => { return n.nodeType = Node.TEXT_NODE });
-}
 
   // on selected chart changed
   // is also used to draw first chart
