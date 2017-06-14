@@ -184,13 +184,6 @@ class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
     }
   }
 
-  _findTextNodes () {
-  // childNodes *might* be a NodeList
-  var nodes = Polymer.dom(this).childNodes;
-  return Array.prototype.filter.call(nodes,
-      (n) => { return n.nodeType = Node.TEXT_NODE });
-}
-
   // on selected chart changed
   // is also used to draw first chart
   _selectedChanged(selectedChart) {
@@ -321,55 +314,3 @@ class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
 }
 
 customElements.define(polymerD3.is,polymerD3)
-
-
-
-
-/*
-Polymer({
-
-  is: 'polymer-d3',
-
-  properties: {
-
-  },
-
-  observers: [],
-
-  // edit mode
-  _modeObserver: function(editMode) {
-  },
-
-  // on inputs change
-  _inputsChanged: function(i) {
-  },
-
-  // on selected chart changed
-  // is also used to draw first chart
-  _selectedChanged: function(selectedChart) {
-  },
-
-  // might be dead code
-  // not deleted because this is a good utility to merge two objects
-  _mergeSettings: function(from, to) {
-  },
-
-  // Creates a utility function that
-  // copies valueToChange from 'from' to 'to', both are array of objects
-  // identifier is the key which uniquely identifies objects
-  _persistData: function(identifier, valeToChange) {
-  },
-
-  showInputSettings: function() {
-  },
-
-  // Bootstraps element as per mode(view/edit)
-  // This meathod avoids crazy rwo-way binding side effects
-  bootstrapCharts: function(config) {  },
-
-  // retrives current state of polymer-d3
-  // is used to save data back to zeppelin
-  getSettings: function() {
-  }
-});
-*/
