@@ -36,15 +36,16 @@
         color: #454545;
       }
     </style>
-    <template is="dom-if" if="[[ editMode ]]" restamp>
-    {{ response }}
-      <div class="tool-bar">
-        <chart-selector
-          charts="[[availableCharts]]"
-          selected="{{selectedChart}}"
-        ></chart-selector>
-      </div>
-    </template>
+    <dom-if if="[[ editMode ]]">
+      <template restamp>
+        <div class="tool-bar">
+          <chart-selector
+            charts="[[availableCharts]]"
+            selected="{{selectedChart}}"
+          ></chart-selector>
+        </div>
+      </template>
+    </dom-if>
     <div class="chartHolder"></div>
   </template>
   <script src="polymer-d3.js"></script>

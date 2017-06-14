@@ -3,11 +3,26 @@
 // http://bl.ocks.org/mccannf/1629464
   PolymerD3.legendBehavior = {
     properties: {
-      xLocation: 0,
-      yLocation: 0,
-      fontSize: 20,
-      legendWidth: 300,
-      legendHeight: 200,
+      xLocation: {
+        type:Number,
+        value:0
+      },
+      yLocation:{
+        type:Number,
+        value:0
+      },
+      fontSize:{
+        type:Number,
+        value:20
+      },
+      legendWidth: {
+        type:Number,
+        value:300
+      },
+      legendHeight: {
+        type:Number,
+        value:200
+      },
       legendSettings: {
         type: Object,
         value: () => {

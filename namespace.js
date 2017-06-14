@@ -15,18 +15,21 @@ PolymerD3.utilities.isEmptyObject = function(obj) {
 
 // Creates and attaches a dom node inside specific container and executes a meathod inside it
 PolymerD3.utilities.attachElement = function(elem, container, cb) {
+
     var dynamicEl = document.createElement(elem);
-    var containerElem = this.querySelector(container);
+    var containerElem = this.root.querySelector(container);
     if (containerElem) {
         containerElem.appendChild(dynamicEl);
     } else {
         this.appendChild(dynamicEl);
     }
+
     if (cb && dynamicEl[cb]) {
         var callBack = dynamicEl[cb];
         callBack.call(dynamicEl);
     }
     return dynamicEl;
+
 };
 
 // Parses changed Object from Array, works with deep obeservers
@@ -134,7 +137,7 @@ PolymerD3.axis = function(type, bound, range) {
     if(range){
         scale.range(range);
     }
-    
+
     if (bound) {
         scale.domain(bound);
 
@@ -285,8 +288,8 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
         var convert = converter(data[0][xIndex]);
         // group by key.
         var layers = d3.nest()
-            .key(function(d) { 
-                return d[xIndex]; 
+            .key(function(d) {
+                return d[xIndex];
             })
             .entries(data)
             .map((d) => {
@@ -381,7 +384,7 @@ PolymerD3.summarizeData = (data, xIndex, xFormat, yIndices, yFormat, stack, meas
         throw new Error("invalid entry in yIndices" + yIndices);
     }
     // findYDomain(dataSummary, yFormat);
-    
+
     console.log("xDom:" + Xdomain + " yDom:" + Ydomain);
     return {
         'getStack': ()=>{
