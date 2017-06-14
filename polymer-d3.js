@@ -159,7 +159,7 @@ class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
     return[
       '_selectedChanged(selectedChart)',
       '_inputsChanged(inputs.*)',
-      '_modeObserver(editMode)',
+      '_modeObserver(editMode)'
     ]
   }
 
