@@ -19,39 +19,62 @@
         type: 'String',
         value: 0
       }, {
-        key: 'l1',
+        key: 'Q1',
         type: 'Number',
         value: 1
       }, {
-        key: 'l2',
+        key: 'Q2',
         type: 'Number',
         value: 2
       }, {
-        key: 'l3',
+        key: 'Q3',
         type: 'Number',
         value: 3
       }, {
-        key: 'l4',
+        key: 'Q4',
         type: 'Number',
         value: 4
-      }, {
-        key: 'l5',
-        type: 'Number',
-        value: 5
-      }, {
-        key: 'l6',
-        type: 'Number',
-        value: 6
       }]
       d3.csv("data/bar-data.csv", function(error, csv) {
-        var data = csv.map(function(row) {
-          return [
-            row.state, Number(row.l1), Number(row.l2),
-            Number(row.l3), Number(row.l4), Number(row.l5),
-            Number(row.l6)
-          ];
-        });
-        console.log(data);
+        // var data = csv.map(function(row) {
+        //   return [
+        //     row.state, Number(row.l1), Number(row.l2),
+        //     Number(row.l3), Number(row.l4), Number(row.l5),
+        //     Number(row.l6)
+        //   ];
+        // });
+
+        let data = [];
+      	data[0] = [];
+      	data[1] = [];
+      	data[2] = [];
+      	data[3] = [];
+      	// add more rows if your csv file has more columns
+
+      	// add here the header of the csv file
+      	data[0][0] = "Q1";
+      	data[1][0] = "Q2";
+      	data[2][0] = "Q3";
+      	data[3][0] = "Q4";
+
+      	csv.forEach(function(x) {
+      		var v1 = Math.floor(x.Q1),
+      			v2 = Math.floor(x.Q2),
+      			v3 = Math.floor(x.Q3),
+      			v4 = Math.floor(x.Q4);
+      			// add more variables if your csv file has more columns
+
+      		var rowMax = Math.max(v1, Math.max(v2, Math.max(v3,v4)));
+      		var rowMin = Math.min(v1, Math.min(v2, Math.min(v3,v4)));
+
+      		data[0].push(v1);
+      		data[1].push(v2);
+      		data[2].push(v3);
+      		data[3].push(v4);
+      		 // add more rows if your csv file has more columns
+
+      	});
+        console.log("chart-data",data);
         var config = {
           source: data,
           externals: externals,

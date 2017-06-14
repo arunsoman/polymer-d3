@@ -88,9 +88,10 @@
     attached: function() {
         let container = document.createElement('div');
             container.className = 'chartContainer';
-            this.appendChild(container);
+            this.root.appendChild(container);
+            //this.appendChild(container);
             //this.makeChartWrap();
-            this.scopeSubtree(this.querySelector('.chartContainer'), true);
+            this.scopeSubtree(this.root.querySelector('.chartContainer'), true);
         this._manageDom();
     },
 
@@ -101,7 +102,7 @@
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;
 
-        let chartContainer = this.querySelector('.chartContainer');
+        let chartContainer = this.root.querySelector('.chartContainer');
         chartContainer.style.height = (outerHeight + 100) + 'px';
         chartContainer.style.width = (outerWidth + 100) + 'px';
 
@@ -139,7 +140,7 @@
         let outerWidth = this._getWidth();
         let outerHeight = this._getHeight();
         let margin = this.getMargins();
-        let chartContainer = this.querySelector('.chartContainer');
+        let chartContainer = this.root.querySelector('.chartContainer');
 
         this.chartWidth  = outerWidth  - margin.left - margin.right;
         this.chartHeight = outerHeight - margin.top  - margin.bottom;

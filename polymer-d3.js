@@ -1,167 +1,170 @@
-Polymer({
+"use strict";
 
-  is: 'polymer-d3',
-
-  properties: {
-    // List of available charts
-    availableCharts: {
-      type: Array,
-      value: function() {
-        // This list if used when available charts aren' fed from zeppelin-viewer
-        // Callback defined in charts and are called after the chart is initated
-        // using PolymerD3.utilities.attachElement
-        // examples => @{{this._selectedChanged}}
-        // barchart.js@{{initStackedBarChart}}
-        if (!this.availableCharts) {
-          return [{
-            label: 'Table',
-            icon: 'chart:table-icon',
-            element: 'polymerd3-table',
-            callBack: 'initTable'
-          }, {
-            label: 'Stacked Bar Chart',
-            icon: 'chart:stacked-bar-chart',
-            element: 'bar-chart',
-            callBack: 'initStackedBarChart'
-          }, {
-            label: 'Grouped Bar Chart',
-            icon: 'chart:grouped-bar-chart',
-            element: 'bar-chart',
-            callBack: 'initGroupedBarChart'
-          }, {
-            label: 'Waterfall Chart',
-            icon: 'chart:waterfall-chart',
-            element: 'bar-chart',
-            callBack: 'initWaterfallChart'
-          }, {
-            label: 'Difference',
-            icon: 'chart:difference-chart',
-            element: 'bar-chart',
-            callBack: 'initDiffrenceChart'
-          }, {
-            label: 'Pie Chart',
-            icon: 'chart:pieChart',
-            element: 'pie-chart',
-            callBack: 'setPieSettings'
-          }, {
-            label: 'Heat Map',
-            icon: 'chart:heatMap',
-            element: 'bar-chart',
-            callBack: 'initHeatMap'
-          }, {
-            label: 'Area Chart',
-            icon: 'chart:area-chart',
-            element: 'area-chart',
-            callBack: 'setAreaSettings'
-          }, {
-            label: 'Sankey Chart',
-            icon: 'chart:sankey-chart',
-            element: 'sankey-chart',
-            callBack: 'setSankeySettings'
-          }, {
-            label: 'Radar Chart',
-            icon: 'chart:radar-chart',
-            element: 'radar-chart',
-            // callBack: 'radar'
-          }, {
-            label: 'Scatter Plot Chart',
-            icon: 'chart:scatter-plot',
-            element: 'scatter-plot'
-          }, {
-            label: 'Calendar View Chart',
-            icon: 'chart:calendar-chart',
-            element: 'calendar-chart'
-          }, {
-            label: 'Pareto Chart',
-            icon: 'chart:pareto-chart',
-            element: 'pareto-chart'
-          }, {
-            label: 'Stacked Composite Chart',
-            icon: 'chart:composite-stacked',
-            element: 'stacked-composite-chart'
-          }, {
-            label: 'Grouped Composite Chart',
-            icon: 'chart:composite-grouped',
-            element: 'grouped-composite-chart'
-          }, {
-            label: 'Horizontal Chart',
-            icon: 'chart:horizontal-bar',
-            element: 'horizontal-chart'
-          }, {
-            label: 'Box plot',
-            icon: 'chart:calendar-chart',
-            element: 'box-plot'
-          }, {
-            label: 'Composite Canvas',
-            icon: 'icons:dashboard',
-            element: 'composite-canvas'
-          }];
+class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
+  static get is(){return 'polymer-d3'}
+  static get properties(){
+    return{
+      availableCharts: {
+        type: Array,
+        value: function() {
+          // This list if used when available charts aren' fed from zeppelin-viewer
+          // Callback defined in charts and are called after the chart is initated
+          // using PolymerD3.utilities.attachElement
+          // examples => @{{this._selectedChanged}}
+          // barchart.js@{{initStackedBarChart}}
+          if (!this.availableCharts) {
+            return [{
+              label: 'Table',
+              icon: 'chart:table-icon',
+              element: 'polymerd3-table',
+              callBack: 'initTable'
+            }, {
+              label: 'Stacked Bar Chart',
+              icon: 'chart:stacked-bar-chart',
+              element: 'bar-chart',
+              callBack: 'initStackedBarChart'
+            }, {
+              label: 'Grouped Bar Chart',
+              icon: 'chart:grouped-bar-chart',
+              element: 'bar-chart',
+              callBack: 'initGroupedBarChart'
+            }, {
+              label: 'Waterfall Chart',
+              icon: 'chart:waterfall-chart',
+              element: 'bar-chart',
+              callBack: 'initWaterfallChart'
+            }, {
+              label: 'Difference',
+              icon: 'chart:difference-chart',
+              element: 'bar-chart',
+              callBack: 'initDiffrenceChart'
+            }, {
+              label: 'Pie Chart',
+              icon: 'chart:pieChart',
+              element: 'pie-chart',
+              callBack: 'setPieSettings'
+            }, {
+              label: 'Heat Map',
+              icon: 'chart:heatMap',
+              element: 'bar-chart',
+              callBack: 'initHeatMap'
+            }, {
+              label: 'Area Chart',
+              icon: 'chart:area-chart',
+              element: 'area-chart',
+              callBack: 'setAreaSettings'
+            }, {
+              label: 'Sankey Chart',
+              icon: 'chart:sankey-chart',
+              element: 'sankey-chart',
+              callBack: 'setSankeySettings'
+            }, {
+              label: 'Radar Chart',
+              icon: 'chart:radar-chart',
+              element: 'radar-chart',
+              // callBack: 'radar'
+            }, {
+              label: 'Scatter Plot Chart',
+              icon: 'chart:scatter-plot',
+              element: 'scatter-plot'
+            }, {
+              label: 'Calendar View Chart',
+              icon: 'chart:calendar-chart',
+              element: 'calendar-chart'
+            }, {
+              label: 'Pareto Chart',
+              icon: 'chart:pareto-chart',
+              element: 'pareto-chart'
+            }, {
+              label: 'Stacked Composite Chart',
+              icon: 'chart:composite-stacked',
+              element: 'stacked-composite-chart'
+            }, {
+              label: 'Grouped Composite Chart',
+              icon: 'chart:composite-grouped',
+              element: 'grouped-composite-chart'
+            }, {
+              label: 'Horizontal Chart',
+              icon: 'chart:horizontal-bar',
+              element: 'horizontal-chart'
+            }, {
+              label: 'Box plot',
+              icon: 'chart:calendar-chart',
+              element: 'box-plot'
+            }, {
+              label: 'Composite Canvas',
+              icon: 'icons:dashboard',
+              element: 'composite-canvas'
+            }];
+          }
         }
+      },
+      // Object desctibing selected chart type
+      selectedChart: {
+        type: Object,
+        value: () => { return {};}
+      },
+      selectedChartObj: {
+        type: Object,
+        value: () => { return {};}
+      },
+      // Flag to display settngs components
+      settingsVisible: {
+        type: Boolean,
+        value: false
+      },
+      // Inputs
+      externals: {
+        type: Array,
+        value: () => { return [];}
+      },
+      inputs: {
+        type:Array,
+        notify: true,
+        value: () => {return [];}
+      },
+      // Data
+      source: {
+        type: Array,
+        value: () => {return [];}
+      },
+
+      // settings
+      settings: {
+        type: Array,
+        value: () => {return [];}
+      },
+
+      // State container
+      stateContainer: {
+        type: Object,
+        value: () => {return {};}
+      },
+      editMode: {
+        type: Boolean,
+        value: false
+      },
+      legendSettingsFlag: {
+        type: Boolean,
+        value: false
+      },
+      legendSettings: {
+        type: Object,
+        value: () => {return {};}
       }
-    },
-    // Object desctibing selected chart type
-    selectedChart: {
-      type: Object,
-      value: () => { return {};}
-    },
-    selectedChartObj: {
-      type: Object,
-      value: () => { return {};}
-    },
-    // Flag to display settngs components
-    settingsVisible: {
-      type: Boolean,
-      value: false
-    },
-    // Inputs
-    externals: {
-      type: Array,
-      value: () => { return [];}
-    },
-    inputs: {
-      type:Array,
-      notify: true,
-      value: () => {return [];}
-    },
-    // Data
-    source: {
-      type: Array,
-      value: () => {return [];}
-    },
-
-    // settings
-    settings: {
-      type: Array,
-      value: () => {return [];}
-    },
-
-    // State container
-    stateContainer: {
-      type: Object,
-      value: () => {return {};}
-    },
-    editMode: {
-      type: Boolean,
-      value: false
-    },
-    legendSettingsFlag: {
-      type: Boolean,
-      value: false
-    },
-    legendSettings: {
-      type: Object,
-      value: () => {return {};}
     }
-  },
+  }
 
-  observers: [
-    '_selectedChanged(selectedChart)',
-    '_inputsChanged(inputs.*)',
-    '_modeObserver(editMode)',
-  ],
+  static get observers(){
+    return[
+      '_selectedChanged(selectedChart)',
+      '_inputsChanged(inputs.*)',
+      '_modeObserver(editMode)',
+    ]
+  }
 
   // edit mode
-  _modeObserver: function(editMode) {
+  _modeObserver (editMode) {
     if (!editMode) {
       if (this.selectedChartObj && this.selectedChartObj.extractData) {
         this.selectedChartObj.viewMode = true;
@@ -172,18 +175,25 @@ Polymer({
         this.selectedChartObj.viewMode = false;
       }
     }
-  },
+  }
 
   // on inputs change
-  _inputsChanged: function(i) {
+  _inputsChanged(i) {
     if (this.selectedChart && this.selectedChart.element) {
       this.$$(this.selectedChart.element).draw();
     }
-  },
+  }
+
+  _findTextNodes () {
+  // childNodes *might* be a NodeList
+  var nodes = Polymer.dom(this).childNodes;
+  return Array.prototype.filter.call(nodes,
+      (n) => { return n.nodeType = Node.TEXT_NODE });
+}
 
   // on selected chart changed
   // is also used to draw first chart
-  _selectedChanged: function(selectedChart) {
+  _selectedChanged(selectedChart) {
     let elem;
     if (this.selectedChartObj && !PolymerD3.utilities.isEmptyObject(this.selectedChartObj)) {
       this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
@@ -191,13 +201,13 @@ Polymer({
     this.set('settingsVisible', true);
     if (selectedChart && !PolymerD3.utilities.isEmptyObject(selectedChart)) {
       this.$$('.chartHolder').innerHTML = '';
+
       elem = PolymerD3.utilities.attachElement.call(
         this,
         selectedChart.element,
         '.chartHolder',
         selectedChart.callBack
       );
-
       elem.set('source', this.source);
       elem.set('externals', this.externals);
 
@@ -210,19 +220,19 @@ Polymer({
         elem.set('editMode', this.editMode);
       });
     }
-  },
+  }
 
   // might be dead code
   // not deleted because this is a good utility to merge two objects
-  _mergeSettings: function(from, to) {
+  _mergeSettings(from, to) {
     let mergeSettings = this._persistData('input', 'selectedValue');
     mergeSettings(from, to);
-  },
+  }
 
   // Creates a utility function that
   // copies valueToChange from 'from' to 'to', both are array of objects
   // identifier is the key which uniquely identifies objects
-  _persistData: function(identifier, valeToChange) {
+  _persistData(identifier, valeToChange) {
     return (from, to) => {
       from.forEach(f => {
         // Short circuits to.loop
@@ -235,17 +245,17 @@ Polymer({
         });
       });
     }
-  },
+  }
 
-  showInputSettings: function() {
+  showInputSettings() {
     if (this.selectedChartObj) {
       this.selectedChartObj.toggleSettingsVisibility();
     }
-  },
+  }
 
   // Bootstraps element as per mode(view/edit)
   // This meathod avoids crazy rwo-way binding side effects
-  bootstrapCharts: function(config) {
+  bootstrapCharts(config) {
     // data and externals are always required
     this.set('externals', config.externals);
     this.set('source', config.source);
@@ -295,11 +305,11 @@ Polymer({
         }
       }, 500);
     }
-  },
+  }
 
   // retrives current state of polymer-d3
   // is used to save data back to zeppelin
-  getSettings: function() {
+  getSettings() {
     var selectedChart = this.selectedChart;
     selectedChart.settings = this.selectedChartObj.extractData();
     return {
@@ -307,4 +317,59 @@ Polymer({
       availableCharts: this.availableCharts
     };
   }
+
+}
+
+customElements.define(polymerD3.is,polymerD3)
+
+
+
+
+/*
+Polymer({
+
+  is: 'polymer-d3',
+
+  properties: {
+
+  },
+
+  observers: [],
+
+  // edit mode
+  _modeObserver: function(editMode) {
+  },
+
+  // on inputs change
+  _inputsChanged: function(i) {
+  },
+
+  // on selected chart changed
+  // is also used to draw first chart
+  _selectedChanged: function(selectedChart) {
+  },
+
+  // might be dead code
+  // not deleted because this is a good utility to merge two objects
+  _mergeSettings: function(from, to) {
+  },
+
+  // Creates a utility function that
+  // copies valueToChange from 'from' to 'to', both are array of objects
+  // identifier is the key which uniquely identifies objects
+  _persistData: function(identifier, valeToChange) {
+  },
+
+  showInputSettings: function() {
+  },
+
+  // Bootstraps element as per mode(view/edit)
+  // This meathod avoids crazy rwo-way binding side effects
+  bootstrapCharts: function(config) {  },
+
+  // retrives current state of polymer-d3
+  // is used to save data back to zeppelin
+  getSettings: function() {
+  }
 });
+*/

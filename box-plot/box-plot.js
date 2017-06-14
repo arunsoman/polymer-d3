@@ -1,3 +1,4 @@
+
 /*
 
 Accepts data in the format:
@@ -15,74 +16,102 @@ Accepts data in the format:
 
 where, Q1, Q2, Q3 and Q4 are plotted at xaxix
 */
-Polymer({
-  is: 'box-plot',
 
-  properties: {
-    title: '',
-    inputs: {
-      notify: true,
-      type: Array,
-      value: () => {
-        return [{
-          input: 'x',
-          txt: 'Coloumns',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'coloumn',
-          maxSelectableValues: 8
-        }, {
-          input: 'y',
-          txt: 'Group By',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'coloumn',
-          maxSelectableValues: 1
-        }];
-      }
-    },
-    settings: {
-      notify: true,
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    chartType: {
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false,
-    isStacked: {
-      type: Boolean,
-      value: true
-    },
-    configurator: {
-      type: Object,
-      value: function() {
-        return {};
+"use script";
+
+class boxPlot extends Polymer.mixinBehaviors([
+  PolymerD3.chartBehavior,PolymerD3.chartConfigCbBehavior
+], Polymer.Element) {
+  static get is() {
+    return "box-plot"
+  }
+  static get properties() {
+    return {
+      title: {
+        type: String
+      },
+      inputs: {
+        notify: true,
+        type: Array,
+        value: () => {
+          return [{
+            input: 'x',
+            txt: 'Coloumns',
+            selectedValue: [],
+            scaleType: '',
+            format: '',
+            selectedObjs: [],
+            uitype: 'single-value',
+            displayName: 'coloumn',
+            maxSelectableValues: 8
+          }, {
+            input: 'y',
+            txt: 'Group By',
+            selectedValue: [],
+            scaleType: '',
+            format: '',
+            selectedObjs: [],
+            uitype: 'single-value',
+            displayName: 'coloumn',
+            maxSelectableValues: 1
+          }];
+        }
+      },
+      settings: {
+        notify: true,
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      chartType: {
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      hideSettings: {
+        type: Boolean,
+        value: true
+      },
+      source: {
+        type: Array,
+        value: []
+      },
+      external: {
+        type: Array,
+        value: []
+      },
+      chart: {
+        type: Object,
+        value: {}
+      },
+      dataMutated: {
+        type: Boolean,
+        value: false
+      },
+      isStacked: {
+        type: Boolean,
+        value: true
+      },
+      configurator: {
+        type: Object,
+        value: function() {
+          return {};
+        }
       }
     }
-  },
+  }
 
-  behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.chartConfigCbBehavior
-  ],
+  constructor() {
+    super()
+  }
+  connectedCallback() {
+  this.addEventListener('tap', this.toggleGenerator.bind(this));
+    super.connectedCallback();
+  }
 
-  draw: function() {
+  draw(){
     // find maximum in an array of arrays
     function findMax(arr) {
       return d3.max(arr, innerArray => d3.max(innerArray[1]));
@@ -92,6 +121,8 @@ Polymer({
     }
 
     this.debounce('drawDebounce', () => {
+      //for localy generating graph
+      this.inputs[0].selectedObjs = externals
 
       let usableCols = this.inputs[0].selectedObjs.filter(external => external.type == 'Number');
       let group = this.inputs[1].selectedObjs;
@@ -99,7 +130,9 @@ Polymer({
       if (!usableCols || !usableCols.length) {
         return false;
       }
+
       let _src = this.source.slice();
+
       let boxPlotData;
       // creates box plot data structure
       // boxplot = [[x1, d1], [x2, d2] ... [xn, dn]]
@@ -235,16 +268,9 @@ Polymer({
         return [i, j];
       };
     }
-  },
-  events: ['TOGGLE', 'RESET'],
-  listeners: {
-    // 'tap': 'toggleGenerator',
-    // 'reset': 'resetGenerator'
-  },
-  attachListeners: function() {
-    this.addEventListener('tap', this.toggleGenerator.bind(this));
-  },
-  cookQuery: function() {
+  }
+
+  cookQuery(){
     let rows = d3.select(this).selectAll('g.box-g.opacity-none');
     let col = this.getInputsPropertyObj('y');
 
@@ -272,8 +298,9 @@ Polymer({
       return coloumn + '=' + beautifiedValue(value, type);
     });
     return queryArray;
-  },
-  toggleGenerator: function(e) {
+  }
+
+  toggleGenerator(e){
     let elem = d3.select(e.target.parentNode);
     let me = this;
     let filterCol = this.getInputsProperty('y');
@@ -293,16 +320,21 @@ Polymer({
         }
       });
     }
-  },
-  toggle: function(g) {
+  }
+
+  toggle(g){
     g.classList.indexOf(opacity)
-  },
-  resetGenerator: function(e) {
+  }
+
+  resetGenerator(e){
     this.fire('RESET', {chartId: this});
-  },
-  reset: function() {
+  }
+
+  reset(){
     var groups = d3.select(this).selectAll('g.box-g').classed('opacity-none', false);
     console.log(groups);
-  },
+  }
 
-});
+}
+
+customElements.define(boxPlot.is, boxPlot)
