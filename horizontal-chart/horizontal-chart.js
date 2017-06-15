@@ -18,7 +18,7 @@ class horizontalChart extends Polymer.mixinBehaviors([
           return [{
             input: 'domain',
             txt: 'Domain Axis',
-            selectedValue: [0,25],
+            selectedValue: [0,25],//dummy value for chart population
             scaleType: '',
             format: '',
             selectedObjs: [],
@@ -28,7 +28,7 @@ class horizontalChart extends Polymer.mixinBehaviors([
           }, {
             input: 'range',
             txt: 'Range Axis',
-            selectedValue: [0,25],
+            selectedValue: [0,25],//dummy value for chart population
             format: '',
             scaleType: '',
             selectedObjs: [],
