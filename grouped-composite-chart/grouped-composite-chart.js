@@ -295,28 +295,3 @@ class groupedCompositeChart extends Polymer.mixinBehaviors([
 }
 
 customElements.define(groupedCompositeChart.is, groupedCompositeChart)
-
-
-/*Polymer({
-  is: 'grouped-composite-chart',
-  draw: function() {
-
-  },
-
-  properties: {
-
-  },
-
-  behaviors: [
-
-  ],
-
-  _conf: function() {
-
-  },
-  _processors: function(nChartConfig) {
-
-  }
-
-});
-*/
