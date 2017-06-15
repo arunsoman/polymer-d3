@@ -1,77 +1,101 @@
-Polymer({
-  is: 'horizontal-chart',
+"use strict"
 
-  properties: {
-    title: '',
-    inputs: {
-      notify: true,
-      type: Array,
-      value: () => {
-        return [{
-          input: 'domain',
-          txt: 'Domain Axis',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'Domain',
-          maxSelectableValues: 1
-        }, {
-          input: 'range',
-          txt: 'Range Axis',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'Range',
-          maxSelectableValues: 5,
-          supportedType: ''
-        }];
-      }
-    },
-    settings: {
-      notify: true,
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    chartType: {
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false,
-    isStacked: {
-      type: Boolean,
-      value: true
-    },
-    configurator: {
-      type: Object,
-      value: function() {
-        return {};
+class horizontalChart extends Polymer.mixinBehaviors([
+  PolymerD3.chartBehavior, PolymerD3.chartConfigCbBehavior
+],Polymer.Element){
+  static get is(){
+    return "horizontal-chart"
+  }
+  static get properties(){
+    return {
+      title:{
+        type:String
+      },
+      inputs: {
+        notify: true,
+        type: Array,
+        value: () => {
+          return [{
+            input: 'domain',
+            txt: 'Domain Axis',
+            selectedValue: [0,25],
+            scaleType: '',
+            format: '',
+            selectedObjs: [],
+            uitype: 'single-value',
+            displayName: 'Domain',
+            maxSelectableValues: 1
+          }, {
+            input: 'range',
+            txt: 'Range Axis',
+            selectedValue: [0,25],
+            format: '',
+            scaleType: '',
+            selectedObjs: [],
+            uitype: 'multi-value',
+            displayName: 'Range',
+            maxSelectableValues: 5,
+            supportedType: ''
+          }];
+        }
+      },
+      settings: {
+        notify: true,
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      chartType: {
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      hideSettings: {
+        type:Boolean,
+        value:true
+      },
+      source: {
+        type:Array,
+        value:[]
+      },
+      external: {
+        type:Array,
+        value:[]
+      },
+      chart: {
+        type:Object,
+        value:{}
+      },
+      dataMutated: {
+        type: Boolean,
+        value: false
+      },
+      isStacked: {
+        type: Boolean,
+        value: true
+      },
+      configurator: {
+        type: Object,
+        value: function() {
+          return {};
+        }
       }
     }
-  },
+  }
 
-  behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.chartConfigCbBehavior
-  ],
+  constructor(){
+    super()
+  }
 
-  draw: function() {
+  draw() {
     this.debounce('draw-debounce', () => {
       let domainIndex = this.getInputsProperty('domain');
       let rangeIndices = this.getInputsProperty('range');
       let z = this.setLegendColor.bind(this);
       this.resize();
+
       // requireed indices not selected
       if (domainIndex === -1 || !rangeIndices || rangeIndices.length < 1 || !this.source || this.source.length < 1) {
         console.warn('Fill all required inputs using drag and drop');
@@ -222,4 +246,7 @@ Polymer({
       this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
   }
-});
+
+}
+
+customElements.define(horizontalChart.is, horizontalChart)
