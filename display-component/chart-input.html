@@ -1,0 +1,33 @@
+<dom-module id="chart-input">
+    <template>
+
+    </template>
+    <script>
+        class chartInput extends Polymer.mixinBehaviors([legendsComponent], Polymer.Element) {
+            constructor() {
+                super();
+            }
+            static get is() {return 'chart-input';}
+
+            static get properties() {
+                return {
+                    axis: 'x',
+                    scaleType: '',
+                    format: '',
+                    selectedObjs: [],
+                    label: '',
+                    maxSelectableValues: 8,
+                    validDataType: [],
+                    exclude: [],
+                };
+            }
+            add(selectedObject) {
+                this.push('selectedObjs', selectedObject);
+            }
+
+            remove(selectedObject) {
+                this.splice('selectedObjs', selectedObject, 1);
+            }
+        }
+    </script>
+</dom-module>
