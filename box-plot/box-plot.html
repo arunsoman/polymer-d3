@@ -2,6 +2,13 @@
 <link rel="stylesheet" type="text/css" href="box-plot-global.css">
 <dom-module id="box-plot">
   <template>
+
+    <slot name="chart-input-group"></slot>
+
+
+
+
+
     <dom-if if="{{editMode}}">
       <template>
       <div class="settings-wrap">

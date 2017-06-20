@@ -9,16 +9,30 @@
     -->
   </head>
   <body>
+
+    <box-plot>
+      <chart-input-group slot="chart-input-group">
+        <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+      </chart-input-group>
+    </box-plot>
+
+
+
+
+
+
+
+
     <polymer-d3></polymer-d3>
     <!-- <polymerd3-table></polymerd3-table> -->
     <script type="text/javascript">
+    var chartInputGrp = document.querySelector('chart-input-group');
+
       var pd3 = document.querySelector('polymer-d3');
       // var table = document.querySelector('polymerd3-table');
       var externals = [{
-        key: 'state',
-        type: 'String',
-        value: 0
-      }, {
         key: 'Q1',
         type: 'Number',
         value: 0
@@ -45,11 +59,17 @@
 
         console.log("chart-data",data);
         var config = {
-          source: data,
+
           externals: externals,
           mode: 'create'
         }
         pd3.bootstrapCharts(config);
+
+        const dataConfig={
+          externals: externals,
+          source: data
+        }
+        chartInputGrp.setData(dataConfig)
         // table.source = data;
         // table.externals = externals;
       });

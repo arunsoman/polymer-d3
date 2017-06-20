@@ -1,33 +1,179 @@
 <dom-module id="chart-input">
     <template>
+      <style>
+        .item-holder p{
+          margin: 0;
+          font-size: 0.8em;
+          color: #8e4740;
+        }
+        .item-holder{
+            width: 33%;
+            display: inline-block;
+            padding: 1em;
+            box-sizing: border-box;
+            text-align: left;
+            position: relative;
+            transform: scale3d(1,1,1);
+            transition: all .2s linear;
+        }
 
+        .item-holder:after{
+            content: "";
+            display: none;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            position: absolute;
+            background: rgba(0,0,0,0);
+            z-index: 1;
+            left: 0;
+        }
+        :host .drag-active .item-holder:after{
+          display: block;
+        }
+        .item-holder.hover{
+          transform: scale3d(1.1,1.1,1);
+        }
+        h4{
+            margin-top: 0.5em;
+            color: #2f3238;
+            margin-bottom: 0;
+        }
+        .item-drop{
+          background: rgba(0,0,0,0.1);
+            padding: 1em;
+            min-height: 50px;
+            vertical-align: middle;
+            color: #7d443e;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .item-drop:after{
+          position: absolute;
+            top: 30%;
+            left: 0;
+            width: 100%;
+            color: rgba(0,0,0,0.15);
+            font-size: 2em;
+            font-family: arial;
+            pointer-events: none;
+            content: "+";
+            text-align: center;
+        }
+        .item-drop ::content .tags{
+          background: #2f3238;
+          color: #bdb0af;
+          cursor: default;
+        }
+        .item-drop ::content .tags:hover{
+          background: #7d413a;
+        }
+
+        .item-drop .tags i{
+            position: absolute;
+            right: 0;
+            top: 0;
+            background: rgba(0,0,0,0.5);
+            margin-top: -0.1em;
+            transition: all .2s linear;
+            left: 0;
+            text-align: center;
+            opacity: 0;
+        }
+        .item-drop .tags:hover i{
+            opacity: 1
+        }
+        .tags{
+          cursor: move;
+          padding: 0.5em 1em;
+          display: inline-block;
+          background: #cc6055;
+          border-radius: 4px;
+          color: #f1dbd9;
+          margin-bottom: 0.2em;
+          overflow: hidden;
+          position: relative;
+        }
+        .tags:hover{
+          background: #c38983;
+        }
+      </style>
+      <div class="item-holder" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
+        <div class="item-drop">
+          <template is="dom-repeat" items="{{ selectedObjs }}" as="tag" index-as="tagIndex">
+            <span class="tags">[[ tag.key ]] <i><paper-icon-button icon="delete" on-tap="removeTag" index="{{index}}"></paper-icon-button></i></span>
+          </template>
+        </div>
+        <h4>[[ label ]]</h4>
+        <p>Accepts srings / number</p>
+      </div>
     </template>
     <script>
-        class chartInput extends Polymer.mixinBehaviors([legendsComponent], Polymer.Element) {
-            constructor() {
-                super();
-            }
+    /*legendsComponent*/
+        class chartInput extends Polymer.mixinBehaviors([PolymerD3.draggableBehavior], Polymer.Element) {
+
             static get is() {return 'chart-input';}
 
             static get properties() {
                 return {
-                    axis: 'x',
-                    scaleType: '',
-                    format: '',
-                    selectedObjs: [],
-                    label: '',
-                    maxSelectableValues: 8,
-                    validDataType: [],
-                    exclude: [],
+                  axis: {type:String},
+                  scaleType: {type:String},
+                  format: {type:String},
+                  selectedObjs: {type:Array},
+                  label: {type:String},
+                  maxSelectableValues: {type:Number},
+                  validDataType: {type:Array},
+                  exclude: {type:Array},
+
+                  currentDrag: {type:Object},
+                  uuid: {type:String}
                 };
             }
+            constructor() {
+                super()
+            }
+
             add(selectedObject) {
-                this.push('selectedObjs', selectedObject);
+                this.set('selectedObjs', selectedObject);
             }
 
             remove(selectedObject) {
                 this.splice('selectedObjs', selectedObject, 1);
             }
+
+            dragLeave(e){
+              e.target.classList.remove('hover');
+            }
+            allowDrop(e){
+              e.target.classList.add('hover');
+              e.preventDefault();
+            }
+            drop(e){
+              e.preventDefault();
+              this.parentElement.$.inputItems.classList.remove('drag-active');
+              var tagIndex = e.dataTransfer.getData('text');
+              if(tagIndex){
+                e.target.classList.remove('hover');
+                this.addTag(tagIndex);
+                e.dataTransfer.clearData('text');
+              }
+            }
+            addTag(tagIndex){
+                var tagNode = this.parentElement.externals[tagIndex];
+                this.add(tagNode)
+                // if(!this.hasDuplicateTag(nodeIndex,tagNode)){
+                //   this.push('inputs.'+nodeIndex+'.selectedObjs',tagNode);
+                //   this.push('inputs.'+nodeIndex+'.selectedValue',tagNode.value);
+                // }
+            }
+            hasDuplicateTag(index,node){
+              var getIndex = this.selectedObjs.indexOf(node)
+              return (getIndex < 0) ? false : true ;
+            }
+
+
         }
+        customElements.define(chartInput.is, chartInput)
     </script>
 </dom-module>
