@@ -1,0 +1,37 @@
+<link rel="import" href="chart-input.html">
+<dom-module id="base-canvas">
+<template>
+  
+</template>
+<script>
+  class baseCanvas extends Polymer.Element (){
+    static get is(){ return 'base-canvas'}
+
+    static get properties(){
+      return{
+        redraw:{
+          type:Boolean,
+          selectPath:'redraw'
+        },
+        externals:[],
+        source:[],
+        charts:{
+          selectPath:'charts'
+        }
+      }
+    }
+    static get observors(){
+      return ['redrawChange(redraw)']
+    }
+    redrawChange(){
+
+    }
+    constructor(){
+      super();
+    }
+
+  }
+  window.CustomElements.define(baseCanvas.is,baseCanvas)
+
+</script>
+</dom-module>

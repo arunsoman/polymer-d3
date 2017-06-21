@@ -1,0 +1,37 @@
+<link rel="import" href="chart-input.html">
+<dom-module id="base-chart">
+<template>
+  <h3>[[settings.title]]</h3>
+</template>
+<script>
+  class baseChart extends Polymer.Element (){
+    static get is(){ return 'base-chart'}
+
+    static get properties(){
+      return{
+        redraw:{
+          type:Boolean,
+          selectPath:''
+        }
+        settings:{
+          selectPath:()
+        },
+        input:{
+          type:Array,
+          selectPath:()
+        }
+      }
+    }
+    constructor(){
+      super();
+    }
+    draw(compute,paint){
+      debounce(paint(compute()),250)  
+    }
+    
+
+  }
+  window.CustomElements.define(baseChart.is,baseChart)
+
+</script>
+</dom-module>

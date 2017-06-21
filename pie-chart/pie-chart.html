@@ -1,79 +1,109 @@
-<link rel="stylesheet" href="pie-chart-global.css">
-<dom-module id='pie-chart'>
-  <style>
-    .arc text {
-      font: 10px sans-serif;
-      text-anchor: middle;
-    }
+<link rel="import" href="chart-input.html">
+<dom-module id="pie-chart">
+<template>
+  <h3>[[settings.title]]</h3>
+  <chart-input axis="{{x}}"></chart-input>
+  <chart-input axis="{{y}}"></chart-input>
+  <chart-legend></chart-legend>
+  <chart-settings></chart-settings>
+</template>
+<script>
+  class pieChart extends baseChart(){
+    static get is(){ return 'pie-chart'}
 
-    .arc path {
-      stroke: #fff;
+    static get properties(){
+      return{
+        inputs:{
+          type:Array,
+          statePath:function(a,b){
+            let store = store.getStore();
+            return store.charts[id].input
+          }()
+        }
+      }
     }
+    constructor(){
+      super();
+    }
+    attached(){
+      redraw();
+    }
+    redraw(){
+      draw(_paint(_compute()));
+    }
+    _compute(){
+      let slice = this.inputs[0].selectedValue;
+        let sliceSize = this.inputs[1].selectedValue;
+        // if slice exists, it would be an array
+        if (!slice || !sliceSize) {
+            return false;
+        }
+        let groupBy = this.inputs[2].selectedValue;
+        slice = slice[0];
+        sliceSize = sliceSize[0];
 
-    .chartContainer {
-      max-width: 100%;
-    }
-    .draggable-areabtn-wrap {
-      position: relative;
-    }
-    .icons-wrap.right-icons,
-    .settings-icon {
-      position: absolute;
-      right: 1em;
-      top: 6px;
-    }
-    paper-icon-button {
-     color: #868686;
-     transition: all .3s ease;
-    }
-    paper-icon-button:hover {
-      color: #454545;
-    }
-    .pie-slice {
-      transition: all .2s ease-in;
-    }
-    .pie-slice:hover {
-      -webkit-filter: drop-shadow( -5px -5px 5px #000);
-      filter: drop-shadow( -5px -5px 5px #000);
-      transform: scale(1.05);
-    }
-  </style>
+        let width = this.chartWidth,
+            height = this.chartHeight,
+            radius = Math.min(width, height) / 2;
+        let innerRadius = this.area[6].selectedValue;
 
-  <template>
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <display-component settings="{{area}}"></display-component>
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
-  </template>
+        let color = d3.scale.category20c();
+
+        let arc = d3.svg.arc()
+            .outerRadius(radius - 10)
+            .innerRadius(innerRadius);
+
+        let labelArc = d3.svg.arc()
+            .outerRadius(radius - 40)
+            .innerRadius(radius - 40);
+
+        let groupedData;
+        if (!groupBy) {
+            groupedData = d3.nest().key(d => d).entries(this.source);
+        } else {
+            groupedData = d3.nest().key(d => d[groupBy]).entries(this.source);
+        }
+        let pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) {
+                return d[sliceSize];
+            });
+        return width, height, pie, arc, slice, color
+    }
+    _paint(width, height, pie, arc, slice, color) {
+      this.parentG.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+        let me = this;
+        if (this.parentG) {
+            this.parentG.html('');
+        }
+        let g = this.parentG.selectAll('.arc')
+            .data(pie(me.source))
+            .enter().append('g')
+            .attr('class', 'arc');
+
+        let segments = g.append('path')
+            .attr('d', arc)
+            .style('fill', function(d) {
+                return color(d.data[slice]);
+            })
+            .attr('class', 'pie-slice');
+        
+        let htmlCallback = d => {
+            // temp. setup to check if grouping works
+            let gpName = d.data.groupName || d.data[this.inputs[1].selectedValue[0]];
+            let str = '<table class="pie-tooltip">' +
+                '<tr>' +
+                '<td>' + d.data[this.inputs[0].selectedValue] + ',</td>' +
+                '<td>' + gpName + '</td>' +
+                '</tr>' +
+                '</table>';
+            return str;
+        };
+        // attachToolTip: (parentG, elem, customClass, htmlCallback) => {
+        this.attachToolTip(this.parentG, segments, 'pie-slice', htmlCallback);
+    }
+  }
+  window.CustomElements.define(pieChart.is,pieChart)
+
+</script>
 </dom-module>
-
-<script src='pie-chart.js'></script>
-<!-- <script src='../bower_components/d3/d3.min.js'></script> -->

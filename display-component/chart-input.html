@@ -1,0 +1,24 @@
+<dom-module id="chart-input">
+<template></template>
+<script>
+  class ChartInput extends Polymer.Element(){
+    static get is(){ return 'chart-input'}
+
+    static get properties(){
+      return{
+        axis:{
+          type:String
+        },
+        label:{
+          type:String
+        }
+      }
+    }
+    constructor(){
+      super();
+    }
+  }
+  window.CustomElements.define(ChartInput.is,ChartInput)
+
+</script>
+</dom-module>

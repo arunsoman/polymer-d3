@@ -1,0 +1,26 @@
+<link rel="import" href="chart-input.html">
+<dom-module id="chart-setting">
+<template>
+  <h3>[[settings.title]]</h3>
+</template>
+<script>
+  class baseChart extends Polymer.Element (){
+    static get is(){ return 'chart-setting'}
+
+    static get properties(){
+      return{
+        title:{
+
+        },
+        width:{StatePath}
+      }
+    }
+    constructor(){
+      super();
+    }
+
+  }
+  window.CustomElements.define(baseChart.is,baseChart)
+
+</script>
+</dom-module>
