@@ -102,7 +102,7 @@
       <div class="item-holder" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
         <div class="item-drop">
           <template is="dom-repeat" items="{{ selectedObjs }}" as="tag" index-as="tagIndex">
-            <span class="tags">[[ tag.key ]] <i><paper-icon-button icon="delete" on-tap="removeTag" index="{{index}}"></paper-icon-button></i></span>
+            <span class="tags">[[ tag.key ]]<i><paper-icon-button icon="delete" on-tap="removeTag" index="{{index}}"></paper-icon-button></i></span>
           </template>
         </div>
         <h4>[[ label ]]</h4>
@@ -111,7 +111,7 @@
     </template>
     <script>
     /*legendsComponent*/
-        class chartInput extends Polymer.mixinBehaviors([PolymerD3.draggableBehavior], Polymer.Element) {
+        class chartInput extends Polymer.mixinBehaviors([PolymerD3.draggableBehavior], ReduxMixin(Polymer.Element)) {
 
             static get is() {return 'chart-input';}
 
@@ -125,6 +125,7 @@
                   maxSelectableValues: {type:Number},
                   validDataType: {type:Array},
                   exclude: {type:Array},
+                  selectedValue: {type:Array},
 
                   currentDrag: {type:Object},
                   uuid: {type:String}
@@ -134,8 +135,9 @@
                 super()
             }
 
-            add(selectedObject) {
+            add(selectedObject,tagNodeVal) {
                 this.set('selectedObjs', selectedObject);
+                this.set("selectedValue",tagNodeVal)
             }
 
             remove(selectedObject) {
@@ -160,8 +162,10 @@
               }
             }
             addTag(tagIndex){
-                var tagNode = this.parentElement.externals[tagIndex];
-                this.add(tagNode)
+                let tagNode = this.parentElement.externals[tagIndex];
+                let tagNodeVal = tagNode.value;
+                this.add(tagNode,tagNodeVal)
+
                 // if(!this.hasDuplicateTag(nodeIndex,tagNode)){
                 //   this.push('inputs.'+nodeIndex+'.selectedObjs',tagNode);
                 //   this.push('inputs.'+nodeIndex+'.selectedValue',tagNode.value);

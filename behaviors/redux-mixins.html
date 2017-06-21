@@ -12,13 +12,13 @@
     ]
   }}
   const store = Redux.createStore(appReducer)
-  const ReduxMixin = PolymerRedux(store)
+  ReduxMixin = PolymerRedux(store)
 
   const appReducer = (state, action)=>{
       state = state || initialState
       let chartObj =
       {
-          charts: chartReducer(state.customer.name, action)
+          charts: chartReducer(state.charts, action)
       }
       return {chartObj: chartObj}
   }
