@@ -18,7 +18,8 @@
     "paper-slider": "PolymerElements/paper-slider#^1.0.11",
     "neon-animation": "v1.2.4",
     "crossfilter": "1.x",
-    "iron-ajax": "^1.4.3"
+    "iron-ajax": "^1.4.3",
+    "polymer-redux": "^1.0.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
@@ -30,6 +31,8 @@
     "polymer-sortablejs": "5b7f08a",
     "web-animations-js": "^2.2.0",
     "paper-styles": "^1.1.4",
-    "neon-animation": "v1.2.4"
+    "neon-animation": "v1.2.4",
+    "polymer": "2.0.0",
+    "webcomponentsjs": "^0.7.0"
   }
 }

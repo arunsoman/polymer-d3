@@ -1,6 +1,101 @@
-Polymer({
-  is: 'grouped-composite-chart',
-  draw: function() {
+"use strict";
+
+class groupedCompositeChart extends Polymer.mixinBehaviors([
+  PolymerD3.chartBehavior,PolymerD3.chartConfigCbBehavior
+],Polymer.Element){
+  static get is(){
+    return "grouped-composite-chart"
+  }
+  static get properties(){
+    return{
+      title: {
+        type:String
+      },
+      inputs: {
+        notify: true,
+        type: Array,
+        value: () => {
+          return [{
+            input: 'x',
+            txt: 'Pick Dimension',
+            selectedValue: [0,25],//dummy value for chart population
+            scaleType: '',
+            format: '',
+            selectedObjs: [{type:"Date"}],//dummy value for chart population
+            uitype: 'single-value',
+            displayName: 'myXAxis',
+            maxSelectableValues: 1
+          }, {
+            input: 'y',
+            txt: 'Pick Measures',
+            selectedValue: [0,25],//dummy value for chart population
+            format: '',
+            scaleType: '',
+            selectedObjs: [{type:"Date"}],//dummy value for chart population
+            uitype: 'multi-value',
+            displayName: 'myYAxis',
+            maxSelectableValues: 2,
+            supportedType: ''
+          }, {
+            input: 'z',
+            txt: 'Pick Z',
+            selectedValue: [],
+            format: '',
+            scaleType: '',
+            selectedObjs: [],
+            uitype: 'multi-value',
+            displayName: 'myZAxis',
+            maxSelectableValues: 2,
+            supportedType: ''
+          }];
+        }
+      },
+      settings: {
+        notify: true,
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      chartType: {
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      hideSettings: {
+        type:Boolean,
+        value:true
+      },
+      source: {
+        type:Array,
+        value:[]
+      },
+      external: {
+        type:Array,
+        value:[]
+      },
+      chart: {
+        type:Object,
+        value:{}
+      },
+      dataMutated: {
+        type:Boolean,
+        value:false
+      },
+      isStacked: {
+        type: Boolean,
+        value: true
+      },
+      configurator: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
+    }
+  }
+  draw() {
     this.debounce('draw-debounce', () => {
       let xIndex = this.getInputsProperty('x');
       let yIndices = this.getInputsProperty('y');
@@ -141,85 +236,9 @@ Polymer({
 
       this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
-  },
+  }
 
-  properties: {
-    title: '',
-    inputs: {
-      notify: true,
-      type: Array,
-      value: () => {
-        return [{
-          input: 'x',
-          txt: 'Pick Dimension',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'myXAxis',
-          maxSelectableValues: 1
-        }, {
-          input: 'y',
-          txt: 'Pick Measures',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myYAxis',
-          maxSelectableValues: 2,
-          supportedType: ''
-        }, {
-          input: 'z',
-          txt: 'Pick Z',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myZAxis',
-          maxSelectableValues: 2,
-          supportedType: ''
-        }];
-      }
-    },
-    settings: {
-      notify: true,
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    chartType: {
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false,
-    isStacked: {
-      type: Boolean,
-      value: true
-    },
-    configurator: {
-      type: Object,
-      value: function() {
-        return {};
-      }
-    }
-  },
-
-  behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.chartConfigCbBehavior
-  ],
-
-  _conf: function() {
+  _conf() {
     let xIndex = this.getInputsProperty('x');
     let yIndices = this.getInputsProperty('y');
     let xObj = this.getInputsPropertyObj('x');
@@ -250,8 +269,8 @@ Polymer({
       parentG: this.parentG,
       forcetToZero: forcetToZero
     };
-  },
-  _processors: function(nChartConfig) {
+  }
+  _processors(nChartConfig) {
     return {
       translate: (d, i) => {
         return 'translate(' + i * nChartConfig.getBarWidth() / nChartConfig.stackDataLength + ',0)';
@@ -273,5 +292,6 @@ Polymer({
       }
     }
   }
+}
 
-});
+customElements.define(groupedCompositeChart.is, groupedCompositeChart)

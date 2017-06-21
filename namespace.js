@@ -15,11 +15,11 @@ PolymerD3.utilities.isEmptyObject = function(obj) {
 
 // Creates and attaches a dom node inside specific container and executes a meathod inside it
 PolymerD3.utilities.attachElement = function(elem, container, cb) {
-
     var dynamicEl = document.createElement(elem);
     var containerElem = this.root.querySelector(container);
     if (containerElem) {
         containerElem.appendChild(dynamicEl);
+        debugger
     } else {
         this.appendChild(dynamicEl);
     }
@@ -28,6 +28,7 @@ PolymerD3.utilities.attachElement = function(elem, container, cb) {
         var callBack = dynamicEl[cb];
         callBack.call(dynamicEl);
     }
+
     return dynamicEl;
 
 };

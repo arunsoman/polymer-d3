@@ -1,0 +1,78 @@
+<link rel="import" href="chart-input.html"/>
+<link rel="import" href="drag-element.html"/>
+
+<dom-module id="chart-input-group">
+  <template>
+    <style>
+    .input-drag-wrapper{
+      padding: 1em;
+    }
+    :host{
+        position: relative;
+        overflow: hidden;
+        background: #2f3238;
+        border-bottom: solid 1px #c71503;
+        display: block;
+        overflow: hidden;
+    }
+    .input-drag-wrapper{
+      padding: 1em;
+    }
+    #inputItems{
+      background: #cc6055;
+    }
+    
+    </style>
+
+    <!-- <div uuid = [[getUUID]]></div> -->
+    <div class="input-drag-wrapper">
+      <template is="dom-repeat" items="[[ externals ]]">
+        <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
+      </template>
+    </div>
+
+    <div id="inputItems">
+      <slot name="chart-input" ></slot>
+    </div>
+
+  </template>
+<script>
+    class chartInputGroup extends Polymer.Element {
+        static get is() {
+            return 'chart-input-group';
+        }
+        static get config(){
+          return{
+            externals:{
+              notify:true,
+              type:Array,
+              value:[]
+            },
+            source:{
+              notify:true,
+              type:Array,
+              value:[]
+            }
+          }
+        }
+        static get observers(){
+          return["_externalsObs(externals)"]
+        }
+        constructor() {
+            super();
+        }
+        setData(arr){/*temparory function for data set*/
+          this.set("externals",arr.externals)
+          this.set("source",arr.source)
+        }
+
+        _externalsObs(externals) {
+          console.log('externals');
+          if (externals.length) {
+            this._externals = PolymerD3.utilities.clone(externals);
+          }
+        }
+    }
+    customElements.define(chartInputGroup.is, chartInputGroup)
+</script>
+</dom-module>

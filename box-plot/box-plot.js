@@ -21,93 +21,26 @@ where, Q1, Q2, Q3 and Q4 are plotted at xaxix
 
 class boxPlot extends Polymer.mixinBehaviors([
   PolymerD3.chartBehavior,PolymerD3.chartConfigCbBehavior
-], Polymer.Element) {
+],basicChartMixin(Polymer.Element)) {
   static get is() {
     return "box-plot"
   }
   static get properties() {
     return {
-      title: {
-        type: String
-      },
-      inputs: {
-        notify: true,
-        type: Array,
-        value: () => {
-          return [{
-            input: 'x',
-            txt: 'Coloumns',
-            selectedValue: [],
-            scaleType: '',
-            format: '',
-            selectedObjs: [],
-            uitype: 'single-value',
-            displayName: 'coloumn',
-            maxSelectableValues: 8
-          }, {
-            input: 'y',
-            txt: 'Group By',
-            selectedValue: [],
-            scaleType: '',
-            format: '',
-            selectedObjs: [],
-            uitype: 'single-value',
-            displayName: 'coloumn',
-            maxSelectableValues: 1
-          }];
-        }
-      },
-      settings: {
-        notify: true,
-        type: Object,
-        value: () => {
-          return [];
-        }
-      },
-      chartType: {
-        type: Object,
-        value: () => {
-          return [];
-        }
-      },
-      hideSettings: {
-        type: Boolean,
-        value: true
-      },
-      source: {
-        type: Array,
-        value: []
-      },
-      external: {
-        type: Array,
-        value: []
-      },
-      chart: {
-        type: Object,
-        value: {}
-      },
-      dataMutated: {
-        type: Boolean,
-        value: false
-      },
-      isStacked: {
-        type: Boolean,
-        value: true
-      },
-      configurator: {
-        type: Object,
-        value: function() {
-          return {};
-        }
-      }
+      //chart common properties are avaible in the "basicChartMixin" behavior
     }
   }
 
   constructor() {
     super()
+    //basic properties are set here. basic properties are available in the mixin behavior
+    this.set("inputs",[
+      this.chartInput({input:"x",txt:"x-axis",maxSelectableValues:8}),
+      this.chartInput({input:"y",txt:"x-axis",maxSelectableValues:1})
+    ])
   }
   connectedCallback() {
-  this.addEventListener('tap', this.toggleGenerator.bind(this));
+    this.addEventListener('tap', this.toggleGenerator.bind(this));
     super.connectedCallback();
   }
 
