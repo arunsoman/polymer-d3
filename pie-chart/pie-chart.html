@@ -1,35 +1,51 @@
-<link rel="import" href="chart-input.html">
+<link rel="import" href="../display-component/base-chart.html">
+<!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
 <dom-module id="pie-chart">
 <template>
+  <chart-input-group  uuid="{{uuid}}" input-obj="{{input}}">
+    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{x}}" label="{{xLabel}}" ></chart-input>
+    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{y}}" label="{{yLabel}}" ></chart-input>
+  </chart-input-group>
   <h3>[[settings.title]]</h3>
-  <chart-input axis="{{x}}"></chart-input>
-  <chart-input axis="{{y}}"></chart-input>
   <chart-legend></chart-legend>
   <chart-settings></chart-settings>
 </template>
 <script>
-  class pieChart extends baseChart(){
+  class pieChart extends baseChart{
     static get is(){ return 'pie-chart'}
 
     static get properties(){
       return{
-        inputs:{
-          type:Array,
-          statePath:function(a,b){
-            let store = store.getStore();
-            return store.charts[id].input
-          }()
-        }
+
       }
     }
     constructor(){
       super();
+
+    }
+
+    connectedCallback(){
+      super.connectedCallback()
+      this._dispatchObj()
     }
     attached(){
       redraw();
     }
     redraw(){
       draw(_paint(_compute()));
+    }
+
+    _dispatchObj(){
+      let self = this
+
+      let chartProperies={}
+      let id= this.uuid
+      let settings=this.settings
+      let inputs = this.inputs
+      let redraw = this.redraw
+      console.log("====", this.inputs)
+      chartProperies= {id,settings,redraw,inputs}
+      this.dispatch("updateChart",chartProperies)
     }
     _compute(){
       let slice = this.inputs[0].selectedValue;
@@ -87,7 +103,7 @@
                 return color(d.data[slice]);
             })
             .attr('class', 'pie-slice');
-        
+
         let htmlCallback = d => {
             // temp. setup to check if grouping works
             let gpName = d.data.groupName || d.data[this.inputs[1].selectedValue[0]];
@@ -103,7 +119,7 @@
         this.attachToolTip(this.parentG, segments, 'pie-slice', htmlCallback);
     }
   }
-  window.CustomElements.define(pieChart.is,pieChart)
+  customElements.define(pieChart.is,pieChart)
 
 </script>
 </dom-module>

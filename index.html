@@ -10,16 +10,18 @@
   </head>
   <body>
 
-    <box-plot>
+    <!-- <box-plot>
       <chart-input-group slot="chart-input-group">
         <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
         <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
         <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
       </chart-input-group>
-    </box-plot>
+    </box-plot> -->
 
 
+<pie-chart  >
 
+</pie-chart>
 
 
 
@@ -28,7 +30,7 @@
     <polymer-d3></polymer-d3>
     <!-- <polymerd3-table></polymerd3-table> -->
     <script type="text/javascript">
-    var chartInputGrp = document.querySelector('chart-input-group');
+    // var piechartData = document.querySelector('chart-input-group');
 
       var pd3 = document.querySelector('polymer-d3');
       // var table = document.querySelector('polymerd3-table');
@@ -69,10 +71,11 @@
           externals: externals,
           source: data
         }
-        chartInputGrp.setData(dataConfig)
+      //  piechartData.setData(dataConfig)
         // table.source = data;
         // table.externals = externals;
       });
+
     </script>
   </body>
 </html>

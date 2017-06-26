@@ -1,6 +1,6 @@
 <link rel="import" href="chart-input.html"/>
 <link rel="import" href="drag-element.html"/>
-
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="chart-input-group">
   <template>
     <style>
@@ -21,7 +21,7 @@
     #inputItems{
       background: #cc6055;
     }
-    
+
     </style>
 
     <!-- <div uuid = [[getUUID]]></div> -->
@@ -32,45 +32,97 @@
     </div>
 
     <div id="inputItems">
-      <slot name="chart-input" ></slot>
+      <slot name="chart-input"></slot>
     </div>
 
   </template>
 <script>
-    class chartInputGroup extends Polymer.Element {
+const initialExt = [{
+  key: 'Q1',
+  type: 'Number',
+  value: 0
+}, {
+  key: 'Q2',
+  type: 'Number',
+  value: 1
+}, {
+  key: 'Q3',
+  type: 'Number',
+  value: 2
+}, {
+  key: 'Q4',
+  type: 'Number',
+  value: 3
+}]
+    class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
         static get is() {
             return 'chart-input-group';
         }
-        static get config(){
+        static get properties(){
           return{
             externals:{
-              notify:true,
               type:Array,
               value:[]
             },
             source:{
-              notify:true,
               type:Array,
               value:[]
+            },
+            inputs:{
+              type:Array,
+              statePath(state){
+                return state.charts[this.uuid]['inputs']
+              }
+            },
+            inputObj:{
+              type:Object,
+              value:{}
             }
           }
         }
-        static get observers(){
-          return["_externalsObs(externals)"]
+        static get actions() {
+          return {
+            updateInputs(inputs) {
+              return {
+                type: 'UPDATE_CHART_INPUTS',
+                value: inputs
+              };
+            }
+          }
         }
         constructor() {
             super();
         }
-        setData(arr){/*temparory function for data set*/
-          this.set("externals",arr.externals)
-          this.set("source",arr.source)
+        static get observers(){
+          return["_inputChange(inputObj)"]
         }
+        connectedCallback(){
+          super.connectedCallback()
+          this.set("externals", initialExt)
 
-        _externalsObs(externals) {
-          console.log('externals');
-          if (externals.length) {
-            this._externals = PolymerD3.utilities.clone(externals);
+        }
+        _inputChange(objData){
+          // debugger
+          console.log("----", objData)
+          let key = Object.keys( objData )
+          if(objData!== undefined && key.length!=0){
+
+            let objKey = Number(key)
+            if(this.inputs[objKey]=== undefined){
+              this.inputs[objKey]=objData[key]
+            }else{
+              this.inputs[objKey].axis =  objData[key].axis
+              this.inputs[objKey].label = objData[key].label
+              this.inputs[objKey].selectedObjs.push(objData[key].selectedObjs[0])
+              this.inputs[objKey].selectedValue.push(objData[key].selectedValue[0])
+            }
+
+            this.dispatch("updateInputs", {uuid:this.uuid,inputs:this.inputs})
           }
+
+        }
+        _initializeData(){
+
         }
     }
     customElements.define(chartInputGroup.is, chartInputGroup)

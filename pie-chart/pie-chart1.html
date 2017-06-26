@@ -1,0 +1,79 @@
+<link rel="stylesheet" href="pie-chart-global.css">
+<dom-module id='pie-chart'>
+  <style>
+    .arc text {
+      font: 10px sans-serif;
+      text-anchor: middle;
+    }
+
+    .arc path {
+      stroke: #fff;
+    }
+
+    .chartContainer {
+      max-width: 100%;
+    }
+    .draggable-areabtn-wrap {
+      position: relative;
+    }
+    .icons-wrap.right-icons,
+    .settings-icon {
+      position: absolute;
+      right: 1em;
+      top: 6px;
+    }
+    paper-icon-button {
+     color: #868686;
+     transition: all .3s ease;
+    }
+    paper-icon-button:hover {
+      color: #454545;
+    }
+    .pie-slice {
+      transition: all .2s ease-in;
+    }
+    .pie-slice:hover {
+      -webkit-filter: drop-shadow( -5px -5px 5px #000);
+      filter: drop-shadow( -5px -5px 5px #000);
+      transform: scale(1.05);
+    }
+  </style>
+
+  <template>
+    <template is="dom-if" if="{{editMode}}">
+      <div class="settings-wrap">
+        <template is="dom-if" if={{!settingsVisibility}}>
+          <paper-icon-button
+              class="settings-icon outer"
+              icon="icons:expand-more"
+              title="View Settings"
+              on-tap="toggleSettingsVisibility"
+          ></paper-icon-button>
+        </template>
+        <template is="dom-if" if={{settingsVisibility}}>
+          <paper-icon-button
+            class="settings-icon outer"
+            icon="icons:expand-less"
+            title="Hide Settings"
+            on-tap="toggleSettingsVisibility"
+          ></paper-icon-button>
+        </template>
+        <template is="dom-if" if="{{settingsVisibility}}">
+          <display-component settings="{{area}}"></display-component>
+          <div class="draggable-areabtn-wrap">
+            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
+            <paper-icon-button
+              class="settings-icon inner"
+              icon="icons:build"
+              title="Area Settings"
+              on-tap="showAreaSettings"
+            ></paper-icon-button>
+          </div>
+        </template>
+      </div>
+    </template>
+  </template>
+</dom-module>
+
+<script src='pie-chart.js'></script>
+<!-- <script src='../bower_components/d3/d3.min.js'></script> -->

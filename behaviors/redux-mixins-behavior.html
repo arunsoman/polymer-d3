@@ -1,0 +1,54 @@
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<script src="../node_modules/redux/dist/redux.js"></script>
+<script>
+
+  const initialState = {
+      externals:[],
+      source:[],
+      charts:{}
+}
+
+  const appReducer = (state, action) => {
+      state = state || initialState
+      let chartObj = {
+          externals:externalsReducer(state.externals, action),
+          source:[],
+          charts: chartReducer(state.charts, action)
+      }
+      return chartObj
+  }
+
+  const chartReducer = (state, action) =>{
+      switch (action.type) {
+          case 'ADD_CHART':
+              return [...state, action.value]
+          case 'UPDATE_CHART':
+              state[action.value.id]=action.value
+              return state
+            case'UPDATE_CHART_INPUTS':
+              state[action.value.uuid].inputs=action.value.inputs
+              return state
+          default:
+              return state;
+      }
+  }
+
+  const externalsReducer =(state, action)=>{
+    switch(action.type){
+      case"UPDATE_EXTERNALS":
+        return Object.assign([],state,[...state,action.value])
+      default:
+          return state;
+    }
+  }
+
+
+  // const store = Redux.createStore(appReducer)
+
+  const store = Redux.createStore(  appReducer,  initialState,
+    Redux.compose(window.devToolsExtension ? window.devToolsExtension() : v => v)
+  );
+
+  ReduxMixinBehavior = PolymerRedux(store)
+
+</script>

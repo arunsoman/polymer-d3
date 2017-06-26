@@ -1,10 +1,11 @@
 <link rel="import" href="chart-input.html">
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="chart-legend">
 <template>
   <h3>[[title]]</h3>
 </template>
 <script>
-  class chartLengend extends Polymer.Element (){
+  class chartLengend extends ReduxMixinBehavior(Polymer.Element){
     static get is(){ return 'chart-legend'}
 
     static get properties(){
@@ -18,7 +19,7 @@
     }
 
   }
-  window.CustomElements.define(chartLengend.is,chartLengend)
+  customElements.define(chartLengend.is,chartLengend)
 
 </script>
 </dom-module>

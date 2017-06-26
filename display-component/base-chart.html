@@ -1,37 +1,75 @@
 <link rel="import" href="chart-input.html">
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="base-chart">
 <template>
   <h3>[[settings.title]]</h3>
 </template>
 <script>
-  class baseChart extends Polymer.Element (){
+  class baseChart extends ReduxMixinBehavior(Polymer.Element){
     static get is(){ return 'base-chart'}
 
     static get properties(){
       return{
         redraw:{
-          type:Boolean,
-          selectPath:''
-        }
-        settings:{
-          selectPath:()
+          type:Boolean
         },
-        input:{
+        uuid:{
+          type:String
+        },
+        settings:{
+          type:Object,
+          value:{
+            title:"base-chart",
+            marginTop:"",
+            marginBottom:"",
+            marginLeft:"",
+            marginRight:"",
+            legendPosition:"",
+            legendColor:"",
+            width:"",
+            height:""
+          }
+        },
+        inputs:{
           type:Array,
-          selectPath:()
+          value:[]
         }
       }
     }
     constructor(){
-      super();
+      super();//baseChart
+      this.initializeChart()
+    }
+    static get actions() {
+      return {
+        updateExternal(externals) {
+          return {
+            type: 'UPDATE_EXTERNALS',
+            value: externals
+          };
+        },
+        updateChart(chartProperies) {
+          return {
+            type: 'UPDATE_CHART',
+            value: chartProperies
+          };
+        }
+      };
+    }
+    connectedCallback(){
+      super.connectedCallback()
+      //this.dispatch("updateExternal",self.externals)
     }
     draw(compute,paint){
-      debounce(paint(compute()),250)  
+      debounce(paint(compute()),250)
     }
-    
+    initializeChart(){
+        this.set("uuid",PolymerD3.utilities.getUUID())
+    }
+
 
   }
-  window.CustomElements.define(baseChart.is,baseChart)
+  customElements.define(baseChart.is,baseChart)
 
 </script>
 </dom-module>

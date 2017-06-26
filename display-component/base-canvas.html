@@ -1,10 +1,11 @@
 <link rel="import" href="chart-input.html">
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="base-canvas">
 <template>
-  
+
 </template>
 <script>
-  class baseCanvas extends Polymer.Element (){
+  class baseCanvas extends ReduxMixinBehavior(Polymer.Element){
     static get is(){ return 'base-canvas'}
 
     static get properties(){
@@ -16,7 +17,7 @@
         externals:[],
         source:[],
         charts:{
-          selectPath:'charts'
+          statePath:'charts'
         }
       }
     }
@@ -31,7 +32,7 @@
     }
 
   }
-  window.CustomElements.define(baseCanvas.is,baseCanvas)
+  customElements.define(baseCanvas.is,baseCanvas)
 
 </script>
 </dom-module>

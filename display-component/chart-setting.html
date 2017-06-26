@@ -1,10 +1,11 @@
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <link rel="import" href="chart-input.html">
 <dom-module id="chart-setting">
 <template>
   <h3>[[settings.title]]</h3>
 </template>
 <script>
-  class baseChart extends Polymer.Element (){
+  class chartSetting extends ReduxMixinBehavior(Polymer.Element){
     static get is(){ return 'chart-setting'}
 
     static get properties(){
@@ -20,7 +21,7 @@
     }
 
   }
-  window.CustomElements.define(baseChart.is,baseChart)
+  customElements.define(chartSetting.is,chartSetting)
 
 </script>
 </dom-module>
