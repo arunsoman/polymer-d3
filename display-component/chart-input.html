@@ -106,7 +106,8 @@
           <span class="tags">[[ tag.key ]]<i><paper-icon-button icon="delete" on-tap="removeTag" index="{{index}}"></paper-icon-button></i></span>
         </template>
       </div>
-      <h4>[[ label ]]</h4>
+      <h4><paper-input label="[[ label ]]" value="{{label}}"></paper-input>
+      </h4>
       <p>Accepts srings / number</p>
     </div>
 
@@ -123,18 +124,21 @@
         },
         label:{
           type:String
+          // ,statePath(state){
+          //   let chartPath = state.charts[this.parentNode.uuid]
+          //   let key = Number(this.id)
+          //   let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+          //   return objAssignChk ?chartPath.inputs[key].label:""
+          // }
         },
         selectedValue:{
           type:Array,
-          value:[]
-        },
-        selectedVal:{
-          type:String,
-          value:" "
-        },
-        selectedObj:{
-          type:Object,
-          value:{}
+          statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let key = Number(this.id)
+            let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+            return objAssignChk ?chartPath.inputs[key].selectedValue:[]
+          }
         },
         selectedObjs:{
           type:Array,
@@ -158,24 +162,26 @@
     }
     connectedCallback(){
       super.connectedCallback()
+      this._initializeData()
+
+    }
+    _initializeData(){
+      let axisData=this.axis.split("|")
+      this.set("axis",axisData[0])
+      this.set("label",axisData[1])
     }
     add(selectedObject,tagNodeVal) {
-        this.set('selectedObj', selectedObject);
-        this.set("selectedValue", tagNodeVal)
-        let selectedValues = []
-        let selectedObjs = []
+        this.push("selectedValue",tagNodeVal)
+        this.push("selectedObjs",selectedObject)
         let input = {}
-        selectedValues.push(this.selectedValue)
-        selectedObjs.push(this.selectedObj)
         input[this.id] = {
-          axis:this.axis,
-          selectedValue:selectedValues,
-          selectedObjs:selectedObjs,
-          label: this.label
+          axis:this.axis||"",
+          selectedValue:this.selectedValue,
+          selectedObjs:this.selectedObjs,
+          label: this.label||""
         }
         this.set("input", input)
     }
-
     remove(selectedObject) {
         this.splice('selectedObjs', selectedObject, 1);
     }

@@ -16,6 +16,12 @@
         uuid:{
           type:String
         },
+        xAxis:{
+          type:String
+        },
+        yAxis:{
+          type:String
+        },
         settings:{
           type:Object,
           value:{
@@ -59,6 +65,7 @@
     connectedCallback(){
       super.connectedCallback()
       //this.dispatch("updateExternal",self.externals)
+      
     }
     draw(compute,paint){
       debounce(paint(compute()),250)

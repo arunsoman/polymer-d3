@@ -3,8 +3,8 @@
 <dom-module id="pie-chart">
 <template>
   <chart-input-group  uuid="{{uuid}}" input-obj="{{input}}">
-    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{x}}" label="{{xLabel}}" ></chart-input>
-    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{y}}" label="{{yLabel}}" ></chart-input>
+    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{xAxis}}" label="{{xLabel}}" ></chart-input>
+    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{yAxis}}" label="{{yLabel}}" ></chart-input>
   </chart-input-group>
   <h3>[[settings.title]]</h3>
   <chart-legend></chart-legend>
@@ -46,6 +46,7 @@
       console.log("====", this.inputs)
       chartProperies= {id,settings,redraw,inputs}
       this.dispatch("updateChart",chartProperies)
+
     }
     _compute(){
       let slice = this.inputs[0].selectedValue;

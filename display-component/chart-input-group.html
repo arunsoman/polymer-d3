@@ -103,21 +103,11 @@ const initialExt = [{
         }
         _inputChange(objData){
           // debugger
-          console.log("----", objData)
           let key = Object.keys( objData )
           if(objData!== undefined && key.length!=0){
-
             let objKey = Number(key)
-            if(this.inputs[objKey]=== undefined){
-              this.inputs[objKey]=objData[key]
-            }else{
-              this.inputs[objKey].axis =  objData[key].axis
-              this.inputs[objKey].label = objData[key].label
-              this.inputs[objKey].selectedObjs.push(objData[key].selectedObjs[0])
-              this.inputs[objKey].selectedValue.push(objData[key].selectedValue[0])
-            }
-
-            this.dispatch("updateInputs", {uuid:this.uuid,inputs:this.inputs})
+            let updatedInput = objData[key]
+            this.dispatch("updateInputs", {uuid:this.uuid,objKey:objKey,input:updatedInput})
           }
 
         }

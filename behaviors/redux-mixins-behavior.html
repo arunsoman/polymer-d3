@@ -21,13 +21,13 @@
   const chartReducer = (state, action) =>{
       switch (action.type) {
           case 'ADD_CHART':
-              return [...state, action.value]
+              return Object.assign({},state,{[action.value.id]:action.value})
           case 'UPDATE_CHART':
-              state[action.value.id]=action.value
-              return state
-            case'UPDATE_CHART_INPUTS':
-              state[action.value.uuid].inputs=action.value.inputs
-              return state
+              return Object.assign({},state,{[action.value.id]:action.value})
+          case'UPDATE_CHART_INPUTS':
+              var clonedObj = Object.assign({},state)
+              clonedObj[action.value.uuid].inputs[action.value.objKey]=action.value.input
+              return clonedObj
           default:
               return state;
       }
