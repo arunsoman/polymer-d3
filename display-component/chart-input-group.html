@@ -29,6 +29,7 @@
       <template is="dom-repeat" items="[[ externals ]]">
         <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
       </template>
+      <paper-icon-button icon="menu" style="color: red; float:right" ></paper-icon-button>
     </div>
 
     <div id="inputItems">
@@ -54,6 +55,7 @@ const initialExt = [{
   type: 'Number',
   value: 3
 }]
+
     class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
         static get is() {
             return 'chart-input-group';
@@ -78,6 +80,7 @@ const initialExt = [{
               type:Object,
               value:{}
             }
+
           }
         }
         static get actions() {
@@ -99,7 +102,6 @@ const initialExt = [{
         connectedCallback(){
           super.connectedCallback()
           this.set("externals", initialExt)
-
         }
         _inputChange(objData){
           // debugger

@@ -103,10 +103,11 @@
     <div class="item-holder" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
       <div class="item-drop">
         <template is="dom-repeat" items="{{selectedObjs}}" as="tag" index-as="tagIndex">
-          <span class="tags">[[ tag.key ]]<i><paper-icon-button icon="delete" on-tap="removeTag" index="{{index}}"></paper-icon-button></i></span>
+          <span class="tags">[[ tag.key ]]<i><paper-icon-button icon="delete" on-tap="remove" index="{{index}}"></paper-icon-button></i></span>
         </template>
       </div>
-      <h4><paper-input label="[[ label ]]" value="{{label}}"></paper-input>
+      <h4>[[ label ]]
+        <paper-input label="[[ label ]]" value="{{label}}" onchange="onLabelChange"></paper-input>
       </h4>
       <p>Accepts srings / number</p>
     </div>
@@ -175,17 +176,22 @@
     add(selectedObject,tagNodeVal) {
         this.push("selectedValue",tagNodeVal)
         this.push("selectedObjs",selectedObject)
-        let input = {}
-        input[this.id] = {
-          axis:this.axis||"",
-          selectedValue:this.selectedValue,
-          selectedObjs:this.selectedObjs,
-          label: this.label||""
-        }
-        this.set("input", input)
+        this.setInputObj()
     }
-    remove(selectedObject) {
-        this.splice('selectedObjs', selectedObject, 1);
+    remove(e) {
+        this.splice('selectedValue', e.model.tagIndex, 1);
+        this.splice('selectedObjs', e.model.tagIndex, 1);
+        this.setInputObj()
+    }
+    setInputObj(){
+      let input = {}
+      input[this.id] = {
+        axis:this.axis||"",
+        selectedValue:this.selectedValue,
+        selectedObjs:this.selectedObjs,
+        label: this.label||""
+      }
+      this.set("input", input)
     }
 
     dragLeave(e){
@@ -206,19 +212,13 @@
       }
     }
     addTag(tagIndex){
-        let tagNode = this.parentElement.externals[tagIndex];
+        let tagNode = this.parentNode.externals[tagIndex];
         let tagNodeVal = tagNode.value;
         this.add(tagNode,tagNodeVal)
     }
     onLabelChange(){
-      let input = {}
-      input[this.id] = {
-        axis:this.axis||"",
-        selectedValue:this.selectedValue,
-        selectedObjs:this.selectedObjs,
-        label: this.label||""
-      }
-      this.set("input", input)
+      this.setInputObj()
+      debugger
     }
   }
   customElements.define(ChartInput.is,ChartInput)

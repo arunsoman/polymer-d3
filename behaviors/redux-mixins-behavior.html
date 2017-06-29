@@ -25,7 +25,7 @@
           case 'UPDATE_CHART':
               return Object.assign({},state,{[action.value.id]:action.value})
           case'UPDATE_CHART_INPUTS':
-              var clonedState = Object.assign({},state)
+              let clonedState = Object.assign({},state)
               clonedState[action.value.uuid].inputs[action.value.objKey]=action.value.input
               return clonedState
           default:
