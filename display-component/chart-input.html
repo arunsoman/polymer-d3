@@ -122,14 +122,17 @@
         axis:{
           type:String
         },
+        labelRdx:{
+          type:String
+          ,statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let key = Number(this.id)
+            let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+            return objAssignChk ?chartPath.inputs[key].label:""
+          }
+        },
         label:{
           type:String
-          // ,statePath(state){
-          //   let chartPath = state.charts[this.parentNode.uuid]
-          //   let key = Number(this.id)
-          //   let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
-          //   return objAssignChk ?chartPath.inputs[key].label:""
-          // }
         },
         selectedValue:{
           type:Array,
@@ -163,7 +166,6 @@
     connectedCallback(){
       super.connectedCallback()
       this._initializeData()
-
     }
     _initializeData(){
       let axisData=this.axis.split("|")
@@ -207,6 +209,16 @@
         let tagNode = this.parentElement.externals[tagIndex];
         let tagNodeVal = tagNode.value;
         this.add(tagNode,tagNodeVal)
+    }
+    onLabelChange(){
+      let input = {}
+      input[this.id] = {
+        axis:this.axis||"",
+        selectedValue:this.selectedValue,
+        selectedObjs:this.selectedObjs,
+        label: this.label||""
+      }
+      this.set("input", input)
     }
   }
   customElements.define(ChartInput.is,ChartInput)
