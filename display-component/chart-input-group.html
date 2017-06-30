@@ -187,15 +187,9 @@ const initialsource = [
                 value: source
               };
             },
-            updateInputs(inputs) {
+            addUpdateInputs(inputs) {
               return {
-                type: 'UPDATE_CHART_INPUTS',
-                value: inputs
-              };
-            },
-            addInputs(inputs) {
-              return {
-                type: 'ADD_CHART_INPUTS',
+                type: 'ADD_UPDATE_CHART_INPUTS',
                 value: inputs
               };
             }
@@ -217,11 +211,7 @@ const initialsource = [
           if(objData!== undefined && key.length!=0){
             let objKey = Number(key)
             let updatedInput = objData[key]
-            if(this.inputs[key]){
-              this.dispatch("updateInputs", {uuid:this.uuid,objKey:objKey,input:updatedInput})
-            }else{
-              this.dispatch("addInputs", {uuid:this.uuid,objKey:objKey,input:updatedInput})
-            }
+            this.dispatch("addUpdateInputs", {uuid:this.uuid,objKey:objKey,input:updatedInput})
           }
 
         }

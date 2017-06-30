@@ -24,22 +24,13 @@
               return Object.assign({},state,{[action.value.id]:action.value})
           case 'UPDATE_CHART':
               return Object.assign({},state,{[action.value.id]:action.value})
-          case 'ADD_CHART_INPUTS':
-              let clonedState = Object.assign({},state)
-              clonedState[action.value.uuid].inputs.splice(action.value.objKey,0,action.value.input)
-              return clonedState
-          case'UPDATE_CHART_INPUTS':
-          debugger
-          return Object.assign({},state,{
-            [action.value.uuid]:Object.assign({},
+          case 'ADD_UPDATE_CHART_INPUTS':
+            return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
               state[action.value.uuid],{
-                inputs:state[action.value.uuid].inputs
-                .map((item, index)=>index==action.value.objKey
-                    ? action.value.input
-                    : item
-                  )
-                })
-              })
+                inputs:Object.assign([],state[action.value.uuid].inputs,[
+                  action.value.input
+                ])
+              })})
           default:
               return state;
       }

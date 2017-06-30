@@ -128,7 +128,7 @@
           ,statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
             let key = Number(this.id)
-            let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+            let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].label:""
           }
         },
@@ -140,7 +140,7 @@
           statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
             let key = Number(this.id)
-            let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+            let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].selectedValue:[]
           }
         },
@@ -149,7 +149,7 @@
           statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
             let key = Number(this.id)
-            let objAssignChk = (chartPath !== undefined && chartPath.inputs[key]!==undefined && chartPath.inputs.length)
+            let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].selectedObjs:[]
           }
         },
@@ -169,10 +169,10 @@
       this._initializeData()
     }
     _initializeData(){
-      // let axisData=this.axis.split("|")
-      // this.set("axis",axisData[0])
-      // this.set("label",axisData[1])
-      debugger
+      let axisData=this.axis.split("|")
+      this.set("axis",axisData[0])
+      this.set("label",axisData[1])
+      // debugger
     }
     add(selectedObject,tagNodeVal) {
         this.push("selectedValue",tagNodeVal)
