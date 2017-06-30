@@ -3,14 +3,16 @@
 <dom-module id="pie-chart">
 <template>
   <chart-input-group  uuid="{{uuid}}" input-obj="{{input}}">
-    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{xAxis}}" label="{{xLabel}}" ></chart-input>
-    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{yAxis}}" label="{{yLabel}}" ></chart-input>
+    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{xAxis}}" ></chart-input>
+    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{yAxis}}" ></chart-input>
+    <chart-input input="{{input}}" id="2" slot="chart-input" axis="{{zAxis}}"></chart-input>
   </chart-input-group>
   <h3>[[settings.title]]</h3>
   <chart-legend></chart-legend>
   <chart-settings></chart-settings>
 </template>
 <script>
+
   class pieChart extends baseChart{
     static get is(){ return 'pie-chart'}
 
@@ -19,20 +21,25 @@
 
       }
     }
+
     constructor(){
       super();
 
     }
-
     connectedCallback(){
       super.connectedCallback()
       this._dispatchObj()
+      // d3.layout.pie()
+      // .value(function(d) {
+      //   return d.count;
+      // })
+      // .sort(null);
     }
     attached(){
-      redraw();
+      this.redraw();
     }
     redraw(){
-      draw(_paint(_compute()));
+      this.draw(this._paint(this._compute()));
     }
 
     _dispatchObj(){
@@ -42,8 +49,8 @@
       let id= this.uuid
       let settings=this.settings
       let inputs = this.inputs
-      let redraw = this.redraw
-      chartProperies= {id,settings,redraw,inputs}
+      let redrawChk = this.redrawChk
+      chartProperies= {id,settings,redrawChk,inputs}
       this.dispatch("updateChart",chartProperies)
 
     }
