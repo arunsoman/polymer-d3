@@ -1,4 +1,5 @@
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+
 <link rel="import" href="chart-setting.html"/>
 <dom-module id="base-chart">
 <template>
@@ -6,7 +7,9 @@
 </template>
 <script>
 
-  class baseChart extends ReduxMixinBehavior(Polymer.Element){
+  class baseChart extends Polymer.mixinBehaviors(
+    [PolymerD3.toolTipBehavior],ReduxMixinBehavior(Polymer.Element)
+    ){
     static get is(){ return 'base-chart'}
 
     static get properties(){
@@ -17,33 +20,63 @@
         uuid:{
           type:String
         },
-        xAxis:{
-          type:String
-        },
-        yAxis:{
-          type:String
-        },
-        settings:{
-          type:Object,
-          value:{
-            title:"base-chart",
-            marginTop:"",
-            marginBottom:"",
-            marginLeft:"",
-            marginRight:"",
-            legendPosition:"",
-            legendColor:"",
-            width:"",
-            height:""
+        axisKeys:{
+          type:String,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            let keys = keyChk && Object.keys(chartPath.inputs)
+            return keys
           }
         },
         inputs:{
           type:Array,
           statePath(state){
             var chartPath = state.charts[this.uuid]
-            return chartPath ? chartPath['inputs']:[]
+            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            return keyChk ? chartPath.inputs:{}
           },
           readOnly:true
+        },
+        // groupBy:{
+        //   type:String
+        // },
+        // x:{
+        //   type:String
+        // },
+        // y:{
+        //   type:String
+        // },
+        // z:{
+        //   type:String
+        // },
+        settings:{
+          type:Object,
+          value:()=>{
+            return {
+              title:"",
+              marginTop:"",
+              marginBottom:"",
+              marginLeft:"",
+              marginRight:"",
+              legendPosition:"",
+              legendColor:"",
+              width:960,
+              height:500
+            }
+          }
+        },
+        externals:{
+          type:Array,
+          statePath(state){
+            return state.externals
+          }
+        },
+        source:{
+          type:Array,
+          statePath(state){
+            return state.source
+          }
         }
       }
     }
@@ -54,7 +87,6 @@
     constructor(){
       super();//baseChart
       this.initializeChart()
-      //barChart.draw(data);
     }
     static get actions() {
       return {
@@ -68,23 +100,25 @@
     }
     connectedCallback(){
       super.connectedCallback()
-      //this.dispatch("updateExternal",self.externals)
-
     }
     _chartDraw(inputs){
-      debugger
-      if(inputs && inputs.length){
-        this.attached()
+      if(inputs && Object.keys(inputs).length!=0){
+        //chart axis dre set here, the axis key's defined in "chart-input" module
+        this.axisKeys.forEach(axis=>{this.set(axis,axis)})
+        this.redraw()
       }
     }
-    draw(compute,paint){
-      this.debounce(paint(compute()),250)
+    draw(paint){
+      //this.debounce(arg,interval)
+      this.debouncer(paint,250)
+    }
+    debouncer(arg,interval){
+        return Polymer.Debouncer.debounce(this.debouncer,
+          Polymer.Async.timeOut.after(interval), () => {arg});
     }
     initializeChart(){
         this.set("uuid",PolymerD3.utilities.getUUID())
     }
-
-
   }
   customElements.define(baseChart.is,baseChart)
 

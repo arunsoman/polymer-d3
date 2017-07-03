@@ -2,14 +2,14 @@
 <!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
 <dom-module id="pie-chart">
 <template>
-  <chart-input-group  uuid="{{uuid}}" input-obj="{{input}}">
-    <chart-input input="{{input}}" id="0" slot="chart-input" axis="{{xAxis}}" ></chart-input>
-    <chart-input input="{{input}}" id="1" slot="chart-input" axis="{{yAxis}}" ></chart-input>
-    <!-- <chart-input input="{{input}}" id="2" slot="chart-input" axis="{{zAxis}}"></chart-input> -->
+  <chart-input-group  uuid="[[uuid]]">
+    <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+    <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
   </chart-input-group>
   <h3>[[settings.title]]</h3>
   <chart-legend></chart-legend>
   <chart-settings></chart-settings>
+  <svg id="svg"></svg>
 </template>
 <script>
 
@@ -18,25 +18,29 @@
 
     static get properties(){
       return{
-
+        chartWidth:{
+          type:Number,
+          value:960
+        },
+        chartHeight:{
+          type:Number,
+          value:500
+        },
+        innerRadius:{
+          type:Object,
+          value:{
+            selectedValue: 0
+          }
+        }
       }
     }
 
     constructor(){
       super();
-
     }
     connectedCallback(){
       super.connectedCallback()
       this._dispatchObj()
-      // d3.layout.pie()
-      // .value(function(d) {
-      //   return d.count;
-      // })
-      // .sort(null);
-    }
-    attached(){
-      this.redraw();
     }
     redraw(){
       this.draw(this._paint(this._compute()));
@@ -44,7 +48,6 @@
 
     _dispatchObj(){
       let self = this
-
       let chartProperies={}
       let id= this.uuid
       let settings=this.settings
@@ -55,22 +58,36 @@
 
     }
     _compute(){
-      let slice = this.inputs[0].selectedValue;
-        let sliceSize = this.inputs[1].selectedValue;
+      // debugger
+      //axis are mentioned in the chart-input module
+      let slice = this.x && this.inputs[this.x].selectedValue
+      let sliceSize = this.y && this.inputs[this.y].selectedValue
+
         // if slice exists, it would be an array
-        if (!slice || !sliceSize) {
+        if (!slice || !sliceSize ) {
             return false;
         }
-        let groupBy = this.inputs[2].selectedValue;
+        let selectedValueChk = slice.length<=0 || sliceSize.length<=0
+
+        let groupBy = this.group && this.inputs[this.groupBy].selectedValue
         slice = slice[0];
         sliceSize = sliceSize[0];
 
         let width = this.chartWidth,
             height = this.chartHeight,
             radius = Math.min(width, height) / 2;
-        let innerRadius = this.area[6].selectedValue;
+
+        let innerRadius = this.innerRadius.selectedValue;
 
         let color = d3.scale.category20c();
+        // let color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+        // let color = d3.scaleOrdinal()
+
+        let pie = d3.layout.pie()
+            .sort(null)
+            .value(function(d) {
+                return d[sliceSize];
+            });
 
         let arc = d3.svg.arc()
             .outerRadius(radius - 10)
@@ -86,45 +103,54 @@
         } else {
             groupedData = d3.nest().key(d => d[groupBy]).entries(this.source);
         }
-        let pie = d3.layout.pie()
-            .sort(null)
-            .value(function(d) {
-                return d[sliceSize];
-            });
-        return width, height, pie, arc, slice, color
+
+        return {slice, width, height, color, arc, pie, selectedValueChk}
     }
-    _paint(width, height, pie, arc, slice, color) {
-      this.parentG.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
-        let me = this;
-        if (this.parentG) {
-            this.parentG.html('');
-        }
-        let g = this.parentG.selectAll('.arc')
-            .data(pie(me.source))
-            .enter().append('g')
-            .attr('class', 'arc');
+    _paint(obj) {
+      // this.parentG = d3.select("svg")
 
-        let segments = g.append('path')
-            .attr('d', arc)
-            .style('fill', function(d) {
-                return color(d.data[slice]);
-            })
-            .attr('class', 'pie-slice');
+      let parentG = d3.select(this.$.svg)
+      if(parentG){
+        parentG.html("")
+      }
 
-        let htmlCallback = d => {
-            // temp. setup to check if grouping works
-            let gpName = d.data.groupName || d.data[this.inputs[1].selectedValue[0]];
-            let str = '<table class="pie-tooltip">' +
-                '<tr>' +
-                '<td>' + d.data[this.inputs[0].selectedValue] + ',</td>' +
-                '<td>' + gpName + '</td>' +
-                '</tr>' +
-                '</table>';
-            return str;
+      if(!obj || obj.selectedValueChk){
+        return false
+      }
+      if(this.$.svg){
+        this.$.svg.setAttribute("width",obj.width)
+        this.$.svg.setAttribute("height",obj.height)
+      }
+
+      let self = this
+      let g = parentG.selectAll('.arc')
+          .data(obj.pie(self.source))
+          .enter().append('g')
+          .attr('class', 'arc');
+
+      let segments = g.append('path')
+          .attr('d', obj.arc)
+          .style('fill', function(d) {
+              return obj.color(d.data[obj.slice]);
+          })
+          .attr('class', 'pie-slice');
+
+    segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+
+      let htmlCallback = d => {
+          // temp. setup to check if grouping works
+          let gpName = d.data.groupName || d.data[this.inputs[this.y].selectedValue[0]];
+          let str = '<table class="pie-tooltip">' +
+              '<tr>' +
+              '<td>' + d.data[this.inputs[this.x].selectedValue[0]] + ',</td>' +
+              '<td>' + gpName + '</td>' +
+              '</tr>' +
+              '</table>';
+          return str;
         };
-        // attachToolTip: (parentG, elem, customClass, htmlCallback) => {
-        this.attachToolTip(this.parentG, segments, 'pie-slice', htmlCallback);
+        this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
     }
+
   }
   customElements.define(pieChart.is,pieChart)
 

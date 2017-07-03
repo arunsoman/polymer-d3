@@ -27,9 +27,9 @@
           case 'ADD_UPDATE_CHART_INPUTS':
             return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
               state[action.value.uuid],{
-                inputs:Object.assign([],state[action.value.uuid].inputs,[
-                  action.value.input
-                ])
+                inputs:Object.assign({},state[action.value.uuid].inputs,{
+                  [action.value.objKey]:action.value.input
+                })
               })})
           default:
               return state;

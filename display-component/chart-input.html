@@ -127,7 +127,7 @@
           type:String
           ,statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
-            let key = Number(this.id)
+            let key = this.axis
             let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].label:""
           }
@@ -139,7 +139,7 @@
           type:Array,
           statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
-            let key = Number(this.id)
+            let key = this.axis
             let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].selectedValue:[]
           }
@@ -148,7 +148,7 @@
           type:Array,
           statePath(state){
             let chartPath = state.charts[this.parentNode.uuid]
-            let key = Number(this.id)
+            let key = this.axis
             let objAssignChk = (chartPath && chartPath.inputs[key])
             return objAssignChk ?chartPath.inputs[key].selectedObjs:[]
           }
@@ -160,6 +160,19 @@
         }
       }
     }
+    static get actions() {
+      return {
+        addUpdateInputs(input) {
+          return {
+            type: 'ADD_UPDATE_CHART_INPUTS',
+            value: input
+          };
+        }
+      }
+    }
+    static get observers(){
+      return["_inputChange(input)"]
+    }
     constructor(){
       super();
 
@@ -168,10 +181,19 @@
       super.connectedCallback()
       this._initializeData()
     }
+    _inputChange(input){
+      // debugger
+      let key = Object.keys( input )
+      if(input!== undefined && key.length!=0){
+        let updatedInput = input[key]
+        this.dispatch("addUpdateInputs", {uuid:this.parentNode.uuid,objKey:key,input:updatedInput})
+      }
+
+    }
     _initializeData(){
-      let axisData=this.axis.split("|")
-      this.set("axis",axisData[0])
-      this.set("label",axisData[1])
+      // let axisData=this.axis.split("|")
+      // this.set("axis",axisData[0])
+      // this.set("label",axisData[1])
       // debugger
     }
     add(selectedObject,tagNodeVal) {
@@ -186,7 +208,7 @@
     }
     setInputObj(){
       let input = {}
-      input[this.id] = {
+      input[this.axis] = {
         axis:this.axis||"",
         selectedValue:this.selectedValue,
         selectedObjs:this.selectedObjs,
@@ -204,6 +226,9 @@
     }
     drop(e){
       e.preventDefault();
+      if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
+        return false
+      }
       this.parentElement.$.inputItems.classList.remove('drag-active');
       var tagIndex = e.dataTransfer.getData('text');
       if(tagIndex){

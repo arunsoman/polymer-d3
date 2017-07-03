@@ -129,7 +129,7 @@ Polymer({
             });
         return width, height, pie, arc, slice, color
     },
-    
+
     paint:function(width, height, pie, arc, slice, color) {
 
         this.parentG.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
@@ -148,7 +148,7 @@ Polymer({
                 return color(d.data[slice]);
             })
             .attr('class', 'pie-slice');
-        
+
         let htmlCallback = d => {
             // temp. setup to check if grouping works
             let gpName = d.data.groupName || d.data[this.inputs[1].selectedValue[0]];

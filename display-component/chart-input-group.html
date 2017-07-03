@@ -159,17 +159,17 @@ const initialsource = [
               statePath(state){
                 return state.source
               }
-            },
-            inputs:{
-              type:Array,
-              statePath(state){
-                return state.charts[this.uuid]['inputs']
-              }
-            },
-            inputObj:{
-              type:Object,
-              value:{}
-            }
+            }//,
+            // inputs:{
+            //   type:Array,
+            //   statePath(state){
+            //     return state.charts[this.uuid]['inputs']
+            //   }
+            // },
+            // inputObj:{
+            //   type:Object,
+            //   value:{}
+            // }
 
           }
         }
@@ -186,34 +186,15 @@ const initialsource = [
                 type: 'UPDATE_SOURCE',
                 value: source
               };
-            },
-            addUpdateInputs(inputs) {
-              return {
-                type: 'ADD_UPDATE_CHART_INPUTS',
-                value: inputs
-              };
             }
           }
         }
         constructor() {
             super();
         }
-        static get observers(){
-          return["_inputChange(inputObj)"]
-        }
         connectedCallback(){
           super.connectedCallback()
           this._initializeData()
-        }
-        _inputChange(objData){
-          // debugger
-          let key = Object.keys( objData )
-          if(objData!== undefined && key.length!=0){
-            let objKey = Number(key)
-            let updatedInput = objData[key]
-            this.dispatch("addUpdateInputs", {uuid:this.uuid,objKey:objKey,input:updatedInput})
-          }
-
         }
         _initializeData(){
           this.dispatch("updateSource",initialsource)
