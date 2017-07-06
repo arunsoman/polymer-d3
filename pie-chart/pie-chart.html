@@ -9,7 +9,8 @@
     <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
-  <svg id="svg"></svg>
+  <!-- <svg id="svg"></svg> -->
+  <div id="grpContainer"></div>
 </template>
 <script>
 
@@ -50,20 +51,38 @@
     _compute(){
 
       //axis are mentioned in the chart-input module
-      let itemGrpX = this.x && this.inputs[this.x].itemGrp
-      let itemGrpY = this.y && this.inputs[this.y].itemGrp
-      let groupBy = this.groupBy && this.inputs[this.groupBy].itemGrp
+      let itemGrpX = this.x ? this.inputs[this.x].itemGrp:[]
+      let itemGrpY = this.y ? this.inputs[this.y].itemGrp:[]
+      let itemChk = itemGrpX.length<=0 || itemGrpY.length<=0
 
-      if (!itemGrpX || !itemGrpY ) {
-        if(!groupBy){
+      let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp:[]
+      let itemGrpChk = groupBy.length<=0
+
+      if (itemChk) {
+        if(itemGrpChk){
           return false;
         }
       }
-      let width = this.settings.width.value,
-          height = this.settings.height.value,
-            radius = Math.min(width, height) / 2;
+      //"itemChk" for avoid error from chart
+      itemChk= itemChk?itemGrpChk:itemChk
 
-        let innerRadius = this.innerRadius.selectedValue;
+      let width = this.settings.width.value,
+          height = this.settings.height.value
+      let innerRadius
+      let radius = Math.min(width, height) / 2
+
+        if(!itemGrpChk){
+          let grpCnt = groupBy.length
+          width = width/grpCnt
+          height = height/grpCnt
+          radius = Math.min(width, height) / 2
+          innerRadius = radius/2
+        }else{
+          width = width
+          height = height
+          innerRadius = this.innerRadius.selectedValue
+        }
+        innerRadius = innerRadius;
 
         let color = d3.scale.category20c();
         // let color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
@@ -71,20 +90,16 @@
 
         //get chart data once pass "itemGrp" into the "getChartData" method
         let itemGrp
-        let itemGrpChk = !groupBy || groupBy.length<=0
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemGrpChk?itemGrpX.length<=0 || itemGrpY.length<=0:itemGrpChk
-
-        itemGrp = itemGrpChk?itemGrpX.concat.apply(itemGrpX,itemGrpY):groupBy
+        itemGrp = !itemGrpChk?groupBy:itemGrpX.concat.apply(itemGrpX,itemGrpY)
 
         let groupedData
         let source = this.getChartData(itemGrp)
-        if (itemGrpChk) {
-            groupedData = d3.nest().key(d => d).entries(source);
+        if (!itemGrpChk) {
+          groupedData = d3.nest().key(d => d.item).entries(source);
         } else {
-            groupedData = d3.nest().key(d => d.item).entries(source);
+          groupedData = d3.nest().key(d => d).entries(source);
         }
+        let grpChk = groupBy.length>=2?true:itemChk
 
         let pie = d3.layout.pie()
             .value(d=>d.value)
@@ -98,31 +113,36 @@
             .outerRadius(radius - 40)
             .innerRadius(radius - 40);
 
-        return { width, height, color, arc, pie, itemChk, itemGrpChk,groupedData}
+        return { width, height, radius, color, arc, pie, itemChk, itemGrpChk, grpChk, groupedData}
     }
     _paint(obj) {
       // this.parentG = d3.select("svg")
 
-      let parentG = d3.select(this.$.svg)
-      if(parentG){
-        parentG.html("")
-      }
+      let parentG= d3.select(this.$.grpContainer)
 
+      if(!obj.grpChk){
+          parentG.html("")
+      }
       if(!obj || obj.itemChk){
         return false
       }
-      if(this.$.svg){
-        this.$.svg.setAttribute("width",obj.width)
-        this.$.svg.setAttribute("height",obj.height)
-      }
-
       let self = this
+
       parentG.data(obj.groupedData).enter()
+
+      parentG = parentG.append("svg")
+        .style("display", "inline-block")
+        .attr("width", obj.width)
+        .attr("height", obj.height)
+      // parentG.append("text")
+      //       .attr("dy", ".35em")
+      //       .attr("text-anchor", "middle")
+      //       .text(function(d) { return d.key; });
+
       let g = parentG.selectAll('.arc')
           .data(d=>obj.pie(d.values))
           .enter().append('g')
           .attr('class', 'arc');
-
       let segments = g.append('path')
           .attr('d', obj.arc)
           .style('fill', function(d) {
@@ -130,9 +150,9 @@
           })
           .attr('class', 'pie-slice');
 
-    segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+      segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
-      let htmlCallback = d => {
+        let htmlCallback = d => {
           // temp. setup to check if grouping works
           // console.log("-d.data--",d.data)
           // let gpName = d.data.groupName || d.data[this.inputs[this.y].selectedValue[0]];
