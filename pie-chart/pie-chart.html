@@ -6,6 +6,7 @@
   <chart-input-group  uuid="[[uuid]]">
     <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
     <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+    <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
   <svg id="svg"></svg>
@@ -30,7 +31,7 @@
     constructor(){
       super();
     }
-    
+
     redraw(){
       this.draw(this._paint(this._compute()));
     }
@@ -47,23 +48,19 @@
 
     }
     _compute(){
-      // debugger
+
       //axis are mentioned in the chart-input module
-      let slice = this.x && this.inputs[this.x].selectedValue
-      let sliceSize = this.y && this.inputs[this.y].selectedValue
+      let itemGrpX = this.x && this.inputs[this.x].itemGrp
+      let itemGrpY = this.y && this.inputs[this.y].itemGrp
+      let groupBy = this.groupBy && this.inputs[this.groupBy].itemGrp
 
-        // if slice exists, it would be an array
-        if (!slice || !sliceSize ) {
-            return false;
+      if (!itemGrpX || !itemGrpY ) {
+        if(!groupBy){
+          return false;
         }
-        let selectedValueChk = slice.length<=0 || sliceSize.length<=0
-
-        let groupBy = this.group && this.inputs[this.groupBy].selectedValue
-        slice = slice[0];
-        sliceSize = sliceSize[0];
-
-        let width = this.settings.width.value,
-            height = this.settings.height.value,
+      }
+      let width = this.settings.width.value,
+          height = this.settings.height.value,
             radius = Math.min(width, height) / 2;
 
         let innerRadius = this.innerRadius.selectedValue;
@@ -72,11 +69,26 @@
         // let color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
         // let color = d3.scaleOrdinal()
 
+        //get chart data once pass "itemGrp" into the "getChartData" method
+        let itemGrp
+        let itemGrpChk = !groupBy || groupBy.length<=0
+
+        //"itemChk" for avoid error from chart
+        let itemChk = itemGrpChk?itemGrpX.length<=0 || itemGrpY.length<=0:itemGrpChk
+
+        itemGrp = itemGrpChk?itemGrpX.concat.apply(itemGrpX,itemGrpY):groupBy
+
+        let groupedData
+        let source = this.getChartData(itemGrp)
+        if (itemGrpChk) {
+            groupedData = d3.nest().key(d => d).entries(source);
+        } else {
+            groupedData = d3.nest().key(d => d.item).entries(source);
+        }
+
         let pie = d3.layout.pie()
-            .sort(null)
-            .value(function(d) {
-                return d[sliceSize];
-            });
+            .value(d=>d.value)
+            .sort(null);
 
         let arc = d3.svg.arc()
             .outerRadius(radius - 10)
@@ -86,14 +98,7 @@
             .outerRadius(radius - 40)
             .innerRadius(radius - 40);
 
-        let groupedData;
-        if (!groupBy) {
-            groupedData = d3.nest().key(d => d).entries(this.source);
-        } else {
-            groupedData = d3.nest().key(d => d[groupBy]).entries(this.source);
-        }
-
-        return {slice, width, height, color, arc, pie, selectedValueChk}
+        return { width, height, color, arc, pie, itemChk, itemGrpChk,groupedData}
     }
     _paint(obj) {
       // this.parentG = d3.select("svg")
@@ -103,7 +108,7 @@
         parentG.html("")
       }
 
-      if(!obj || obj.selectedValueChk){
+      if(!obj || obj.itemChk){
         return false
       }
       if(this.$.svg){
@@ -112,15 +117,16 @@
       }
 
       let self = this
+      parentG.data(obj.groupedData).enter()
       let g = parentG.selectAll('.arc')
-          .data(obj.pie(self.source))
+          .data(d=>obj.pie(d.values))
           .enter().append('g')
           .attr('class', 'arc');
 
       let segments = g.append('path')
           .attr('d', obj.arc)
           .style('fill', function(d) {
-              return obj.color(d.data[obj.slice]);
+              return obj.color(d.data.value);
           })
           .attr('class', 'pie-slice');
 
@@ -128,10 +134,12 @@
 
       let htmlCallback = d => {
           // temp. setup to check if grouping works
-          let gpName = d.data.groupName || d.data[this.inputs[this.y].selectedValue[0]];
+          // console.log("-d.data--",d.data)
+          // let gpName = d.data.groupName || d.data[this.inputs[this.y].selectedValue[0]];
+          let gpName = d.data.groupName || d.data.item;
           let str = '<table class="pie-tooltip">' +
               '<tr>' +
-              '<td>' + d.data[this.inputs[this.x].selectedValue[0]] + ',</td>' +
+              '<td>' + d.data.value + ',</td>' +
               '<td>' + gpName + '</td>' +
               '</tr>' +
               '</table>';

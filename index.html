@@ -51,6 +51,7 @@
         value: 3
       }]
       d3.csv("data/bar-data.csv", function(error, csv) {
+        console.log("--csv", csv)
         var data = csv.map(function(row) {
           return [
             Number(row.Q1), Number(row.Q2),

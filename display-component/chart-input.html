@@ -144,6 +144,15 @@
             return objAssignChk ?chartPath.inputs[key].selectedValue:[]
           }
         },
+        itemGrp:{
+          type:Array,
+          statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let key = this.axis
+            let objAssignChk = (chartPath && chartPath.inputs[key])
+            return objAssignChk ?chartPath.inputs[key].itemGrp:[]
+          }
+        },
         selectedObjs:{
           type:Array,
           statePath(state){
@@ -199,11 +208,13 @@
     add(selectedObject,tagNodeVal) {
         this.push("selectedValue",tagNodeVal)
         this.push("selectedObjs",selectedObject)
+        this.push("itemGrp",selectedObject.key)
         this.setInputObj()
     }
     remove(e) {
         this.splice('selectedValue', e.model.tagIndex, 1);
         this.splice('selectedObjs', e.model.tagIndex, 1);
+        this.splice('itemGrp', e.model.tagIndex, 1);
         this.setInputObj()
     }
     setInputObj(){
@@ -212,7 +223,8 @@
         axis:this.axis||"",
         selectedValue:this.selectedValue,
         selectedObjs:this.selectedObjs,
-        label: this.label||""
+        label: this.label||"",
+        itemGrp:this.itemGrp
       }
       this.set("input", input)
     }
@@ -226,9 +238,9 @@
     }
     drop(e){
       e.preventDefault();
-      if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
-        return false
-      }
+      // if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
+      //   return false
+      // }
       this.parentElement.$.inputItems.classList.remove('drag-active');
       var tagIndex = e.dataTransfer.getData('text');
       if(tagIndex){
