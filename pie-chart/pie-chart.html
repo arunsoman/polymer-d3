@@ -1,8 +1,15 @@
 <link rel="import" href="../display-component/base-chart.html">
 <!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
 <dom-module id="pie-chart">
-<template>
-
+  <template>
+<style>
+  body {
+  text-align: center;
+  }
+  svg {
+  font: 29px sans-serif;
+  }
+  </style>
   <chart-input-group  uuid="[[uuid]]">
     <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
     <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
@@ -12,72 +19,73 @@
   <!-- <svg id="svg"></svg> -->
   <div id="grpContainer"></div>
 </template>
-<script>
+  <script>
+    class pieChart extends baseChart {
+      static get is() {
+        return 'pie-chart'
+      }
 
-  class pieChart extends baseChart{
-    static get is(){ return 'pie-chart'}
 
-
-    static get properties(){
-      return{
-        innerRadius:{
-          type:Object,
-          value:{
-            selectedValue: 0
+      static get properties() {
+        return {
+          innerRadius: {
+            type: Object,
+            value: {
+              selectedValue: 0
+            }
           }
         }
       }
-    }
 
-    constructor(){
-      super();
-    }
-
-    redraw(){
-      this.draw(this._paint(this._compute()));
-    }
-
-    _dispatchObj(){
-      let self = this
-      let chartProperies={}
-      let id= this.uuid
-      let settings=this.settings
-      let inputs = this.inputs
-      let redrawChk = this.redrawChk
-      // chartProperies= {id,settings,redrawChk,inputs}
-      // this.dispatch("updateChart",chartProperies)
-
-    }
-    _compute(){
-
-      //axis are mentioned in the chart-input module
-      let itemGrpX = this.x ? this.inputs[this.x].itemGrp:[]
-      let itemGrpY = this.y ? this.inputs[this.y].itemGrp:[]
-      let itemChk = itemGrpX.length<=0 || itemGrpY.length<=0
-
-      let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp:[]
-      let itemGrpChk = groupBy.length<=0
-
-      if (itemChk) {
-        if(itemGrpChk){
-          return false;
-        }
+      constructor() {
+        super();
       }
-      //"itemChk" for avoid error from chart
-      itemChk= itemChk?itemGrpChk:itemChk
 
-      let width = this.settings.width.value,
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+
+      _dispatchObj() {
+        let self = this
+        let chartProperies = {}
+        let id = this.uuid
+        let settings = this.settings
+        let inputs = this.inputs
+        let redrawChk = this.redrawChk
+        // chartProperies= {id,settings,redrawChk,inputs}
+        // this.dispatch("updateChart",chartProperies)
+
+      }
+      _compute() {
+
+        //axis are mentioned in the chart-input module
+        let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
+        let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
+        let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
+
+        let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
+        let itemGrpChk = groupBy.length > 0
+
+        if (itemChk) {
+          if (!itemGrpChk) {
+            return false;
+          }
+        }
+        //"itemChk" for avoid error from chart
+        itemChk = itemChk ? !itemGrpChk : itemChk
+
+        let width = this.settings.width.value,
           height = this.settings.height.value
-      let innerRadius
-      let radius = Math.min(width, height) / 2
+        let innerRadius
+        let radius = Math.min(width, height) / 2
 
-        if(!itemGrpChk){
+        if (itemGrpChk) {
           let grpCnt = groupBy.length
-          width = width/grpCnt
-          height = height/grpCnt
+          width = (width - 50) / grpCnt
+          height = height / grpCnt
           radius = Math.min(width, height) / 2
-          innerRadius = radius/2
-        }else{
+          innerRadius = radius / 2
+        } else {
           width = width
           height = height
           innerRadius = this.innerRadius.selectedValue
@@ -90,86 +98,87 @@
 
         //get chart data once pass "itemGrp" into the "getChartData" method
         let itemGrp
-        itemGrp = !itemGrpChk?groupBy:itemGrpX.concat.apply(itemGrpX,itemGrpY)
+        itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
 
         let groupedData
         let source = this.getChartData(itemGrp)
-        if (!itemGrpChk) {
+        if (itemGrpChk) {
           groupedData = d3.nest().key(d => d.item).entries(source);
+          source = []
         } else {
           groupedData = d3.nest().key(d => d).entries(source);
         }
-        let grpChk = groupBy.length>=2?true:itemChk
+        let grpChk = groupBy.length > 1 ? true : itemChk
 
         let pie = d3.layout.pie()
-            .value(d=>d.value)
-            .sort(null);
+          .value(d => d.value)
+          .sort(null);
 
         let arc = d3.svg.arc()
-            .outerRadius(radius - 10)
-            .innerRadius(innerRadius);
+          .outerRadius(radius - 10)
+          .innerRadius(innerRadius);
 
         let labelArc = d3.svg.arc()
-            .outerRadius(radius - 40)
-            .innerRadius(radius - 40);
+          .outerRadius(radius - 40)
+          .innerRadius(radius - 40);
 
-        return { width, height, radius, color, arc, pie, itemChk, itemGrpChk, grpChk, groupedData}
-    }
-    _paint(obj) {
-      // this.parentG = d3.select("svg")
-
-      let parentG= d3.select(this.$.grpContainer)
-
-      if(!obj.grpChk){
-          parentG.html("")
+        return {
+          width,
+          height,
+          radius,
+          color,
+          arc,
+          pie,
+          itemChk,
+          itemGrpChk,
+          grpChk,
+          groupedData
+        }
       }
-      if(!obj || obj.itemChk){
-        return false
-      }
-      let self = this
+      _paint(obj) {
 
-      parentG.data(obj.groupedData).enter()
+        d3.select(this.$.grpContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        let parentG = d3.select(this.$.grpContainer)
+          .selectAll("div#grpContainer")
+          .data(obj.groupedData).enter()
 
-      parentG = parentG.append("svg")
-        .style("display", "inline-block")
-        .attr("width", obj.width)
-        .attr("height", obj.height)
-      // parentG.append("text")
-      //       .attr("dy", ".35em")
-      //       .attr("text-anchor", "middle")
-      //       .text(function(d) { return d.key; });
+        parentG = parentG.append("div")
+          .style({"display":"inline-block","width":obj.width,"height":obj.height})
+          .append("svg")
+          .attr("width", obj.width)
+          .attr("height", obj.height).append("g")
 
-      let g = parentG.selectAll('.arc')
-          .data(d=>obj.pie(d.values))
+        let g = parentG.selectAll('.arc')
+          .data(d => obj.pie(d.values))
           .enter().append('g')
-          .attr('class', 'arc');
-      let segments = g.append('path')
+          .attr('class', 'arc')
+
+        let segments = g.append('path')
           .attr('d', obj.arc)
           .style('fill', function(d) {
-              return obj.color(d.data.value);
+            return obj.color(d.data.value);
           })
           .attr('class', 'pie-slice');
 
-      segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+        segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
         let htmlCallback = d => {
-          // temp. setup to check if grouping works
-          // console.log("-d.data--",d.data)
-          // let gpName = d.data.groupName || d.data[this.inputs[this.y].selectedValue[0]];
           let gpName = d.data.groupName || d.data.item;
           let str = '<table class="pie-tooltip">' +
-              '<tr>' +
-              '<td>' + d.data.value + ',</td>' +
-              '<td>' + gpName + '</td>' +
-              '</tr>' +
-              '</table>';
+            '<tr>' +
+            '<td>' + d.data.value + ',</td>' +
+            '<td>' + gpName + '</td>' +
+            '</tr>' +
+            '</table>';
           return str;
         };
         this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
+      }
+
     }
-
-  }
-  customElements.define(pieChart.is,pieChart)
-
-</script>
+    customElements.define(pieChart.is, pieChart)
+  </script>
 </dom-module>
