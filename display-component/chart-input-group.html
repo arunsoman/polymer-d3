@@ -14,6 +14,7 @@
         border-bottom: solid 1px #c71503;
         display: block;
         overflow: hidden;
+        text-align: center;
     }
     .input-drag-wrapper{
       padding: 1em;
@@ -29,7 +30,6 @@
       <template is="dom-repeat" items="[[ externals ]]">
         <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
       </template>
-      <paper-icon-button icon="menu" style="color: red; float:right" ></paper-icon-button>
     </div>
 
     <div id="inputItems">

@@ -2,40 +2,8 @@
 <link rel="import" href="display-component/chart-selector.html">
 <link rel="import" href="display-component/settings-component.html">
 <link rel="import" href="display-component/legends-component.html">
-<link rel="stylesheet" href="polymer-d3-global.css">
 <dom-module id="polymer-d3">
   <template>
-    <style>
-      :host {
-        background-color: #fff;
-        display: block;
-        font-family: 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-        transition: all .1s ease;
-      }
-      :host:hover {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.24);
-      }
-      .tool-bar {
-        background-color: #EDEDED;
-        box-shadow: 0 1px 1px rgba(0,0,0,0.16), 0 1px 1px rgba(0,0,0,0.23);
-        margin: .5em 1em;
-        padding: .5em;
-        position: relative;
-      }
-      .chartHolder {
-        text-align: center;
-      }
-      bar-chart {
-        display: inline-block;
-      }
-      paper-icon-button {
-       color: #868686;
-       transition: all .3s ease;
-      }
-      paper-icon-button:hover {
-        color: #454545;
-      }
-    </style>
     <dom-if if="[[ editMode ]]">
       <template restamp>
         <div class="tool-bar">
