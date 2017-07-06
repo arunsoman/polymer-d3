@@ -1,0 +1,127 @@
+<dom-module id="legend-customizer">
+  <template>
+    <style>
+    #chartArea{
+      min-height: 150px;
+      margin: 2em;
+      position: relative;
+      background: #f2f0ee;
+      box-shadow: 0px 0px 22px rgba(0,0,0,0.2) inset;
+    }
+    .legends{
+      position: absolute;
+      background: #ffec93;
+      padding: 1px 6px;
+      border-radius: 11px;
+      color: #c39c19;
+      border: solid 1px;
+    }
+    .legends iron-icon{
+      position: absolute;
+      width: 1.2em;
+      margin-left: 0.5em;
+      margin-top: -0.2em;
+      cursor: pointer;
+    }
+    .flex {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 2em;
+    }
+    .flex paper-input {
+      flex-grow: 1;
+      display: inline-block;
+      width: 10%;
+    }
+
+    </style>
+    <div id="chartArea" on-drop="drop" on-dragover="allowDrop">
+      <div class="legends" draggable="true" style$="left:[[xPos]]%;top:[[yPos]]%;" on-dragstart="drag">Legend<iron-icon icon="icons:expand-more" label="legends" on-click="showColorPicker"></iron-icon></div>
+    </div>
+        <paper-dialog id="dialog" modal>
+      <h2>Label Color picker</h2>
+        <paper-dialog-scrollable>
+          <div class="flex">
+            <paper-input label="Q1">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>
+          <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>   <paper-input label="Q2">
+            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
+          </paper-input>  
+          </div>
+          
+        </paper-dialog-scrollable>
+        <div class="buttons">
+        <paper-button dialog-dismiss>Apply</paper-button>
+        <paper-button dialog-dismiss>Cancel</paper-button>
+      </div>
+      </paper-dialog>
+
+  </template>
+  <script>
+  class legendCustomizer extends Polymer.Element {
+    static get is() {
+      return 'legend-customizer'
+    }
+
+    static get properties() {
+      return {
+        xPos:{
+          type:Number,
+          value:0
+        },
+        yPos:{
+          type:Number,
+          value:0
+        }
+      }
+    }
+
+    showColorPicker(){
+      this.$.dialog.open();
+    }
+    allowDrop(ev) {
+      ev.preventDefault();
+    }
+    drop(e){
+      let getchartWidth = this.$.chartArea.offsetWidth;
+      let getchartHeight = this.$.chartArea.offsetHeight;
+      let xpos = ((e.offsetX-30)/getchartWidth)*100;
+      let ypos = ((e.offsetY-12)/getchartHeight)*100;
+      this.set('xPos',xpos);
+      this.set('yPos',ypos);
+    }
+    drag(){
+    }
+
+   
+    constructor() {
+      super();
+    }
+
+  }
+  customElements.define(legendCustomizer.is, legendCustomizer)
+  </script>
+</dom-module>
