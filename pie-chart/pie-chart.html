@@ -4,10 +4,13 @@
   <template>
 <style>
   body {
-  text-align: center;
+    text-align: center;
   }
   svg {
-  font: 29px sans-serif;
+    font: 29px sans-serif;
+  }
+  #grpContainer{
+    margin:0 auto;
   }
   </style>
   <chart-input-group  uuid="[[uuid]]">
@@ -24,8 +27,6 @@
       static get is() {
         return 'pie-chart'
       }
-
-
       static get properties() {
         return {
           innerRadius: {
@@ -36,28 +37,13 @@
           }
         }
       }
-
       constructor() {
         super();
       }
-
       redraw() {
         this.draw(this._paint(this._compute()));
       }
-
-      _dispatchObj() {
-        let self = this
-        let chartProperies = {}
-        let id = this.uuid
-        let settings = this.settings
-        let inputs = this.inputs
-        let redrawChk = this.redrawChk
-        // chartProperies= {id,settings,redrawChk,inputs}
-        // this.dispatch("updateChart",chartProperies)
-
-      }
       _compute() {
-
         //axis are mentioned in the chart-input module
         let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
         let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
@@ -93,8 +79,6 @@
         innerRadius = innerRadius;
 
         let color = d3.scale.category20c();
-        // let color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-        // let color = d3.scaleOrdinal()
 
         //get chart data once pass "itemGrp" into the "getChartData" method
         let itemGrp
@@ -136,7 +120,6 @@
         }
       }
       _paint(obj) {
-
         d3.select(this.$.grpContainer).html("")
         if (!obj || obj.itemChk) {
           return false
@@ -164,6 +147,9 @@
           .attr('class', 'pie-slice');
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+
+        d3.select(this.$.grpContainer).style({"width":this.settings.width.value+"px",
+          "height":this.settings.height.value+"px"})
 
         let htmlCallback = d => {
           let gpName = d.data.groupName || d.data.item;

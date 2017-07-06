@@ -102,8 +102,8 @@
     </style>
     <div class="item-holder" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
       <div class="item-drop">
-        <template is="dom-repeat" items="{{selectedObjs}}" as="tag" index-as="tagIndex">
-          <span class="tags">[[ tag.key ]]<i><paper-icon-button icon="delete" on-tap="remove" index="{{index}}"></paper-icon-button></i></span>
+        <template is="dom-repeat" items="{{itemGrp}}" as="tag" index-as="tagIndex">
+          <span class="tags">[[ tag ]]<i><paper-icon-button icon="delete" on-tap="remove" index="{{index}}"></paper-icon-button></i></span>
         </template>
       </div>
       <h4>[[ label ]]</h4>
@@ -186,7 +186,6 @@
     }
     connectedCallback(){
       super.connectedCallback()
-      this._initializeData()
     }
     _inputChange(input){
       // debugger
@@ -196,12 +195,6 @@
         this.dispatch("addUpdateInputs", {uuid:this.parentNode.uuid,objKey:key,input:updatedInput})
       }
 
-    }
-    _initializeData(){
-      // let axisData=this.axis.split("|")
-      // this.set("axis",axisData[0])
-      // this.set("label",axisData[1])
-      // debugger
     }
     add(selectedObject,tagNodeVal) {
         this.push("selectedValue",tagNodeVal)
