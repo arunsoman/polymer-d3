@@ -31,6 +31,12 @@
                   [action.value.objKey]:action.value.input
                 })
               })})
+          case 'UPDATE_SETTINGS':
+            return Object.assign({},state,{
+              [action.value.id]:Object.assign({},state[action.value.id],{
+                settings: action.value.settings
+              }
+              )})
           default:
               return state;
       }

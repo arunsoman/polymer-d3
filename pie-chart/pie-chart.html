@@ -2,13 +2,12 @@
 <!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
 <dom-module id="pie-chart">
 <template>
+
   <chart-input-group  uuid="[[uuid]]">
     <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
     <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
   </chart-input-group>
-  <h3>[[settings.title]]</h3>
-  <chart-legend></chart-legend>
-  <chart-settings></chart-settings>
+  <chart-settings uuid="[[uuid]]"></chart-settings>
   <svg id="svg"></svg>
 </template>
 <script>
@@ -16,16 +15,9 @@
   class pieChart extends baseChart{
     static get is(){ return 'pie-chart'}
 
+
     static get properties(){
       return{
-        chartWidth:{
-          type:Number,
-          value:960
-        },
-        chartHeight:{
-          type:Number,
-          value:500
-        },
         innerRadius:{
           type:Object,
           value:{
@@ -38,10 +30,7 @@
     constructor(){
       super();
     }
-    connectedCallback(){
-      super.connectedCallback()
-      this._dispatchObj()
-    }
+    
     redraw(){
       this.draw(this._paint(this._compute()));
     }
@@ -53,8 +42,8 @@
       let settings=this.settings
       let inputs = this.inputs
       let redrawChk = this.redrawChk
-      chartProperies= {id,settings,redrawChk,inputs}
-      this.dispatch("updateChart",chartProperies)
+      // chartProperies= {id,settings,redrawChk,inputs}
+      // this.dispatch("updateChart",chartProperies)
 
     }
     _compute(){
@@ -73,8 +62,8 @@
         slice = slice[0];
         sliceSize = sliceSize[0];
 
-        let width = this.chartWidth,
-            height = this.chartHeight,
+        let width = this.settings.width.value,
+            height = this.settings.height.value,
             radius = Math.min(width, height) / 2;
 
         let innerRadius = this.innerRadius.selectedValue;

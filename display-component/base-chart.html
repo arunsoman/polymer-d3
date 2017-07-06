@@ -1,9 +1,9 @@
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<link href="chart-settings.html" rel='import'>
 
-<link rel="import" href="chart-setting.html"/>
 <dom-module id="base-chart">
-<template>
-  <h3>[[settings.title]]</h3>
+<template >
+  <h3>[[title]] </h3>
 </template>
 <script>
 
@@ -31,6 +31,7 @@
         },
         inputs:{
           type:Array,
+          observer:'_chartDraw',
           statePath(state){
             var chartPath = state.charts[this.uuid]
             let keyChk = chartPath && Object.keys(chartPath.inputs).length
@@ -52,19 +53,25 @@
         // },
         settings:{
           type:Object,
-          value:()=>{
-            return {
-              title:"",
-              marginTop:"",
-              marginBottom:"",
-              marginLeft:"",
-              marginRight:"",
-              legendPosition:"",
-              legendColor:"",
-              width:960,
-              height:500
+          observer:'_chartDraw',
+          statePath(state){
+            if(state.charts[this.uuid]){
+              return state.charts[this.uuid].settings;
+            }else{
+              return {
+                title:{uitype:'text',txt:"Title",value:""},
+                marginTop:{uitype:'number',txt:"Top Margin",value:""},
+                marginBottom:{uitype:'number',txt:"Bottom Margin",value:""},
+                marginLeft:{uitype:'number',txt:"Left Margin",value:""},
+                marginRight:{uitype:'number',txt:"Right Margin",value:""},
+                legendPosition:{uitype:'popup',txt:"Legend position", value:""},
+                legendColor:{uitype:'picker',txt:"Legend color",value:""},
+                width:{uitype:'number',txt:"Chart width", value:"960"},
+                height:{uitype:'number',txt:"Chart Height", value:"500"}
+              }
             }
           }
+          
         },
         externals:{
           type:Array,
@@ -81,12 +88,13 @@
       }
     }
     static get observers(){
-      return["_chartDraw(inputs)"]
+      // return["_chartDraw(inputs)"]
     }
 
     constructor(){
       super();//baseChart
-      this.initializeChart()
+      this.initializeChart();
+      
     }
     static get actions() {
       return {
@@ -99,15 +107,17 @@
       };
     }
     connectedCallback(){
-      super.connectedCallback()
+      super.connectedCallback();
+      this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
     }
-    _chartDraw(inputs){
-      if(inputs && Object.keys(inputs).length!=0){
+    _chartDraw(){
+      if(this.inputs && Object.keys(this.inputs).length!=0){
         //chart axis dre set here, the axis key's defined in "chart-input" module
         this.axisKeys.forEach(axis=>{this.set(axis,axis)})
         this.redraw()
       }
     }
+
     draw(paint){
       //this.debounce(arg,interval)
       this.debouncer(paint,250)
