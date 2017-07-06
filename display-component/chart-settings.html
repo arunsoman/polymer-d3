@@ -1,143 +1,162 @@
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
-<!-- <link href="chart-customizer.html" rel='import'> -->
+<link href="legend-customizer.html" rel='import'>
 <dom-module id="chart-settings">
-<template>
+  <template>
     <style>
-      :host {
-        display: block;
-      }
-      .customizer-holder {
-        height: 400px;
-        width: 700px
-      }
-      .dummy-txt {
-        display: inline-block;
-        transition: all 400ms ease;
-      }
-      .flex {
-        display: flex;
-      }
-      .inputs.flex {
-        justify-content: center;
-      }
-      .inputs.flex paper-input{
-        margin-left: 5px;
-      }
-      .none{
-        display: none!important;
-      }
-    </style>
-    <template is="dom-if" if="[[!isActive]]">
-      <paper-icon-button icon="icons:settings" on-click="toggleActive"></paper-icon-button>
-    </template>
-
-    <template is="dom-if" if="[[isActive]]">
-      
+    :host {
+      display: block;
+    }
     
-    <!-- <div class="customizer-holder none">
-      <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 500 400" class="parent-svg" id="parentSvg"></svg>
-    </div> -->
+    .customizer-holder {
+      height: 400px;
+      width: 700px
+    }
+    
+    .dummy-txt {
+      display: inline-block;
+      transition: all 400ms ease;
+    }
+    
+    .flex {
+      display: flex;
+    }
+    
+    .item {
+      flex-grow: 1;
+      display: inline-block;
+      width: 20%;
+    }
+    
+    .inputs.flex {
+      flex-wrap: wrap;
+      margin: 0 2em;
+    }
+    
+    .inputs.flex paper-input {
+      margin-left: 5px;
+    }
+    
+    .none {
+      display: none!important;
+    }
+    </style>
+    <paper-icon-button icon="icons:settings" on-click="showSettings"></paper-icon-button>
+    <paper-dialog id="dialog" modal>
+      <h2>Chart Settings</h2>
+      <paper-dialog-scrollable>
+        
+        <legend-customizer legend-data="{{_settings}}"></legend-customizer>
 
-    <!-- Tick rotation -->
-    <div class="tick-rotation flex">
-      <template is='dom-repeat' items="{{_settings}}">
-        <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
-          <span>[[item.txt]]</span>
-          <div class="slider-wrap">
+        <div class="inputs flex">
+          <template is='dom-repeat' items="{{_settings}}">
+              <template is="dom-if" if="{{eq(item.value.uitype,'picker')}}">
+                <div class="item">
+                  
+                </div>
+              </template>
+              <template is="dom-if" if="{{eq(item.value.uitype,'text')}}">
+                <div class="item">
+                  <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
+                </div>
+              </template>
+              <template is="dom-if" if="{{eq(item.value.uitype,'number')}}">
+                <div class="item">
+                  <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
+                </div>
+              </template>
+          </template>
+        </div>
+      </paper-dialog-scrollable>
+      <div class="buttons">
+        <paper-button on-tap="applySettings" dialog-dismiss>Apply</paper-button>
+        <paper-button on-tap="resetSettings" dialog-dismiss>Cancel</paper-button>
+      </div>
+    </paper-dialog>
+    
+    <!-- <template is="dom-if" if="[[isActive]]">
+      <div class="tick-rotation flex">
+        <template is='dom-repeat' items="{{_settings}}">
+          <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
+            <span>[[item.txt]]</span>
+            <div class="slider-wrap">
               <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
               <span id="{{item.input}}" class="dummy-txt">TICK</span>
-          </div>
+            </div>
+          </template>
         </template>
-      </template>
-    </div>
-    
-    <div class="inputs flex">
-      <template is='dom-repeat' items="{{_settings}}">
-        <!-- <template is="dom-if" if="{{isVisibleInput(item.input)}}"> -->
-          <!-- <template is="dom-if" if="{{isNumber(item.uitype)}}">
-            <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
-          </template> -->
-          <template is="dom-if" if="{{eq(item.value.uitype,'picker')}}">
-            <paper-input label="[[item.value.txt]]" >
-            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
-            </paper-input>
-          </template>
-
-          <template is="dom-if" if="{{noeq(item.value.uitype,'picker')}}">
-            <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
-          </template>
-        <!-- </template> -->
-      </template>
-    </div>
-    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+      </div>
+      <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
         <legends-component opener="{{legendSettingsFlag}}" settings="{{_legendSettings}}"></legends-component>
       </template>
-    <div>
-      <span id="mouse-pointer"></span>
       <div>
-        <paper-button on-tap="applySettings">Apply</paper-button>
-        <paper-button on-tap="resetSettings">Cancel</paper-button>
+        <span id="mouse-pointer"></span>
+        <div>
+        </div>
       </div>
-    </div>
-    </template>
-  <!-- <chart-customizer-new settings="[[settings]]">Chart Customizer-new</chart-customizer-new> -->
-</template>
-<script>
-  class chartSettings extends ReduxMixinBehavior(Polymer.Element){
-    static get is(){ return 'chart-settings'}
+    </template> -->
 
-    static get properties(){
-      return{
-        isActive:{
-          type:Boolean,
-          value:false
-        },
-        settings:{
-          type:Object,
-          statePath(state){
-            if(state.charts[this.uuid]){
+  </template>
+  <script>
+  class chartSettings extends ReduxMixinBehavior(Polymer.Element) {
+    static get is() {
+      return 'chart-settings'
+    }
+
+    static get properties() {
+      return {
+        settings: {
+          type: Object,
+          statePath(state) {
+            if (state.charts[this.uuid]) {
               return state.charts[this.uuid].settings
             }
           },
-          observer:'settingsToArray'
+          observer: 'settingsToArray'
         }
       }
     }
-    eq(object,args){
-      return object ==args
+    eq(object, args) {
+      return object == args
     }
-    noeq(object,args){
-      return object!==args
+    noeq(object, args) {
+      return object !== args
     }
-    resetSettings(){
+    resetSettings() {
       this.settingsToArray();
-      this.toggleActive()
     }
-    toggleActive(){
-      this.set('isActive',!this.isActive);
+    showSettings() {
+      this.$.dialog.open();
     }
-
-    applySettings(){
+    applySettings() {
       let newSettings = this.settingstoObj();
-      this.dispatch({type:'UPDATE_SETTINGS',value:{id:this.uuid,settings:newSettings}})
-      this.toggleActive();
+      this.dispatch({
+        type: 'UPDATE_SETTINGS',
+        value: {
+          id: this.uuid,
+          settings: newSettings
+        }
+      })
     }
-    settingsToArray(){
+    settingsToArray() {
       // transform object to array with object key value.
-      this.set('_settings',Object.keys(this.settings).map(item=>{return {item,value:Object.assign({},this.settings[item])}}));
+      this.set('_settings', Object.keys(this.settings).map(item => {
+        return {
+          item,
+          value: Object.assign({}, this.settings[item])
+        }
+      }));
     }
-    settingstoObj(){
-      return this._settings.reduce((prev,newVal)=>{
-        prev[newVal.item]=newVal.value;
+    settingstoObj() {
+      return this._settings.reduce((prev, newVal) => {
+        prev[newVal.item] = newVal.value;
         return prev;
-      },{})
+      }, {})
     }
-    constructor(){
+    constructor() {
       super();
     }
 
   }
-  customElements.define(chartSettings.is,chartSettings)
-
-</script>
+  customElements.define(chartSettings.is, chartSettings)
+  </script>
 </dom-module>
