@@ -9,7 +9,7 @@
   svg {
     font: 29px sans-serif;
   }
-  #grpContainer{
+  #chartContainer{
     margin:0 auto;
   }
   </style>
@@ -20,7 +20,7 @@
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
   <!-- <svg id="svg"></svg> -->
-  <div id="grpContainer"></div>
+  <div id="chartContainer"></div>
 </template>
   <script>
     class pieChart extends baseChart {
@@ -88,11 +88,9 @@
         let source = this.getChartData(itemGrp)
         if (itemGrpChk) {
           groupedData = d3.nest().key(d => d.item).entries(source);
-          source = []
         } else {
           groupedData = d3.nest().key(d => d).entries(source);
         }
-        let grpChk = groupBy.length > 1 ? true : itemChk
 
         let pie = d3.layout.pie()
           .value(d => d.value)
@@ -109,23 +107,20 @@
         return {
           width,
           height,
-          radius,
           color,
           arc,
           pie,
           itemChk,
-          itemGrpChk,
-          grpChk,
           groupedData
         }
       }
       _paint(obj) {
-        d3.select(this.$.grpContainer).html("")
+        d3.select(this.$.chartContainer).html("")
         if (!obj || obj.itemChk) {
           return false
         }
-        let parentG = d3.select(this.$.grpContainer)
-          .selectAll("div#grpContainer")
+        let parentG = d3.select(this.$.chartContainer)
+          .selectAll("div#chartContainer")
           .data(obj.groupedData).enter()
 
         parentG = parentG.append("div")
@@ -148,7 +143,7 @@
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
-        d3.select(this.$.grpContainer).style({"width":this.settings.width.value+"px",
+        d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
           "height":this.settings.height.value+"px"})
 
         let htmlCallback = d => {
