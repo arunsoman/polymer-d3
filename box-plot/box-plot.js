@@ -19,11 +19,11 @@ where, Q1, Q2, Q3 and Q4 are plotted at xaxix
 
 "use script";
 
-class boxPlot extends Polymer.mixinBehaviors([
+class boxPlotN extends Polymer.mixinBehaviors([
   PolymerD3.chartBehavior,PolymerD3.chartConfigCbBehavior
 ],basicChartMixin(Polymer.Element)) {
   static get is() {
-    return "box-plot"
+    return "box-plot-n"
   }
   static get properties() {
     return {

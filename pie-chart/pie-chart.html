@@ -67,8 +67,8 @@
         //"itemChk" for avoid error from chart
         itemChk = itemChk ? !itemGrpChk : itemChk
 
-        let width = this.settings.width.value,
-          height = this.settings.height.value
+        let width = +this.settings.width.value,
+          height = +this.settings.height.value
         let innerRadius
         let radius = Math.min(width, height) / 2
 
