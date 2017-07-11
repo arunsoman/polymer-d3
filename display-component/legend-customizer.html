@@ -67,6 +67,9 @@
     static get properties() {
       return {
         legendData:{
+          type:Object
+        },
+        legendSettings:{
           notify:true
         }
       }
@@ -89,6 +92,7 @@
         y:ypos
       }
       this.set('legendData.position',position);
+      this.set('legendSettings',Object.assign({},this.legendData));
     }
   
     constructor() {
