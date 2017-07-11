@@ -45,7 +45,7 @@
       <h2>Chart Settings</h2>
       <paper-dialog-scrollable>
         
-        <legend-customizer legend-data="{{settings.legend.values}}"></legend-customizer>
+        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}"></legend-customizer>
 
         <div class="inputs flex">
           <template is='dom-repeat' items="{{_settings}}">
@@ -115,14 +115,17 @@
         },
         legendData:{
           type:Object
+        },
+        legend:{
+          type:Object
         }
       }
     }
     static get observers(){
-      return['legendChange(legendData)']
+      return['legendChange(legend)']
     }
     legendChange(data){
-      console.log('label change');
+      this._settings.find(items=>{if(items.item=='legend') items.value.values = Object.assign({},data)});
     }
     eq(object, args) {
       return object == args

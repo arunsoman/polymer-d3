@@ -67,10 +67,11 @@
         //"itemChk" for avoid error from chart
         itemChk = itemChk ? !itemGrpChk : itemChk
 
-        let width = +this.settings.width.value,
-          height = +this.settings.height.value
-        let innerRadius
-        let radius = Math.min(width, height) / 2
+        let width = this.settings.width.value,
+          height = this.settings.height.value,
+          labelPos = this.settings.legend.values.position;
+        let innerRadius;
+        let radius = Math.min(width, height) / 2;
 
         if (itemGrpChk) {
           let grpCnt = groupBy.length
@@ -118,7 +119,8 @@
           arc,
           pie,
           itemChk,
-          groupedData
+          groupedData,
+          labelPos
         }
       }
       _paint(obj) {
@@ -163,7 +165,7 @@
 
         let legend = parentG.append("g")
           .attr("class","legend")
-          .attr("transform","translate(10,10)")
+          .attr("transform","translate("+(obj.width*obj.labelPos.x)/100+","+(obj.height*obj.labelPos.y)/100+")")
           .call(d3.legend)
 
         d3.select(this.$.grpContainer).style({"width":this.settings.width.value+"px",
