@@ -12,6 +12,13 @@
   #chartContainer{
     margin:0 auto;
   }
+  .legend-items text{
+    fill:black
+  }
+  .legend{
+    fill:transparent;
+    font-size: 12px;
+  }
   </style>
   <chart-input-group  uuid="[[uuid]]">
     <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
@@ -127,23 +134,39 @@
           .style({"display":"inline-block","width":obj.width,"height":obj.height})
           .append("svg")
           .attr("width", obj.width)
-          .attr("height", obj.height).append("g")
+          .attr("height", obj.height).append("g");
+      parentG.append("text")
+        .attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate("+(obj.width/2)+","+(obj.height/2)+")")
+        .text(function(d) {
+          return d.key; });
+
 
         let g = parentG.selectAll('.arc')
           .data(d => obj.pie(d.values))
           .enter().append('g')
           .attr('class', 'arc')
+          .attr("data-legend",function(d) { return d.value})
+          .attr("data-legend-color",function(d){
+            return obj.color(d.value);
+          })
 
         let segments = g.append('path')
           .attr('d', obj.arc)
           .style('fill', function(d) {
-            return obj.color(d.data.value);
+            return obj.color(d.value);
           })
           .attr('class', 'pie-slice');
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
-        d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
+        let legend = parentG.append("g")
+          .attr("class","legend")
+          .attr("transform","translate(10,10)")
+          .call(d3.legend)
+
+        d3.select(this.$.grpContainer).style({"width":this.settings.width.value+"px",
           "height":this.settings.height.value+"px"})
 
         let htmlCallback = d => {

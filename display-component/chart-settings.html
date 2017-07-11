@@ -45,7 +45,7 @@
       <h2>Chart Settings</h2>
       <paper-dialog-scrollable>
         
-        <legend-customizer legend-data="{{_settings}}"></legend-customizer>
+        <legend-customizer legend-data="{{settings.legend.values}}"></legend-customizer>
 
         <div class="inputs flex">
           <template is='dom-repeat' items="{{_settings}}">
@@ -68,8 +68,8 @@
         </div>
       </paper-dialog-scrollable>
       <div class="buttons">
-        <paper-button on-tap="applySettings" dialog-dismiss>Apply</paper-button>
-        <paper-button on-tap="resetSettings" dialog-dismiss>Cancel</paper-button>
+        <paper-button on-click="applySettings" dialog-dismiss>Apply</paper-button>
+        <paper-button on-click="resetSettings" dialog-dismiss>Cancel</paper-button>
       </div>
     </paper-dialog>
     
@@ -112,8 +112,17 @@
             }
           },
           observer: 'settingsToArray'
+        },
+        legendData:{
+          type:Object
         }
       }
+    }
+    static get observers(){
+      return['legendChange(legendData)']
+    }
+    legendChange(data){
+      console.log('label change');
     }
     eq(object, args) {
       return object == args
