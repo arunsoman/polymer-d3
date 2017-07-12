@@ -9,7 +9,6 @@
     .box line,
     .box rect,
     .box circle {
-    fill: steelblue;
     stroke: #000;
     stroke-width: 1px;
     }
@@ -19,6 +18,9 @@
     .box .outlier {
     fill: none;
     stroke: #000;
+    }
+    .box text{
+      fill:#000;
     }
     .axis {
     font: 12px sans-serif;
@@ -41,6 +43,10 @@
     }
     #chartContainer{
       margin:0 auto;
+    }
+    .legend rect{
+      fill:transparent;
+      stroke-width:0;
     }
   </style>
   <chart-input-group  uuid="[[uuid]]">
@@ -91,7 +97,8 @@
 
       let width = this.settings.width.value,
           height = this.settings.height.value,
-          margin = {top: 20, right: 20, bottom: 30, left: 40}
+          margin = {top: 20, right: 20, bottom: 30, left: 40},
+          label = this.settings.legend.values;
           //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
 
       width = +width - margin.left - margin.right
@@ -141,6 +148,8 @@
         width = width + margin.left + margin.right
         height = height + margin.top + margin.bottom
 
+
+
       return {
         width,
         height,
@@ -152,7 +161,8 @@
         chart,
         margin,
         itemChk,
-        chartData
+        chartData,
+        label
       }
     }
 
@@ -161,12 +171,16 @@
       if (!obj || obj.itemChk) {
         return false
       }
+      this.chartKeys(obj,0);
+      let legendNodes = obj.chartData.map(items=>{return {key:items[0],color:obj.color(items[0])}});
+      this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
+
       let parentG = d3.select(this.$.chartContainer).append("svg")
-    		.attr("width", obj.width)
-    		.attr("height", obj.height+90)
-    		.attr("class", "box")
-    		.append("g")
-    		.attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+        .attr("width", obj.width)
+        .attr("height", obj.height+90)
+        .attr("class", "box")
+        .append("g")
+        .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
 
         // draw the boxplots
     	parentG.selectAll(".box")
@@ -174,12 +188,11 @@
     	  .enter().append("g")
     		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.margin.top + ")")
         .attr('class', 'box-g')
-        .attr("data-legend",function(d) { return d.value})
-        .attr("data-legend-color",function(d){
-          return obj.color(d.value);
-        })
         .call(obj.chart.width(obj.x.rangeBand()))
         .attr('class', 'box')
+        .attr("data-legend",function(d) { return d[0]})
+        .style('fill', this.colorFill.bind(obj))
+        .attr("data-legend-color",this.colorFill.bind(obj))
 
       // add a title
      parentG.append("text")
@@ -210,7 +223,7 @@
 
     let legend = parentG.append("g")
       .attr("class","legend")
-      .attr("transform","translate(10,10)")
+      .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
       .call(d3.legend)
     }
     // Returns a function to compute the interquartile range.

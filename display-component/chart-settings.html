@@ -45,7 +45,7 @@
       <h2>Chart Settings</h2>
       <paper-dialog-scrollable>
         
-        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}"></legend-customizer>
+        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}"></legend-customizer>
 
         <div class="inputs flex">
           <template is='dom-repeat' items="{{_settings}}">
@@ -118,6 +118,14 @@
         },
         legend:{
           type:Object
+        },
+        chartKeys:{
+          type:Object,
+          statePath(state){
+            if(state.charts[this.uuid]){
+              return state.charts[this.uuid].chartkeys
+            }
+          }
         }
       }
     }

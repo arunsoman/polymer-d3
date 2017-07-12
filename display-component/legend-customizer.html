@@ -1,14 +1,15 @@
 <dom-module id="legend-customizer">
   <template>
     <style>
-    #chartArea{
+    #chartArea {
       min-height: 150px;
       margin: 2em;
       position: relative;
       background: #f2f0ee;
-      box-shadow: 0px 0px 22px rgba(0,0,0,0.2) inset;
+      box-shadow: 0px 0px 22px rgba(0, 0, 0, 0.2) inset;
     }
-    #legends{
+    
+    #legends {
       position: absolute;
       background: #ffec93;
       padding: 1px 6px;
@@ -16,47 +17,48 @@
       color: #c39c19;
       border: solid 1px;
     }
-    #legends iron-icon{
+    
+    #legends iron-icon {
       position: absolute;
       width: 1.2em;
       margin-left: 0.5em;
       margin-top: -0.2em;
       cursor: pointer;
     }
+    
     .flex {
       display: flex;
       flex-wrap: wrap;
       margin: 0 2em;
     }
+    
     .flex paper-input {
       flex-grow: 3;
       display: inline-block;
-      width: 40px;
+      width: 20%;
     }
-
     </style>
     <div id="chartArea" on-drop="drop" on-dragover="allowDrop">
-      <div id="legends" draggable="true" style$="left:[[legendData.position.x]]%;top:[[legendData.position.y]]%;">Legend<iron-icon icon="icons:expand-more" label="legends" on-click="showColorPicker"></iron-icon></div>
+      <div id="legends" draggable="true" style$="left:[[legendData.position.x]]%;top:[[legendData.position.y]]%;">Legend
+        <iron-icon icon="icons:invert-colors" label="legends" on-click="showColorPicker"></iron-icon>
+      </div>
     </div>
-        <paper-dialog id="dialog" modal>
+    <paper-dialog id="dialog" modal>
       <h2>Label Color picker</h2>
-        <paper-dialog-scrollable>
-          <div class="flex">
-            <paper-input label="Q1">
-            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
-          </paper-input>
-          <paper-input label="Q2">
-            <paper-swatch-picker color="{{selectedColor}}" slot="prefix"></paper-swatch-picker>
-          </paper-input>   
-          </div>
-          
-        </paper-dialog-scrollable>
-        <div class="buttons">
+      <paper-dialog-scrollable>
+        <div class="flex">
+          <template is="dom-repeat" items="[[keys]]">
+            <paper-input label="[[item.key]]">
+              <paper-swatch-picker color="{{item.color}}" slot="prefix"></paper-swatch-picker>
+            </paper-input>
+          </template>
+        </div>
+      </paper-dialog-scrollable>
+      <div class="buttons">
         <paper-button dialog-dismiss on-click="save">Apply</paper-button>
         <paper-button dialog-dismiss>Cancel</paper-button>
       </div>
-      </paper-dialog>
-
+    </paper-dialog>
   </template>
   <script>
   class legendCustomizer extends Polymer.Element {
@@ -66,37 +68,47 @@
 
     static get properties() {
       return {
-        legendData:{
-          type:Object
+        legendData: {
+          type: Object
         },
-        legendSettings:{
-          notify:true
+        legendSettings: {
+          notify: true
+        },
+        legendKeys:{
+          type:Object,
+          observer:'tansformKeys'
         }
       }
     }
 
-    showColorPicker(){
+    tansformKeys(items){
+      this.set('keys',Object.keys(items).map((item,i)=>items[i]));
+    }
+    showColorPicker() {
       this.$.dialog.open();
     }
     allowDrop(ev) {
       ev.preventDefault();
     }
 
-    drop(e){
+    drop(e) {
       let getchartWidth = this.$.chartArea.offsetWidth;
       let getchartHeight = this.$.chartArea.offsetHeight;
-      let xpos = ((e.offsetX-30)/getchartWidth)*100;
-      let ypos = ((e.offsetY-12)/getchartHeight)*100;
+      let xpos = ((e.offsetX - 30) / getchartWidth) * 100;
+      let ypos = ((e.offsetY - 12) / getchartHeight) * 100;
       let position = {
-        x:xpos,
-        y:ypos
+        x: xpos,
+        y: ypos
       }
-      this.set('legendData.position',position);
-      this.set('legendSettings',Object.assign({},this.legendData));
+      this.set('legendData.position', position);
+      this.set('legendSettings', Object.assign({}, this.legendData));
     }
-  
+
     constructor() {
       super();
+    }
+    save(){
+      this.set('legendData.nodes',this.keys)
     }
 
   }

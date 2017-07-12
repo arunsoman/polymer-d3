@@ -37,6 +37,12 @@
                 settings: action.value.settings
               }
               )})
+          case 'UPDATE_PRIVATE_NODE':
+              return Object.assign({},state,{
+              [action.value.id]:Object.assign({},state[action.value.id],{
+                chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
+              })
+            })
           default:
               return state;
       }

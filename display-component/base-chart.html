@@ -61,7 +61,7 @@
               return {
                 title:{uitype:'text',txt:"Title",value:""},
                 margin:{uitype:'visual',txt:'Margin',value:{left:0,top:0,right:0,bottom:0}},
-                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[{"label":"Q1",color:'red'}],position:{x:10,y:20}}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:10,y:20}}},
                 width:{uitype:'number',txt:"Chart width", value:"960"},
                 height:{uitype:'number',txt:"Chart Height", value:"500"}
               }
@@ -139,6 +139,20 @@
     }
     initializeChart(){
         this.set("uuid",PolymerD3.utilities.getUUID())
+    }
+    // add keys and colors to chartstore as keys
+    chartKeys(obj,data,key){
+      let legendNodes = this.settings.legend.values.nodes;
+      if(legendNodes.length<1){
+        legendNodes = data.map(items=>{return {key:items[key],color:obj.color(items[key])}});
+      }
+      this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
+    }
+    // to fill color for svg and legends
+    colorFill(){
+      let items = arguments[0];
+      let index = arguments[1];
+      return this.label.nodes[index] ? this.label.nodes[index].color : this.color(items[0] || items.value);
     }
   }
   customElements.define(baseChart.is,baseChart)

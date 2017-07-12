@@ -69,7 +69,7 @@
 
         let width = this.settings.width.value,
           height = this.settings.height.value,
-          labelPos = this.settings.legend.values.position;
+          label = this.settings.legend.values;
         let innerRadius;
         let radius = Math.min(width, height) / 2;
 
@@ -92,12 +92,18 @@
         let itemGrp
         itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
 
-        let groupedData
-        let source = this.getChartData(itemGrp)
+        let chartData
+        // let source = this.getChartData(itemGrp)
+        debugger;
+        let source = this.source.map(items=>{return {
+          item:items[this.inputs[this.x].selectedValue[0]],
+          value:items[this.inputs[this.y].selectedValue[0]]
+        }
+        })
         if (itemGrpChk) {
-          groupedData = d3.nest().key(d => d.item).entries(source);
+          chartData = d3.nest().key(d => d.item).entries(source);
         } else {
-          groupedData = d3.nest().key(d => d).entries(source);
+          chartData = d3.nest().key(d => d).entries(source);
         }
 
         let pie = d3.layout.pie()
@@ -119,8 +125,8 @@
           arc,
           pie,
           itemChk,
-          groupedData,
-          labelPos
+          chartData,
+          label
         }
       }
       _paint(obj) {
@@ -128,9 +134,11 @@
         if (!obj || obj.itemChk) {
           return false
         }
+
+        this.chartKeys(obj,obj.chartData[0].values,'item');
         let parentG = d3.select(this.$.chartContainer)
           .selectAll("div#chartContainer")
-          .data(obj.groupedData).enter()
+          .data(obj.chartData).enter()
 
         parentG = parentG.append("div")
           .style({"display":"inline-block","width":obj.width,"height":obj.height})
@@ -149,23 +157,19 @@
           .data(d => obj.pie(d.values))
           .enter().append('g')
           .attr('class', 'arc')
-          .attr("data-legend",function(d) { return d.value})
-          .attr("data-legend-color",function(d){
-            return obj.color(d.value);
-          })
+          .attr("data-legend",function(d) {return d.data.item})
+          .attr("data-legend-color",this.colorFill.bind(obj))
 
         let segments = g.append('path')
           .attr('d', obj.arc)
-          .style('fill', function(d) {
-            return obj.color(d.value);
-          })
+          .style('fill', this.colorFill.bind(obj))
           .attr('class', 'pie-slice');
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
         let legend = parentG.append("g")
           .attr("class","legend")
-          .attr("transform","translate("+(obj.width*obj.labelPos.x)/100+","+(obj.height*obj.labelPos.y)/100+")")
+          .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
           .call(d3.legend)
 
         d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
