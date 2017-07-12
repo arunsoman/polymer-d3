@@ -1,6 +1,6 @@
 "use strict";
 
-class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
+class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
   static get is(){return 'polymer-d3'}
   static get properties(){
     return{
@@ -162,6 +162,28 @@ class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
       '_modeObserver(editMode)'
     ]
   }
+  static get actions() {
+    return {
+      updateExternal(externals) {
+        return {
+          type: 'UPDATE_EXTERNALS',
+          value: externals
+        };
+      },
+      updateSource(source) {
+        return {
+          type: 'UPDATE_SOURCE',
+          value: source
+        };
+      }
+    }
+  }
+  constructor(){
+    super();
+    debugger;
+    this.dispatch("updateSource",datacsv.source)
+    this.dispatch("updateExternal",datacsv.externals)
+  }
 
   // edit mode
   _modeObserver (editMode) {
@@ -245,13 +267,13 @@ class polymerD3 extends Polymer.mixinBehaviors([],Polymer.Element) {
       this.selectedChartObj.toggleSettingsVisibility();
     }
   }
+  
 
   // Bootstraps element as per mode(view/edit)
   // This meathod avoids crazy rwo-way binding side effects
   bootstrapCharts(config) {
     // data and externals are always required
-    this.set('externals', config.externals);
-    this.set('source', config.source);
+    
     if (config.availableCharts) {
       // to support new charts added to polymer-d3
       // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it

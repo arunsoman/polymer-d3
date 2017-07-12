@@ -37,7 +37,7 @@
     </div>
 
   </template>
-  <script src="data.js"></script>
+  
 <script>
 const initialExt = datacsv.externals;
 const initialsource = datacsv.source;
@@ -97,8 +97,8 @@ const initialsource = datacsv.source;
           this._initializeData()
         }
         _initializeData(){
-          this.dispatch("updateSource",initialsource)
-          this.dispatch("updateExternal",initialExt)
+          // this.dispatch("updateSource",initialsource)
+          // this.dispatch("updateExternal",initialExt)
         }
     }
     customElements.define(chartInputGroup.is, chartInputGroup)
