@@ -229,9 +229,9 @@
     }
     drop(e){
       e.preventDefault();
-      // if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
-      //   return false
-      // }
+      if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
+        return false
+      }
       this.parentElement.$.inputItems.classList.remove('drag-active');
       var tagIndex = e.dataTransfer.getData('text');
       if(tagIndex){

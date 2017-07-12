@@ -1,4 +1,6 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id='bullet-chart'>
+  <template>
   <style>
 
     button {
@@ -14,25 +16,134 @@
     .bullet .range.s1 { fill: #ddd; }
     .bullet .range.s2 { fill: #ccc; }
     .bullet .measure.s0 { fill: lightsteelblue; }
-    .bullet .measure.s1 { fill: steelblue; }
+    .bullet .measure.s1 { fill: lightblue; }
+    .bullet .measure.s2 { fill: steelblue; }
     .bullet .title { font-size: 14px; font-weight: bold; }
     .bullet .subtitle { fill: #999; }
-          
+
+    #chartContainer{
+      margin:0 auto;
+    }
   </style>
 
-  <template>
-    <h4>Bullet Chart</h4>
-    <template is="dom-if" if="{{editMode}}">
-      <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-      </div>
-
-      <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-      <div class='optional' hidden="{{hideSettings}}">
-        <display-component settings="{{settings}}" external='[[external]]'></display-component>
-      </div>
-    </template>
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+      <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <!-- <svg id="svg"></svg> -->
+    <div id="chartContainer"></div>
   </template>
+  <script>
+    class bulletChart extends baseChart{
+      static get is(){
+        return "bullet-chart"
+      }
+      static get properties(){
+        return{
+
+        }
+      }
+      constructor(){
+        super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
+        let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
+        let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
+
+        let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
+        let itemGrpChk = groupBy.length > 0
+
+        if (itemChk) {
+          if (!itemGrpChk) {
+            return false;
+          }
+        }
+
+        //"itemChk" for avoid error from chart
+        itemChk = itemChk ? !itemGrpChk : itemChk
+
+        let width = +this.settings.width.value,
+            height = 50,
+            margin = {top: 5, right: 40, bottom: 20, left: 120}
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+        width = width - margin.left - margin.right
+        height = height - margin.top - margin.bottom
+
+        let color = d3.scale.category20c();
+
+        //get chart data once pass "itemGrp" into the "getChartData" method
+        let itemGrp
+        itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
+
+        let groupedData
+        let source = this.getChartData(itemGrp)
+        groupedData = d3.nest().key(d => d.item).entries(source);
+
+        let chartData =[]
+        groupedData.map((item,idx)=>{
+          let itemValues = item.values.map(test=>test.value),
+              minRange = itemValues.reduce((prev,cur)=>prev < cur ? prev : cur,+Infinity),
+              markers = itemValues.reduce((prev,cur)=>prev > cur ? prev : cur,-Infinity),
+              midRange = Math.round(markers/2),
+              maxRange = markers+minRange;
+          chartData[idx]={"title":item.key,
+            "ranges":[minRange,midRange,maxRange],
+            "measures":item.values.map(test=>test.value),
+            "markers":[markers]
+          }
+        })
+
+        let chart = d3.bullet()
+            .width(width)
+            .height(height);
+
+        width = width + margin.left + margin.right
+        height = height + margin.top + margin.bottom
+
+        return {
+          width,
+          height,
+          color,
+          chart,
+          margin,
+          itemChk,
+          chartData
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        var parentG = d3.select(this.$.chartContainer).selectAll("div")
+            .data(obj.chartData)
+            .enter().append("svg")
+            .attr("class", "bullet")
+            .attr("width", obj.width )
+            .attr("height", obj.height)
+            .append("g")
+            .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")")
+            .call(obj.chart);
+
+      var title = parentG.append("g")
+          .style("text-anchor", "end")
+          .attr("transform", "translate(-6," + obj.height / 2 + ")");
+
+      title.append("text")
+          .attr("class", "title")
+          .text(function(d) { return d.title; });
+
+      d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
+      }
+    }
+    customElements.define(bulletChart.is, bulletChart)
+  </script>
+  <script src='bullet.js'></script>
 </dom-module>
-<script src='bullet.js'></script>
-<script src='bullet-chart.js'></script>

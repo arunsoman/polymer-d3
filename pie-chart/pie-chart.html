@@ -168,7 +168,7 @@
           .attr("transform","translate("+(obj.width*obj.labelPos.x)/100+","+(obj.height*obj.labelPos.y)/100+")")
           .call(d3.legend)
 
-        d3.select(this.$.grpContainer).style({"width":this.settings.width.value+"px",
+        d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
           "height":this.settings.height.value+"px"})
 
         let htmlCallback = d => {
