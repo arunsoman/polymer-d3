@@ -266,13 +266,13 @@ class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Ele
       this.selectedChartObj.toggleSettingsVisibility();
     }
   }
-  
+
 
   // Bootstraps element as per mode(view/edit)
   // This meathod avoids crazy rwo-way binding side effects
   bootstrapCharts(config) {
     // data and externals are always required
-    
+
     if (config.availableCharts) {
       // to support new charts added to polymer-d3
       // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it
