@@ -180,7 +180,6 @@ class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Ele
   }
   constructor(){
     super();
-    debugger;
     this.dispatch("updateSource",datacsv.source)
     this.dispatch("updateExternal",datacsv.externals)
   }

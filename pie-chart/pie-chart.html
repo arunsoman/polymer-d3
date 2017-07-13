@@ -94,12 +94,15 @@
 
         let chartData
         // let source = this.getChartData(itemGrp)
-        debugger;
-        let source = this.source.map(items=>{return {
-          item:items[this.inputs[this.x].selectedValue[0]],
-          value:items[this.inputs[this.y].selectedValue[0]]
-        }
-        })
+
+        let sourcemap = 
+        this.source.reduce((old,newVal)=>{
+          let xaxis= this.inputs[this.x].selectedValue[0];
+          let yaxis= this.inputs[this.y].selectedValue[0];
+          old[newVal[xaxis]]=(old[newVal[xaxis]]||0)+newVal[yaxis]
+          return old
+        },{})
+        let source  = Object.keys(sourcemap).map(item=>{return {item,value:sourcemap[item]}})
         if (itemGrpChk) {
           chartData = d3.nest().key(d => d.item).entries(source);
         } else {
@@ -145,12 +148,11 @@
           .append("svg")
           .attr("width", obj.width)
           .attr("height", obj.height).append("g");
-      parentG.append("text")
+        parentG.append("text")
         .attr("dy", ".35em")
         .attr("text-anchor", "middle")
         .attr("transform", "translate("+(obj.width/2)+","+(obj.height/2)+")")
-        .text(function(d) {
-          return d.key; });
+        .text(function(d) { return d.key; });
 
 
         let g = parentG.selectAll('.arc')
