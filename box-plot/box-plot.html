@@ -218,6 +218,8 @@
       .attr("class","legend")
       .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
       .call(d3.legend)
+
+      d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
     }
     // Returns a function to compute the interquartile range.
     iqr(k) {
