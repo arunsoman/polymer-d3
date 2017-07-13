@@ -22,7 +22,7 @@
   </style>
   <chart-input-group  uuid="[[uuid]]">
     <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
-    <chart-input slot="chart-input" axis="y" label="Value"></chart-input>
+    <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
   <!-- <svg id="svg"></svg> -->
@@ -51,26 +51,30 @@
       }
       _compute() {
         //axis are mentioned in the chart-input module
-        let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
-        let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+
         //"itemChk" for avoid error from chart
-        let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
 
         if (itemChk) {
             return false;
         }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
 
         let width = this.settings.width.value,
-          height = this.settings.height.value,
-          label = this.settings.legend.values;
+            height = this.settings.height.value,
+            label = this.settings.legend.values;
         let innerRadius;
         let radius = Math.min(width, height) / 2;
         innerRadius = radius / 2
 
         let color = d3.scale.category20c();
-        
+
         // get chart data
-        let source = this.getChartData()
+        let source = this.getChartData(itemX,itemY)
         let chartData = d3.nest().key(d => d).entries(source);
 
         let pie = d3.layout.pie()
@@ -156,12 +160,10 @@
         };
         this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
       }
-      getChartData(){
+      getChartData(itemX, itemY){
         let sourcemap =
         this.source.reduce((old,newVal)=>{
-          let xaxis= this.inputs[this.x].selectedValue[0];
-          let yaxis= this.inputs[this.y].selectedValue[0];
-          old[newVal[xaxis]]=(old[newVal[xaxis]]||0)+newVal[yaxis]
+          old[newVal[itemX]]=(old[newVal[itemX]]||0)+newVal[itemY]
           return old
         },{})
         let source  = Object.keys(sourcemap).map(item=>{return {item,value:sourcemap[item]}})

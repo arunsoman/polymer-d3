@@ -5,7 +5,7 @@ var datacsv={
     value: 0
   }, {
     key: 'Percentage',
-    type: 'String',
+    type: 'Number',
     value: 1
   }, {
     key: 'value',

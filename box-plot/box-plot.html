@@ -50,9 +50,8 @@
     }
   </style>
   <chart-input-group  uuid="[[uuid]]">
-    <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-    <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
-    <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
+    <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+    <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
   <!-- <svg id="svg"></svg> -->
@@ -75,21 +74,18 @@
     }
     _compute() {
       //axis are mentioned in the chart-input module
-      let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
-      let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
-      let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
-
-      let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
-      let itemGrpChk = groupBy.length > 0
-
-      if (itemChk) {
-        if (!itemGrpChk) {
-          return false;
-        }
-      }
+      let itemX = this.x ? this.inputs[this.x].selectedValue : []
+      let itemY = this.y ? this.inputs[this.y].selectedValue : []
 
       //"itemChk" for avoid error from chart
-      itemChk = itemChk ? !itemGrpChk : itemChk
+      let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+      if (itemChk) {
+          return false;
+      }
+      //axis inputs selectedValue assigin
+      itemX = itemX[0]
+      itemY=itemY[0]
 
       let labels = true,
           min = Infinity,
@@ -106,18 +102,17 @@
 
       let color = d3.scale.category20c();
 
-      //get chart data once pass "itemGrp" into the "getChartData" method
-      let itemGrp
-      itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
+      //get chart data once pass "x and y" into the "getChartData" method
 
       let groupedData
-      let source = this.getChartData(itemGrp)
+      let source = this.getChartData(itemX, itemY)
       groupedData = d3.nest().key(d => d.item).entries(source);
 
       let chartData =[]
       groupedData.map((item,idx)=>{
         chartData[idx]=[item.key,item.values.map(test=>test.value)]
       })
+
       min = this.findMin(chartData)
       max = this.findMax(chartData)
 
@@ -148,8 +143,6 @@
         width = width + margin.left + margin.right
         height = height + margin.top + margin.bottom
 
-
-
       return {
         width,
         height,
@@ -171,7 +164,7 @@
       if (!obj || obj.itemChk) {
         return false
       }
-      this.chartKeys(obj,0);
+      this.chartKeys(obj,obj.chartData,0);
       let legendNodes = obj.chartData.map(items=>{return {key:items[0],color:obj.color(items[0])}});
       this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
 
@@ -256,6 +249,15 @@
     // find minimum in an array of arrays
     findMin(arr) {
       return d3.min(arr, innerArray => d3.min(innerArray[1]));
+    }
+    // populate chart data
+    getChartData(itemX, itemY){
+        let sourcemap = this.source.map(row=>{
+          return{[row[itemX]]:row[itemY]}
+        })
+        // debugger
+        let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+        return source
     }
   }
   customElements.define(boxPlot.is, boxPlot)
