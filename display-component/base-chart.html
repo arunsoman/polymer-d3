@@ -122,21 +122,7 @@
         return Polymer.Debouncer.debounce(this.debouncer,
           Polymer.Async.timeOut.after(interval), () => {arg});
     }
-    getChartData(itemGrp){
-        let source = this.source.map(row=>row.map((item,i)=>{
-              if(itemGrp.indexOf(this.externals[i]['key'])!=-1){
-                return {
-                  item:this.externals[i]['key'],
-                  value:item
-                }
-              }
-            })
-          )
-        source = [].concat.apply([],source).filter((items,i)=>{
-          return items
-        })
-        return source
-    }
+    
     initializeChart(){
         this.set("uuid",PolymerD3.utilities.getUUID())
     }

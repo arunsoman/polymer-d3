@@ -21,9 +21,8 @@
   }
   </style>
   <chart-input-group  uuid="[[uuid]]">
-    <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-    <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
-    <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
+    <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+    <chart-input slot="chart-input" axis="y" label="Value"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
   <!-- <svg id="svg"></svg> -->
@@ -54,60 +53,25 @@
         //axis are mentioned in the chart-input module
         let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
         let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
+        //"itemChk" for avoid error from chart
         let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
 
-        let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
-        let itemGrpChk = groupBy.length > 0
-
         if (itemChk) {
-          if (!itemGrpChk) {
             return false;
-          }
         }
-        //"itemChk" for avoid error from chart
-        itemChk = itemChk ? !itemGrpChk : itemChk
 
         let width = this.settings.width.value,
           height = this.settings.height.value,
           label = this.settings.legend.values;
         let innerRadius;
         let radius = Math.min(width, height) / 2;
-
-        if (itemGrpChk) {
-          let grpCnt = groupBy.length
-          width = (width - 50) / grpCnt
-          height = height / grpCnt
-          radius = Math.min(width, height) / 2
-          innerRadius = radius / 2
-        } else {
-          width = width
-          height = height
-          innerRadius = this.innerRadius.selectedValue
-        }
-        innerRadius = innerRadius;
+        innerRadius = radius / 2
 
         let color = d3.scale.category20c();
-
-        //get chart data once pass "itemGrp" into the "getChartData" method
-        let itemGrp
-        itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
-
-        let chartData
-        // let source = this.getChartData(itemGrp)
-
-        let sourcemap = 
-        this.source.reduce((old,newVal)=>{
-          let xaxis= this.inputs[this.x].selectedValue[0];
-          let yaxis= this.inputs[this.y].selectedValue[0];
-          old[newVal[xaxis]]=(old[newVal[xaxis]]||0)+newVal[yaxis]
-          return old
-        },{})
-        let source  = Object.keys(sourcemap).map(item=>{return {item,value:sourcemap[item]}})
-        if (itemGrpChk) {
-          chartData = d3.nest().key(d => d.item).entries(source);
-        } else {
-          chartData = d3.nest().key(d => d).entries(source);
-        }
+        
+        // get chart data
+        let source = this.getChartData()
+        let chartData = d3.nest().key(d => d).entries(source);
 
         let pie = d3.layout.pie()
           .value(d => d.value)
@@ -148,11 +112,14 @@
           .append("svg")
           .attr("width", obj.width)
           .attr("height", obj.height).append("g");
+
+        let txt = this.externals[this.inputs[this.x].selectedValue[0]]["key"]
+
         parentG.append("text")
         .attr("dy", ".35em")
         .attr("text-anchor", "middle")
         .attr("transform", "translate("+(obj.width/2)+","+(obj.height/2)+")")
-        .text(function(d) { return d.key; });
+        .text(txt);
 
 
         let g = parentG.selectAll('.arc')
@@ -189,7 +156,17 @@
         };
         this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
       }
-
+      getChartData(){
+        let sourcemap =
+        this.source.reduce((old,newVal)=>{
+          let xaxis= this.inputs[this.x].selectedValue[0];
+          let yaxis= this.inputs[this.y].selectedValue[0];
+          old[newVal[xaxis]]=(old[newVal[xaxis]]||0)+newVal[yaxis]
+          return old
+        },{})
+        let source  = Object.keys(sourcemap).map(item=>{return {item,value:sourcemap[item]}})
+        return source
+      }
     }
     customElements.define(pieChart.is, pieChart)
   </script>
