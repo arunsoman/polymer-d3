@@ -99,15 +99,36 @@
       .tags:hover{
         background: #c38983;
       }
+      .warning{
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        text-align: center;
+        background: #fff;
+        position: absolute;
+        border-radius: 4px;
+        padding-top: 24px;
+        z-index: 999;
+      }
     </style>
     <div class="item-holder" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
       <div class="item-drop">
         <template is="dom-repeat" items="{{itemGrp}}" as="tag" index-as="tagIndex">
           <span class="tags">[[ tag ]]<i><paper-icon-button icon="delete" on-tap="remove" index="{{index}}"></paper-icon-button></i></span>
         </template>
+        <template is="dom-if" if="{{warning}}">
+        <div class="warning">[[warning]]
+          <paper-icon-button icon="close" on-tap="toggleWarning"></paper-icon-button>
+        </div>
+      </template>
       </div>
+      
       <h4>[[ label ]]</h4>
-      <p>Accepts srings / number</p>
+      <p>Accept 
+      <template is="dom-if" if="[[accept]]">only [[accept]]</template>
+      <template is="dom-if" if="[[!accept]]">all types</template>
+      </p>
     </div>
 
 </template>
@@ -164,6 +185,20 @@
           type:Object,
           value:{},
           notify:true
+        },
+        max:{
+          type:String,
+          value:0
+        },
+        warning:{
+          value:false
+        },
+        accept:{
+          value:false
+        },
+        exclude:{
+          type:Array,
+          value:[]
         }
       }
     }
@@ -178,7 +213,7 @@
       }
     }
     static get observers(){
-      return["_inputChange(input)"]
+      return["_inputChange(input)","_transformAccept(accept)"]
     }
     constructor(){
       super();
@@ -186,6 +221,11 @@
     }
     connectedCallback(){
       super.connectedCallback()
+    }
+    _transformAccept(item){
+      if(item){
+        this.set('_accepts',item.split(','));
+      }
     }
     _inputChange(input){
       // debugger
@@ -229,9 +269,6 @@
     }
     drop(e){
       e.preventDefault();
-      if(this.selectedValue.length>=1 &&(["x","y","z"].indexOf(this.axis)!=-1)){
-        return false
-      }
       this.parentElement.$.inputItems.classList.remove('drag-active');
       var tagIndex = e.dataTransfer.getData('text');
       if(tagIndex){
@@ -242,8 +279,16 @@
     }
     addTag(tagIndex){
         let tagNode = this.parentNode.externals[tagIndex];
+        // add only accepted data types on input box
+        if(this._accepts && (this._accepts.indexOf(tagNode.type.toLowerCase())==-1) ){
+          this.set('warning','accept only '+this.accept);
+          return false;
+        }
         let tagNodeVal = tagNode.value;
         this.add(tagNode,tagNodeVal)
+    }
+    toggleWarning(){
+      this.set('warning',false);
     }
     onLabelChange(){
       this.setInputObj()
