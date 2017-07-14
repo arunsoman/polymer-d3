@@ -106,7 +106,7 @@
           return false
         }
 
-        this.chartKeys(obj,obj.chartData[0].values,'item');
+      //  this.chartKeys(obj,obj.chartData[0].values,'item');
         let parentG = d3.select(this.$.chartContainer)
           .selectAll("div#chartContainer")
           .data(obj.chartData).enter()
@@ -140,10 +140,18 @@
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
 
-        let legend = parentG.append("g")
-          .attr("class","legend")
-          .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
-          .call(d3.legend)
+        // let legend = parentG.append("g")
+        //   .attr("class","legend")
+        //   .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
+        //   .call(d3.legend)
+
+        this.addLegend({
+            obj,
+            container:parentG,
+            selector:'.pie-slice',
+            node:obj.chartData,
+            key: 'value'
+          });
 
         d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
           "height":this.settings.height.value+"px"})

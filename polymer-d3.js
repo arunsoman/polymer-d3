@@ -210,7 +210,7 @@ class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Ele
   _selectedChanged(selectedChart) {
     let elem;
     if (this.selectedChartObj && !PolymerD3.utilities.isEmptyObject(this.selectedChartObj)) {
-      this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+    //  this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
     }
     this.set('settingsVisible', true);
     if (selectedChart && !PolymerD3.utilities.isEmptyObject(selectedChart)) {
@@ -222,17 +222,17 @@ class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Ele
         '.chartHolder',
         selectedChart.callBack
       );
-      elem.set('source', this.source);
-      elem.set('externals', this.externals);
+      // elem.set('source', this.source);
+      // elem.set('externals', this.externals);
 
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
       if (selectedChart.settings) {
         elem.setData(selectedChart.settings);
       }
-      this.async(() => {
-        elem.set('editMode', this.editMode);
-      });
+      // this.async(() => {
+      //   elem.set('editMode', this.editMode);
+      // });
     }
   }
 

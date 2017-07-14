@@ -164,9 +164,6 @@
       if (!obj || obj.itemChk) {
         return false
       }
-      this.chartKeys(obj,obj.chartData,0);
-      let legendNodes = obj.chartData.map(items=>{return {key:items[0],color:obj.color(items[0])}});
-      this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
 
       let parentG = d3.select(this.$.chartContainer).append("svg")
         .attr("width", obj.width)
@@ -183,9 +180,6 @@
         .attr('class', 'box-g')
         .call(obj.chart.width(obj.x.rangeBand()))
         .attr('class', 'box')
-        .attr("data-legend",function(d) { return d[0]})
-        .style('fill', this.colorFill.bind(obj))
-        .attr("data-legend-color",this.colorFill.bind(obj))
 
       // add a title
      parentG.append("text")
@@ -214,11 +208,13 @@
           .attr("y",  34 )
 		      .attr("dy", ".71em")
 
-    let legend = parentG.append("g")
-      .attr("class","legend")
-      .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
-      .call(d3.legend)
-
+    this.addLegend({
+        obj,
+        container:parentG,
+        selector:'.box',
+        node:obj.chartData,
+        key: 0
+      });
       d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
     }
     // Returns a function to compute the interquartile range.

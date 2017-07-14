@@ -19,7 +19,6 @@ PolymerD3.utilities.attachElement = function(elem, container, cb) {
     var containerElem = this.root.querySelector(container);
     if (containerElem) {
         containerElem.appendChild(dynamicEl);
-        debugger
     } else {
         this.appendChild(dynamicEl);
     }
