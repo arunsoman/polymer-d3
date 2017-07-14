@@ -1,53 +1,58 @@
 <link rel="import" href="../display-component/base-chart.html">
 <dom-module id='calendar-chart'>
-  <style>
-    .arc text {
-      font: 10px sans-serif;
-      text-anchor: middle;
-    }
-
-    .arc path {
-      stroke: #fff;
-    }
-
-    .chartContainer {
-      max-width: 100%;
-    }
-    .draggable-areabtn-wrap {
-      position: relative;
-    }
-    .icons-wrap.right-icons,
-    .settings-icon {
-      position: absolute;
-      right: 1em;
-      top: 6px;
-    }
-    paper-icon-button {
-     color: #868686;
-     transition: all .3s ease;
-    }
-    paper-icon-button:hover {
-      color: #454545;
-    }
-    .pie-slice {
-      transition: all .2s ease-in;
-    }
-    .pie-slice:hover {
-      -webkit-filter: drop-shadow( -5px -5px 5px #000);
-      filter: drop-shadow( -5px -5px 5px #000);
-      transform: scale(1.05);
-    }
-  </style>
-
   <template>
+  <style>
+  .day {
+    fill: #fff;
+    stroke: black;
+    stroke-width: .5px;
+  }
+  .month {
+    fill: none;
+    stroke: white;
+    stroke-width: 1px;
+  }
+  .year-title {
+    font-size: 18px;
+    letter-spacing: 10px;
+    fill: #00B0DD;
+  }
+  #info {
+  position: absolute;
+  top: 10px;
+  left: 40px;
+  font-size: 13px;
+  }
+  header {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 33px;
+  width: 100%;
+  background: #ffff00;
+  opacity: 0.9;
+  z-index: 22;
+  background: #00B0DD;
+  color: white;
+  }
+  svg text {
+    font-size: 11px;
+    text-transform: uppercase;
+    fill: #00B0DD;
+  }
+  #chartContainer{
+    margin:0 auto;
+  }
+  </style>
     <chart-input-group  uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+      <chart-input slot="chart-input" axis="x" label="Key" accept="date"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <!-- <svg id="svg"></svg> -->
     <div id="chartContainer"></div>
   </template>
+
   <script>
     class calendarChart extends baseChart{
       static get is(){
@@ -66,61 +71,60 @@
       }
       _compute() {
         //axis are mentioned in the chart-input module
-        let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
-        let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
-        let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
-
-        // let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
-        // let itemGrpChk = groupBy.length > 0
-
-        if (itemChk) {
-          // if (!itemGrpChk) {
-            return false;
-          // }
-        }
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
 
         //"itemChk" for avoid error from chart
-        // itemChk = itemChk ? !itemGrpChk : itemChk
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
+
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let width = +this.settings.width.value,
-            height = 50,
+            height = +this.settings.height.value,
             margin = {top: 5, right: 40, bottom: 20, left: 120}
             //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right
-        height = height - margin.top - margin.bottom
-
         let color = d3.scale.category20c();
 
-        //get chart data once pass "itemGrp" into the "getChartData" method
-        let itemGrp = itemGrpX.concat.apply(itemGrpX, itemGrpY)
-        // itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
-
-        let groupedData
-        let source = this.getChartData(itemGrp)
-        // debugger
-        // groupedData = d3.nest().key(d => d.item).entries(source);
-// debugger
-        let chartSrcData = source.map((item,i)=>{ if(i%2) return {
-          "item":source[i-1].value,"date":item.value}
-        }).filter((items,i)=>{
-          return items
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY)
+        let chartSrcData = source.map((item,i)=>{
+          return{"item":item.value,"date":item["item"]}
         })
-
+        // debugger
         let chartData = d3.nest()
-              .key((d)=> parseDate(d.date.split(' ')[0]))
+              .key((d)=> parseDate(d.item.split(' ')[0]))
               .rollup(function (n) {
                   return d3.sum(n, function (d) {
-                      return d.item; // key
+                      return d.value; // key
                   })
               })
-              .map(chartSrcData);;
+              .map(source);
+        //get years and calculated for year range(start and end year)
+        let yearRange = chartSrcData.map(date=>+date.date.split("-")[0]).sort((a, b)=> a-b)
+        let startYear =yearRange[0]
+        let endYear =yearRange.pop()+1
+
+
+        // create chart and source available in calendar-heatmap.js
+        let self = this
+        let calendarChart = d3.calendar.heatmap()
+            .colourRangeStart('#FDBB30')
+            .colourRangeEnd('#EE3124')
+            .height(height)
+            .width(width)
+            .startYear(startYear)
+            .endYear(endYear)
+            .margin(margin)
 
         return {
           width,
-          height,
-          color,
-          //chart,
-          margin,
+          calendarChart,
           itemChk,
           chartData
         }
@@ -131,8 +135,25 @@
         if (!obj || obj.itemChk) {
           return false
         }
+        // render chart
+
+        d3.select(this.$.chartContainer)
+          .datum(obj.chartData)
+          .call(obj.calendarChart);
+
+        d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY){
+          let sourcemap = this.source.map(row=>{
+            return{[row[itemX]]:row[itemY]}
+          })
+          // debugger
+          let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+          return source
       }
     }
     customElements.define(calendarChart.is,calendarChart)
   </script>
+  <script src="calendar-heatmap.js"></script>
 </dom-module>

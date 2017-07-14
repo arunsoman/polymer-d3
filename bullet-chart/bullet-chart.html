@@ -27,9 +27,8 @@
   </style>
 
     <chart-input-group  uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
-      <chart-input slot="chart-input" axis="groupBy" label="Group by"></chart-input>
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <!-- <svg id="svg"></svg> -->
@@ -53,21 +52,18 @@
       }
       _compute() {
         //axis are mentioned in the chart-input module
-        let itemGrpX = this.x ? this.inputs[this.x].itemGrp : []
-        let itemGrpY = this.y ? this.inputs[this.y].itemGrp : []
-        let itemChk = itemGrpX.length <= 0 || itemGrpY.length <= 0
-
-        let groupBy = this.groupBy ? this.inputs[this.groupBy].itemGrp : []
-        let itemGrpChk = groupBy.length > 0
-
-        if (itemChk) {
-          if (!itemGrpChk) {
-            return false;
-          }
-        }
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
 
         //"itemChk" for avoid error from chart
-        itemChk = itemChk ? !itemGrpChk : itemChk
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
 
         let width = +this.settings.width.value,
             height = 50,
@@ -78,12 +74,10 @@
 
         let color = d3.scale.category20c();
 
-        //get chart data once pass "itemGrp" into the "getChartData" method
-        let itemGrp
-        itemGrp = itemGrpChk ? groupBy : itemGrpX.concat.apply(itemGrpX, itemGrpY)
+        //get chart data once pass "x and y" into the "getChartData" method
 
         let groupedData
-        let source = this.getChartData(itemGrp)
+        let source = this.getChartData(itemX, itemY)
         groupedData = d3.nest().key(d => d.item).entries(source);
 
         let chartData =[]
@@ -141,6 +135,15 @@
           .text(function(d) { return d.title; });
 
       d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY){
+          let sourcemap = this.source.map(row=>{
+            return{[row[itemX]]:row[itemY]}
+          })
+          // debugger
+          let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+          return source
       }
     }
     customElements.define(bulletChart.is, bulletChart)
