@@ -67,7 +67,8 @@
 
         let width = +this.settings.width.value,
             height = 50,
-            margin = {top: 5, right: 40, bottom: 20, left: 120}
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
             //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
         width = width - margin.left - margin.right
         height = height - margin.top - margin.bottom
@@ -108,7 +109,8 @@
           chart,
           margin,
           itemChk,
-          chartData
+          chartData,
+          label
         }
       }
       _paint(obj) {
@@ -133,7 +135,13 @@
       title.append("text")
           .attr("class", "title")
           .text(function(d) { return d.title; });
-
+      this.addLegend({
+          obj,
+          container:parentG,
+          selector:'.measure',
+          node:obj.chartData,
+          key: 'date'
+        });
       d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
       }
       // populate chart data

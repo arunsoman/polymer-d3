@@ -74,6 +74,7 @@ d3.calendar={};
                             y: function(d) { return day(d) * sizeByDay; }
                         })
                   rect.filter(function(d) { return d in nestedData; })
+                      .attr({class: 'day-rect'})
                       .append("title")
                       .text(function(d) {
                         let f = d3.time.format('%B %d, %Y')

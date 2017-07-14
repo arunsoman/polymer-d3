@@ -17,24 +17,6 @@
     letter-spacing: 10px;
     fill: #00B0DD;
   }
-  #info {
-  position: absolute;
-  top: 10px;
-  left: 40px;
-  font-size: 13px;
-  }
-  header {
-  position: fixed;
-  left: 0;
-  top: 0;
-  height: 33px;
-  width: 100%;
-  background: #ffff00;
-  opacity: 0.9;
-  z-index: 22;
-  background: #00B0DD;
-  color: white;
-  }
   svg text {
     font-size: 11px;
     text-transform: uppercase;
@@ -87,7 +69,8 @@
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let width = +this.settings.width.value,
             height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120}
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
             //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
         let color = d3.scale.category20c();
 
@@ -124,9 +107,11 @@
 
         return {
           width,
+          height,
           calendarChart,
           itemChk,
-          chartData
+          chartData,
+          label
         }
 
       }
@@ -140,6 +125,14 @@
         d3.select(this.$.chartContainer)
           .datum(obj.chartData)
           .call(obj.calendarChart);
+
+        // this.addLegend({
+        //     obj,
+        //     container:d3.select(this.$.chartContainer),
+        //     selector:'.day-rect',
+        //     node:obj.chartData,
+        //     key: 'date'
+        //   });
 
         d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
       }
