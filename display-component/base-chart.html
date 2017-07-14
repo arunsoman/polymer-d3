@@ -130,9 +130,15 @@
     chartKeys(data,key){
       let color = d3.scale.category20c();
       let legendNodes = this.settings.legend.values.nodes;
-      if(legendNodes.length < 1){
-        legendNodes = data.map(items=>{return {key:items[key],color:color(items[key])}});
-      }
+      // if(legendNodes.length < 1){
+        // check whether key is present else show y axis values as label
+        if(key==undefined){
+          let axisLabel = this.inputs[this.y].selectedObjs[0].key;
+          legendNodes = [{key:axisLabel,color:color(axisLabel)}];
+        }else{
+          legendNodes = data.map(items=>{return {key:items[key],color:color(items[key])}});
+        }
+      // }
       this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
     }
     // to fill color for svg and legends
@@ -156,8 +162,7 @@
       this.chartKeys(obj.node,obj.key);
       obj.container.selectAll(obj.selector)
         .style("fill", this.colorFill.bind(obj.obj))
-        .attr("data-legend",function(d) {
-          return d.item})
+        .attr("data-legend",d=>d[obj.key]||this.inputs[this.y].selectedObjs[0].key)
         .attr("data-legend-color",this.colorFill.bind(obj.obj))
 
       obj.container.append("g")

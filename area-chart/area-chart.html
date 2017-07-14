@@ -1,50 +1,5 @@
 <link rel="import" href="../display-component/base-chart.html">
 <dom-module id="area-chart">
-  <style>
-    /*.axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }*/
-    /*.area {
-      fill: steelblue;
-    }*/
-    area.above {
-      fill: #D4D4FF;
-    }
-
-    .area.below {
-      fill: #E6D8B5;
-    }
-
-    .line2 {
-      fill: none;
-      stroke: #AD513F;  /* brown */
-      stroke-width: 1.5px;
-    }
-    .line1 {
-      fill: none;
-      stroke: #314EE0;  /* royal blue */
-      stroke-width: 1.5px;
-    }
-    .draggable-areabtn-wrap {
-      position: relative;
-    }
-    .icons-wrap.right-icons,
-    .settings-icon {
-      position: absolute;
-      right: 1em;
-      top: 6px;
-    }
-    paper-icon-button {
-     color: #868686;
-     transition: all .3s ease;
-    }
-    paper-icon-button:hover {
-      color: #454545;
-    }
-  </style>
   <template>
     <style>
     .axis path,
@@ -61,6 +16,13 @@
     }
     #chartContainer{
       margin:0 auto;
+    }
+    .legend-items text{
+      fill:black
+    }
+    .legend{
+      fill:transparent;
+      font-size: 12px;
     }
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -181,8 +143,7 @@
               obj,
               container:parentG,
               selector:'.area',
-              node:obj.chartData,
-              key: 'date'
+              node:obj.chartData
             });
         d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
       }

@@ -149,8 +149,8 @@
             obj,
             container:parentG,
             selector:'.pie-slice',
-            node:obj.chartData,
-            key: 'value'
+            node:obj.chartData[0].values,
+            key: 'item'
           });
 
         d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",

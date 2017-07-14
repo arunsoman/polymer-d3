@@ -179,7 +179,7 @@
     		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.margin.top + ")")
         .attr('class', 'box-g')
         .call(obj.chart.width(obj.x.rangeBand()))
-        .attr('class', 'box')
+        .attr('class', 'rect')
 
       // add a title
      parentG.append("text")
@@ -211,7 +211,7 @@
     this.addLegend({
         obj,
         container:parentG,
-        selector:'.box',
+        selector:'.rect',
         node:obj.chartData,
         key: 0
       });
