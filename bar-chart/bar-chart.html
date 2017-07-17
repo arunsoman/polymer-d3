@@ -19,7 +19,6 @@
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <div id="chartContainer"></div>
-    bar chart goes here
   </template>
   <script>
   class barChart extends baseChart {
@@ -105,7 +104,7 @@
         .style("text-anchor", "end")
         .text("Value ($)");
 
-      svg.selectAll("bar")
+      let segments = svg.selectAll("bar")
         .data(obj.chartData)
         .enter().append("rect")
         .attr('class', 'bar')
@@ -124,10 +123,13 @@
       this.addLegend({
         obj,
         container:svg,
-        selector:'.bar',
+        selector:'rect.bar',
         node:obj.chartData,
-        key: 'item'
+        key: 'item',
+        segments
       });
+      // debugger;
+      // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
 
     }
     getChartData(itemX, itemY) {

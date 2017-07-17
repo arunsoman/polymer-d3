@@ -61,7 +61,7 @@
               return {
                 title:{uitype:'text',txt:"Title",value:""},
                 margin:{uitype:'visual',txt:'Margin',value:{left:0,top:0,right:0,bottom:0}},
-                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:10,y:20}}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
                 width:{uitype:'number',txt:"Chart width", value:"960"},
                 height:{uitype:'number',txt:"Chart Height", value:"500"}
               }
@@ -157,6 +157,11 @@
     inputCheck(){
       return Object.keys(this.inputs).length < 2;
     }
+    addToolTip(obj){
+      this.attachToolTip(obj.container,obj.segments,obj.selector,d=>{
+        return `<span><strong>${d.item||d.data.item}</strong><br/>${d.value||d.data.value}<span>`;
+      })
+    }
 
     addLegend(obj){
       this.chartKeys(obj.node,obj.key);
@@ -169,6 +174,11 @@
           .attr("class","legend")
           .attr("transform","translate("+(obj.obj.width*obj.obj.label.position.x)/100+","+(obj.obj.height*obj.obj.label.position.y)/100+")")
           .call(d3.legend);
+
+      // add tooltip if segments are provided
+      if(obj.segments){
+        this.addToolTip(obj);
+      }
 
     }
   }
