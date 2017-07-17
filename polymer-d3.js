@@ -92,6 +92,10 @@ class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Ele
               icon: 'chart:calendar-chart',
               element: 'box-plot'
             }, {
+              label: 'Bullet Chart',
+              icon: 'chart:bullet-chart',
+              element: 'bullet-chart'
+            }, {
               label: 'Composite Canvas',
               icon: 'icons:dashboard',
               element: 'composite-canvas'
