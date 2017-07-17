@@ -12,6 +12,12 @@
     fill:transparent;
     font-size: 12px;
   }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
   </style>
     <chart-input-group uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
@@ -37,7 +43,7 @@
           top: 20,
           right: 50,
           bottom: 70,
-          left: 50
+          left: 150
         },
         width = this.settings.width.value - margin.left - margin.right,
         height = this.settings.height.value - margin.top - margin.bottom,
@@ -78,14 +84,15 @@
       if(!obj) return false;
       this.clear();
       
-      let svg = d3.select(this.$.chartContainer)
+      let selector = d3.select(this.$.chartContainer)
         .append("svg")
         .attr("width", obj.width + obj.margin.left + obj.margin.right)
         .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
 
-      svg.append("g")
+      let svg = selector.append("g")
         .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
-      svg.append("g")
+
+        svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + obj.height + ")")
         .call(obj.axis.position.x)
@@ -93,8 +100,8 @@
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
         .attr("dy", "-.55em")
-        .attr("transform", "rotate(-90)");
-      svg.append("g")
+        .attr("transform", "rotate(-90)")
+        svg.append("g")
         .attr("class", "y axis")
         .call(obj.axis.position.y)
         .append("text")

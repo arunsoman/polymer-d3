@@ -8,12 +8,12 @@
         display: block;
         background: #f9f9f9;
         position: relative;
-        border: solid 1px #e4e4e4;
+        /*border: solid 1px #e4e4e4;*/
         margin: 0 0;
         border-left: 0;
         border-right: 0;
         box-shadow: inset 0px -1px 20px 6px rgba(0, 0, 0, 0.02);
-        height: 37px;
+        /*height: 37px;*/
         overflow: hidden;
       }
       paper-icon-button {
@@ -37,23 +37,25 @@
         transition: all 1s ease;
         white-space: nowrap;
       }*/
-      paper-icon-button:hover {
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
-        color: #454545;
-        transform: scale(1.11);
+      paper-tabs{
+        --paper-tabs-selection-bar-color: #cc6055;
       }
-      /*paper-icon-button:hover:after {
-        display: inline-block;
-        transform: scale(1);
-      }*/
+      paper-tab.iron-selected{
+        background: #2f3238;
+      }
     </style>
+    <paper-tabs selected="1" scrollable>
     <template is="dom-repeat" items="{{charts}}">
-      <paper-icon-button
-        icon="[[item.icon]]"
-        title="[[item.label]]"
-        on-tap="notifyTap"
-      ></paper-icon-button>
+      <paper-tab>
+        <paper-icon-button
+          icon="[[item.icon]]"
+          title="[[item.label]]"
+          on-tap="notifyTap"
+        ></paper-icon-button>
+      </paper-tab>
     </template>
+    </paper-tabs>
+    
   </template>
   <script>
     Polymer({
@@ -76,17 +78,17 @@
 
       // Sets current selected object
       notifyTap: function(e) {
-        if (this.selectedBtn.style) {
-          this.selectedBtn.style.color = '';
-        }
-        this.set('selectedBtn', e.target);
-        this.selectedBtn.style.color = '#97DBE6';
+        // if (this.selectedBtn.style) {
+        //   this.selectedBtn.style.color = '';
+        // }
+        // this.set('selectedBtn', e.target);
+        // this.selectedBtn.style.color = '#ffffff';
         this.set('selected', e.model.item);
       },
 
       setSelectedChart: function(selectedBtnIdentifier) {
-        this.set('selectedBtn', this.$$(selectedBtnIdentifier));
-        this.selectedBtn.style.color = '#97DBE6';
+        // this.set('selectedBtn', this.$$(selectedBtnIdentifier));
+        // this.selectedBtn.style.color = '#97DBE6';
       }
 
     });
