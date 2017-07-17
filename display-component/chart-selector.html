@@ -1,6 +1,4 @@
-<!--
-  Input to select chart type
--->
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
 <dom-module id="chart-selector">
   <template>
     <style>
@@ -44,7 +42,7 @@
         background: #2f3238;
       }
     </style>
-    <paper-tabs selected="1" scrollable>
+    <paper-tabs selected="0" scrollable>
     <template is="dom-repeat" items="{{charts}}">
       <paper-tab>
         <paper-icon-button
@@ -58,9 +56,10 @@
     
   </template>
   <script>
-    Polymer({
-      is: 'chart-selector',
-      properties: {
+  class chartSelector extends Polymer.Element{
+    static get is(){return 'chart-selector'}
+    static get properties(){
+      return{
         charts: {
           type: Array,
           value: () => { return [];}
@@ -74,23 +73,12 @@
           value: () => { return {};},
           notify: true
         }
-      },
-
-      // Sets current selected object
-      notifyTap: function(e) {
-        // if (this.selectedBtn.style) {
-        //   this.selectedBtn.style.color = '';
-        // }
-        // this.set('selectedBtn', e.target);
-        // this.selectedBtn.style.color = '#ffffff';
-        this.set('selected', e.model.item);
-      },
-
-      setSelectedChart: function(selectedBtnIdentifier) {
-        // this.set('selectedBtn', this.$$(selectedBtnIdentifier));
-        // this.selectedBtn.style.color = '#97DBE6';
       }
-
-    });
+    }
+    notifyTap(e) {
+      this.set('selected', e.model.item);
+    }
+  }
+  window.customElements.define(chartSelector.is,chartSelector);
   </script>
 </dom-module>
