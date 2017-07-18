@@ -36,10 +36,7 @@
         white-space: nowrap;
       }*/
       paper-tabs{
-        --paper-tabs-selection-bar-color: #cc6055;
-      }
-      paper-tab.iron-selected{
-        background: #2f3238;
+        --paper-tabs-selection-bar-color: #000000;
       }
     </style>
     <paper-tabs selected="0" scrollable>
@@ -75,8 +72,16 @@
         }
       }
     }
+    connectedCallback(){
+      this.set('selected', {
+            callBack:"initTable",
+            element:"polymerd3-table",
+            icon:"chart:table-icon",
+            label:"Table"
+          });
+    }
     notifyTap(e) {
-      this.set('selected', e.model.item);
+      this.set('selected',e.model.item);
     }
   }
   window.customElements.define(chartSelector.is,chartSelector);
