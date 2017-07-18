@@ -1,6 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../display-component/base-chart.html">
-<dom-module id="bar-chart">
+<link rel="import" href="../bar-chart/bar-chart.html">
+<dom-module id="stacked-bar-chart">
   <template>
   <style>
   #chartContainer{
@@ -20,17 +20,19 @@
     shape-rendering: crispEdges;
     }
   </style>
+  Stacked Bar chart
     <chart-input-group uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Y axis"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="Z axis"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <div id="chartContainer"></div>
   </template>
   <script>
-  class barChart extends baseChart {
+  class stackedbarChart extends barChart {
     static get is() {
-      return 'bar-chart'
+      return 'stacked-bar-chart'
     }
     static get properties() {
       return {}
@@ -52,16 +54,21 @@
 
       let xInput = this.x ? this.inputs[this.x].selectedValue : [];
       let yInput = this.y ? this.inputs[this.y].selectedValue : [];
-      let chartData = this.getChartData(xInput, yInput);
+      let chartData = this.transformSource(xInput, yInput,100);
 
       let axis = {
         scale: {},
         position: {}
       }
+      let layers = d3.layout.stack()(chartData);
       axis.scale.x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
       axis.scale.y = d3.scale.linear().range([height, 0]);
-      axis.scale.x.domain(chartData.map(items => items.item))
-      axis.scale.y.domain([0, d3.max(chartData, items => items.value)])
+      axis.scale.z = d3.scale.category10();
+      axis.scale.x.domain(layers[0].map(items => items.x))
+      axis.scale.y.domain([0, d3.max(layers[layers.length - 1], function(d) { return d.y0 + d.y; })]).nice();
+      // get keys of array map without duplicate in it
+      let keys = Object.keys(this.source.map(items=>items[0]).reduce((a,b)=>{a[b]=true; return a},{}));
+      axis.scale.z.domain(keys);
 
       // x.domain(data.map(function(d) { return d.date; }));
       // y.domain([0, d3.max(data, function(d) { return d.value; })]);
@@ -77,7 +84,8 @@
         height,
         axis,
         label,
-        chartData
+        chartData,
+        layers
       }
 
     }
@@ -93,7 +101,11 @@
       let svg = selector.append("g")
         .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
 
-        svg.append("g")
+      // // render stacked bar chart
+      // if(obj.axis.scale.z){
+       
+      // }
+      svg.append("g")
         .attr("class", "x axis")
         .attr("transform", "translate(0," + obj.height + ")")
         .call(obj.axis.position.x)
@@ -112,35 +124,50 @@
         .style("text-anchor", "end")
         .text("Value ($)");
 
-      let segments = svg.selectAll("bar")
-        .data(obj.chartData)
-        .enter().append("rect")
-        .attr('class', 'bar')
-        .style("fill", "steelblue")
-        .attr("x", function(d) {
-          return obj.axis.scale.x(d.item);
-        })
-        .attr("width", obj.axis.scale.x.rangeBand())
-        .attr("y", function(d) {
-          return obj.axis.scale.y(d.value);
-        })
-        .attr("height", function(d) {
-          return obj.height - obj.axis.scale.y(d.value);
-        })
+      let segments = svg.selectAll(".layer")
+        .data(obj.layers)
+        .enter().append("g")
+        .attr('class', 'layer')
+        .style("fill", function(d, i) { return obj.axis.scale.z(i); });
+        // .style("fill", "steelblue");
 
-      this.addLegend({
-        obj,
-        container:svg,
-        selector:'rect.bar',
-        node:obj.chartData,
-        key: 'item',
-        segments
-      });
+      segments.selectAll("rect")
+      .data(function(d) { return d; })
+      .enter().append("rect")
+      .attr("x", function(d) { return obj.axis.scale.x(d.x); })
+      .attr("y", function(d) { return obj.axis.scale.y(d.y + d.y0); })
+      .attr("height", function(d) { return obj.axis.scale.y(d.y0) - obj.axis.scale.y(d.y + d.y0); })
+      .attr("width", obj.axis.scale.x.rangeBand() - 1);
+
+        // .attr("x", function(d) {
+        //   return obj.axis.scale.x(d.item);
+        // })
+        // .attr("width", obj.axis.scale.x.rangeBand())
+        // .attr("y", function(d) {
+        //   return obj.axis.scale.y(d.value);
+        // })
+        // .attr("height", function(d) {
+        //   return obj.height - obj.axis.scale.y(d.value);
+        // })
+
+      // this.addLegend({
+      //   obj,
+      //   container:svg,
+      //   selector:'g.layer',
+      //   node:obj.layers[0],
+      //   key: 'x',
+      //   segments
+      // });
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
 
     }
-    getChartData(itemX, itemY) {
+    transformSource(itemX, itemY, stacked) {
+      return stacked ? this.transformToStackedData(itemX,itemY,stacked) : this.transformToBaseData(itemX,itemY);
+      
+    }
+    // transform data to basic bar chart data
+    transformToBaseData(itemX,itemY){
       let sourcemap =
         this.source.reduce((old, newVal) => {
           old[newVal[itemX]] = (old[newVal[itemX]] || 0) + newVal[itemY]
@@ -155,7 +182,14 @@
       return source
     }
 
+    // transform data to render chart in stacked format
+    transformToStackedData(itemX,itemY,stacked){
+      var keys = Object.keys(this.source.map(items=>items[itemX]).reduce((a,b)=>{a[b]=true; return a},{}));
+      return keys.map(items=>this.source.map(source=>{return {
+x:source[itemX],y:source[itemY]}}));
+      // return this.source.map((items,i)=>{ return this.source.reduce((old,newVal)=>{ old[newVal[itemX]]=items[itemX]==newVal[itemX] ? items[itemY]:newVal[itemY]; return old},{total:stacked}) });
+    }
   }
-  window.customElements.define(barChart.is, barChart);
+  window.customElements.define(stackedbarChart.is, stackedbarChart);
   </script>
 </dom-module>
