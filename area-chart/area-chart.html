@@ -26,8 +26,9 @@
     }
     </style>
     <chart-input-group  uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="Key" accept="date"></chart-input>
+      <chart-input slot="chart-input" axis="x" label="Key" accept="number,date"></chart-input>
       <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <!-- <svg id="svg"></svg> -->
@@ -61,8 +62,12 @@
             return false;
         }
         //axis inputs selectedValue assigin
+        let stacked = true
         itemX = itemX[0]
         itemY=itemY[0]
+
+        let itemZ = stacked && this.z ? this.inputs[this.z].selectedValue : []
+        itemZ = itemZ[0]
 
         let formatDate = d3.time.format("%Y-%m-%d").parse;
         let width = +this.settings.width.value,
@@ -73,29 +78,69 @@
         width = width - margin.left - margin.right,
         height = height - margin.top - margin.bottom;
 
-        let x = d3.time.scale().range([0, width]);
+        let color = d3.scale.category20c();
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY,itemZ,stacked)
+        let chartData,
+            areaChart,
+            dateVal
+        if(stacked){
+          color.domain(source.names);
+          let nest = d3.nest().key(function(d) { return d.key; });
+          debugger
+          let stack = d3.layout.stack()
+              .values(function(d) { return d.values; });
+          let srcData = //stack(
+            color.domain().map(function(name) {
+              // debugger
+                return {
+                  name: name,
+                  values: source.data[name].map(function(d) {
+                    // debugger
+                      dateVal = formatDate(String(d.item).split(" ")[0])
+                      let dateSet = dateVal?dateVal:d.item
+                    return {item: dateSet, y: d[name] * 1};
+                  })
+                };
+              })
+            //);
+          chartData = stack(srcData)
+debugger
+        }else{
+          chartData = source.map((item,i)=>{
+            dateVal = formatDate(String(item["item"]).split(" ")[0])
+            let dateSet = dateVal?dateVal:item["item"]
+            return{"value":item.value,"item":dateSet}
+          })
+        }
+
+        let dateX = d3.time.scale().range([0, width]);
+        let stringX = d3.scale.ordinal().range([0, width]);
+
+        let x = dateVal?dateX:stringX
         let y = d3.scale.linear().range([height, 0]);
         let xAxis = d3.svg.axis()
             .scale(x).orient("bottom");
         let yAxis = d3.svg.axis()
             .scale(y).orient("left");
 
-        let color = d3.scale.category20c();
+        if(stacked){
 
-        //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY)
-        let chartData = source.map((item,i)=>{
-          return{"value":item.value,"date":formatDate(item["item"].split(" ")[0])}
-        })
 
-        let areaChart = d3.svg.area()
-            .x(function(d) { return x(d.date); })
-            //.y0(height)
-            .y1(function(d) { return y(d.value); })
-            .y0(height)
-
-        x.domain(d3.extent(chartData, function(d) { return d.date; }));
-        y.domain([0, d3.max(chartData, function(d) { return d.value; })]);
+        }else{
+          areaChart = d3.svg.area()
+              .x(function(d) { return x(d.item); })
+              .y1(function(d) { return y(d.value); })
+              .y0(height)
+          if(dateVal){
+            x.domain(d3.extent(chartData, function(d) { return d.item; }));
+          }else{
+            x.domain(chartData.map(d=> d.item))
+            .rangeRoundBands([0 , width]);
+          }
+          y.domain([0, d3.max(chartData, function(d) { return d.value; })]);
+        }
+debugger
 
         return {
           width,
@@ -148,13 +193,38 @@
         d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
       }
       // populate chart data
-      getChartData(itemX, itemY){
+      getChartData(itemX, itemY,itemZ,stacked){
+        let arr = []
+        if(stacked){
+          let names=this.source.map(row=>row[itemZ])
+          //let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
+
+          let source = this.source.map(row=>{
+
+            return {
+              item:row[itemX],
+              [row[itemZ]]:row[itemY]
+            }
+          })
+          let data = source.reduce((old,newVal)=>{
+
+               if(!old[Object.keys(newVal)[1]]){
+                old[Object.keys(newVal)[1]] = [newVal]
+               }else{
+                old[Object.keys(newVal)[1]].push(newVal)
+               }
+              return old
+              },{})
+          return {data,names}
+
+        }else{
           let sourcemap = this.source.map(row=>{
             return{[row[itemX]]:row[itemY]}
           })
           // debugger
           let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
           return source
+        }
       }
     }
     customElements.define(areaChart.is,areaChart)
