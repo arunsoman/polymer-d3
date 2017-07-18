@@ -1,66 +1,57 @@
-<!DOCTYPE html>
-<html>
-  <head>
+<!DOCTYPE html><html><head>
     <link rel="import" href="polymer-d3-imports-internal.html">
-    <link rel="stylesheet" href="index.css">
+    <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
     <link href="bullet-chart/bullet-chart.html" rel="import">
     <link href="difference-chart/difference-chart.html" rel="import">
     -->
+    <style>
+    body{
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    </style>
   </head>
   <body>
+
+    <!-- <box-plot>
+      <chart-input-group slot="chart-input-group">
+        <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+      </chart-input-group>
+    </box-plot> -->
+
+
+<!-- <pie-chart></pie-chart>
+<box-plot></box-plot>
+<bullet-chart></bullet-chart>
+<calendar-chart></calendar-chart>
+<area-chart></area-chart> -->
+
+
+
+
+
     <polymer-d3></polymer-d3>
     <!-- <polymerd3-table></polymerd3-table> -->
+    <script src="data.js"></script>
     <script type="text/javascript">
+    // var piechartData = document.querySelector('chart-input-group');
       var pd3 = document.querySelector('polymer-d3');
-      // var table = document.querySelector('polymerd3-table');
-      var externals = [{
-        key: 'state',
-        type: 'String',
-        value: 0
-      }, {
-        key: 'l1',
-        type: 'Number',
-        value: 1
-      }, {
-        key: 'l2',
-        type: 'Number',
-        value: 2
-      }, {
-        key: 'l3',
-        type: 'Number',
-        value: 3
-      }, {
-        key: 'l4',
-        type: 'Number',
-        value: 4
-      }, {
-        key: 'l5',
-        type: 'Number',
-        value: 5
-      }, {
-        key: 'l6',
-        type: 'Number',
-        value: 6
-      }]
-      d3.csv("data/bar-data.csv", function(error, csv) {
-        var data = csv.map(function(row) {
-          return [
-            row.state, Number(row.l1), Number(row.l2),
-            Number(row.l3), Number(row.l4), Number(row.l5),
-            Number(row.l6)
-          ];
-        });
-        console.log(data);
-        var config = {
-          source: data,
-          externals: externals,
+      var config = {
+
+          externals: datacsv.externals,
           mode: 'create'
         }
         pd3.bootstrapCharts(config);
-        // table.source = data;
-        // table.externals = externals;
-      });
+
+        var dataConfig={
+          externals: datacsv.externals,
+          source: datacsv.source
+        }
+        PolymerD3.dataSource = dataConfig
+      
     </script>
-  </body>
-</html>
+  
+
+</body></html>

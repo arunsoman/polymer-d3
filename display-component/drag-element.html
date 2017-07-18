@@ -1,0 +1,51 @@
+<dom-module id="drag-element">
+  <template>
+  <style>
+  .tags{
+    cursor: move;
+    padding: 0.5em 1em;
+    display: inline-block;
+    background: #e47f36;
+    border-radius: 4px;
+    color: #ffffff;
+    margin-bottom: 0.2em;
+    overflow: hidden;
+    position: relative;
+  }
+  .tags:hover{
+    background: #d06010;
+  }
+  .tags small {
+      font-size: 0.5em;
+      display: block;
+      color: #000;
+  }
+  </style>
+    <span class="tags">
+      [[ item.key ]]
+      <small>[[ item.type ]]</small>
+    </span>
+  </template>
+  <script>
+    class dragElement extends Polymer.Element {
+      static get is() {
+          return 'drag-element';
+      }
+      constructor() {
+          super();
+      }
+      connectedCallback(){
+        this.addEventListener("dragstart",this.drag.bind(this))
+        super.connectedCallback()
+      }
+      drag(e){
+          if(!e.target.dataset) return;
+          if(this.parentNode.nextElementSibling.id==="inputItems")
+            this.parentElement.nextElementSibling.classList.add('drag-active');
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text",e.target.dataset.index);
+      }
+    }
+    customElements.define(dragElement.is, dragElement)
+  </script>
+</dom-module>

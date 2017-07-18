@@ -1,88 +1,232 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id="area-chart">
-  <style>
-    /*.axis path,
-    .axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }*/
-    /*.area {
-      fill: steelblue;
-    }*/
-    area.above {
-      fill: #D4D4FF;
-    }
-
-    .area.below {
-      fill: #E6D8B5;
-    }
-
-    .line2 {
-      fill: none;
-      stroke: #AD513F;  /* brown */
-      stroke-width: 1.5px;
-    }
-    .line1 {
-      fill: none;
-      stroke: #314EE0;  /* royal blue */
-      stroke-width: 1.5px;
-    }
-    .draggable-areabtn-wrap {
-      position: relative;
-    }
-    .icons-wrap.right-icons,
-    .settings-icon {
-      position: absolute;
-      right: 1em;
-      top: 6px;
-    }
-    paper-icon-button {
-     color: #868686;
-     transition: all .3s ease;
-    }
-    paper-icon-button:hover {
-      color: #454545;
-    }
-  </style>
   <template>
-    <h4>Area Chart</h4>
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-            <paper-dialog id="display-component" opened>
-              <h2>Settings</h2>
-              <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-            </paper-dialog>
-          </template>
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
+    <style>
+    .axis path,
+    .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+    .x.axis path {
+    display: none;
+    }
+    .area {
+    fill: steelblue;
+    }
+    #chartContainer{
+      margin:0 auto;
+    }
+    .legend-items text{
+      fill:black
+    }
+    .legend{
+      fill:transparent;
+      font-size: 12px;
+    }
+    </style>
+    <chart-input-group uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key" accept="number,date"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <!-- <svg id="svg"></svg> -->
+    <div id="chartContainer"></div>
   </template>
+  <script>
+    class areaChart extends baseChart{
+      static get is(){
+        return "area-chart"
+      }
+      static get properties(){
+        return{
+
+        }
+      }
+      constructor(){
+        super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        let stacked = true
+        itemX = itemX[0]
+        itemY=itemY[0]
+
+        let itemZ = stacked && this.z ? this.inputs[this.z].selectedValue : []
+        itemZ = itemZ[0]
+
+        let formatDate = d3.time.format("%Y-%m-%d").parse;
+        let width = +this.settings.width.value,
+            height = +this.settings.height.value,
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+        width = width - margin.left - margin.right,
+        height = height - margin.top - margin.bottom;
+
+        let color = d3.scale.category20c();
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY,itemZ,stacked)
+        let chartData,
+            areaChart,
+            dateVal
+        if(stacked){
+          color.domain(source.names);
+          let nest = d3.nest().key(function(d) { return d.key; });
+          debugger
+          let stack = d3.layout.stack()
+              .values(function(d) { return d.values; });
+          let srcData = //stack(
+            color.domain().map(function(name) {
+              // debugger
+                return {
+                  name: name,
+                  values: source.data[name].map(function(d) {
+                    // debugger
+                      dateVal = formatDate(String(d.item).split(" ")[0])
+                      let dateSet = dateVal?dateVal:d.item
+                    return {item: dateSet, y: d[name] * 1};
+                  })
+                };
+              })
+            //);
+          chartData = stack(srcData)
+debugger
+        }else{
+          chartData = source.map((item,i)=>{
+            dateVal = formatDate(String(item["item"]).split(" ")[0])
+            let dateSet = dateVal?dateVal:item["item"]
+            return{"value":item.value,"item":dateSet}
+          })
+        }
+
+        let dateX = d3.time.scale().range([0, width]);
+        let stringX = d3.scale.ordinal().range([0, width]);
+
+        let x = dateVal?dateX:stringX
+        let y = d3.scale.linear().range([height, 0]);
+        let xAxis = d3.svg.axis()
+            .scale(x).orient("bottom");
+        let yAxis = d3.svg.axis()
+            .scale(y).orient("left");
+
+        if(stacked){
+
+
+        }else{
+          areaChart = d3.svg.area()
+              .x(function(d) { return x(d.item); })
+              .y1(function(d) { return y(d.value); })
+              .y0(height)
+          if(dateVal){
+            x.domain(d3.extent(chartData, function(d) { return d.item; }));
+          }else{
+            x.domain(chartData.map(d=> d.item))
+            .rangeRoundBands([0 , width]);
+          }
+          y.domain([0, d3.max(chartData, function(d) { return d.value; })]);
+        }
+debugger
+
+        return {
+          width,
+          height,
+          margin,
+          xAxis,
+          yAxis,
+          areaChart,
+          itemChk,
+          chartData,
+          label
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+            .attr({"width": obj.width + obj.margin.left + obj.margin.right,
+                    "height": obj.height + obj.margin.top + obj.margin.bottom+40
+            })
+            .append("g")
+              .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+          parentG.append("path")
+            .datum(obj.chartData)
+            .attr({"class":"area",
+                    "fill": "steelblue",
+                    "d": obj.areaChart
+                  })
+        parentG.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + obj.height + ")")
+            .call(obj.xAxis);
+        parentG.append("g")
+            .attr("class", "y axis")
+            .call(obj.yAxis)
+            .append("text")
+              .attr("transform", "rotate(-90)")
+              .attr("y", 6)
+              .attr("dy", ".71em")
+              .style("text-anchor", "end")
+          this.addLegend({
+              obj,
+              container:parentG,
+              selector:'.area',
+              node:obj.chartData
+            });
+        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY,itemZ,stacked){
+        let arr = []
+        if(stacked){
+          let names=this.source.map(row=>row[itemZ])
+          //let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
+
+          let source = this.source.map(row=>{
+
+            return {
+              item:row[itemX],
+              [row[itemZ]]:row[itemY]
+            }
+          })
+          let data = source.reduce((old,newVal)=>{
+
+               if(!old[Object.keys(newVal)[1]]){
+                old[Object.keys(newVal)[1]] = [newVal]
+               }else{
+                old[Object.keys(newVal)[1]].push(newVal)
+               }
+              return old
+              },{})
+          return {data,names}
+
+        }else{
+          let sourcemap = this.source.map(row=>{
+            return{[row[itemX]]:row[itemY]}
+          })
+          // debugger
+          let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+          return source
+        }
+      }
+    }
+    customElements.define(areaChart.is,areaChart)
+  </script>
 </dom-module>
-<script src='area-chart.js'></script>

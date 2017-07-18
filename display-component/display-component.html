@@ -1,6 +1,6 @@
-<link rel="import" href="draggable-input.html">
+<link rel="import" href="settings-component.html">
 
-<dom-module id='display-component' >
+<dom-module id="display-component">
     <style>
         :host {
             text-align: left;
@@ -37,12 +37,12 @@
         }
     </style>
     <template>
-        <paper-dialog id="settingsModal" modal>
+        <paper-dialog id="settingsModal" modal="">
             <h2>Settings</h2>
-            <template is='dom-repeat' items="{{settings}}">
+            <template is="dom-repeat" items="{{settings}}">
                 <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                    <paper-dropdown-menu label='[[ item.txt ]]'>
-                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
+                    <paper-dropdown-menu label="[[ item.txt ]]">
+                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected="{{item.selectedValue}}">
                             <template is="dom-repeat" items="[[item.options]]">
                                 <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
                             </template>
@@ -52,25 +52,25 @@
                 </template>
 
                 <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                    <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+                    <paper-input label="[[item.txt]]" type="[[item.uitype]]" value="{{item.selectedValue}}"></paper-input>
                 </template>
                 <template is="dom-if" if="{{isText(item.uitype)}}">
-                    <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
+                    <paper-input label="[[item.txt]]" type="text" value="{{item.selectedValue}}"></paper-input>
                 </template>
 
                 <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                    <paper-dropdown-menu label='[[ item.txt ]]'>
-                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
-                            <template is="dom-repeat" items="[[external]]" >
+                    <paper-dropdown-menu label="[[ item.txt ]]">
+                        <paper-listbox attr-for-selected="value" class="dropdown-content" selected="{{item.selectedValue}}">
+                            <template is="dom-repeat" items="[[external]]">
                                 <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
                             </template>
                         </paper-listbox>
                     </paper-dropdown-menu>
                 </template>
                 <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
-                    <paper-dropdown-menu label='[[ item.txt ]]'>
-                        <paper-listbox multi attr-for-selected="value" class="dropdown-content"  selected-values='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
-                            <template is="dom-repeat" items="[[external]]" >
+                    <paper-dropdown-menu label="[[ item.txt ]]">
+                        <paper-listbox multi="" attr-for-selected="value" class="dropdown-content" selected-values="{{item.selectedValue}}" selecteditemlabel="{{item.selectedName}}">
+                            <template is="dom-repeat" items="[[external]]">
                                 <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
                             </template>
                         </paper-listbox>
@@ -88,7 +88,7 @@
                 <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
                     <span>[[item.txt]]</span>
                     <div class="slider-wrap">
-                        <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+                        <paper-slider pin="" snaps="" min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
                         <span id="{{item.input}}" class="dummy-txt">TICK</span>
                     </div>
                 </template>

@@ -1,6 +1,101 @@
-Polymer({
-  is: 'stacked-composite-chart',
-  draw: function() {
+"use strict";
+
+class stackedCompositeChart extends Polymer.mixinBehaviors([
+  PolymerD3.chartBehavior,PolymerD3.chartConfigCbBehavior
+], Polymer.Element){
+  static get is(){
+    return "stacked-composite-chart"
+  }
+  static get properties(){
+    return {
+      title: {
+        type:String
+      },
+      inputs: {
+        notify: true,
+        type: Array,
+        value: () => {
+          return [{
+            input: 'x',
+            txt: 'Pick Dimension',
+            selectedValue: [0,25],//dummy value for chart population
+            scaleType: '',
+            format: '',
+            selectedObjs: [],
+            uitype: 'single-value',
+            displayName: 'myXAxis',
+            maxSelectableValues: 1
+          }, {
+            input: 'y',
+            txt: 'Pick Measures',
+            selectedValue: [0,25],//dummy value for chart population
+            format: '',
+            scaleType: '',
+            selectedObjs: [],
+            uitype: 'multi-value',
+            displayName: 'myYAxis',
+            maxSelectableValues: 2,
+            supportedType: ''
+          }, {
+            input: 'z',
+            txt: 'Pick Z',
+            selectedValue: [0,200],//dummy value for chart population
+            format: '',
+            scaleType: '',
+            selectedObjs: [],
+            uitype: 'multi-value',
+            displayName: 'myZAxis',
+            maxSelectableValues: 2,
+            supportedType: ''
+          }];
+        }
+      },
+      settings: {
+        notify: true,
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      chartType: {
+        type: Object,
+        value: () => {
+          return [];
+        }
+      },
+      hideSettings: {
+        type:Boolean,
+        value:true
+      },
+      source: {
+        type:Array,
+        value:[]
+      },
+      external: {
+        type:Array,
+        value:[]
+      },
+      chart: {
+        type:Object,
+        value:{}
+      },
+      dataMutated: {
+        type: Boolean,
+        value: false
+      },
+      isStacked: {
+        type: Boolean,
+        value: true
+      },
+      configurator: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
+    }
+  }
+  draw() {
     this.debounce('draw-debounce', () => {
       const xInput = this.inputs[0].selectedValue;
       const yInputs = this.inputs[1].selectedValue;
@@ -82,7 +177,6 @@ Polymer({
         .attr('data-legend', function(d) {
           return d.key;
         });;
-
       let rects = layer.selectAll('rect')
         .data(d => d)
         .enter().append('rect')
@@ -153,82 +247,7 @@ Polymer({
 
       this.attachLegend(this.parentG, this.legendSettings);
     }, 500);
-  },
+  }
+}
 
-  properties: {
-    title: '',
-    inputs: {
-      notify: true,
-      type: Array,
-      value: () => {
-        return [{
-          input: 'x',
-          txt: 'Pick Dimension',
-          selectedValue: [],
-          scaleType: '',
-          format: '',
-          selectedObjs: [],
-          uitype: 'single-value',
-          displayName: 'myXAxis',
-          maxSelectableValues: 1
-        }, {
-          input: 'y',
-          txt: 'Pick Measures',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myYAxis',
-          maxSelectableValues: 2,
-          supportedType: ''
-        }, {
-          input: 'z',
-          txt: 'Pick Z',
-          selectedValue: [],
-          format: '',
-          scaleType: '',
-          selectedObjs: [],
-          uitype: 'multi-value',
-          displayName: 'myZAxis',
-          maxSelectableValues: 2,
-          supportedType: ''
-        }];
-      }
-    },
-    settings: {
-      notify: true,
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    chartType: {
-      type: Object,
-      value: () => {
-        return [];
-      }
-    },
-    hideSettings: true,
-    source: Array,
-    external: Array,
-    chart: Object,
-    dataMutated: false,
-    isStacked: {
-      type: Boolean,
-      value: true
-    },
-    configurator: {
-      type: Object,
-      value: function() {
-        return {};
-      }
-    }
-  },
-
-  behaviors: [
-    PolymerD3.chartBehavior,
-    PolymerD3.chartConfigCbBehavior
-  ]
-
-});
+customElements.define(stackedCompositeChart.is, stackedCompositeChart)

@@ -1,4 +1,4 @@
-<dom-module id='heat-map'>
+<dom-module id="heat-map">
 <style>
 
      rect.bordered {
@@ -23,15 +23,15 @@
 </style>
 
     <template>
-        <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
+        <div class="mandatory">
+        <display-component settings="{{inputs}}" external="[[external]]"></display-component>
         </div>
 
         <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-        <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external='[[external]]'></display-component>
+        <div class="optional" hidden="{{hideSettings}}">
+            <display-component settings="{{settings}}" external="[[external]]"></display-component>
         </div>
         <div id="chartHolder"></div>
     </template>
 </dom-module>
-<script src='heat-map.js'></script>
+<script src="heat-map.js"></script>

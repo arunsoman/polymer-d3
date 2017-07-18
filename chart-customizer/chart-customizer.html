@@ -5,9 +5,7 @@ The changes made to this component can be propogated to settings attribute
 Example:
 
     <chart-customizer settings="[[settings]]"></chart-customizer>
--->
-
-<script type="text/javascript" src="drag-elem.js"></script>
+--><script type="text/javascript" src="drag-elem.js"></script>
 <dom-module id="chart-customizer">
   <template>
     <style>
@@ -38,29 +36,29 @@ Example:
 
     <!-- Tick rotation -->
     <div class="tick-rotation flex">
-      <template is='dom-repeat' items="{{_settings}}">
+      <template is="dom-repeat" items="{{_settings}}">
         <template is="dom-if" if="{{isSliderInput(item.uitype)}}">
           <span>[[item.txt]]</span>
           <div class="slider-wrap">
-              <paper-slider pin snaps min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
+              <paper-slider pin="" snaps="" min="[[item.min]]" max="[[item.max]]" max-markers="10" step="[[item.step]]" value="{{item.selectedValue}}" on-value-change="_rotateTick"></paper-slider>
               <span id="{{item.input}}" class="dummy-txt">TICK</span>
           </div>
         </template>
       </template>
     </div>
     <div class="inputs flex">
-      <template is='dom-repeat' items="{{_settings}}">
+      <template is="dom-repeat" items="{{_settings}}">
         <template is="dom-if" if="{{isVisibleInput(item.input)}}">
           <template is="dom-if" if="{{isNumber(item.uitype)}}">
-            <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
+            <paper-input label="[[item.txt]]" type="[[item.uitype]]" value="{{item.selectedValue}}"></paper-input>
           </template>
           <template is="dom-if" if="{{isText(item.uitype)}}">
-            <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
+            <paper-input label="[[item.txt]]" type="text" value="{{item.selectedValue}}"></paper-input>
           </template>
         </template>
       </template>
     </div>
-    <template is="dom-if" if="{{legendSettingsFlag}}" restamp>
+    <template is="dom-if" if="{{legendSettingsFlag}}" restamp="">
         <legends-component opener="{{legendSettingsFlag}}" settings="{{_legendSettings}}"></legends-component>
       </template>
     <div>

@@ -6,14 +6,14 @@ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<link rel="import" href="../polymer/polymer.html">
+--><link rel="import" href="../polymer/polymer.html">
 
 <script>
   /**
   Polymer.IronFormElementBehavior enables a custom element to be included
   in an `iron-form`.
+
+  Events `iron-form-element-register` and `iron-form-element-unregister` are not fired on Polymer 2.0.
 
   @demo demo/index.html
   @polymerBehavior
@@ -32,7 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        *
        * @event iron-form-element-unregister
        */
-
+       
       /**
        * The name of this element.
        */
@@ -69,13 +69,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     },
 
-    attached: function() {
+    attached: Polymer.Element ? null : function() {
       // Note: the iron-form that this element belongs to will set this
       // element's _parentForm property when handling this event.
       this.fire('iron-form-element-register');
     },
 
-    detached: function() {
+    detached: Polymer.Element ? null : function() {
       if (this._parentForm) {
         this._parentForm.fire('iron-form-element-unregister', {target: this});
       }

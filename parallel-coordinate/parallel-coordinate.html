@@ -1,4 +1,4 @@
-<dom-module id='parallel-coordinate'>
+<dom-module id="parallel-coordinate">
 <style>
 
 svg {
@@ -37,15 +37,15 @@ svg {
     <template>
     <h4>Parallel coordinates</h4>
       <template is="dom-if" if="[[editMode]]">
-        <div class='mandatory'>
-        <display-component settings="{{inputs}}" external=[[external]]></display-component>
+        <div class="mandatory">
+        <display-component settings="{{inputs}}" external="[[external]]"></display-component>
         </div>
 
         <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-        <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external=[[external]]></display-component>
+        <div class="optional" hidden="{{hideSettings}}">
+            <display-component settings="{{settings}}" external="[[external]]"></display-component>
         </div>
       </template>
     </template>
 </dom-module>
-<script src='parallel-coordinate.js'></script>
+<script src="parallel-coordinate.js"></script>

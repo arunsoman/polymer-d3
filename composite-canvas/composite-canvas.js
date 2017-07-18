@@ -1,8 +1,12 @@
-Polymer({
+"use strict";
 
-  is: 'composite-canvas',
+class compositeCanvas extends Polymer.mixinBehaviors([PolymerD3.chartDataManagerBehavior],Polymer.Element){
+  static get is(){
+    return 'composite-canvas'
+  }
 
-  properties: {
+  static get properties(){
+  return {
     source: {
       type: Array,
       value: () => {
@@ -17,7 +21,9 @@ Polymer({
     },
     charts: {
       type: Array,
-      value: () => []
+      value: () => {
+        return []
+      }
     },
     // The query that run at paragraph,
     // to be used for generating query
@@ -55,26 +61,27 @@ Polymer({
     lastModifiedBy: {
       type: String
     }
-  },
+  }
+}
+  static get observers(){
+    return [
+      'pargraphQueryChanged(pargraphQuery)'
+    ]
+  }
+  constructor(){
+    super()
+  }
+  connectedCallback(){
+    this.addEventListener("TOGGLE",this.toggleData.bind(this))
+    super.connectedCallback()
+  }
 
-  listeners: {
-    'TOGGLE': 'toggleData',
-    'RESET': 'resetCharts'
-  },
-
-  behaviors: [
-    PolymerD3.chartDataManagerBehavior
-  ],
-
-  observers: [
-    'pargraphQueryChanged(pargraphQuery)'
-  ],
-
-  pargraphQueryChanged: function(query) {
+  pargraphQueryChanged(query) {
     this.set('_pargraphQuery', query);
-  },
+  }
 
-  attached: function() {
+  attached() {
+    debugger
     this.async(() => {
       this.set('sourceVolume', this.source.length);
       // select and register chart
@@ -94,9 +101,9 @@ Polymer({
       this.charts = processed.charts;
       this._sourceDimension = processed.newDimension;
     });
-  },
+  }
 
-  toggleData: function(e) {
+  toggleData(e) {
     console.log(e.detail.filter);
     if (!e.detail.chart) {
       console.warn('Event source couldn\'t be identified');
@@ -112,18 +119,18 @@ Polymer({
       queries: queries
     }, e.detail.filter);
     this._sourceDimension = processed.newDimension;
-  },
+  }
 
-  resetAllCharts: function() {
+  resetAllCharts() {
     this.initCharts(this.charts, {
       externals: this.externals,
       dimension: this._sourceDimension
     }, arr => arr);
     this.charts.forEach(chart => chart.draw());
-  },
+  }
 
   // register chart to chart-array
-  registerChart: function(chart) {
+  registerChart(chart) {
     // search a list of available charts, push only if isn't present
     let chartIds = this.charts.map(chart => chart.id);
     if (chartIds.indexOf(chart.chartId) == -1) {
@@ -135,10 +142,10 @@ Polymer({
     } else {
       console.warn('Chart already present');
     }
-  },
+  }
 
   // removes chart form chart array
-  deRegisterChart: function(chart) {
+  deRegisterChart(chart) {
     var indexToRem;
     this.charts.forEach((c, i) => {
       if (c.chartId == chart.chartId) {
@@ -148,9 +155,9 @@ Polymer({
     if (indexToRem != null) {
       this.splice('charts', indexToRem, 1);
     }
-  },
+  }
 
-  initCharts: function(chartArr, config, filter) {
+  initCharts(chartArr, config, filter) {
     let processor;
     if (!config.queries) {
       config.queries = [];
@@ -208,9 +215,12 @@ Polymer({
       charts: charts,
       newDimension: config.dimension
     };
-  },
+  }
 
-  remTwoRows: function() {
+  remTwoRows() {
     this.resetAllCharts();
   }
-});
+
+}
+
+customElements.define(compositeCanvas.is, compositeCanvas)

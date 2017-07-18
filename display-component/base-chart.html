@@ -1,0 +1,187 @@
+<link href="../behaviors/redux-mixins-behavior.html" rel="import">
+
+<dom-module id="base-chart">
+<template>
+  <h3>[[title]] </h3>
+</template>
+<script>
+
+  class baseChart extends Polymer.mixinBehaviors(
+    [PolymerD3.toolTipBehavior],ReduxMixinBehavior(Polymer.Element)
+    ){
+    static get is(){ return 'base-chart'}
+
+    static get properties(){
+      return{
+        redrawChk:{
+          type:Boolean
+        },
+        uuid:{
+          type:String
+        },
+        axisKeys:{
+          type:String,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            let keys = keyChk && Object.keys(chartPath.inputs)
+            return keys
+          }
+        },
+        inputs:{
+          type:Array,
+          observer:'_chartDraw',
+          statePath(state){
+            var chartPath = state.charts[this.uuid]
+            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            return keyChk ? chartPath.inputs:{}
+          },
+          readOnly:true
+        },
+        // groupBy:{
+        //   type:String
+        // },
+        // x:{
+        //   type:String
+        // },
+        // y:{
+        //   type:String
+        // },
+        // z:{
+        //   type:String
+        // },
+        settings:{
+          type:Object,
+          observer:'_chartDraw',
+          statePath(state){
+            if(state.charts[this.uuid]){
+              return state.charts[this.uuid].settings;
+            }else{
+              return {
+                title:{uitype:'text',txt:"Title",value:""},
+                margin:{uitype:'visual',txt:'Margin',value:{left:0,top:0,right:0,bottom:0}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
+                width:{uitype:'number',txt:"Chart width", value:"960"},
+                height:{uitype:'number',txt:"Chart Height", value:"500"}
+              }
+            }
+          }
+
+        },
+        externals:{
+          type:Array,
+          statePath(state){
+            return state.externals
+          }
+        },
+        source:{
+          type:Array,
+          statePath(state){
+            return state.source
+          }
+        }
+      }
+    }
+    static get observers(){
+      // return["_chartDraw(inputs)"]
+    }
+
+    constructor(){
+      super();//baseChart
+      this.initializeChart();
+
+    }
+    static get actions() {
+      return {
+        updateChart(chartProperies) {
+          return {
+            type: 'UPDATE_CHART',
+            value: chartProperies
+          };
+        }
+      };
+    }
+    connectedCallback(){
+      super.connectedCallback();
+      this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
+    }
+    _chartDraw(){
+      if(this.inputs && Object.keys(this.inputs).length!=0){
+        //chart axis dre set here, the axis key's defined in "chart-input" module
+        this.axisKeys.forEach(axis=>{this.set(axis,axis)})
+        this.redraw()
+      }
+    }
+
+    draw(paint){
+      //this.debounce(arg,interval)
+      this.debouncer(paint,250)
+    }
+    debouncer(arg,interval){
+        return Polymer.Debouncer.debounce(this.debouncer,
+          Polymer.Async.timeOut.after(interval), () => {arg});
+    }
+    
+    initializeChart(){
+        this.set("uuid",PolymerD3.utilities.getUUID())
+    }
+    // add keys and colors to chartstore as keys
+    chartKeys(data,key){
+      let color = d3.scale.category20c();
+      let legendNodes = this.settings.legend.values.nodes;
+      // if(legendNodes.length < 1){
+        // check whether key is present else show y axis values as label
+        if(key==undefined){
+          let axisLabel = this.inputs[this.y].selectedObjs[0].key;
+          legendNodes = [{key:axisLabel,color:color(axisLabel)}];
+        }else{
+          legendNodes = data.map(items=>{return {key:items[key],color:color(items[key])}});
+        }
+      // }
+      this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
+    }
+    // to fill color for svg and legends
+    colorFill(){
+      let color = d3.scale.category20c();
+      let items = arguments[0];
+      let index = arguments[1];
+      return this.label.nodes[index] ? this.label.nodes[index].color : color(items[0] || items.value);
+    }
+    clear(){
+      d3.select(this.$.chartContainer).html("");
+    }
+    // check input contains 2 or more axis.
+    // if axis value is less than 2 or empty
+    // do not need to compute chart values.
+    inputCheck(){
+      return Object.keys(this.inputs).length < 2;
+    }
+    addToolTip(obj){
+      this.attachToolTip(obj.container,obj.segments,obj.selector,d=>{
+        return `<span><strong>${d.item||d.data.item}</strong><br/>${d.value||d.data.value}<span>`;
+      })
+    }
+
+    addLegend(obj){
+      this.chartKeys(obj.node,obj.key);
+      obj.container.selectAll(obj.selector)
+        .style("fill", this.colorFill.bind(obj.obj))
+        .attr("data-legend",d=>d[obj.key]||this.inputs[this.y].selectedObjs[0].key)
+        .attr("data-legend-color",this.colorFill.bind(obj.obj))
+
+      obj.container.append("g")
+          .attr("class","legend")
+          .attr("transform","translate("+(obj.obj.width*obj.obj.label.position.x)/100+","+(obj.obj.height*obj.obj.label.position.y)/100+")")
+          .call(d3.legend);
+
+      // add tooltip if segments are provided
+      if(obj.segments){
+        this.addToolTip(obj);
+      }
+
+    }
+  }
+  customElements.define(baseChart.is,baseChart)
+
+</script>
+</dom-module>

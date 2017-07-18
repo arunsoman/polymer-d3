@@ -1,8 +1,7 @@
 <!--
 A table to display data suitable for gh-pages
 Could also be used as a custom visualization
--->
-
+--><link href="../behaviors/redux-mixins-behavior.html" rel="import">
 <dom-module id="polymerd3-table">
   <template>
     <style>
@@ -86,27 +85,21 @@ Could also be used as a custom visualization
     </div>
   </template>
   <script>
-    Polymer({
-      is: 'polymerd3-table',
-      properties: {
-        source: {
-          type: Array,
-          value: () => {
-            return [];
-          }
+  class polymerd3Table extends ReduxMixinBehavior(Polymer.Element){
+    static get is(){return 'polymerd3-table'}
+    static get properties(){
+      return{
+        source:{
+          type:Array,
+          statePath:'source'
         },
-        externals: {
-          type: Array,
-          value: () => {
-            return [];
-          }
+        externals:{
+          type:Array,
+          statePath:'externals'
         }
-      },
-      behaviors: [
-        PolymerD3.chartDataManagerBehavior
-      ],
-      draw: function() {
       }
-    });
+    }
+  }
+  window.customElements.define(polymerd3Table.is,polymerd3Table)
   </script>
 </dom-module>

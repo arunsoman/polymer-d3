@@ -1,79 +1,184 @@
-<link rel="stylesheet" href="pie-chart-global.css">
-<dom-module id='pie-chart'>
-  <style>
-    .arc text {
-      font: 10px sans-serif;
-      text-anchor: middle;
-    }
-
-    .arc path {
-      stroke: #fff;
-    }
-
-    .chartContainer {
-      max-width: 100%;
-    }
-    .draggable-areabtn-wrap {
-      position: relative;
-    }
-    .icons-wrap.right-icons,
-    .settings-icon {
-      position: absolute;
-      right: 1em;
-      top: 6px;
-    }
-    paper-icon-button {
-     color: #868686;
-     transition: all .3s ease;
-    }
-    paper-icon-button:hover {
-      color: #454545;
-    }
-    .pie-slice {
-      transition: all .2s ease-in;
-    }
-    .pie-slice:hover {
-      -webkit-filter: drop-shadow( -5px -5px 5px #000);
-      filter: drop-shadow( -5px -5px 5px #000);
-      transform: scale(1.05);
-    }
-  </style>
-
+<link rel="import" href="../display-component/base-chart.html">
+<!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
+<dom-module id="pie-chart">
   <template>
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <display-component settings="{{area}}"></display-component>
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
-  </template>
-</dom-module>
+<style>
+  body {
+    text-align: center;
+  }
+  svg {
+    font: 29px sans-serif;
+  }
+  #chartContainer{
+    margin:0 auto;
+  }
+  .legend-items text{
+    fill:black
+  }
+  .legend{
+    fill:transparent;
+    font-size: 12px;
+  }
+  </style>
+  <chart-input-group uuid="[[uuid]]">
+    <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+    <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+  </chart-input-group>
+  <chart-settings uuid="[[uuid]]"></chart-settings>
+  <!-- <svg id="svg"></svg> -->
+  <div id="chartContainer"></div>
+</template>
+  <script>
+    class pieChart extends baseChart {
+      static get is() {
+        return 'pie-chart'
+      }
+      static get properties() {
+        return {
+          innerRadius: {
+            type: Object,
+            value: {
+              selectedValue: 0
+            }
+          }
+        }
+      }
+      constructor() {
+        super();
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
 
-<script src='pie-chart.js'></script>
-<!-- <script src='../bower_components/d3/d3.min.js'></script> -->
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
+
+        let width = this.settings.width.value,
+            height = this.settings.height.value,
+            label = this.settings.legend.values;
+        let innerRadius;
+        let radius = Math.min(width, height) / 2;
+        innerRadius = radius / 2
+
+        let color = d3.scale.category20c();
+
+        // get chart data
+        let source = this.getChartData(itemX,itemY)
+        let chartData = d3.nest().key(d => d).entries(source);
+
+        let pie = d3.layout.pie()
+          .value(d => d.value)
+          .sort(null);
+
+        let arc = d3.svg.arc()
+          .outerRadius(radius - 10)
+          .innerRadius(innerRadius);
+
+        let labelArc = d3.svg.arc()
+          .outerRadius(radius - 40)
+          .innerRadius(radius - 40);
+
+        return {
+          width,
+          height,
+          color,
+          arc,
+          pie,
+          itemChk,
+          chartData,
+          label
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+
+      //  this.chartKeys(obj,obj.chartData[0].values,'item');
+        let parentG = d3.select(this.$.chartContainer)
+          .selectAll("div#chartContainer")
+          .data(obj.chartData).enter()
+
+        parentG = parentG.append("div")
+          .style({"display":"inline-block","width":obj.width,"height":obj.height})
+          .append("svg")
+          .attr("width", obj.width)
+          .attr("height", obj.height).append("g");
+
+        let txt = this.externals[this.inputs[this.x].selectedValue[0]]["key"]
+
+        parentG.append("text")
+        .attr("dy", ".35em")
+        .attr("text-anchor", "middle")
+        .attr("transform", "translate("+(obj.width/2)+","+(obj.height/2)+")")
+        .text(txt);
+
+
+        let g = parentG.selectAll('.arc')
+          .data(d => obj.pie(d.values))
+          .enter().append('g')
+          .attr('class', 'arc')
+          .attr("data-legend",function(d) {return d.data.item})
+          .attr("data-legend-color",this.colorFill.bind(obj))
+
+        let segments = g.append('path')
+          .attr('d', obj.arc)
+          .style('fill', this.colorFill.bind(obj))
+          .attr('class', 'pie-slice');
+
+        segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+
+        // let legend = parentG.append("g")
+        //   .attr("class","legend")
+        //   .attr("transform","translate("+(obj.width*obj.label.position.x)/100+","+(obj.height*obj.label.position.y)/100+")")
+        //   .call(d3.legend)
+
+        this.addLegend({
+            obj,
+            container:parentG,
+            selector:'.pie-slice',
+            node:obj.chartData[0].values,
+            key: 'item',
+            segments
+          });
+
+        d3.select(this.$.chartContainer).style({"width":this.settings.width.value+"px",
+          "height":this.settings.height.value+"px"})
+
+        // let htmlCallback = d => {
+        //   let gpName = d.data.groupName || d.data.item;
+        //   let str = '<table class="pie-tooltip">' +
+        //     '<tr>' +
+        //     '<td>' + d.data.value + ',</td>' +
+        //     '<td>' + gpName + '</td>' +
+        //     '</tr>' +
+        //     '</table>';
+        //   return str;
+        // };
+        // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
+      }
+      getChartData(itemX, itemY){
+        let sourcemap =
+        this.source.reduce((old,newVal)=>{
+          old[newVal[itemX]]=(old[newVal[itemX]]||0)+newVal[itemY]
+          return old
+        },{})
+        let source  = Object.keys(sourcemap).map(item=>{return {item,value:sourcemap[item]}})
+        return source
+      }
+    }
+    customElements.define(pieChart.is, pieChart)
+  </script>
+</dom-module>

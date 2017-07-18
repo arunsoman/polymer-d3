@@ -1,82 +1,24 @@
 <link rel="import" href="draggable-input.html">
 
-<dom-module id='settings-component' >
+<dom-module id="settings-component">
     <template>
-        <template is='dom-repeat' items="{{settings}}">
-            <template is="dom-if" if="{{isDropDown(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
-                        <template is="dom-repeat" items="[[item.options]]">
-                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                    <span>------------{{item.selectedValue}}' ,, '{{item.selectedName}}'</span>
-                </paper-dropdown-menu>
-            </template>
-
-            <template is="dom-if" if="{{isNumber(item.uitype)}}">
-                <paper-input label="[[item.txt]]" type='[[item.uitype]]' value='{{item.selectedValue}}'></paper-input>
-            </template>
-            <template is="dom-if" if="{{isText(item.uitype)}}">
-                <paper-input label="[[item.txt]]" type='text' value='{{item.selectedValue}}'></paper-input>
-            </template>
-
-            <template is="dom-if" if="{{isSingleValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox attr-for-selected="value" class="dropdown-content" selected='{{item.selectedValue}}'>
-                        <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[index]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-            </template>
-            <template is="dom-if" if="{{isMultiValue(item.uitype)}}">
-                <paper-dropdown-menu label='[[ item.txt ]]'>
-                    <paper-listbox multi attr-for-selected="value" class="dropdown-content"  selected-values='{{item.selectedValue}}' selectedItemLabel='{{item.selectedName}}'>
-                        <template is="dom-repeat" items="[[external]]" >
-                            <paper-item value="[[item.value]]" class="dropdown-item">[[item.key]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-            </template>
-
-            <template is="dom-if" if="{{isColorRangePicker(item.uitype)}}">
-                <span>from:</span>
-                <polymer-color-picker color="{{item.from}}"></polymer-color-picker>
-                <span>to:</span>
-                <polymer-color-picker color="{{item.to}}"></polymer-color-picker>
-            </template>
-
-        </template>
+        <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
     </template>
+    
     <script type="text/javascript">
         Polymer({
             is : 'settings-component',
 
             properties: {
-                draggable: {
-                    type: Boolean,
-                    value: false
-                }
-            },
-
-            isDropDown:function(name){
-                return name === 'dropDown';
-            },
-            isSingleValue:function(name){
-                return name === 'single-value';
-            },
-            isMultiValue:function(name){
-                return name === 'multi-value';
-            },
-            isColorRangePicker: function (argument) {
-                return argument === 'colorRangePicker';
-            },
-            isNumber:function(argument) {
-                return argument === 'Number';
-            },
-            isText: function(argument) {
-                return argument === 'Text';
+               active:{
+                type:Boolean
+               },
+               externals:{
+                type:Object
+               },
+               inputs:{
+                type:Object
+               }
             }
         });
 

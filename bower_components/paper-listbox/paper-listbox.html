@@ -6,9 +6,7 @@ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
 The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
--->
-
-<link rel="import" href="../polymer/polymer.html">
+--><link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../iron-menu-behavior/iron-menu-behavior.html">
 <link rel="import" href="../paper-styles/default-theme.html">
 
@@ -68,14 +66,14 @@ of a listbox item will also focus it.
         display: block;
         padding: 8px 0;
 
-        background: var(--paper-listbox-background-color, --primary-background-color);
-        color: var(--paper-listbox-color, --primary-text-color);
+        background: var(--paper-listbox-background-color, var(--primary-background-color));
+        color: var(--paper-listbox-color, var(--primary-text-color));
 
-        @apply(--paper-listbox);
+        @apply --paper-listbox;
       }
     </style>
 
-    <content></content>
+    <slot></slot>
   </template>
 
   <script>

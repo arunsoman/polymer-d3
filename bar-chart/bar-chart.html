@@ -1,85 +1,161 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id="bar-chart">
   <template>
-    <style>
-      :host {
-        margin: 14px;
-      }
-      .chartContainer {
-        max-width: 100%;
-      }
-      .draggable-areabtn-wrap {
-        position: relative;
-      }
-      .icons-wrap.right-icons,
-      .settings-icon {
-        position: absolute;
-        right: 1em;
-        top: 6px;
-      }
-      paper-icon-button {
-       color: #868686;
-       transition: all .3s ease;
-      }
-      paper-icon-button:hover {
-        color: #454545;
-      }
-    </style>
-    <!-- set true temporarly -->
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-            <paper-dialog id="display-component" opened>
-              <h2>Settings</h2>
-              <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-            </paper-dialog>
-          </template>
-          <!-- <display-component settings="{{area}}"></display-component> -->
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
-    <!-- <h4>Bar Chart</h4> -->
-    <!-- <template is="dom-if" if="[[editMode]]">
-      <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]' draggable="true"></display-component>
-      </div>
-
-      <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-      <div class='optional' hidden="{{hideSettings}}">
-        <display-component settings="{{settings}}" external='[[external]]'></display-component>
-      </div>
-    </template> -->
-
+  <style>
+  #chartContainer{
+    margin:0 auto;
+  }
+  .legend-items text{
+    fill:black
+  }
+  .legend{
+    fill:transparent;
+    font-size: 12px;
+  }
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+  </style>
+    <chart-input-group uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
   </template>
-  <script src="bar-chart.js"></script>
-  <script src="difference.js"></script>
-  <script src="grouped.js"></script>
-  <script src="stacked.js"></script>
-  <script src="waterfall.js"></script>
-  <script src="heatmap.js"></script>
+  <script>
+  class barChart extends baseChart {
+    static get is() {
+      return 'bar-chart'
+    }
+    static get properties() {
+      return {}
+    }
+    redraw() {
+      this.draw(this._paint(this._compute(this.inputCheck())));
+    }
+    _compute(err) {
+      if (err) return false;
+      let margin = {
+          top: 20,
+          right: 50,
+          bottom: 70,
+          left: 150
+        },
+        width = this.settings.width.value - margin.left - margin.right,
+        height = this.settings.height.value - margin.top - margin.bottom,
+        label = this.settings.legend.values;
+
+      let xInput = this.x ? this.inputs[this.x].selectedValue : [];
+      let yInput = this.y ? this.inputs[this.y].selectedValue : [];
+      let chartData = this.getChartData(xInput, yInput);
+
+      let axis = {
+        scale: {},
+        position: {}
+      }
+      axis.scale.x = d3.scale.ordinal().rangeRoundBands([0, width], .05);
+      axis.scale.y = d3.scale.linear().range([height, 0]);
+      axis.scale.x.domain(chartData.map(items => items.item))
+      axis.scale.y.domain([0, d3.max(chartData, items => items.value)])
+
+      // x.domain(data.map(function(d) { return d.date; }));
+      // y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+      axis.position.x = d3.svg.axis().scale(axis.scale.x).orient("bottom");
+      axis.position.y = d3.svg.axis().scale(axis.scale.y).orient("left").ticks(10);
+
+      // this.source.map(items=>{return {item:items[xInput],value:items[yInput]}});
+
+      return {
+        width,
+        margin,
+        height,
+        axis,
+        label,
+        chartData
+      }
+
+    }
+    _paint(obj) {
+      if(!obj) return false;
+      this.clear();
+      
+      let selector = d3.select(this.$.chartContainer)
+        .append("svg")
+        .attr("width", obj.width + obj.margin.left + obj.margin.right)
+        .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+
+      let svg = selector.append("g")
+        .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+
+        svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + obj.height + ")")
+        .call(obj.axis.position.x)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.55em")
+        .attr("transform", "rotate(-90)")
+        svg.append("g")
+        .attr("class", "y axis")
+        .call(obj.axis.position.y)
+        .append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", 10)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Value ($)");
+
+      let segments = svg.selectAll("bar")
+        .data(obj.chartData)
+        .enter().append("rect")
+        .attr('class', 'bar')
+        .style("fill", "steelblue")
+        .attr("x", function(d) {
+          return obj.axis.scale.x(d.item);
+        })
+        .attr("width", obj.axis.scale.x.rangeBand())
+        .attr("y", function(d) {
+          return obj.axis.scale.y(d.value);
+        })
+        .attr("height", function(d) {
+          return obj.height - obj.axis.scale.y(d.value);
+        })
+
+      this.addLegend({
+        obj,
+        container:svg,
+        selector:'rect.bar',
+        node:obj.chartData,
+        key: 'item',
+        segments
+      });
+      // debugger;
+      // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
+
+    }
+    getChartData(itemX, itemY) {
+      let sourcemap =
+        this.source.reduce((old, newVal) => {
+          old[newVal[itemX]] = (old[newVal[itemX]] || 0) + newVal[itemY]
+          return old
+        }, {})
+      let source = Object.keys(sourcemap).map(item => {
+        return {
+          item,
+          value: sourcemap[item]
+        }
+      })
+      return source
+    }
+
+  }
+  window.customElements.define(barChart.is, barChart);
+  </script>
 </dom-module>

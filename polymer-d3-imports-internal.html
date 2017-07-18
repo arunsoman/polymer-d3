@@ -1,29 +1,22 @@
-<!-- Contains a list of elements to be imported into polymer-d3 while testing-->
-<!-- Don't use with external elements -->
-<!-- External dependencies -->
-<script src='bower_components/d3/d3.min.js'></script>
+<!-- Contains a list of elements to be imported into polymer-d3 while testing--><!-- Don't use with external elements --><!-- External dependencies --><script src="bower_components/d3/d3.min.js"></script>
 <!-- <script src='bower_components/d3-tip/index.js'></script> -->
-<script src='d3.tip.js'></script> -->
+<script src="d3.tip.js"></script> --&gt;
 <script src="d3-time.v1.min.js"></script>
 <script src="d3.legend.js"></script>
-<script src="d3.tip.js"></script>
 <link href="bower_components/polymer/polymer.html" rel="import">
-<link rel="import" href="bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="bower_components/paper-color-pallete/paper-color-pallete.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-button/paper-button.html">
+<link rel="import" href="bower_components/paper-slider/paper-slider.html">
 <link rel="import" href="bower_components/paper-input/paper-input.html">
-<link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="bower_components/paper-item/paper-item.html">
-<link rel="import" href="bower_components/polymer-color-picker/polymer-color-picker.html">
-<link rel="import" href="bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="bower_components/polymer-sortablejs/polymer-sortablejs.html">
-<link rel="import" href="bower_components/paper-color-pallete/paper-color-pallete.html">
+<link rel="import" href="bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="bower_components/paper-swatch-picker/paper-swatch-picker.html">
 <link rel="import" href="bower_components/paper-slider/paper-slider.html">
-<link rel="import" href="bower_components/paper-color-picker/paper-color-input.html">
 <script type="text/javascript" src="bower_components/crossfilter/crossfilter.js"></script>
 
 <!-- Internal dependencies -->
@@ -31,7 +24,7 @@
 <link href="polymer-d3.html" rel="import">
 <link href="behaviors/colorpicker-behavior.html" rel="import">
 <link href="display-component/display-component.html" rel="import">
-<link href="display-component/legends-component.html" rel="import">
+<link href="display-component/chart-settings.html" rel="import">
 <link href="behaviors/chart-behavior.html" rel="import">
 <link href="bar-chart/bar-chart.html" rel="import">
 <link href="area-chart/area-chart.html" rel="import">
@@ -42,14 +35,19 @@
 <link href="box-plot/box-plot.html" rel="import">
 <link href="sankey-chart/sankey-chart.html" rel="import">
 <link href="calendar-chart/calendar-chart.html" rel="import">
-<link href="scatter-plot/scatter-plot.html" rel='import'>
-<link href="heat-map/heat-map.html" rel='import'>
-<link href="multi-line/multi-line.html" rel='import'>
-<link href="chart-icons.html" rel='import'>
-<link href="chart-customizer/chart-customizer.html" rel='import'>
-<link href="pareto-chart/pareto-chart.html" rel='import'>
-<link href="stacked-composite-chart/stacked-composite-chart.html" rel='import'>
-<link href="grouped-composite-chart/grouped-composite-chart.html" rel='import'>
-<link href="horizontal-chart/horizontal-chart.html" rel='import'>
-<link href="polymerd3-table/polymerd3-table.html" rel='import'>
-<link href="composite-canvas/composite-canvas.html" rel='import'>
+<link href="scatter-plot/scatter-plot.html" rel="import">
+<link href="heat-map/heat-map.html" rel="import">
+<link href="multi-line/multi-line.html" rel="import">
+<link href="chart-icons.html" rel="import">
+<link href="chart-customizer/chart-customizer.html" rel="import">
+<link href="pareto-chart/pareto-chart.html" rel="import">
+<link href="stacked-composite-chart/stacked-composite-chart.html" rel="import">
+<link href="grouped-composite-chart/grouped-composite-chart.html" rel="import">
+<link href="horizontal-chart/horizontal-chart.html" rel="import">
+<link href="polymerd3-table/polymerd3-table.html" rel="import">
+<link href="composite-canvas/composite-canvas.html" rel="import">
+
+
+<link rel="import" href="behaviors/chartMixins.html">
+<!-- <link rel="import" href="behaviors/redux-mixins.html"> -->
+<link href="display-component/chart-input-group.html" rel="import">

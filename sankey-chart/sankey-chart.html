@@ -1,4 +1,4 @@
-<dom-module id='sankey-chart'>
+<dom-module id="sankey-chart">
 <style>
 
 .node rect {
@@ -28,42 +28,27 @@
       <h4>Sankey Chart</h4>
       <template is="dom-if" if="{{editMode}}">
         <div class="settings-wrap">
-          <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
+          <template is="dom-if" if="{{!settingsVisibility}}">
+          <paper-icon-button class="settings-icon outer" icon="icons:expand-more" title="View Settings" on-tap="toggleSettingsVisibility"></paper-icon-button>
         </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
+        <template is="dom-if" if="{{settingsVisibility}}">
+          <paper-icon-button class="settings-icon outer" icon="icons:expand-less" title="Hide Settings" on-tap="toggleSettingsVisibility"></paper-icon-button>
         </template>
           <template is="dom-if" if="{{settingsVisibility}}">
-            <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-              <paper-dialog id="display-component" opened>
+            <template is="dom-if" if="{{chartCustomizerFlag}}" restamp="">
+              <paper-dialog id="display-component" opened="">
                 <h2>Settings</h2>
                 <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
               </paper-dialog>
             </template>
             <div class="draggable-areabtn-wrap">
               <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-              <paper-icon-button
-                class="settings-icon inner"
-                icon="icons:build"
-                title="Area Settings"
-                on-tap="showAreaSettings"
-              ></paper-icon-button>
+              <paper-icon-button class="settings-icon inner" icon="icons:build" title="Area Settings" on-tap="showAreaSettings"></paper-icon-button>
             </div>
           </template>
         </div>
       </template>
     </template>
 </dom-module>
-<script src='sankey.js'></script>
-<script src='sankey-chart.js'></script>
+<script src="sankey.js"></script>
+<script src="sankey-chart.js"></script>
