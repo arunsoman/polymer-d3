@@ -23,7 +23,7 @@
   Stacked Bar chart
     <chart-input-group uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="Y axis"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Y axis" accept="number,date"></chart-input>
       <chart-input slot="chart-input" axis="z" label="Z axis"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
@@ -38,7 +38,7 @@
       return {}
     }
     redraw() {
-      this.draw(this._paint(this._compute(this.inputCheck())));
+      this.draw(this._paint(this._compute(this.inputCheck(3))));
     }
     _compute(err) {
       if (err) return false;
@@ -54,7 +54,8 @@
 
       let xInput = this.x ? this.inputs[this.x].selectedValue : [];
       let yInput = this.y ? this.inputs[this.y].selectedValue : [];
-      let chartData = this.transformSource(xInput, yInput,100);
+      let zInput = this.z ? this.inputs[this.z].selectedValue : [];
+      let chartData = this.transformSource(xInput, yInput,zInput);
 
       let axis = {
         scale: {},
@@ -67,7 +68,7 @@
       axis.scale.x.domain(layers[0].map(items => items.x))
       axis.scale.y.domain([0, d3.max(layers[layers.length - 1], function(d) { return d.y0 + d.y; })]).nice();
       // get keys of array map without duplicate in it
-      let keys = Object.keys(this.source.map(items=>items[0]).reduce((a,b)=>{a[b]=true; return a},{}));
+      let keys = Object.keys(this.source.map(items=>items[zInput[0]]).reduce((a,b)=>{a[b]=true; return a},{}));
       axis.scale.z.domain(keys);
 
       // x.domain(data.map(function(d) { return d.date; }));
@@ -121,8 +122,7 @@
         .attr("transform", "rotate(-90)")
         .attr("y", 10)
         .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Value ($)");
+        .style("text-anchor", "end");
 
       let segments = svg.selectAll(".layer")
         .data(obj.layers)
@@ -163,7 +163,7 @@
 
     }
     transformSource(itemX, itemY, stacked) {
-      return stacked ? this.transformToStackedData(itemX,itemY,stacked) : this.transformToBaseData(itemX,itemY);
+      return stacked!==null ? this.transformToStackedData(itemX,itemY,stacked) : this.transformToBaseData(itemX,itemY);
       
     }
     // transform data to basic bar chart data
@@ -184,7 +184,7 @@
 
     // transform data to render chart in stacked format
     transformToStackedData(itemX,itemY,stacked){
-      var keys = Object.keys(this.source.map(items=>items[itemX]).reduce((a,b)=>{a[b]=true; return a},{}));
+      var keys = Object.keys(this.source.map(items=>items[stacked]).reduce((a,b)=>{a[b]=true; return a},{}));
       return keys.map(items=>this.source.map(source=>{return {
 x:source[itemX],y:source[itemY]}}));
       // return this.source.map((items,i)=>{ return this.source.reduce((old,newVal)=>{ old[newVal[itemX]]=items[itemX]==newVal[itemX] ? items[itemY]:newVal[itemY]; return old},{total:stacked}) });
