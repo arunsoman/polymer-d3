@@ -149,15 +149,15 @@
         // .attr("height", function(d) {
         //   return obj.height - obj.axis.scale.y(d.value);
         // })
-
-      // this.addLegend({
-      //   obj,
-      //   container:svg,
-      //   selector:'g.layer',
-      //   node:obj.layers[0],
-      //   key: 'x',
-      //   segments
-      // });
+      debugger;
+      this.addLegend({
+        obj,
+        container:svg,
+        selector:'rect',
+        node:obj.layers[0],
+        key: 'x',
+        segments
+      });
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
 
