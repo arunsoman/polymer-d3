@@ -62,7 +62,8 @@
                 margin:{uitype:'visual',txt:'Margin',value:{left:0,top:0,right:0,bottom:0}},
                 legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
                 width:{uitype:'number',txt:"Chart width", value:"960"},
-                height:{uitype:'number',txt:"Chart Height", value:"500"}
+                height:{uitype:'number',txt:"Chart Height", value:"500"},
+                stacked:{uitype:'boolean',value:false}
               }
             }
           }
@@ -121,7 +122,7 @@
         return Polymer.Debouncer.debounce(this.debouncer,
           Polymer.Async.timeOut.after(interval), () => {arg});
     }
-    
+
     initializeChart(){
         this.set("uuid",PolymerD3.utilities.getUUID())
     }
