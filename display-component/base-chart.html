@@ -80,6 +80,14 @@
           statePath(state){
             return state.source
           }
+        },
+        stacked:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            return objAssignChk&&chartPath.settings.stacked.value
+          }
         }
       }
     }

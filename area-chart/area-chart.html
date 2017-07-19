@@ -47,14 +47,7 @@
       }
       static get properties(){
         return{
-          stacked:{
-            type:Boolean,
-            statePath(state){
-              let chartPath = state.charts[this.uuid]
-              let objAssignChk = (chartPath && chartPath.settings)
-              return objAssignChk&&chartPath.settings.stacked.value
-            }
-          }
+
         }
       }
       constructor(){
@@ -65,7 +58,7 @@
       }
       _compute() {
         //assign stacked value
-        let stacked = this.settings.stacked.value
+        let stacked = this.stacked
         //axis are mentioned in the chart-input module
         let itemX = this.x ? this.inputs[this.x].selectedValue : []
         let itemY = this.y ? this.inputs[this.y].selectedValue : []
