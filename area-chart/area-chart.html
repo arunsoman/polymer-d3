@@ -26,11 +26,11 @@
     }
     </style>
     <chart-input-group  uuid="[[uuid]]">
-        <template is="dom-if" if="[[!stacked]]">
+        <template is="dom-if" if="{{!stacked}}">
           <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
           <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
         </template>
-        <template is="dom-if" if="[[stacked]]">
+        <template is="dom-if" if="{{stacked}}">
           <chart-input slot="chart-input" axis="x" label="Key"accept="number,date" ></chart-input>
           <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
           <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
@@ -52,7 +52,7 @@
             statePath(state){
               let chartPath = state.charts[this.uuid]
               let objAssignChk = (chartPath && chartPath.settings)
-              return objAssignChk ?chartPath.settings.stacked.value:false
+              return objAssignChk&&chartPath.settings.stacked.value
             }
           }
         }
