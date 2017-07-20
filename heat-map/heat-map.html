@@ -2,28 +2,25 @@
 <dom-module id='heat-map'>
   <template>
     <style>
-         rect.bordered {
-            stroke: #E6E6E6;
-            stroke-width:2px;
-          }
+      .axis path,
+      .axis line {
+      fill: none;
+      stroke: black;
+      shape-rendering: crispEdges;
+      }
 
-          text.mono {
-            font-size: 9pt;
-            font-family: Consolas, courier;
-            fill: #aaa;
-          }
-
-          text.axis-workweek {
-            fill: #000;
-          }
-
-          text.axis-worktime {
-            fill: #000;
-          }
+      .axis text {
+       font-family: sans-serif;
+       font-size: 11px;
+      }
+      #chartContainer{
+        margin:0 auto;
+      }
     </style>
     <chart-input-group  uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="Value" accept="number"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <div id="chartContainer"></div>
@@ -39,6 +36,151 @@
       }
       constructor(){
         super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
+
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
+        itemZ = itemZ[0]
+
+        let parseDate = d3.time.format('%Y-%m-%d').parse;
+        let width = +this.settings.width.value,
+            height = +this.settings.height.value,
+             margin = {top: 72, right: 40, bottom: 20, left: 120},
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left},
+            label= this.settings.legend.values
+
+        width = width - margin.left - margin.right,
+        height = height - margin.top - margin.bottom;
+
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY,itemZ)
+        let chartData = source.data;
+
+        let xKey=source.xKey,
+            yKey = source.yKey
+
+        let itemSize = 18,
+            cellSize = itemSize - 1
+
+        let x_elements = d3.set(chartData.map(item=>item[xKey])).values(),
+            y_elements = d3.set(chartData.map(item=>item[yKey])).values();
+
+        let xScale = d3.scale.ordinal()
+            .domain(x_elements)
+            .rangeBands([0, x_elements.length * itemSize]);
+
+        let xAxis = d3.svg.axis()
+            .scale(xScale)
+            .tickFormat(function (d) {
+                return d;
+            })
+            .orient("top");
+        let yScale = d3.scale.ordinal()
+          .domain(y_elements)
+          .rangeBands([0, y_elements.length * itemSize]);
+
+        let yAxis = d3.svg.axis()
+            .scale(yScale)
+            .tickFormat(function (d) {
+                return d;
+            })
+            .orient("left");
+        let colorScale = d3.scale.threshold()
+            .domain([0.85, 1])
+            .range(["#2980B9", "#E67E22", "#27AE60", "#27AE60"]);
+
+        return {
+          width,
+          height,
+          margin,
+          cellSize,
+          xAxis,
+          yAxis,
+          xScale,
+          yScale,
+          xKey,
+          yKey,
+          colorScale,
+          calendarChart,
+          itemChk,
+          chartData,
+          label
+        }
+      }
+
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        // render chart
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+            .attr({"width": obj.width + obj.margin.left + obj.margin.right,
+                    "height": obj.height + obj.margin.top + obj.margin.bottom})
+            .append("g")
+              .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top+ ")");
+        let cells = parentG.selectAll('rect')
+                    .data(obj.chartData)
+                    .enter().append('g').append('rect')
+                    .attr('class', 'cell')
+                    .attr('width', obj.cellSize)
+                    .attr('height', obj.cellSize)
+                    .attr('y', function(d) { return obj.yScale(d[obj.yKey]); })
+                    .attr('x', function(d) { return obj.xScale(d[obj.xKey]); })
+                    .attr('fill', function(d) { return obj.colorScale(d.value); });
+        parentG.append("g")
+              .attr("class", "y axis")
+              .call(obj.yAxis)
+              .selectAll('text')
+              .attr('font-weight', 'normal');
+
+        parentG.append("g")
+              .attr("class", "x axis")
+              .call(obj.xAxis)
+              .selectAll('text')
+              .attr({'font-weight':'normal',"dx":".8em","dy":".5em"})
+              .style("text-anchor", "start")
+              .attr("transform", function (d) {
+                  return "rotate(-65)";
+              });
+
+      d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+      }
+      // populate chart data
+      getChartData(itemX,itemY,itemZ){
+          let xKey = this.externals[itemX]["key"],
+              yKey = this.externals[itemY]["key"]
+          let parseDate = d3.time.format('%Y-%m-%d').parse
+
+          let data = this.source.map(row=>{
+            let splitRowX = String(row[itemX]).split(" ")[0],
+                splitRowY = String(row[itemY]).split(" ")[0],
+                dateParseRowX = parseDate(String(row[itemX]).split(" ")[0]),
+                xRow = dateParseRowX?splitRowX:row[itemX],
+                dateParseRowY = parseDate(String(row[itemY]).split(" ")[0]),
+                yRow = dateParseRowY?splitRowY:row[itemY]
+            return{
+              [xKey]:xRow,
+              [yKey]:yRow,
+              value:row[itemZ]
+            }
+          })
+          return {data,xKey,yKey}
       }
     }
     customElements.define(heatMap.is, heatMap)
