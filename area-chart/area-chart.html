@@ -29,6 +29,7 @@
         <template is="dom-if" if="{{!stacked}}">
           <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
           <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+          <chart-input slot="chart-input" axis="z" label="z-axis" ></chart-input>
         </template>
         <template is="dom-if" if="{{stacked}}">
           <chart-input slot="chart-input" axis="x" label="Key"accept="number,date" ></chart-input>
@@ -65,12 +66,13 @@
 
         //"itemChk" for avoid error from chart
         let itemChk = itemX.length <= 0 || itemY.length <= 0
-        let itemZ = stacked && this.z ? this.inputs[this.z].selectedValue : []
+        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
         let itemStackChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
         itemChk = stacked ?itemStackChk: itemChk
         if (itemChk) {
             return false;
         }
+        let itemZChk = !stacked&&itemZ&&itemZ.length>0
         //axis inputs selectedValue assigin
         itemX = itemX[0]
         itemY=itemY[0]
@@ -87,10 +89,10 @@
 
         let color = d3.scale.category20c();
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ,stacked)
+        let source = this.getChartData(itemX, itemY,itemZ,stacked,itemZChk)
         let chartData,
             itemVal = source.itemVal&&source.itemVal
-        if(stacked){
+        if(stacked || itemZChk){
           color.domain(source.names);
           let stack = d3.layout.stack().values(function(d) { return d.values});
           chartData = stack(color.domain().map((name)=> {
@@ -108,7 +110,7 @@
             return{"value":item.value,"item":itemSet}
           })
         }
-        let srcData = stacked?source.data:chartData
+        let srcData = stacked || itemZChk?source.data:chartData
 
         let dateX = d3.time.scale().range([0, width]);
         let stringX = d3.scale.ordinal().range([0, width]);
@@ -123,8 +125,8 @@
         // Define area chart and set chart values and item
         let areaChart = d3.svg.area()
             .x((d)=>x(d.item))
-            .y0((d)=>stacked?y(d.y0):height)
-            .y1((d)=>stacked?y(d.y0 + d.y):y(d.value));
+            .y0((d)=>(stacked || itemZChk)?y(d.y0):height)
+            .y1((d)=>(stacked || itemZChk)?y(d.y0 + d.y):y(d.value));
 
         // Set domains for X axes
         if(itemVal){
@@ -135,12 +137,12 @@
         }
         // Find the value of the item with highest total value
         let maxItemVal = d3.max(srcData, function(d){
-          let vals = stacked && d3.keys(d).map(function(key){ return key !== "item" ? d[key] : 0 })
-          return stacked?d3.sum(vals):d.value;
+          let vals = (stacked || itemZChk)&& d3.keys(d).map(function(key){ return key !== "item" ? d[key] : 0 })
+          return (stacked || itemZChk)?d3.sum(vals):d.value;
         });
         // Set domains for Y axes
         y.domain([0, maxItemVal]);
-        let names = source.names
+
         return {
           width,
           height,
@@ -155,7 +157,7 @@
           label,
           color,
           stacked,
-          names
+          itemZChk
         }
       }
       _paint(obj) {
@@ -170,7 +172,7 @@
             .append("g")
               .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
 
-        if(obj.stacked){
+        if(obj.stacked || obj.itemZChk){
           let chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
             .enter().append("g")
             .attr("class", "area-chart")
@@ -206,37 +208,57 @@
               .attr("dy", ".71em")
               .style("text-anchor", "end")
 
-        this.addLegend({
-            obj,
-            container:parentG,
-            selector:'.area',
-            node:obj.chartData
-          });
-
-
+        // this.addLegend({
+        //     obj,
+        //     container:parentG,
+        //     selector:'.area',
+        //     node:obj.chartData
+        //   });
         d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
       }
       // populate chart data
-      getChartData(itemX, itemY,itemZ,stacked){
+      getChartData(itemX, itemY,itemZ,stacked,itemZChk){
         let formatDate = d3.time.format("%Y-%m-%d").parse;
-        if(stacked){
-          let names=this.source.map(row=>row[itemZ])
-          let itemVal
-          let data = this.source.map((items,i)=>{
+        let names=this.source.map(row=>row[itemZ])
+        let itemVal
+        let sourceData
+        if(stacked || itemZChk){
+          sourceData = this.source.map((items,i)=>{
             itemVal = formatDate(String(items[itemX]).split(" ")[0])
             let itemSet = itemVal?itemVal:items[itemX]
             return this.source.reduce((old,newVal)=>{
-              old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:newVal[itemY];
+              old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:stacked?newVal[itemY]:0;
               return old},{item:itemSet})
             })
+        }
+        if(stacked){
+          let data=sourceData
           return {data,names,itemVal}
-
         }else{
-          let sourcemap = this.source.map(row=>{
-            return{[row[itemX]]:row[itemY]}
-          })
-          let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
-          return source
+          if(itemZChk){
+            let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
+            let obj = {}
+            let data = sourceData.filter((item,i)=>{
+                nameMap.forEach(name=>{
+                  if(i==0){
+                  	obj[name] = item[name]
+                  }else{
+                  	if(item[name] == 0){
+                  		item[name] = obj[name]
+                    }
+                    obj[name] = item[name]
+                  }
+                })
+                return item
+              })
+              return {data,names,itemVal}
+          }else{
+            let sourcemap = this.source.map(row=>{
+              return{[row[itemX]]:row[itemY]}
+            })
+            let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+            return source
+          }
         }
       }
     }

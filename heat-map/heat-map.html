@@ -1,37 +1,48 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id='heat-map'>
-<style>
+  <template>
+    <style>
+         rect.bordered {
+            stroke: #E6E6E6;
+            stroke-width:2px;
+          }
 
-     rect.bordered {
-        stroke: #E6E6E6;
-        stroke-width:2px;   
+          text.mono {
+            font-size: 9pt;
+            font-family: Consolas, courier;
+            fill: #aaa;
+          }
+
+          text.axis-workweek {
+            fill: #000;
+          }
+
+          text.axis-worktime {
+            fill: #000;
+          }
+    </style>
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
+  </template>
+  <script>
+    class heatMap extends baseChart{
+      static get is(){
+        return"heat-map"
       }
+      static get properties(){
+        return{
 
-      text.mono {
-        font-size: 9pt;
-        font-family: Consolas, courier;
-        fill: #aaa;
+        }
       }
-
-      text.axis-workweek {
-        fill: #000;
+      constructor(){
+        super()
       }
-
-      text.axis-worktime {
-        fill: #000;
-      }
-
-</style>
-
-    <template>
-        <div class='mandatory'>
-        <display-component settings="{{inputs}}" external='[[external]]'></display-component>
-        </div>
-
-        <iron-icon on-tap="_toggleView" icon="icons:expand-more"></iron-icon>
-        <div class='optional' hidden="{{hideSettings}}">
-            <display-component settings="{{settings}}" external='[[external]]'></display-component>
-        </div>
-        <div id="chartHolder"></div>
-    </template>
+      
+    }
+    customElements.define(heatMap.is, heatMap)
+  </script>
 </dom-module>
-<script src='heat-map.js'></script>
