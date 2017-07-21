@@ -67,6 +67,8 @@
         width = width - margin.left - margin.right,
         height = height - margin.top - margin.bottom;
 
+        let colors = ["#2980B9", "#E67E22", "#27AE60", "#27AE60","#253494","#081d58"]
+
         //get chart data once pass "x and y" into the "getChartData" method
         let source = this.getChartData(itemX, itemY,itemZ)
         let chartData = source.data;
@@ -83,7 +85,6 @@
         let xScale = d3.scale.ordinal()
             .domain(x_elements)
             .rangeBands([0, x_elements.length * itemSize]);
-
         let xAxis = d3.svg.axis()
             .scale(xScale)
             .tickFormat(function (d) {
@@ -102,7 +103,7 @@
             .orient("left");
         let colorScale = d3.scale.threshold()
             .domain([0.85, 1])
-            .range(["#2980B9", "#E67E22", "#27AE60", "#27AE60"]);
+            .range(colors);
 
         return {
           width,
@@ -129,7 +130,8 @@
           return false
         }
         // render chart
-        let parentG = d3.select(this.$.chartContainer).append("svg")
+        let parentG = d3.select(this.$.chartContainer)
+            .append("svg")
             .attr({"width": obj.width + obj.margin.left + obj.margin.right,
                     "height": obj.height + obj.margin.top + obj.margin.bottom})
             .append("g")
@@ -140,9 +142,9 @@
                     .attr({'class':'cell','width':obj.cellSize, 'height':obj.cellSize})
                     .attr('y', d=>obj.yScale(d[obj.yKey]))
                     .attr('x', d=>obj.xScale(d[obj.xKey]))
-                    .attr('fill', d=>obj.colorScale(d.value))
-                    .append("title")
-                    .text(d=>"Value: "+d.value)
+                    .attr('fill', (d)=>{return obj.colorScale(d.value)})
+                    // .append("title")
+                    // .text(d=>"Value: "+d.value)
         parentG.append("g")
               .attr("class", "y axis")
               .call(obj.yAxis)
