@@ -16,6 +16,10 @@
         redrawChk:{
           type:Boolean
         },
+        sufficiantInputs:{
+          type:Boolean,
+          value:false
+        },
         uuid:{
           type:String
         },
@@ -124,11 +128,12 @@
 
     draw(paint){
       //this.debounce(arg,interval)
-      this.debouncer(paint,250)
+      //if(this.sufficiantInputs)
+        this.debouncer(paint,250)
     }
     debouncer(arg,interval){
-        return Polymer.Debouncer.debounce(this.debouncer,
-          Polymer.Async.timeOut.after(interval), () => {arg});
+      this._debouncer = Polymer.Debouncer.debounce(this._debouncer,
+        Polymer.Async.timeOut.after(interval), arg);
     }
 
     initializeChart(){
