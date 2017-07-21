@@ -134,7 +134,7 @@
     debouncer(arg,interval){
       // debugger
         return Polymer.Debouncer.debounce(this.debouncer,
-          Polymer.Async.timeOut.after(interval), arg);
+          Polymer.Async.timeOut.after(interval), ()=>arg);
     }
 
     initializeChart(){
