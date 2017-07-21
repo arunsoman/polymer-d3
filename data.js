@@ -37,7 +37,7 @@ var datacsv={
     type: 'String',
     value: 8
   },{
-    key: 'PdctValue',
+    key: 'Fruites value',
     type: 'Number',
     value: 9
   }],
