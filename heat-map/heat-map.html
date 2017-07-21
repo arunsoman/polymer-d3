@@ -137,12 +137,12 @@
         let cells = parentG.selectAll('rect')
                     .data(obj.chartData)
                     .enter().append('g').append('rect')
-                    .attr('class', 'cell')
-                    .attr('width', obj.cellSize)
-                    .attr('height', obj.cellSize)
-                    .attr('y', function(d) { return obj.yScale(d[obj.yKey]); })
-                    .attr('x', function(d) { return obj.xScale(d[obj.xKey]); })
-                    .attr('fill', function(d) { return obj.colorScale(d.value); });
+                    .attr({'class':'cell','width':obj.cellSize, 'height':obj.cellSize})
+                    .attr('y', d=>obj.yScale(d[obj.yKey]))
+                    .attr('x', d=>obj.xScale(d[obj.xKey]))
+                    .attr('fill', d=>obj.colorScale(d.value))
+                    .append("title")
+                    .text(d=>"Value: "+d.value)
         parentG.append("g")
               .attr("class", "y axis")
               .call(obj.yAxis)
@@ -155,9 +155,7 @@
               .selectAll('text')
               .attr({'font-weight':'normal',"dx":".8em","dy":".5em"})
               .style("text-anchor", "start")
-              .attr("transform", function (d) {
-                  return "rotate(-65)";
-              });
+              .attr("transform", d=>"rotate(-65)");
 
       d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
       }
