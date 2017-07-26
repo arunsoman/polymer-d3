@@ -30,7 +30,7 @@ var datacsv={
     value: 6
   },{
     key: 'Country',
-    type: 'Number',
+    type: 'String',
     value: 7
   },{
     key: 'Fruites',

@@ -1,48 +1,207 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id="pareto-chart">
   <template>
     <style>
       :host {
         display: block;
       }
+      svg {
+        font: 10px sans-serif;
+      }
+      .bar rect {
+        fill: steelblue;
+        shape-rendering: crispEdges;
+      }
+      .axis path, .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+      .line {
+        fill: none;
+        stroke: purple;
+        stroke-width: 1.5px;
+      }
+      .legend-box{
+          fill:white
+        }
     </style>
-    <h5>Pareto Chart</h5>
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-            <paper-dialog id="display-component" opened>
-              <h2>Settings</h2>
-              <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-            </paper-dialog>
-          </template>
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button
-              class="settings-icon inner"
-              icon="icons:build"
-              title="Area Settings"
-              on-tap="showAreaSettings"
-            ></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
   </template>
-  <script src="pareto-chart.js"></script>
+  <script>
+    class paretoChart extends baseChart{
+      static get is(){
+        return "pareto-chart"
+      }
+      static get properties(){
+        return{
+
+        }
+      }
+      constructor(){
+        super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY=itemY[0]
+
+        let parseDate = d3.time.format('%Y-%m-%d').parse;
+        let width = +this.settings.width.value,
+            height = +this.settings.height.value,
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+        width = width - margin.left - margin.right
+        height = height - margin.top - margin.bottom
+
+        let color = d3.scale.category20c();
+
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY)
+        let chartData = source.data
+        let xKey = source.xKey
+
+        //Axes and scales
+        let xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
+        xScale.domain(chartData.map(d=>d[xKey]));
+
+        let yhist = d3.scale.linear()
+                      .domain([0, d3.max(chartData, d=>d.value)])
+                      .range([height, 0]);
+        let ycum = d3.scale.linear().domain([0, 1]).range([height, 0]);
+        let xAxis = d3.svg.axis()
+                      .scale(xScale)
+                      .orient('bottom');
+
+        let yAxis = d3.svg.axis()
+                      .scale(yhist)
+                      .orient('left');
+        let yAxis2 = d3.svg.axis()
+                       .scale(ycum)
+                       .orient('right');
+        return {
+          width,
+          height,
+          margin,
+          xKey,
+          xScale,
+          yhist,
+          ycum,
+          xAxis,
+          yAxis,
+          yAxis2,
+          itemChk,
+          chartData,
+          label
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        //Draw svg
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+                        .attr("width", obj.width + obj.margin.left + obj.margin.right)
+                        .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+        //Draw histogram
+        let bar = parentG.selectAll(".bar")
+                        .data(obj.chartData)
+                        .enter().append("g")
+                        .attr("class", "bar");
+        bar.append("rect")
+            .attr("x", d=>obj.xScale(d[obj.xKey]))
+            .attr("width", obj.xScale.rangeBand())
+            .attr("y", d=>obj.yhist(d.value))
+            .attr("height", d=>obj.height - obj.yhist(d.value));
+
+        //Draw CDF line
+        let guide = d3.svg.line()
+                      .x(d=>obj.xScale(d[obj.xKey]))
+                      .y(d=>obj.ycum(d.CumulativePercentage))
+                      .interpolate('basis');
+        let line = parentG.append('path')
+                      .datum(obj.chartData)
+                      .attr('d', guide)
+                      .attr('class', 'line');
+        //Draw axes
+        parentG.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + obj.height + ")")
+            .call(obj.xAxis);
+
+        parentG.append("g")
+            .attr("class", "y axis")
+            .call(obj.yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Value");
+
+        parentG.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + [obj.width, 0] + ")")
+            .call(obj.yAxis2)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 4)
+            .attr("dy", "-.71em")
+            .style("text-anchor", "end")
+            .text("Cumulative %");
+
+        this.addLegend({
+            obj,
+            container:parentG,
+            selector:'.bar rect',
+            node:obj.chartData,
+            key: obj.xKey
+          });
+      }
+      getChartData(itemX, itemY){
+          let xKey = this.externals[itemX]["key"]
+
+          let sourcemap = this.source.reduce((old,newVal)=>{
+            old[newVal[itemX]]=(old[newVal[itemX]]||0)+newVal[itemY]
+            return old
+          },{})
+          let source  = Object.keys(sourcemap).map(item=>{return {[xKey]:item,value:sourcemap[item]}})
+          let totalValue = 0
+          //now calculate cumulative value from "item value + previous item value".
+          source.forEach((item,i)=>{
+            totalValue += item.value
+            item.CumulativeValue = item.value + ((i > 0)? source[i-1].CumulativeValue:0);
+            return item
+          })
+          //now calculate cumulative % from the cumulative amounts & total, round %
+          let data = source.filter(item=>{
+            return item.CumulativePercentage = parseFloat((item.CumulativeValue/ totalValue).toFixed(2));
+          })
+          return {data,xKey}
+      }
+    }
+    customElements.define(paretoChart.is, paretoChart)
+  </script>
 </dom-module>
