@@ -1,69 +1,216 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id='sankey-chart'>
-<style>
+  <template>
+    <style>
+      .node rect {
+        cursor: move;
+        fill-opacity: .9;
+        shape-rendering: crispEdges;
+      }
+      .node text {
+        pointer-events: none;
+        text-shadow: 0 1px 0 #fff;
+      }
+      .link {
+        fill: none;
+        stroke: #000;
+        stroke-opacity: .2;
+      }
+      .link:hover {
+        stroke-opacity: .5;
+      }
+      #chartContainer{
+        margin:0 auto;
+      }
+    </style>
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
+  </template>
+  <script>
+    class sankeyChart extends baseChart{
+      static get is(){
+        return "sankey-chart"
+      }
+      static get properties(){
+        return{
 
-.node rect {
-  cursor: move;
-  fill-opacity: .9;
-  shape-rendering: crispEdges;
-}
+        }
+      }
+      constructor(){
+        super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
 
-.node text {
-  pointer-events: none;
-  text-shadow: 0 1px 0 #fff;
-}
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
 
-.link {
-  fill: none;
-  stroke: #000;
-  stroke-opacity: .2;
-}
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY = itemY[0]
+        itemZ = itemZ[0]
 
-.link:hover {
-  stroke-opacity: .5;
-}
+        let parseDate = d3.time.format('%Y-%m-%d').parse;
+        let width = +this.settings.width.value,
+            height = +this.settings.height.value,
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+        width = width - margin.left - margin.right
+        height = height - margin.top - margin.bottom
 
-</style>
+        let color = d3.scale.category20();
 
-    <template>
-      <h4>Sankey Chart</h4>
-      <template is="dom-if" if="{{editMode}}">
-        <div class="settings-wrap">
-          <template is="dom-if" if={{!settingsVisibility}}>
-          <paper-icon-button
-              class="settings-icon outer"
-              icon="icons:expand-more"
-              title="View Settings"
-              on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-        <template is="dom-if" if={{settingsVisibility}}>
-          <paper-icon-button
-            class="settings-icon outer"
-            icon="icons:expand-less"
-            title="Hide Settings"
-            on-tap="toggleSettingsVisibility"
-          ></paper-icon-button>
-        </template>
-          <template is="dom-if" if="{{settingsVisibility}}">
-            <template is="dom-if" if="{{chartCustomizerFlag}}" restamp>
-              <paper-dialog id="display-component" opened>
-                <h2>Settings</h2>
-                <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-              </paper-dialog>
-            </template>
-            <div class="draggable-areabtn-wrap">
-              <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-              <paper-icon-button
-                class="settings-icon inner"
-                icon="icons:build"
-                title="Area Settings"
-                on-tap="showAreaSettings"
-              ></paper-icon-button>
-            </div>
-          </template>
-        </div>
-      </template>
-    </template>
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY,itemZ)
+        let chartData = source.data
+
+        let units = "Widgets";
+        let formatNumber = d3.format(",.0f"),    // zero decimal places
+            format = function(d) { return formatNumber(d) + " " + units; }
+
+        // Set the sankey diagram properties
+        let sankey = d3.sankey()
+            .nodeWidth(36)
+            .nodePadding(10)
+            .size([width, height]);
+
+        let path = sankey.link();
+
+        sankey.nodes(chartData.nodes)
+              .links(chartData.links)
+              .layout(32);
+debugger
+        return {
+          width,
+          height,
+          margin,
+          sankey,
+          path,
+          format,
+          itemChk,
+          chartData,
+          color,
+          label
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        let self = this
+        //Draw Sankey chart and append the svg canvas to the page
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+            .attr("width", obj.width + obj.margin.left + obj.margin.right)
+            .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+          .append("g")
+            .attr("transform","translate(" + obj.margin.left + "," + obj.margin.top + ")");
+
+        // add in the links
+        let link = parentG.append("g").selectAll(".link")
+                  .data(obj.chartData.links)
+                  .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", obj.path)
+                    .style("stroke-width", function(d) { return Math.max(1, d.dy); })
+                        .sort(function(a, b) { return b.dy - a.dy; });
+        // add the link titles
+        link.append("title")
+              .text(function(d) {
+            	return d.source.name + " → " +
+                      d.target.name + "\n" + obj.format(d.value); });
+
+        // add in the nodes
+        let node = parentG.append("g").selectAll(".node")
+                  .data(obj.chartData.nodes)
+                  .enter().append("g")
+                    .attr("class", "node")
+                    .attr("transform", function(d) {
+              		  return "translate(" + d.x + "," + d.y + ")"; })
+                  .call(d3.behavior.drag()
+                    .origin(function(d) { return d; })
+                    .on("dragstart", function() {this.parentNode.appendChild(this); })
+                    .on("drag", dragmove));
+
+          // add the rectangles for the nodes
+          node.append("rect")
+              .attr("height", function(d) { return d.dy; })
+              .attr("width", obj.sankey.nodeWidth())
+              .style("fill", function(d) {return d.color = obj.color(d.name.replace(/ .*/, "")); })
+              .style("stroke", function(d) {return d3.rgb(d.color).darker(2); })
+              .append("title")
+                .text(function(d) {return d.name + "\n" + obj.format(d.value); });
+
+        // add in the title for the nodes
+        node.append("text")
+            .attr("x", -6)
+            .attr("y", function(d) { return d.dy / 2; })
+            .attr("dy", ".35em")
+            .attr("text-anchor", "end")
+            .attr("transform", null)
+            .text(function(d) { return d.name; })
+          .filter(function(d) { return d.x < obj.width / 2; })
+            .attr("x", 6 + obj.sankey.nodeWidth())
+            .attr("text-anchor", "start");
+        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+        // the function for moving the nodes
+        function dragmove(d) {
+          d3.select(this).attr("transform",
+              "translate(" + (
+              	   d.x = Math.max(0, Math.min(obj.width - d.dx, d3.event.x))
+              	) + "," + (
+                         d.y = Math.max(0, Math.min(obj.height - d.dy, d3.event.y))
+                  ) + ")");
+          obj.sankey.relayout();
+          link.attr("d", obj.path);
+        }
+      }
+      // populate chart data
+      getChartData(itemX, itemY,itemZ){
+        let formatDate = d3.time.format("%Y-%m-%d").parse;
+        let itemXKeys=this.source.map(row=>row[itemX])
+        let itemZKeys=this.source.map(row=>row[itemZ])
+        let itemKeys = [...itemXKeys,...itemZKeys]
+        let itemKeyMap = itemKeys.filter((item, pos)=>itemKeys.indexOf(item) == pos)
+        let dateChk
+        let sourceData = {}
+        let nodeMap = {}
+        let sourceNode = itemKeyMap.map(item=>{
+          return{
+            name:item
+          }
+        })
+        sourceNode.forEach(item=>nodeMap[item.name] = item);
+        let sourceXYZ = this.source.map(item=>{
+            return {
+              source:nodeMap[item[itemX]],
+              target:nodeMap[item[itemZ]],
+              value:String(item[itemY])
+            }
+        })
+        sourceData.links=sourceXYZ
+        sourceData.nodes=sourceNode
+        let data = sourceData
+        return{data,itemKeyMap}
+      }
+
+    }
+    customElements.define(sankeyChart.is, sankeyChart)
+  </script>
+  <script src='sankey.js'></script>
 </dom-module>
-<script src='sankey.js'></script>
-<script src='sankey-chart.js'></script>

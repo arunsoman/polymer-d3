@@ -40,9 +40,20 @@ var datacsv={
     key: 'Fruites value',
     type: 'Number',
     value: 9
+  },{
+    key: 'SItem',
+    type: 'String',
+    value: 10
+  },{
+    key: 'STarget',
+    type: 'String',
+    value: 11
+  },{
+    key: 'value',
+    type: 'Number',
+    value: 12
   }],
   source:[
-
   [
   "Python",
   81.2,
@@ -51,7 +62,8 @@ var datacsv={
   "2016-01-16 00:00:00",
   "JAVA",
   1941,
-  "France", "Apricot", 2.3129545439964723
+  "France", "Apricot", 2.3129545439964723,
+  "Agricultural Energy Use","Carbon Dioxide","1.4"
   ],
   [
   "Python",
@@ -61,7 +73,8 @@ var datacsv={
   "2016-01-17 00:00:00",
   "JAVA",
   1941,
-  "France", "Avocado", 3.1610140317890965
+  "France", "Avocado", 3.1610140317890965,
+  "Agriculture","Agriculture Soils","5.2"
   ],
   [
   "Python",
@@ -71,7 +84,8 @@ var datacsv={
   "2016-01-18 00:00:00",
   "JAVA",
   1941,
-  "France", "Lemon", 0.9075695440623942
+  "France", "Lemon", 0.9075695440623942,
+  "Agriculture","Livestock and Manure","5.4"
   ],
   [
   "JavaScript",
@@ -81,7 +95,8 @@ var datacsv={
   "2016-02-16 00:00:00",
   "JAVA",
   1941,
-  "France", "Date", 1.1296454803177811
+  "France", "Date", 1.1296454803177811,
+  "Agriculture","Other Agriculture","1.7"
   ],
   [
   "JavaScript",
@@ -91,7 +106,8 @@ var datacsv={
   "2016-02-17 00:00:00",
   "JAVA",
   1950,
-  "France", "Strawberry", 0
+  "France", "Strawberry", 0,
+  "Agriculture","Rice Cultivation","1.5"
   ],
   [
   "Java",
@@ -101,7 +117,8 @@ var datacsv={
   "2016-02-18 00:00:00",
   "JAVA",
   1959,
-  "France", "Mandarin", 2.6193568568512493
+  "France", "Mandarin", 2.6193568568512493,
+  "Agriculture Soils","Nitrous Oxide","5.2"
   ],
   [
   "Java",
@@ -111,7 +128,8 @@ var datacsv={
   "2016-02-19 00:00:00",
   "JAVA",
   1968,
-  "France", "Chestnut", 0.08748279136251946
+  "France", "Chestnut", 0.08748279136251946,
+  "Air","Carbon Dioxide","1.7"
   ],
   [
   "Java",
@@ -121,7 +139,8 @@ var datacsv={
   "2016-02-20 00:00:00",
   "JAVA",
   1977,
-  "France", "Nuts", 2.943858242639327
+  "France", "Nuts", 2.943858242639327,
+  "Aluminium Non-Ferrous Metals","Carbon Dioxide","1.0"
   ],
   [
   "Java",
@@ -131,7 +150,8 @@ var datacsv={
   "2016-02-21 00:00:00",
   "JAVA",
   1986,
-  "France", "Olive", 1.3356914547843943
+  "France", "Olive", 1.3356914547843943,
+  "Aluminium Non-Ferrous Metals","HFCs - PFCs","0.2"
   ],
   [
   "JavaScript",
@@ -141,7 +161,8 @@ var datacsv={
   "2016-02-22 00:00:00",
   "JAVA",
   1995,
-  "France", "Mirabelle", 0.31390905400247027
+  "France", "Mirabelle", 0.31390905400247027,
+  "Cement","Carbon Dioxide","5.0"
   ],
   [
   "JavaScript",
@@ -151,7 +172,8 @@ var datacsv={
   "2016-02-23 00:00:00",
   "JAVA",
   2004,
-  "France", "Orange", 0.5709024568447734
+  "France", "Orange", 0.5709024568447734,
+  "Chemicals","Carbon Dioxide","3.4"
   ],
   [
   "JavaScript",
@@ -161,7 +183,8 @@ var datacsv={
   "2016-02-24 00:00:00",
   "JAVA",
   2013,
-  "France", "Fig", 0.8689875977541086
+  "France", "Fig", 0.8689875977541086,
+  "Chemicals","HFCs - PFCs","0.5"
   ],
   [
   "PHP",
@@ -171,7 +194,8 @@ var datacsv={
   "2016-02-25 00:00:00",
   "JAVA",
   2022,
-  "France", "Raisin", 0
+  "France", "Raisin", 0,
+  "Chemicals","Nitrous Oxide","0.2"
   ],
   [
   "PHP",
@@ -181,7 +205,8 @@ var datacsv={
   "2016-02-26 00:00:00",
   "JAVA",
   2031,
-  "France", "Pear", 0
+  "France", "Pear", 0,
+  "Coal Mining","Carbon Dioxide","0.1"
   ],
   [
   "PHP",
@@ -191,7 +216,8 @@ var datacsv={
   "2016-02-27 00:00:00",
   "JAVA",
   2040,
-  "France", "Potato", 0
+  "France", "Potato", 0,
+  "Coal Mining","Methane","1.2"
   ],
   [
   "ASP",
@@ -201,7 +227,8 @@ var datacsv={
   "2016-02-28 00:00:00",
   "JAVA",
   2049,
-  "France", "Khaki", 0
+  "France", "Khaki", 0,
+  "Commercial Buildings","Carbon Dioxide","6.3"
   ],
   [
   "ASP",
@@ -211,7 +238,8 @@ var datacsv={
   "2016-03-01 00:00:00",
   "JAVA",
   2058,
-  "France", "Kiwi", 6.026783469350332
+  "France", "Kiwi", 6.026783469350332,
+  "Deforestation","Carbon Dioxide","10.9"
   ],
   [
   "Python",
@@ -221,7 +249,8 @@ var datacsv={
   "2016-03-02 00:00:00",
   "JAVA",
   2067,
-  "France", "Pumpkin", 0.5472217416389179
+  "France", "Pumpkin", 0.5472217416389179,
+  "Electricity and heat","Agricultural Energy Use","0.4"
   ],
   [
   "Python",
@@ -231,7 +260,8 @@ var datacsv={
   "2016-03-03 00:00:00",
   "JAVA",
   2076,
-  "France", "Mango", 0
+  "France", "Mango", 0,
+  "Electricity and heat","Aluminium Non-Ferrous Metals","0.4"
   ],
   [
   "CPP",
@@ -241,7 +271,8 @@ var datacsv={
   "2016-03-04 00:00:00",
   "JAVA",
   2085,
-  "France", "Cherry", 1.9472375734686518
+  "France", "Cherry", 1.9472375734686518,
+  "Electricity and heat","Cement","0.3"
   ],
   [
   "CPP",
@@ -251,7 +282,8 @@ var datacsv={
   "2016-03-05 00:00:00",
   "JAVA",
   2094,
-  "Italy", "Apricot", 2.250335336990016
+  "Italy", "Apricot", 2.250335336990016,
+  "Electricity and heat","Chemicals","1.3"
   ],
   [
   "CPP",
@@ -261,7 +293,8 @@ var datacsv={
   "2016-03-06 00:00:00",
   "JAVA",
   2103,
-  "Italy", "Avocado", 1.4472931892677967
+  "Italy", "Avocado", 1.4472931892677967,
+  "Electricity and heat","Commercial Buildings","5.0"
   ],
   [
   "CPP",
@@ -271,7 +304,8 @@ var datacsv={
   "2016-03-07 00:00:00",
   "JAVA",
   2112,
-  "Italy", "Lemon", 1.7163168911863054
+  "Italy", "Lemon", 1.7163168911863054,
+  "Electricity and heat","Food and Tobacco","0.5"
   ],
   [
   "CPP",
@@ -281,7 +315,8 @@ var datacsv={
   "2016-03-08 00:00:00",
   "JAVA",
   2121,
-  "Italy", "Date", 0.6222770814456479
+  "Italy", "Date", 0.6222770814456479,
+  "Electricity and heat","Iron and Steel","1.0"
   ],
   [
   "Java",
@@ -291,7 +326,8 @@ var datacsv={
   "2016-03-09",
   "JAVA",
   2130,
-  "Italy", "Strawberry", 0
+  "Italy", "Strawberry", 0,
+  "Electricity and heat","Machinery","1.0"
   ],
   [
   "CPP",
@@ -301,7 +337,8 @@ var datacsv={
   "2016-03-10",
   "JAVA",
   2139,
-  "Italy", "Mandarin", 1.9378611429750559
+  "Italy", "Mandarin", 1.9378611429750559,
+  "Electricity and heat","Oil and Gas Processing","0.4"
   ],
   [
   "PHP",
@@ -311,7 +348,8 @@ var datacsv={
   "2016-03-11",
   "JAVA",
   2148,
-  "Italy", "Goyave", 0
+  "Italy", "Goyave", 0,
+  "Electricity and heat","Other Industry","2.7"
   ],
   [
   "JavaScript",
@@ -321,7 +359,8 @@ var datacsv={
   "2016-03-12",
   "JAVA",
   2157,
-  "Italy", "Chestnut", 0.35446193006796944
+  "Italy", "Chestnut", 0.35446193006796944,
+  "Electricity and heat","Pulp - Paper and Printing","0.6"
   ],
   [
   "Java",
@@ -331,7 +370,8 @@ var datacsv={
   "2016-03-13",
   "JAVA",
   2166,
-  "Italy", "Nuts", 0.37199215156032084
+  "Italy", "Nuts", 0.37199215156032084,
+  "Electricity and heat","Residential Buildings","5.2"
   ],
   [
   "Java",
@@ -341,7 +381,8 @@ var datacsv={
   "2016-03-14",
   "JAVA",
   2175,
-  "Italy", "Olive", 1.05979039016384
+  "Italy", "Olive", 1.05979039016384,
+  "Electricity and heat","T and D Losses","2.2"
   ],
   [
   "Java",
@@ -351,7 +392,8 @@ var datacsv={
   "2016-03-15",
   "JAVA",
   2184,
-  "Italy", "Orange", 1.9087621718437413
+  "Italy", "Orange", 1.9087621718437413,
+  "Electricity and heat","Unallocated Fuel Combustion","2.0"
   ],
   [
   "Java",
@@ -361,7 +403,8 @@ var datacsv={
   "2016-03-16",
   "JAVA",
   2193,
-  "Italy", "Fig", 4.632439392448328
+  "Italy", "Fig", 4.632439392448328,
+  "Energy","Electricity and heat","24.9"
   ],
   [
   "Java",
@@ -371,7 +414,8 @@ var datacsv={
   "2016-03-17",
   "JAVA",
   2202,
-  "Italy", "Raisin", 0
+  "Italy", "Raisin", 0,
+  "Energy","Fugitive Emissions","4.0"
   ],
   [
   "Java",
@@ -381,7 +425,8 @@ var datacsv={
   "2016-03-18",
   "JAVA",
   2211,
-  "Italy", "Pear", 0
+  "Italy", "Pear", 0,
+  "Energy","Industry","14.7"
   ],
   [
   "Java",
@@ -391,7 +436,8 @@ var datacsv={
   "2016-03-19",
   "JAVA",
   2220,
-  "Italy", "Potato", 0
+  "Italy", "Potato", 0,
+  "Energy","Other Fuel Combustion","8.6"
   ],
   [
   "Java",
@@ -401,7 +447,8 @@ var datacsv={
   "2016-03-20",
   "JAVA",
   2229,
-  "Italy", "Khaki", 0
+  "Italy", "Khaki", 0,
+  "Energy","Transportation","14.3"
   ],
   [
   "Java",
@@ -411,7 +458,8 @@ var datacsv={
   "2016-03-21",
   "JAVA",
   2238,
-  "Italy", "Banana", 0
+  "Italy", "Banana", 0,
+  "Food and Tobacco","Carbon Dioxide","1.0"
   ],
   [
   "Java",
@@ -421,7 +469,8 @@ var datacsv={
   "2016-03-22",
   "JAVA",
   2247,
-  "Italy", "Blackcurrant", 0
+  "Italy", "Blackcurrant", 0,
+  "Fugitive Emissions","Coal Mining","1.3"
   ],
   [
   "Java",
@@ -431,7 +480,8 @@ var datacsv={
   "2016-03-23",
   "JAVA",
   2256,
-  "Italy", "Kiwi", 1.673923311217576
+  "Italy", "Kiwi", 1.673923311217576,
+  "Fugitive Emissions","Oil and Gas Processing","3.2"
   ],
   [
   "Java",
@@ -441,7 +491,8 @@ var datacsv={
   "2016-03-24",
   "JAVA",
   2265,
-  "Italy", "Pumpkin", 0.8029920360319587
+  "Italy", "Pumpkin", 0.8029920360319587,
+  "Harvest \/ Management","Carbon Dioxide","1.3"
   ],
   [
   "JavaScript",
@@ -451,7 +502,8 @@ var datacsv={
   "2016-03-25",
   "JAVA",
   2274,
-  "Italy", "Cherry", 1.9453249240219272
+  "Italy", "Cherry", 1.9453249240219272,
+  "Industrial Processes","Aluminium Non-Ferrous Metals","0.4"
   ],
   [
   "Python",
@@ -461,7 +513,8 @@ var datacsv={
   "2016-03-26",
   "JAVA",
   2283,
-  "Germany", "Apricot", 0.24786564820472912
+  "Germany", "Apricot", 0.24786564820472912,
+  "Industrial Processes","Cement","2.8"
   ],
   [
   "Python",
@@ -471,7 +524,8 @@ var datacsv={
   "2016-03-27",
   "JAVA",
   2292,
-  "Germany", "Avocado", 1.13545847239482
+  "Germany", "Avocado", 1.13545847239482,
+  "Industrial Processes","Chemicals","1.4"
   ],
   [
   "Python",
@@ -481,7 +535,8 @@ var datacsv={
   "2016-03-28",
   "JAVA",
   2301,
-  "Germany", "Lemon", 0.6388067539810734
+  "Germany", "Lemon", 0.6388067539810734,
+  "Industrial Processes","Other Industry","0.5"
   ],
   [
   "PHP",
@@ -491,7 +546,8 @@ var datacsv={
   "2016-03-29",
   "JAVA",
   2310,
-  "Germany", "Date", 1.626323182055196
+  "Germany", "Date", 1.626323182055196,
+  "Industry","Aluminium Non-Ferrous Metals","0.4"
   ],
   [
   "JavaScript",
@@ -501,7 +557,8 @@ var datacsv={
   "2016-03-30",
   "JAVA",
   2319,
-  "Germany", "Strawberry", 0
+  "Germany", "Strawberry", 0,
+  "Industry","Cement","1.9"
   ],
   [
   "Java",
@@ -511,7 +568,8 @@ var datacsv={
   "2016-03-31",
   "JAVA",
   2328,
-  "Germany", "Mandarin", 0.4239980281990543
+  "Germany", "Mandarin", 0.4239980281990543,
+  "Industry","Chemicals","1.4"
   ],
   [
   "Java",
@@ -521,7 +579,8 @@ var datacsv={
   "2016-04-01",
   "JAVA",
   2328,
-  "Germany", "Chestnut", 1.4341389749588975
+  "Germany", "Chestnut", 1.4341389749588975,
+  "Industry","Food and Tobacco","0.5"
   ],
   [
   "Java",
@@ -531,7 +590,8 @@ var datacsv={
   "2016-04-02",
   "JAVA",
   2328,
-  "Germany", "Nuts", 0.7392983316104583
+  "Germany", "Nuts", 0.7392983316104583,
+  "Industry","Iron and Steel","3.0"
   ],
   [
   "Java",
@@ -541,7 +601,8 @@ var datacsv={
   "2016-04-03",
   "JAVA",
   2328,
-  "Germany", "Olive", 1.6630071601899028
+  "Germany", "Olive", 1.6630071601899028,
+  "Industry","Oil and Gas Processing","2.8"
   ],
   [
   "Java",
@@ -551,7 +612,8 @@ var datacsv={
   "2016-04-04",
   "JAVA",
   2328,
-  "Germany", "Mirabelle", 4.759329801939115
+  "Germany", "Mirabelle", 4.759329801939115,
+  "Industry","Other Industry","3.8"
   ],
   [
   "Java",
@@ -561,7 +623,8 @@ var datacsv={
   "2016-04-05",
   "JAVA",
   2328,
-  "Germany", "Orange", 3.718673834416696
+  "Germany", "Orange", 3.718673834416696,
+  "Industry","Pulp - Paper and Printing","0.5"
   ],
   [
   "Java",
@@ -571,7 +634,8 @@ var datacsv={
   "2016-04-06",
   "JAVA",
   2328,
-  "Germany", "Fig", 2.458679694479642
+  "Germany", "Fig", 2.458679694479642,
+  "Iron and Steel","Carbon Dioxide","4.0"
   ],
   [
   "Java",
@@ -581,7 +645,8 @@ var datacsv={
   "2016-04-07",
   "JAVA",
   2328,
-  "Germany", "Raisin", 0
+  "Germany", "Raisin", 0,
+  "Land Use Change","Deforestation","10.9"
   ],
   [
   "Java",
@@ -591,7 +656,8 @@ var datacsv={
   "2016-04-08",
   "JAVA",
   2328,
-  "Germany", "Pear", 0
+  "Germany", "Pear", 0,
+  "Land Use Change","Harvest \/ Management","1.3"
   ],
   [
   "Java",
@@ -601,7 +667,8 @@ var datacsv={
   "2016-04-09",
   "JAVA",
   2328,
-  "Germany", "Potato", 0
+  "Germany", "Potato", 0,
+  "Landfills","Methane","1.7"
   ],
   [
   "Java",
@@ -611,7 +678,8 @@ var datacsv={
   "2016-04-10",
   "JAVA",
   2328,
-  "Germany", "Prune", 0
+  "Germany", "Prune", 0,
+  "Livestock and Manure","Methane","5.1"
   ],
   [
   "Java",
@@ -621,7 +689,8 @@ var datacsv={
   "2016-04-11",
   "JAVA",
   2328,
-  "Germany", "Khaki", 0
+  "Germany", "Khaki", 0,
+  "Livestock and Manure","Nitrous Oxide","0.3"
   ],
   [
   "Java",
@@ -631,7 +700,8 @@ var datacsv={
   "2016-04-12",
   "JAVA",
   2328,
-  "Germany", "Banana", 0
+  "Germany", "Banana", 0,
+  "Machinery","Carbon Dioxide","1.0"
   ],
   [
   "Java",
@@ -641,7 +711,8 @@ var datacsv={
   "2016-04-13",
   "JAVA",
   2328,
-  "Germany", "Ananas", 0
+  "Germany", "Ananas", 0,
+  "Oil and Gas Processing","Carbon Dioxide","3.6"
   ],
   [
   "Java",
@@ -651,7 +722,8 @@ var datacsv={
   "2016-04-14",
   "JAVA",
   2328,
-  "Germany", "Kiwi", 1.3234705953824204
+  "Germany", "Kiwi", 1.3234705953824204,
+  "Oil and Gas Processing","Methane","2.8"
   ],
   [
   "Java",
@@ -661,7 +733,8 @@ var datacsv={
   "2016-04-15",
   "JAVA",
   2328,
-  "Germany", "Pumpkin", 0.0770059996293927
+  "Germany", "Pumpkin", 0.0770059996293927,
+  "Other Agriculture","Methane","1.4"
   ],
   [
   "Java",
@@ -671,7 +744,8 @@ var datacsv={
   "2016-04-16",
   "JAVA",
   2328,
-  "Germany", "Cherry", 1.7111604775075815
+  "Germany", "Cherry", 1.7111604775075815,
+  "Other Agriculture","Nitrous Oxide","0.3"
   ],
   [
   "Java",
@@ -681,7 +755,8 @@ var datacsv={
   "2016-04-17",
   "JAVA",
   2328,
-  "United Kingdom", "Apricot", 0.17924671480874477
+  "United Kingdom", "Apricot", 0.17924671480874477,
+  "Other Fuel Combustion","Agricultural Energy Use","1.0"
   ],
   [
   "Java",
@@ -691,7 +766,8 @@ var datacsv={
   "2016-04-18",
   "JAVA",
   2328,
-  "United Kingdom", "Avocado", 0.022885648078082133
+  "United Kingdom", "Avocado", 0.022885648078082133,
+  "Other Fuel Combustion","Commercial Buildings","1.3"
   ],
   [
   "Java",
@@ -701,7 +777,8 @@ var datacsv={
   "2016-04-19",
   "JAVA",
   2328,
-  "United Kingdom", "Lemon", 1.7152082470441878
+  "United Kingdom", "Lemon", 1.7152082470441878,
+  "Other Fuel Combustion","Residential Buildings","5.0"
   ],
   [
   "Java",
@@ -711,7 +788,8 @@ var datacsv={
   "2016-04-20",
   "JAVA",
   2328,
-  "United Kingdom", "Date", 1.752070575653172
+  "United Kingdom", "Date", 1.752070575653172,
+  "Other Fuel Combustion","Unallocated Fuel Combustion","1.8"
   ],
   [
   "Java",
@@ -721,7 +799,8 @@ var datacsv={
   "2016-04-21",
   "JAVA",
   2328,
-  "United Kingdom", "Mandarin", 3.4281163770331387
+  "United Kingdom", "Mandarin", 3.4281163770331387,
+  "Other Industry","Carbon Dioxide","6.6"
   ],
   [
   "Java",
@@ -731,7 +810,8 @@ var datacsv={
   "2016-04-22",
   "JAVA",
   2328,
-  "United Kingdom", "Goyave", 0
+  "United Kingdom", "Goyave", 0,
+  "Other Industry","HFCs - PFCs","0.4"
   ],
   [
   "Java",
@@ -741,7 +821,8 @@ var datacsv={
   "2016-04-23",
   "JAVA",
   2328,
-  "United Kingdom", "Chestnut", 0.19739811992921974
+  "United Kingdom", "Chestnut", 0.19739811992921974,
+  "Pulp - Paper and Printing","Carbon Dioxide","1.1"
   ],
   [
   "Java",
@@ -751,7 +832,8 @@ var datacsv={
   "2016-04-24",
   "JAVA",
   2328,
-  "United Kingdom", "Nuts", 1.0070422960846344
+  "United Kingdom", "Nuts", 1.0070422960846344,
+  "Rail - Ship and Other Transport","Carbon Dioxide","2.5"
   ],
   [
   "Java",
@@ -761,7 +843,8 @@ var datacsv={
   "2016-04-25",
   "JAVA",
   2328,
-  "United Kingdom", "Olive", 2.228287010523628
+  "United Kingdom", "Olive", 2.228287010523628,
+  "Residential Buildings","Carbon Dioxide","10.2"
   ],
   [
   "Java",
@@ -771,7 +854,8 @@ var datacsv={
   "2016-04-26",
   "JAVA",
   2328,
-  "United Kingdom", "Orange", 0.9304979227921532
+  "United Kingdom", "Orange", 0.9304979227921532,
+  "Rice Cultivation","Methane","1.5"
   ],
   [
   "Java",
@@ -781,7 +865,8 @@ var datacsv={
   "2016-04-27",
   "JAVA",
   2328,
-  "United Kingdom", "Fig", 0.5953329645659061
+  "United Kingdom", "Fig", 0.5953329645659061,
+  "Road","Carbon Dioxide","10.5"
   ],
   [
   "Java",
@@ -791,7 +876,8 @@ var datacsv={
   "2016-04-28",
   "JAVA",
   2328,
-  "United Kingdom", "Cerise", 0
+  "United Kingdom", "Cerise", 0,
+  "T and D Losses","Carbon Dioxide","2.2"
   ],
   [
   "Java",
@@ -801,7 +887,8 @@ var datacsv={
   "2016-04-29",
   "JAVA",
   2328,
-  "United Kingdom", "Raisin", 0
+  "United Kingdom", "Raisin", 0,
+  "Transportation","Air","1.7"
   ],
   [
   "Java",
@@ -811,7 +898,8 @@ var datacsv={
   "2016-04-30",
   "JAVA",
   2328,
-  "United Kingdom", "Potato", 0
+  "United Kingdom", "Potato", 0,
+  "Transportation","Rail - Ship and Other Transport","2.5"
   ],
   [
   "Java",
@@ -821,7 +909,85 @@ var datacsv={
   "2016-05-01",
   "JAVA",
   2328,
-  "United Kingdom", "Prune", 0
+  "United Kingdom", "Prune", 0,
+  "Transportation","Road","10.5"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-02",
+  "JAVA",
+  2329,
+  "United Kingdom", "Khaki", 0.7,
+  "Unallocated Fuel Combustion","Carbon Dioxide","3.0"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-03",
+  "JAVA",
+  2328,
+  "United Kingdom", "Banana", 10,
+  "Unallocated Fuel Combustion","Methane","0.4"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-04",
+  "JAVA",
+  2328,
+  "United Kingdom", "Apple", 4,
+  "Unallocated Fuel Combustion","Nitrous Oxide","0.4"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-05",
+  "JAVA",
+  2328,
+  "United Kingdom", "Kiwi", 2,
+  "Waste","Landfills","1.7"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-06",
+  "JAVA",
+  2328,
+  "United Kingdom", "Mango", 0.9,
+  "Waste","Waste water - Other Waste","1.5"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-07",
+  "JAVA",
+  2328,
+  "United Kingdom", "Thenga", 0.4,
+  "Waste water - Other Waste","Methane","1.2"
+  ],
+  [
+  "Java",
+  121.55,
+  6821,
+  9056,
+  "2016-05-08",
+  "JAVA",
+  2328,
+  "United Kingdom", "Chacka", 3,
+  "Waste water - Other Waste","Nitrous Oxide","0.3"
   ]
 
   ]
