@@ -20,7 +20,6 @@
     shape-rendering: crispEdges;
     }
   </style>
-  Stacked Bar chart
     <chart-input-group uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>
       <chart-input slot="chart-input" axis="y" label="Y axis" accept="number,date"></chart-input>
@@ -86,7 +85,8 @@
         axis,
         label,
         chartData,
-        layers
+        layers,
+        keys
       }
 
     }
@@ -122,7 +122,7 @@
         .attr("transform", "rotate(-90)")
         .attr("y", 10)
         .attr("dy", ".71em")
-        .style("text-anchor", "end");
+        .style("text-anchor", "start");
 
       let segments = svg.selectAll(".layer")
         .data(obj.layers)
@@ -149,14 +149,12 @@
         // .attr("height", function(d) {
         //   return obj.height - obj.axis.scale.y(d.value);
         // })
-      debugger;
       this.addLegend({
         obj,
         container:svg,
-        selector:'rect',
-        node:obj.layers[0],
-        key: 'x',
-        segments
+        selector:'.layer',
+        node:obj.keys.map(items=>{return {item:items}}),
+        key: 'item'
       });
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);

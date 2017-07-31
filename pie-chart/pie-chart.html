@@ -130,12 +130,9 @@
           .data(d => obj.pie(d.values))
           .enter().append('g')
           .attr('class', 'arc')
-          .attr("data-legend",function(d) {return d.data.item})
-          .attr("data-legend-color",this.colorFill.bind(obj))
 
         let segments = g.append('path')
           .attr('d', obj.arc)
-          .style('fill', this.colorFill.bind(obj))
           .attr('class', 'pie-slice');
 
         segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');

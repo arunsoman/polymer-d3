@@ -156,11 +156,8 @@
       this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
     }
     // to fill color for svg and legends
-    colorFill(){
-      let color = d3.scale.category20c();
-      let items = arguments[0];
-      let index = arguments[1];
-      return this.label.nodes[index] ? this.label.nodes[index].color : color(items[0] || items.value);
+    colorFill(item,i){
+      return item.label.nodes[i] ? item.label.nodes[i].color : this.color(i);
     }
     clear(){
       d3.select(this.$.chartContainer).html("");
@@ -179,10 +176,13 @@
 
     addLegend(obj){
       this.chartKeys(obj.node,obj.key);
+      this.set('color',d3.scale.category20c());
       obj.container.selectAll(obj.selector)
-        .style("fill", this.colorFill.bind(obj.obj))
-        .attr("data-legend",d=>d[obj.key]||this.inputs[this.y].selectedObjs[0].key)
-        .attr("data-legend-color",this.colorFill.bind(obj.obj))
+        .style("fill", (d,i)=>{
+          return this.colorFill(obj.obj,i);
+        })
+        .attr("data-legend",(d,i)=>(d[obj.key] || (d.data && d.data[obj.key]))|| (obj.obj.keys && obj.obj.keys[i]) ||this.inputs[this.y].selectedObjs[0].key)
+        .attr("data-legend-color",(d,i)=>{return this.colorFill(obj.obj,i);})
 
       obj.container.append("g")
           .attr("class","legend")
