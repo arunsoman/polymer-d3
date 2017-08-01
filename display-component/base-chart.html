@@ -67,7 +67,8 @@
                 legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
                 width:{uitype:'number',txt:"Chart width", value:"960"},
                 height:{uitype:'number',txt:"Chart Height", value:"500"},
-                stacked:{uitype:'boolean',value:false}
+                stacked:{uitype:'boolean',value:false,txt:"Stacked Chart"},
+                group:{uitype:'boolean',value:true, txt:"Group Chart"}
               }
             }
           }
@@ -91,6 +92,14 @@
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             return objAssignChk&&chartPath.settings.stacked.value
+          }
+        },
+        group:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            return objAssignChk&&chartPath.settings.group.value
           }
         }
       }

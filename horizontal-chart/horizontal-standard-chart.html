@@ -1,0 +1,230 @@
+<!-- This chart is specifically built to be transformed into a 100% chart -->
+<link rel="import" href="../display-component/base-chart.html">
+<dom-module id="horizontal-standard-chart">
+  <template>
+    <style>
+      #chartContainer{
+        margin:0 auto;
+        font: 10px sans-serif;
+        position: relative;
+      }
+      .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
+
+      text {
+          font: 9px sans-serif;
+          color: white;
+      }
+      text.value {
+          font-size: 90%;
+          fill: white;
+      }
+
+      .axisHorizontal path{
+          fill: none;
+      }
+
+      .axisHorizontal .tick line {
+          stroke-width: 1;
+          stroke: rgba(0, 0, 0, 0.2);
+      }
+
+      .bar {
+          fill: steelblue;
+          fill-opacity: .9;
+      }
+
+    </style>
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
+  </template>
+  <script>
+    class horizontalStandardChart extends baseChart{
+      static get is(){
+        return "horizontal-standard-chart"
+      }
+      static get properties(){
+        return{}
+      }
+      constructor(){
+        super()
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //axis are mentioned in the chart-input module
+        let itemX = this.x ? this.inputs[this.x].selectedValue : []
+        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
+
+        //"itemChk" for avoid error from chart
+        let itemChk = itemX.length <= 0 || itemY.length <= 0
+        // let itemChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
+
+        if (itemChk) {
+            return false;
+        }
+        //axis inputs selectedValue assigin
+        itemX = itemX[0]
+        itemY = itemY[0]
+        itemZ = itemZ[0]
+
+        let parseDate = d3.time.format('%Y-%m-%d').parse;
+        let width = +this.settings.width.value,
+            height = +this.settings.height.value,
+            margin = {top: 5, right: 40, bottom: 20, left: 120},
+            label= this.settings.legend.values
+            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+        // width = width - margin.left - margin.right
+        // height = height - margin.top - margin.bottom
+
+        let color = d3.scale.category20();
+
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(itemX, itemY,itemZ)
+        let chartData = source.data
+        let dataLength = chartData.length
+
+        margin.axisMargin = 20
+        let xMargin = margin.left + margin.right,
+            yMargin = margin.top + margin.bottom,
+            tMargin = xMargin+yMargin
+        yMargin = yMargin>40?yMargin:40
+        yMargin = dataLength>25?dataLength-25:yMargin
+        margin.xMargin = xMargin
+        margin.yMargin = yMargin
+        let barHeight=(height-margin.axisMargin-yMargin*2)* 0.4/dataLength,
+            barPadding = (height-margin.axisMargin-yMargin*2)*0.6/dataLength
+        let max = d3.max(chartData, d=>d.yKey)
+        let valueMargin = 4
+        let charWidth = 5
+        let labelWidth = 0
+        let cElem = document.createElement("canvas"),
+            ctx=cElem.getContext("2d")
+        chartData.forEach(function(d) {
+          labelWidth = Math.ceil(Math.max(labelWidth, ctx.measureText(d.xKey).width));
+        })
+        let scale = d3.scale.linear()
+            .domain([0, max])
+            .range([0, width - xMargin*2 - labelWidth]);
+        let xAxis = d3.svg.axis()
+            .scale(scale)
+            .tickSize(-height + 2*yMargin + margin.axisMargin)
+            .orient("bottom");
+
+        return {
+          width,
+          height,
+          margin,
+          barHeight,
+          barPadding,
+          labelWidth,
+          scale,
+          xAxis,
+          valueMargin,
+          itemChk,
+          chartData,
+          color,
+          label
+        }
+      }
+      _paint(obj) {
+        d3.select(this.$.chartContainer).html("")
+        if (!obj || obj.itemChk) {
+          return false
+        }
+        //Draw Horizontal chart and append the svg canvas to the page
+        let parentG = d3.select(this.$.chartContainer)
+            .append("svg")
+            .attr("width", obj.width)
+            .attr("height", obj.height);
+
+        let bar = parentG.selectAll("g")
+                .data(obj.chartData)
+                .enter()
+                .append("g");
+
+        bar.attr("class", "bar")
+            .attr("cx",0)
+            .attr("transform", function(d, i) {
+                return "translate(" + obj.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding) + obj.barPadding) + ")";
+            });
+
+        bar.append("text")
+              .attr("class", "label")
+              .attr("y", obj.barHeight / 2)
+              .attr("dy", ".35em") //vertical align middle
+              .text(function(d){
+                  return d.xKey;
+              })
+        bar.append("rect")
+            .attr("transform", "translate("+obj.labelWidth+", 0)")
+            .attr("height", obj.barHeight)
+            .attr("width", function(d){
+                return obj.scale(d.yKey);
+            });
+        let fontSize = obj.barHeight / 2
+        fontSize = fontSize>5?fontSize:obj.barHeight
+        bar.append("text")
+          .attr("class", "value")
+          .attr("y", obj.barHeight / 2)
+          .attr("dx", -obj.valueMargin + obj.labelWidth) //margin right
+          .attr("dy", ".35em") //vertical align middle
+          .attr("text-anchor", "end")
+          .style("font-size",fontSize+"px")
+          .text(function(d){
+              return (d.yKey).toFixed(2);
+          })
+          .attr("x", function(d){
+              let width = this.getBBox().width;
+              return Math.max(width + obj.valueMargin, obj.scale(d.yKey));
+          });
+        parentG.insert("g",":first-child")
+          .attr("class", "axisHorizontal")
+          .attr("transform", "translate(" + (obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height - obj.margin.axisMargin - obj.margin.yMargin)+")")
+          .call(obj.xAxis);
+        // append div for toolTip
+        let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
+        let offsetTop = this.$.chartContainer.offsetTop+25
+        bar.on("mousemove", function(d){
+              div.style("left", d3.event.pageX+10+"px");
+              div.style("top", d3.event.pageY-offsetTop+"px");
+              div.style("display", "inline-block");
+              div.html((d.xKey)+"<br>"+(d.yKey));
+          });
+        bar.on("mouseout", function(d){
+              div.style("display", "none");
+          });
+        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.xMargin+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY,itemZ){
+        let sourceData = this.source.reduce((old,newVal)=>{
+          old[newVal[itemX]]=(old[newVal[itemX]]||0)+(+newVal[itemY])
+          return old
+        },{})
+        let data  = Object.keys(sourceData).map(item=>{return {xKey:item,yKey:sourceData[item]}})
+        return{data}
+      }
+    }
+    customElements.define(horizontalStandardChart.is, horizontalStandardChart)
+  </script>
+</dom-module>
