@@ -76,6 +76,9 @@
           stroke: #000;
           shape-rendering: crispEdges;
         }
+        .chart .tick text {
+          fill: black;
+        }
 
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -132,8 +135,6 @@
             margin = {top: 5, right: 40, bottom: 20, left: 120},
             label= this.settings.legend.values
             //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        // width = width - margin.left - margin.right
-        // height = height - margin.top - margin.bottom
 
         let color = d3.scale.category20();
 
@@ -145,93 +146,78 @@
             yMargin = margin.top + margin.bottom,
             tMargin = xMargin+yMargin
         yMargin = yMargin>40?yMargin:40
-
-        margin.axisMargin = 20
+        margin.yMargin = yMargin
+        margin.axisMargin = group?10:20
         margin.xMargin = xMargin
+        let labelData = group?source.zKeys:chartData
+        let barHeight=group?(height-tMargin):(height-margin.axisMargin-yMargin*2)
+        barHeight= group?barHeight* (labelData.length+1)/chartData.length:barHeight* 0.4/dataLength
+        barHeight = Math.ceil(barHeight)
+        barHeight = barHeight>12?barHeight:barHeight*2
+        let calcMargin = barHeight>9?margin.axisMargin:margin.axisMargin/2
+        height = group?barHeight * chartData.length + barHeight*labelData.length + calcMargin * chartData.length/labelData.length :barHeight * chartData.length+calcMargin * chartData.length;
+        height = group?height+20:height
+        let yAxis,
+            sourceData,
+            xKeys, zKeys, groupHeight, barPadding
+        let valueMargin = 4,
+            charWidth = 5,
+            labelWidth = 0
 
+        let max = group?d3.max(chartData):d3.max(chartData, d=>d.yKey)
+        let cElem = document.createElement("canvas"),
+            ctx=cElem.getContext("2d")
+        labelData.forEach(function(d) {
+          let key = group?d:d.xKey
+          labelWidth = Math.ceil(Math.max(labelWidth, ctx.measureText(key).width));
+        })
 
-        let barHeight=(height-margin.axisMargin-yMargin*2)
+        let xScale = d3.scale.linear()
+            .domain([0, max])
+            .range([0, width - xMargin*2 - labelWidth]);
+        let xAxis = d3.svg.axis()
+            .scale(xScale)
+            .tickSize(-height)
+            .orient("bottom");
 
         if(group){
-          let xKeys = source.xKeys,
-              zKeys = source.zKeys
-
-          let sourceData = source.sourceData
-          barHeight = barHeight* sourceData.length/chartData.length
-          let groupHeight = barHeight * sourceData.length
-          height = barHeight * chartData.length + margin.axisMargin * xKeys.length;
-
+          xKeys = source.xKeys
+          zKeys = source.zKeys
+          sourceData = source.sourceData
+          groupHeight = barHeight * sourceData.length
           margin.yMargin = yMargin
-
-          let x = d3.scale.linear()
-                    .domain([0, d3.max(chartData)])
-                    .range([0, width]),
-              y = d3.scale.linear()
-                    .range([height + margin.axisMargin, 0]);
-          // define y axis
-          let yAxis = d3.svg.axis()
+          // define y and y axis
+          let y = d3.scale.linear()
+                .range([(height-20) + margin.axisMargin, 0]);
+          yAxis = d3.svg.axis()
                         .scale(y)
                         .tickFormat('')
                         .tickSize(0)
                         .orient("left");
-
-          return {
-            width,
-            height,
-            margin,
-            x,
-            yAxis,
-            xKeys,
-            zKeys,
-            barHeight,
-            groupHeight,
-            sourceData,
-            itemChk,
-            chartData,
-            color,
-            label,
-            group
-          }
         }else{
-          yMargin = dataLength>25?dataLength-25:yMargin
-          margin.yMargin = yMargin
-          let barHeight= barHeight* 0.4/dataLength,
-              barPadding = (height-margin.axisMargin-yMargin*2)*0.6/dataLength
-          let max = d3.max(chartData, d=>d.yKey)
-          let valueMargin = 4
-          let charWidth = 5
-          let labelWidth = 0
-          let cElem = document.createElement("canvas"),
-              ctx=cElem.getContext("2d")
-          chartData.forEach(function(d) {
-            labelWidth = Math.ceil(Math.max(labelWidth, ctx.measureText(d.xKey).width));
-          })
-          let scale = d3.scale.linear()
-              .domain([0, max])
-              .range([0, width - xMargin*2 - labelWidth]);
-          let xAxis = d3.svg.axis()
-              .scale(scale)
-              .tickSize(-height + 2*yMargin + margin.axisMargin)
-              .orient("bottom");
-
-          return {
-            width,
-            height,
-            margin,
-            barHeight,
-            barPadding,
-            labelWidth,
-            scale,
-            xAxis,
-            valueMargin,
-            itemChk,
-            chartData,
-            color,
-            label,
-            group
-          }
+          barPadding = (height-margin.axisMargin-yMargin*2)*0.6/dataLength
         }
-
+        return {
+          width,
+          height,
+          margin,
+          valueMargin,
+          xScale,
+          xAxis,
+          yAxis,
+          xKeys,
+          zKeys,
+          barHeight,
+          barPadding,
+          groupHeight,
+          labelWidth,
+          sourceData,
+          itemChk,
+          chartData,
+          color,
+          label,
+          group
+        }
       }
       _paint(obj) {
         d3.select(this.$.chartContainer).html("")
@@ -243,14 +229,45 @@
             .append("svg")
             .attr("width", obj.width)
             .attr("height", obj.height);
+        let chart
+        // Create bars
+        let bar = parentG.selectAll("g")
+            .data(obj.chartData)
+            .enter().append("g")
         if(obj.group){
           d3.select(this.$.chartContainer).attr("class", "chart")
-          this.paintHorizontalGrpChart(parentG,obj)
+          this.paintHorizontalGrpChart(parentG,bar,obj)
         }else{
           d3.select(this.$.chartContainer).attr("class", "")
-          this.paintHorizontalStdChart(parentG,obj)
+          this.paintHorizontalStdChart(parentG,bar,obj)
         }
 
+        parentG.insert("g",":first-child")
+          .attr("class", "axisHorizontal")
+          .attr("transform", "translate(" + (obj.group?obj.margin.xMargin:obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height-15)+")")
+          .call(obj.xAxis);
+
+        // append div for toolTip
+        let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
+        let offsetTop = this.$.chartContainer.offsetTop+25
+        bar.on("mousemove", function(d,i){
+              div.style("left", d3.event.pageX+10+"px");
+              div.style("top", d3.event.pageY-offsetTop+"px");
+              div.style("display", "inline-block");
+              let tTxt = obj.group?d:(d.xKey)+"<br>"+(d.yKey)
+              div.html(tTxt);
+          });
+        bar.on("mouseout", function(d){
+              div.style("display", "none");
+          });
+        // Draw legend
+        this.addLegend({
+            obj,
+            container:parentG,
+            selector:'.bar',
+            node:obj.group?obj.sourceData:obj.chartData,
+            key:"label"
+          });
         d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.xMargin+"px"})
       }
       // populate chart data
@@ -267,7 +284,7 @@
                 label:item,
                 value:this.source.map(items=>{
                   if(items[itemZ] == item){
-                    return items[itemY]
+                    return +items[itemY]
                   }
                 }).filter(d=>d!=undefined)
               }
@@ -289,16 +306,11 @@
           return{data}
         }
       }
-      paintHorizontalStdChart(parentG,obj){
-        let bar = parentG.selectAll("g")
-                .data(obj.chartData)
-                .enter()
-                .append("g");
-
+      paintHorizontalStdChart(parentG,bar,obj){
         bar.attr("class", "bar")
             .attr("cx",0)
             .attr("transform", function(d, i) {
-                return "translate(" + obj.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding) + obj.barPadding) + ")";
+                return "translate(" + obj.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding)) + ")";
             });
 
         bar.append("text")
@@ -312,7 +324,7 @@
             .attr("transform", "translate("+obj.labelWidth+", 0)")
             .attr("height", obj.barHeight)
             .attr("width", function(d){
-                return obj.scale(d.yKey);
+                return obj.xScale(d.yKey);
             });
         let fontSize = obj.barHeight / 2
         fontSize = fontSize>5?fontSize:obj.barHeight
@@ -328,44 +340,25 @@
           })
           .attr("x", function(d){
               let width = this.getBBox().width;
-              return Math.max(width + obj.valueMargin, obj.scale(d.yKey));
+              return Math.max(width + obj.valueMargin, obj.xScale(d.yKey));
           });
-        parentG.insert("g",":first-child")
-          .attr("class", "axisHorizontal")
-          .attr("transform", "translate(" + (obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height - obj.margin.axisMargin - obj.margin.yMargin)+")")
-          .call(obj.xAxis);
-        // append div for toolTip
-        let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
-        let offsetTop = this.$.chartContainer.offsetTop+25
-        bar.on("mousemove", function(d){
-              div.style("left", d3.event.pageX+10+"px");
-              div.style("top", d3.event.pageY-offsetTop+"px");
-              div.style("display", "inline-block");
-              div.html((d.xKey)+"<br>"+(d.yKey));
-          });
-        bar.on("mouseout", function(d){
-              div.style("display", "none");
-          });
+
       }
-      paintHorizontalGrpChart(parentG,obj){
-        // Create bars
-        let bar = parentG.selectAll("g")
-            .data(obj.chartData)
-            .enter().append("g")
-            .attr("transform", function(d, i) {
+      paintHorizontalGrpChart(parentG,bar,obj){
+
+            bar.attr("transform", function(d, i) {
               return "translate(" + obj.margin.xMargin + "," + (i * obj.barHeight + obj.margin.axisMargin * (0.5 + Math.floor(i/obj.sourceData.length))) + ")";
             });
-
         // Create rectangles of the correct width
         bar.append("rect")
             //.attr("fill", function(d,i) { return obj.color(i % obj.sourceData.length); })
             .attr("class", "bar")
-            .attr("width", obj.x)
+            .attr("width", obj.xScale)
             .attr("height", obj.barHeight - 1);
 
         // Add text label in bar
         bar.append("text")
-            .attr("x", function(d) { return obj.x(d) - 3; })
+            .attr("x", function(d) { return obj.xScale(d) - 3; })
             .attr("y", obj.barHeight / 2)
             .attr("fill", "red")
             .attr("dy", ".35em")
@@ -385,29 +378,9 @@
 
         parentG.append("g")
               .attr("class", "y axis")
-              .attr("transform", "translate(" + obj.margin.xMargin + ", " + -obj.margin.axisMargin/2 + ")")
+              .attr("transform", "translate(" + obj.margin.xMargin + ", " + -obj.margin.axisMargin + ")")
               .call(obj.yAxis);
-        // append div for toolTip
-        let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
-        let offsetTop = this.$.chartContainer.offsetTop+25
-        bar.on("mousemove", function(d){
-              div.style("left", d3.event.pageX+10+"px");
-              div.style("top", d3.event.pageY-offsetTop+"px");
-              div.style("display", "inline-block");
-              div.html(d);
-          });
-        bar.on("mouseout", function(d){
-              div.style("display", "none");
-          });
-        // Draw legend
 
-        this.addLegend({
-            obj,
-            container:parentG,
-            selector:'.bar',
-            node:obj.sourceData,
-            key:"label"
-          });
       }
     }
     customElements.define(horizontalChart.is, horizontalChart)
