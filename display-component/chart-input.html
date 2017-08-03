@@ -123,9 +123,9 @@
         </div>
       </template>
       </div>
-      
+
       <h4>[[ label ]]</h4>
-      <p>Accept 
+      <p>Accept
       <template is="dom-if" if="[[accept]]">only [[accept]]</template>
       <template is="dom-if" if="[[!accept]]">all types</template>
       </p>
@@ -209,6 +209,12 @@
             type: 'ADD_UPDATE_CHART_INPUTS',
             value: input
           };
+        },
+        removeInputs(removeInput) {
+          return {
+            type: 'REMOVE_CHART_INPUTS',
+            value: removeInput
+          };
         }
       }
     }
@@ -246,7 +252,10 @@
         this.splice('selectedValue', e.model.tagIndex, 1);
         this.splice('selectedObjs', e.model.tagIndex, 1);
         this.splice('itemGrp', e.model.tagIndex, 1);
-        this.setInputObj()
+        let key = this.axis
+        let slctedValLength= this.input[this.axis].selectedValue.length
+        slctedValLength==0 ? this.dispatch("removeInputs", {uuid:this.parentNode.uuid,objKey:key})
+          : this.setInputObj()
     }
     setInputObj(){
       let input = {}

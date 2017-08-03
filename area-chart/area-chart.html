@@ -60,22 +60,22 @@
       _compute() {
         //assign stacked value
         let stacked = this.stacked
+        //Here checks the axis availability for avoid error from chart
+        let axisKeys = this.axisKeys.sort().join(",")
+        let chkXY = axisKeys == "x,y"
+        let chkXYZ = axisKeys == "x,y,z"
+        let axisIndex = chkXY?2:4
+        axisIndex = chkXYZ?3:axisIndex
+        axisIndex = stacked?3:axisIndex
+        //"hasInputs" for avoid error from chart
+        if(!this.hasInputs(axisIndex))return false
         //axis are mentioned in the chart-input module
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0
-        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
-        let itemStackChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
-        itemChk = stacked ?itemStackChk: itemChk
-        if (itemChk) {
-            return false;
-        }
-        let itemZChk = !stacked&&itemZ&&itemZ.length>0
+        let itemX,itemY,itemZ
         //axis inputs selectedValue assigin
-        itemX = itemX[0]
-        itemY=itemY[0]
+        itemX = this.inputs[this.x].selectedValue[0]
+        itemY = this.inputs[this.y].selectedValue[0]
+        itemZ = this.inputs[this.z] ? this.inputs[this.z].selectedValue : []
+        let itemZChk = !stacked&&itemZ
         itemZ = itemZ[0]
 
         let formatDate = d3.time.format("%Y-%m-%d").parse;
@@ -152,7 +152,6 @@
           xAxis,
           yAxis,
           areaChart,
-          itemChk,
           chartData,
           label,
           color,
@@ -161,10 +160,8 @@
         }
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
+        this.clear()
+        if (!obj) return false
         let parentG = d3.select(this.$.chartContainer).append("svg")
             .attr({"width": obj.width + obj.margin.left + obj.margin.right,
                     "height": obj.height + obj.margin.top + obj.margin.bottom+40

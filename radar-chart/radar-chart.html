@@ -31,21 +31,15 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
+        let axisIndex = 3
+        //"inputCheck" for avoid error from chart
+        if(!this.hasInputs(axisIndex)) return false
         //axis are mentioned in the chart-input module
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
-        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
-
-        if (itemChk) {
-            return false;
-        }
+        let itemX,itemY,itemZ
         //axis inputs selectedValue assigin
-        itemX = itemX[0]
-        itemY = itemY[0]
-        itemZ = itemZ[0]
+        itemX = this.inputs[this.x].selectedValue[0]
+        itemY = this.inputs[this.y].selectedValue[0]
+        itemZ = this.inputs[this.z].selectedValue[0]
 
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let width = +this.settings.width.value,
@@ -78,7 +72,6 @@
           width,
           height,
           margin,
-          itemChk,
           chartData,
           options,
           KeyMap,
@@ -87,10 +80,8 @@
         }
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
+        this.clear()
+        if (!obj) return false
         //Draw Radar chart
         let parentG = this.$.chartContainer
         chart.radarChart(parentG,obj.chartData,obj.options)

@@ -110,24 +110,17 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        //axis are mentioned in the chart-input module
+        //assign group value
         let group = this.group
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
-        let itemZ = this.z ? this.inputs[this.z].selectedValue : []
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0
-        let itemGroupChk = itemX.length <= 0 || itemY.length <= 0 || itemZ.length<=0
-        itemChk = group?itemGroupChk:itemChk
-
-        if (itemChk) {
-            return false;
-        }
+        let axisIndex = group?3:2
+        //"inputCheck" for avoid error from chart
+        if(!this.hasInputs(axisIndex))return false
+        //axis are mentioned in the chart-input module
+        let itemX,itemY,itemZ
         //axis inputs selectedValue assigin
-        itemX = itemX[0]
-        itemY = itemY[0]
-        itemZ = itemZ[0]
+        itemX = this.inputs[this.x].selectedValue[0]
+        itemY = this.inputs[this.y].selectedValue[0]
+        if(group){itemZ = this.inputs[this.z].selectedValue[0]}
 
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let width = +this.settings.width.value,
@@ -212,7 +205,6 @@
           groupHeight,
           labelWidth,
           sourceData,
-          itemChk,
           chartData,
           color,
           label,
@@ -220,10 +212,8 @@
         }
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
+        this.clear()
+        if (!obj) return false
         //Draw Horizontal chart and append the svg canvas to the page
         let parentG = d3.select(this.$.chartContainer)
             .append("svg")

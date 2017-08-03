@@ -51,19 +51,14 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
+        let axisIndex = 2
+        //"inputCheck" for avoid error from chart
+        if(!this.hasInputs(axisIndex)) return false
         //axis are mentioned in the chart-input module
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0
-
-        if (itemChk) {
-            return false;
-        }
+        let itemX,itemY
         //axis inputs selectedValue assigin
-        itemX = itemX[0]
-        itemY=itemY[0]
+        itemX = this.inputs[this.x].selectedValue[0]
+        itemY = this.inputs[this.y].selectedValue[0]
 
         let width = +this.settings.width.value,
             height = 50,
@@ -108,16 +103,13 @@
           color,
           chart,
           margin,
-          itemChk,
           chartData,
           label
         }
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
+        this.clear()
+        if (!obj) return false
         var parentG = d3.select(this.$.chartContainer).selectAll("div")
             .data(obj.chartData)
             .enter().append("svg")

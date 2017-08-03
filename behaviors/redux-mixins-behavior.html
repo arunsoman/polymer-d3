@@ -31,6 +31,16 @@
                   [action.value.objKey]:action.value.input
                 })
               })})
+          case 'REMOVE_CHART_INPUTS':
+            return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+              state[action.value.uuid],{
+                inputs:Object.assign({},Object.keys(state[action.value.uuid].inputs).reduce((prev,next)=>{
+                  if(next!=action.value.objKey){
+                    prev[next]=state[action.value.uuid].inputs[next]
+                  }
+                  return prev
+                },{}))
+              })})
           case 'UPDATE_SETTINGS':
             return Object.assign({},state,{
               [action.value.id]:Object.assign({},state[action.value.id],{

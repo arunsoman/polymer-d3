@@ -174,8 +174,10 @@
     // check input contains 2 or more axis.
     // if axis value is less than 2 or empty
     // do not need to compute chart values.
-    inputCheck(index){
-      return Object.keys(this.inputs).length < 3;
+    hasInputs(index){
+      let inputCheck = Object.keys(this.inputs).length >= index
+      inputCheck && this.clear()
+      return inputCheck;
     }
     addToolTip(obj){
       this.attachToolTip(obj.container,obj.segments,obj.selector,d=>{
