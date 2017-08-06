@@ -253,7 +253,7 @@
         this.splice('selectedObjs', e.model.tagIndex, 1);
         this.splice('itemGrp', e.model.tagIndex, 1);
         let key = this.axis
-        let slctedValLength= this.input[this.axis].selectedValue.length
+        let slctedValLength= this.input[this.axis]?this.input[this.axis].selectedValue.length:0
         slctedValLength==0 ? this.dispatch("removeInputs", {uuid:this.parentNode.uuid,objKey:key})
           : this.setInputObj()
     }

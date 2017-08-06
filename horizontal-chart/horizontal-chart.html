@@ -120,7 +120,7 @@
         //axis inputs selectedValue assigin
         itemX = this.inputs[this.x].selectedValue[0]
         itemY = this.inputs[this.y].selectedValue[0]
-        if(group){itemZ = this.inputs[this.z].selectedValue[0]}
+        group&&(itemZ = this.inputs[this.z].selectedValue[0])
 
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let width = +this.settings.width.value,
@@ -145,7 +145,7 @@
         let labelData = group?source.zKeys:chartData
         let barHeight=group?(height-tMargin):(height-margin.axisMargin-yMargin*2)
         barHeight= group?barHeight* (labelData.length+1)/chartData.length:barHeight* 0.4/dataLength
-        barHeight = Math.ceil(barHeight)
+        barHeight = Math.round(barHeight)
         barHeight = barHeight>12?barHeight:barHeight*2
         let calcMargin = barHeight>9?margin.axisMargin:margin.axisMargin/2
         height = group?barHeight * chartData.length + barHeight*labelData.length + calcMargin * chartData.length/labelData.length :barHeight * chartData.length+calcMargin * chartData.length;
@@ -234,7 +234,7 @@
 
         parentG.insert("g",":first-child")
           .attr("class", "axisHorizontal")
-          .attr("transform", "translate(" + (obj.group?obj.margin.xMargin:obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height-15)+")")
+          .attr("transform", "translate(" + (obj.group?obj.margin.xMargin:obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height-20)+")")
           .call(obj.xAxis);
 
         // append div for toolTip
