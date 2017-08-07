@@ -294,53 +294,53 @@
   // This meathod avoids crazy rwo-way binding side effects
   bootstrapCharts(config) {
     // data and externals are always required
-
-    if (config.availableCharts) {
-      // to support new charts added to polymer-d3
-      // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it
-      let cookedAvailableCharts = PolymerD3.utilities.compareAndMerge(config.availableCharts, this.availableCharts, elem => {
-        let avaiable = false;
-        for ( let i = 0; i < config.availableCharts.length; i++) {
-          if (config.availableCharts[i].label == elem.label) {
-            avaiable = true;
-          }
-        }
-        return !avaiable;
-      });
-      this.availableCharts = cookedAvailableCharts;
-    }
-    if (config.mode == 'view') {
-      this.set('editMode', false);
-      this.set('selectedChart', config.selectedChart);
-      this.set('settings', config.settings);
-      this.set('inputs', config.inputs);
-    } else if (config.mode === 'create') {
-      // Fresh Polymer d3
-      this.set('editMode', true);
-    } else {
-      this.set('selectedChart', config.selectedChart);
-      this.set('settings', config.settings);
-      this.set('inputs', config.inputs);
-      if (config.mode === 'edit') {
-        // Edit mode settings
-        this.set('editMode', true);
-      } else {
-        this.set('editMode', false);
-      }
-      // Find why legend settings has to added twice
-      this.set('legendSettings', config.legendSettings);
-      this.selectedChartObj.set('legendSettings', config.legendSettings);
-      // To set inputs to selected chart manually
-      this.selectedChartObj.set('inputs', config.inputs);
-      this.selectedChartObj.draw();
-      this.async(() => {
-        this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
-        // gives color to selected chart
-        if(!this.editMode){
-          this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
-        }
-      }, 500);
-    }
+    this.set('editMode', true);
+    // if (config.availableCharts) {
+    //   // to support new charts added to polymer-d3
+    //   // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it
+    //   let cookedAvailableCharts = PolymerD3.utilities.compareAndMerge(config.availableCharts, this.availableCharts, elem => {
+    //     let avaiable = false;
+    //     for ( let i = 0; i < config.availableCharts.length; i++) {
+    //       if (config.availableCharts[i].label == elem.label) {
+    //         avaiable = true;
+    //       }
+    //     }
+    //     return !avaiable;
+    //   });
+    //   this.availableCharts = cookedAvailableCharts;
+    // }
+    // if (config.mode == 'view') {
+    //   this.set('editMode', false);
+    //   this.set('selectedChart', config.selectedChart);
+    //   this.set('settings', config.settings);
+    //   this.set('inputs', config.inputs);
+    // } else if (config.mode === 'create') {
+    //   // Fresh Polymer d3
+    //   this.set('editMode', true);
+    // } else {
+    //   this.set('selectedChart', config.selectedChart);
+    //   this.set('settings', config.settings);
+    //   this.set('inputs', config.inputs);
+    //   if (config.mode === 'edit') {
+    //     // Edit mode settings
+    //     this.set('editMode', true);
+    //   } else {
+    //     this.set('editMode', false);
+    //   }
+    //   // Find why legend settings has to added twice
+    //   this.set('legendSettings', config.legendSettings);
+    //   this.selectedChartObj.set('legendSettings', config.legendSettings);
+    //   // To set inputs to selected chart manually
+    //   this.selectedChartObj.set('inputs', config.inputs);
+    //   this.selectedChartObj.draw();
+    //   this.async(() => {
+    //     this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
+    //     // gives color to selected chart
+    //     if(!this.editMode){
+    //       this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
+    //     }
+    //   }, 500);
+    // }
   }
 
   // retrives current state of polymer-d3
