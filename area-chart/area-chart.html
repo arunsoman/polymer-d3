@@ -75,6 +75,7 @@
 
         //get chart data once pass "x and y" into the "getChartData" method
         let itemZChk = !stacked&&chartProp.itemZ
+        itemZChk = (itemZChk==0)?true:itemZChk
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
             itemVal = source.itemVal
