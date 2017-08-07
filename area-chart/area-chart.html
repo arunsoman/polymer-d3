@@ -16,6 +16,7 @@
     }
     #chartContainer{
       margin:0 auto;
+      font: 10px sans-serif;
     }
     .legend-items text{
       fill:black
@@ -67,35 +68,20 @@
         let axisIndex = chkXY?2:4
         axisIndex = chkXYZ?3:axisIndex
         axisIndex = stacked?3:axisIndex
-        //"hasInputs" for avoid error from chart
-        if(!this.hasInputs(axisIndex))return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        itemZ = this.inputs[this.z] ? this.inputs[this.z].selectedValue : []
-        let itemZChk = !stacked&&itemZ
-        itemZ = itemZ[0]
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex,stacked}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
-        let formatDate = d3.time.format("%Y-%m-%d").parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right,
-        height = height - margin.top - margin.bottom;
-
-        let color = d3.scale.category20c();
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ,stacked,itemZChk)
+        let itemZChk = !stacked&&chartProp.itemZ
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
-            itemVal = source.itemVal&&source.itemVal
+            itemVal = source.itemVal
         if(stacked || itemZChk){
-          color.domain(source.names);
+          chartProp.color.domain(source.names);
           let stack = d3.layout.stack().values(function(d) { return d.values});
-          chartData = stack(color.domain().map((name)=> {
+          chartData = stack(chartProp.color.domain().map((name)=> {
                 return {
                   name: name,
                   values: source.data.map((d)=> {
@@ -105,18 +91,18 @@
               }));
         }else{
           chartData = source.map((item,i)=>{
-            itemVal = formatDate(item["item"].split(" ")[0])
+            itemVal = chartProp.parseDate(item["item"].split(" ")[0])
             let itemSet = itemVal?itemVal:item["item"]
             return{"value":item.value,"item":itemSet}
           })
         }
         let srcData = stacked || itemZChk?source.data:chartData
 
-        let dateX = d3.time.scale().range([0, width]);
-        let stringX = d3.scale.ordinal().range([0, width]);
+        let dateX = d3.time.scale().range([0, chartProp.width]);
+        let stringX = d3.scale.ordinal().range([0, chartProp.width]);
 
         let x = itemVal?dateX:stringX
-        let y = d3.scale.linear().range([height, 0]);
+        let y = d3.scale.linear().range([chartProp.height, 0]);
         let xAxis = d3.svg.axis()
             .scale(x).orient("bottom");
         let yAxis = d3.svg.axis()
@@ -125,7 +111,7 @@
         // Define area chart and set chart values and item
         let areaChart = d3.svg.area()
             .x((d)=>x(d.item))
-            .y0((d)=>(stacked || itemZChk)?y(d.y0):height)
+            .y0((d)=>(stacked || itemZChk)?y(d.y0):chartProp.height)
             .y1((d)=>(stacked || itemZChk)?y(d.y0 + d.y):y(d.value));
 
         // Set domains for X axes
@@ -133,7 +119,7 @@
           x.domain(d3.extent(srcData, function(d) { return d.item; }));
         }else{
           x.domain(srcData.map(d=> d.item))
-          .rangeRoundBands([0 , width]);
+          .rangeRoundBands([0 , chartProp.width]);
         }
         // Find the value of the item with highest total value
         let maxItemVal = d3.max(srcData, function(d){
@@ -144,17 +130,13 @@
         y.domain([0, maxItemVal]);
 
         return {
-          width,
-          height,
-          margin,
           x,
           y,
           xAxis,
           yAxis,
           areaChart,
           chartData,
-          label,
-          color,
+          chartProp,
           stacked,
           itemZChk
         }
@@ -163,11 +145,11 @@
         this.clear()
         if (!obj) return false
         let parentG = d3.select(this.$.chartContainer).append("svg")
-            .attr({"width": obj.width + obj.margin.left + obj.margin.right,
-                    "height": obj.height + obj.margin.top + obj.margin.bottom+40
+            .attr({"width": obj.chartProp.width + obj.chartProp.margin.xMargin,
+                    "height": obj.chartProp.height + obj.chartProp.margin.yMargin+40
             })
             .append("g")
-              .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+              .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         if(obj.stacked || obj.itemZChk){
           let chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
@@ -176,7 +158,7 @@
           chartSvg.append("path")
               .attr("class", "area")
               .attr("d", function(d) {return obj.areaChart(d.values); })
-              .style("fill", function(d) { return obj.color(d.name); });
+              .style("fill", function(d) { return obj.chartProp.color(d.name); });
 
           chartSvg.append("text")
               .datum(function(d) {return {name: d.name, value: d.values[d.values.length - 1]}; })
@@ -194,7 +176,7 @@
         }
         parentG.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + obj.height + ")")
+            .attr("transform", "translate(0," + obj.chartProp.height + ")")
             .call(obj.xAxis);
         parentG.append("g")
             .attr("class", "y axis")
@@ -211,11 +193,11 @@
         //     selector:'.area',
         //     node:obj.chartData
         //   });
-        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
-      getChartData(itemX, itemY,itemZ,stacked,itemZChk){
-        let formatDate = d3.time.format("%Y-%m-%d").parse;
+      getChartData(itemX, itemY,itemZ,stacked,itemZChk,formatDate){
+        // let formatDate = d3.time.format("%Y-%m-%d").parse;
         let names=this.source.map(row=>row[itemZ])
         let itemVal
         let sourceData

@@ -113,43 +113,27 @@
         //assign group value
         let group = this.group
         let axisIndex = group?3:2
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex))return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        group&&(itemZ = this.inputs[this.z].selectedValue[0])
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex,group}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-
-        let color = d3.scale.category20();
-
-        //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ,group)
+        //get chart data once pass axis into the "getChartData" method
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,group)
         let chartData = source.data
         let dataLength = chartData.length
-        let xMargin = margin.left + margin.right,
-            yMargin = margin.top + margin.bottom,
-            tMargin = xMargin+yMargin
-        yMargin = yMargin>40?yMargin:40
-        margin.yMargin = yMargin
-        margin.axisMargin = group?10:20
-        margin.xMargin = xMargin
+        let tMargin = chartProp.margin.xMargin+chartProp.margin.yMargin
+        chartProp.margin.yMargin = chartProp.margin.yMargin>40?chartProp.margin.yMargin:40
+        chartProp.margin.axisMargin = group?10:20
         let labelData = group?source.zKeys:chartData
-        let barHeight=group?(height-tMargin):(height-margin.axisMargin-yMargin*2)
+        let barHeight=group?(chartProp.height-tMargin):(chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin*2)
         barHeight= group?barHeight* (labelData.length+1)/chartData.length:barHeight* 0.4/dataLength
         barHeight = Math.round(barHeight)
         barHeight = barHeight>12?barHeight:barHeight*2
-        let calcMargin = barHeight>9?margin.axisMargin:margin.axisMargin/2
-        height = group?barHeight * chartData.length + barHeight*labelData.length + calcMargin * chartData.length/labelData.length :barHeight * chartData.length+calcMargin * chartData.length;
-        height = group?height+20:height
+        let calcMargin = barHeight>9?chartProp.margin.axisMargin:chartProp.margin.axisMargin/2
+        chartProp.height = chartProp.height+chartProp.margin.yMargin
+        chartProp.height = group?barHeight * chartData.length + barHeight*labelData.length + calcMargin * chartData.length/labelData.length :barHeight * chartData.length+calcMargin * chartData.length;
+        chartProp.height = group?chartProp.height+20:chartProp.height
         let yAxis,
             sourceData,
             xKeys, zKeys, groupHeight, barPadding
@@ -167,10 +151,10 @@
 
         let xScale = d3.scale.linear()
             .domain([0, max])
-            .range([0, width - xMargin*2 - labelWidth]);
+            .range([0, chartProp.width - chartProp.margin.xMargin*2 - labelWidth]);
         let xAxis = d3.svg.axis()
             .scale(xScale)
-            .tickSize(-height)
+            .tickSize(-chartProp.height)
             .orient("bottom");
 
         if(group){
@@ -178,22 +162,18 @@
           zKeys = source.zKeys
           sourceData = source.sourceData
           groupHeight = barHeight * sourceData.length
-          margin.yMargin = yMargin
           // define y and y axis
           let y = d3.scale.linear()
-                .range([(height-20) + margin.axisMargin, 0]);
+                .range([(chartProp.height-20) + chartProp.margin.axisMargin, 0]);
           yAxis = d3.svg.axis()
                         .scale(y)
                         .tickFormat('')
                         .tickSize(0)
                         .orient("left");
         }else{
-          barPadding = (height-margin.axisMargin-yMargin*2)*0.6/dataLength
+          barPadding = (chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin*2)*0.6/dataLength
         }
         return {
-          width,
-          height,
-          margin,
           valueMargin,
           xScale,
           xAxis,
@@ -206,8 +186,7 @@
           labelWidth,
           sourceData,
           chartData,
-          color,
-          label,
+          chartProp,
           group
         }
       }
@@ -217,8 +196,8 @@
         //Draw Horizontal chart and append the svg canvas to the page
         let parentG = d3.select(this.$.chartContainer)
             .append("svg")
-            .attr("width", obj.width)
-            .attr("height", obj.height);
+            .attr("width", obj.chartProp.width)
+            .attr("height", obj.chartProp.height);
         let chart
         // Create bars
         let bar = parentG.selectAll("g")
@@ -234,7 +213,7 @@
 
         parentG.insert("g",":first-child")
           .attr("class", "axisHorizontal")
-          .attr("transform", "translate(" + (obj.group?obj.margin.xMargin:obj.margin.xMargin + obj.labelWidth) + ","+ (obj.height-20)+")")
+          .attr("transform", "translate(" + (obj.group?obj.chartProp.margin.xMargin:obj.chartProp.margin.xMargin + obj.labelWidth) + ","+ (obj.chartProp.height-20)+")")
           .call(obj.xAxis);
 
         // append div for toolTip
@@ -258,7 +237,7 @@
             node:obj.group?obj.sourceData:obj.chartData,
             key:"label"
           });
-        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.xMargin+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
       getChartData(itemX, itemY,itemZ,group){
@@ -300,7 +279,7 @@
         bar.attr("class", "bar")
             .attr("cx",0)
             .attr("transform", function(d, i) {
-                return "translate(" + obj.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding)) + ")";
+                return "translate(" + obj.chartProp.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding)) + ")";
             });
 
         bar.append("text")
@@ -337,7 +316,7 @@
       paintHorizontalGrpChart(parentG,bar,obj){
 
             bar.attr("transform", function(d, i) {
-              return "translate(" + obj.margin.xMargin + "," + (i * obj.barHeight + obj.margin.axisMargin * (0.5 + Math.floor(i/obj.sourceData.length))) + ")";
+              return "translate(" + obj.chartProp.margin.xMargin + "," + (i * obj.barHeight + obj.chartProp.margin.axisMargin * (0.5 + Math.floor(i/obj.sourceData.length))) + ")";
             });
         // Create rectangles of the correct width
         bar.append("rect")
@@ -368,7 +347,7 @@
 
         parentG.append("g")
               .attr("class", "y axis")
-              .attr("transform", "translate(" + obj.margin.xMargin + ", " + -obj.margin.axisMargin + ")")
+              .attr("transform", "translate(" + obj.chartProp.margin.xMargin + ", " + -obj.chartProp.margin.axisMargin + ")")
               .call(obj.yAxis);
 
       }

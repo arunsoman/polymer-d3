@@ -52,39 +52,23 @@
        this.draw(this._paint(this._compute()));
      }
      _compute() {
+       //assign axisIndex value
        let axisIndex = 3
-       //"inputCheck" for avoid error from chart
-       if(!this.hasInputs(axisIndex))return false
-       //axis are mentioned in the chart-input module
-       let itemX,itemY,itemZ
-       //axis inputs selectedValue assigin
-       itemX = this.inputs[this.x].selectedValue[0]
-       itemY = this.inputs[this.y].selectedValue[0]
-       itemZ = this.inputs[this.z].selectedValue[0]
+       //"chartProp" define for chart axis and properties
+       let arg = {axisIndex}
+       let chartProp = this.getChartProperties(arg)
+       if(!chartProp)return false
 
-       let parseDate = d3.time.format('%Y-%m-%d').parse;
-       let width = +this.settings.width.value,
-           height = +this.settings.height.value,
-           margin = {top: 5, right: 40, bottom: 20, left: 120},
-           label= this.settings.legend.values
-           //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-       margin.xMargin = margin.left + margin.right
-       margin.yMargin = margin.top + margin.bottom
-       width = parseFloat(width -margin.xMargin)
-       height = parseFloat(height - margin.yMargin)
-
-       let color = d3.scale.category20();
-
-       //get chart data once pass "x and y" into the "getChartData" method
-       let source = this.getChartData(itemX, itemY,itemZ)
+       //get chart data once pass axis into the "getChartData" method
+       let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
        let chartData = source.data
        let dateChk = source.dateChk
        //define x for date(time) or String
-       let dateX = d3.time.scale().range([0, width]);
-       let stringX = d3.scale.ordinal().range([0, width]);
+       let dateX = d3.time.scale().range([0, chartProp.width]);
+       let stringX = d3.scale.ordinal().range([0, chartProp.width]);
        //define x and y
        let x = dateChk?dateX:stringX,
-          y = d3.scale.linear().range([height, 0])
+          y = d3.scale.linear().range([chartProp.height, 0])
       //define x and y axis
       let xAxis = d3.svg.axis().scale(x).orient("bottom"),
           yAxis = d3.svg.axis().scale(y).orient("left")
@@ -106,34 +90,31 @@
         d3.max(chartData, d=>Math.max(d.yKey, d.zKey))
       ]);
        return {
-         width,
-         height,
-         margin,
          area,
          line,
          y,
          xAxis,
          yAxis,
          chartData,
-         color,
-         label
+         chartProp
        }
      }
      _paint(obj) {
        this.clear()
        if (!obj) return false
+       debugger
        //Draw Difference chart and append the svg canvas to the page
        let parentG = d3.select(this.$.chartContainer).append("svg")
-                    .attr("width", obj.width + obj.margin.xMargin)
-                    .attr("height", obj.height + obj.margin.yMargin)
+                    .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+                    .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
                   .append("g")
-                    .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+                    .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
       parentG.datum(obj.chartData);
       parentG.append("clipPath")
           .attr("id", "clip-below")
         .append("path")
-          .attr("d", obj.area.y0(obj.height))
+          .attr("d", obj.area.y0(obj.chartProp.height))
       parentG.append("clipPath")
           .attr("id", "clip-above")
         .append("path")
@@ -153,7 +134,7 @@
 
       parentG.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + obj.height + ")")
+        .attr("transform", "translate(0," + obj.chartProp.height + ")")
         .call(obj.xAxis);
 
       parentG.append("g")
@@ -165,11 +146,11 @@
           .attr("dy", ".71em")
           .style("text-anchor", "end")
           .text("Values");
-      d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.xMargin+"px"})
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
      }
      // populate chart data
-     getChartData(itemX, itemY,itemZ){
-       let parseDate = d3.time.format("%Y-%m-%d").parse;
+     getChartData(itemX, itemY,itemZ,parseDate){
+       //let parseDate = d3.time.format("%Y-%m-%d").parse;
        let dateChk
        let sourceData = this.source.map(items=>{
          let dateV = String(items[itemX]).split(" ")[0]

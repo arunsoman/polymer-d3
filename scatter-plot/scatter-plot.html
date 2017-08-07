@@ -35,47 +35,25 @@
       static get is(){
         return "scatter-plot"
       }
-      static get properties(){
-        return{}
-      }
-      constructor(){
-        super()
-      }
       redraw() {
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-
         let axisIndex = 3
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        itemZ = this.inputs[this.z].selectedValue[0]
-
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right
-        height = height - margin.top - margin.bottom
-
-        let color = d3.scale.category20();
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ)
         let chartData = source.data,
             xKeyStr = source.xKeyStr,
             yKeyStr = source.yKeyStr
 
         // define x and y
-        let x = d3.scale.linear().range([0, width]),
-            y = d3.scale.linear().range([height, 0]);
+        let x = d3.scale.linear().range([0, chartProp.width]),
+            y = d3.scale.linear().range([chartProp.height, 0]);
 
         // define x and y values
         let xValue = (d)=>d.xKey,
@@ -94,9 +72,6 @@
         y.domain(d3.extent(chartData, d=>d.yKey)).nice();
 
         return {
-          width,
-          height,
-          margin,
           x,
           y,
           xValue,
@@ -106,8 +81,7 @@
           xKeyStr,
           yKeyStr,
           chartData,
-          color,
-          label
+          chartProp
         }
       }
       _paint(obj) {
@@ -115,10 +89,10 @@
         if (!obj) return false
         //Draw Scatter plot chart and append the svg canvas to the page
         let parentG = d3.select(this.$.chartContainer).append("svg")
-            .attr("width", obj.width + obj.margin.left + obj.margin.right)
-            .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+            .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+            .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
           .append("g")
-            .attr("transform","translate(" + obj.margin.left + "," + obj.margin.top + ")");
+            .attr("transform","translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
         // add the tooltip area to the webpage
         let tooltip = d3.select(this.$.chartContainer).append("div")
                         .attr("class", "tooltip")
@@ -126,11 +100,11 @@
 
         parentG.append("g")
                 .attr("class", "x axis")
-                .attr("transform", "translate(0," + obj.height + ")")
+                .attr("transform", "translate(0," + obj.chartProp.height + ")")
                 .call(obj.xAxis)
                 .append("text")
                   .attr("class", "label")
-                  .attr("x", obj.width)
+                  .attr("x", obj.chartProp.width)
                   .attr("y", -6)
                   .style("text-anchor", "end")
                   .text(obj.xKeyStr);
@@ -153,7 +127,7 @@
                   .attr("r", 3.5)
                   .attr("cx", d=>obj.x(d.xKey))
                   .attr("cy", d=>obj.y(d.yKey))
-                  .style("fill", d=>obj.color(d.zKey))
+                  .style("fill", d=>obj.chartProp.color(d.zKey))
                   .on("mouseover", function(d) {
                         tooltip.transition()
                              .duration(200)
@@ -168,10 +142,10 @@
           obj,
           container:parentG,
           selector:'.dot',
-          node:obj.color.domain()
+          node:obj.chartProp.color.domain()
         });
 
-      d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
       getChartData(itemX, itemY,itemZ){

@@ -15,6 +15,7 @@
       }
       #chartContainer{
         margin:0 auto;
+        font: 10px sans-serif;
       }
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -42,29 +43,15 @@
       }
       _compute() {
         let axisIndex = 3
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        itemZ = this.inputs[this.z].selectedValue[0]
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-             margin = {top: 72, right: 40, bottom: 20, left: 120},
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left},
-            label= this.settings.legend.values
-
-        width = width - margin.left - margin.right,
-        height = height - margin.top - margin.bottom;
-
-        let colors = ["#2980B9", "#E67E22", "#27AE60", "#27AE60","#253494","#081d58"]
+        chartProp.colors = ["#2980B9", "#E67E22", "#27AE60", "#27AE60","#253494","#081d58"]
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,chartProp.parseDate)
         let chartData = source.data;
 
         let xKey=source.xKey,
@@ -97,12 +84,9 @@
             .orient("left");
         let colorScale = d3.scale.threshold()
             .domain([0.85, 1])
-            .range(colors);
+            .range(chartProp.colors);
 
         return {
-          width,
-          height,
-          margin,
           cellSize,
           xAxis,
           yAxis,
@@ -113,7 +97,7 @@
           colorScale,
           calendarChart,
           chartData,
-          label
+          chartProp
         }
       }
 
@@ -123,10 +107,10 @@
         // render chart
         let parentG = d3.select(this.$.chartContainer)
             .append("svg")
-            .attr({"width": obj.width + obj.margin.left + obj.margin.right,
-                    "height": obj.height + obj.margin.top + obj.margin.bottom})
+            .attr({"width": obj.chartProp.width + obj.chartProp.margin.xMargin,
+                    "height": obj.chartProp.height + obj.chartProp.margin.yMargin})
             .append("g")
-              .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top+ ")");
+              .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top+ ")");
         let cells = parentG.selectAll('rect')
                     .data(obj.chartData)
                     .enter().append('g').append('rect')
@@ -150,13 +134,13 @@
               .style("text-anchor", "start")
               .attr("transform", d=>"rotate(-65)");
 
-      d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
-      getChartData(itemX,itemY,itemZ){
+      getChartData(itemX,itemY,itemZ,parseDate){
           let xKey = this.externals[itemX]["key"],
               yKey = this.externals[itemY]["key"]
-          let parseDate = d3.time.format('%Y-%m-%d').parse
+          // let parseDate = d3.time.format('%Y-%m-%d').parse
 
           let data = this.source.map(row=>{
             let splitRowX = String(row[itemX]).split(" ")[0],

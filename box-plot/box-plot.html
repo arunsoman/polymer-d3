@@ -43,6 +43,7 @@
     }
     #chartContainer{
       margin:0 auto;
+      font: 10px sans-serif;
     }
     .legend rect{
       fill:transparent;
@@ -74,33 +75,18 @@
     }
     _compute() {
       let axisIndex = 2
-      //"inputCheck" for avoid error from chart
-      if(!this.hasInputs(axisIndex)) return false
-      //axis are mentioned in the chart-input module
-      let itemX,itemY
-      //axis inputs selectedValue assigin
-      itemX = this.inputs[this.x].selectedValue[0]
-      itemY = this.inputs[this.y].selectedValue[0]
+      //"chartProp" define for chart axis and properties
+      let arg = {axisIndex}
+      let chartProp = this.getChartProperties(arg)
+      if(!chartProp)return false
 
       let labels = true,
           min = Infinity,
           max = -Infinity
 
-      let width = this.settings.width.value,
-          height = this.settings.height.value,
-          margin = {top: 20, right: 20, bottom: 30, left: 40},
-          label = this.settings.legend.values;
-          //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-
-      width = +width - margin.left - margin.right
-      height = +height - margin.top - margin.bottom
-
-      let color = d3.scale.category20c();
-
       //get chart data once pass "x and y" into the "getChartData" method
-
       let groupedData
-      let source = this.getChartData(itemX, itemY)
+      let source = this.getChartData(chartProp.itemX, chartProp.itemY)
       groupedData = d3.nest().key(d => d.item).entries(source);
 
       let chartData =[]
@@ -114,7 +100,7 @@
       // debugger  // the x-axis
     	let x = d3.scale.ordinal()
     		.domain( chartData.map(d=> d[0]) )
-    		.rangeRoundBands([0 , width], 0.7, 0.3);
+    		.rangeRoundBands([0 , chartProp.width], 0.7, 0.3);
 
     	let xAxis = d3.svg.axis()
     		.scale(x)
@@ -123,7 +109,7 @@
     	// the y-axis
     	let y = d3.scale.linear()
     		.domain([min, max])
-    		.range([height + margin.top, margin.top]);
+    		.range([chartProp.height + chartProp.margin.top, chartProp.margin.top]);
 
     	let yAxis = d3.svg.axis()
         .scale(y)
@@ -131,25 +117,18 @@
 
       let chart = d3.box({y: y,formatNumber:this.formatNumber})
       		.whiskers(this.iqr(1.5))
-      		.height(height)
+      		.height(chartProp.height)
       		.domain([min, max])
       		.showLabels(labels);
 
-        width = width + margin.left + margin.right
-        height = height + margin.top + margin.bottom
-
       return {
-        width,
-        height,
-        color,
         x,
         xAxis,
         y,
         yAxis,
         chart,
-        margin,
         chartData,
-        label
+        chartProp
       }
     }
 
@@ -157,25 +136,25 @@
       this.clear()
       if (!obj) return false
       let parentG = d3.select(this.$.chartContainer).append("svg")
-        .attr("width", obj.width)
-        .attr("height", obj.height+90)
+        .attr("width", obj.chartProp.width+obj.chartProp.margin.xMargin)
+        .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin+90)
         .attr("class", "box")
         .append("g")
-        .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+        .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         // draw the boxplots
     	parentG.selectAll(".box")
         .data(obj.chartData)
     	  .enter().append("g")
-    		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.margin.top + ")")
+    		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.chartProp.margin.top + ")")
         .attr('class', 'box-g')
         .call(obj.chart.width(obj.x.rangeBand()))
         .attr('class', 'rect')
 
       // add a title
      parentG.append("text")
-        .attr("x", (obj.width / 2))
-        .attr("y", 0 + (obj.margin.top / 2))
+        .attr("x", (obj.chartProp.width / 2))
+        .attr("y", 0 + (obj.chartProp.margin.top / 2))
         .attr("text-anchor", "middle")
         .text(this.settings.title.value);
 
@@ -192,10 +171,10 @@
 
   	parentG.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + (obj.height+ 10) + ")")
+        .attr("transform", "translate(0," + (obj.chartProp.height+ 10) + ")")
         .call(obj.xAxis)
   	  .append("text")             // text label for the x axis
-          .attr("x", (obj.width / 2) )
+          .attr("x", (obj.chartProp.width / 2) )
           .attr("y",  34 )
 		      .attr("dy", ".71em")
 
@@ -206,7 +185,7 @@
         node:obj.chartData,
         key: 0
       });
-      d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
     }
     // Returns a function to compute the interquartile range.
     iqr(k) {

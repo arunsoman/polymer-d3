@@ -21,6 +21,7 @@
       }
       #chartContainer{
         margin:0 auto;
+        font: 10px sans-serif;
       }
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -49,28 +50,14 @@
       }
       _compute() {
         let axisIndex = 3
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        itemZ = this.inputs[this.z].selectedValue[0]
 
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right
-        height = height - margin.top - margin.bottom
-
-        let color = d3.scale.category20();
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,chartProp.parseDate)
         let chartData = source.data
 
         let units = "Widgets";
@@ -81,7 +68,7 @@
         let sankey = d3.sankey()
             .nodeWidth(36)
             .nodePadding(10)
-            .size([width, height]);
+            .size([chartProp.width, chartProp.height]);
 
         let path = sankey.link();
 
@@ -90,15 +77,11 @@
               .layout(32);
 
         return {
-          width,
-          height,
-          margin,
           sankey,
           path,
           format,
           chartData,
-          color,
-          label
+          chartProp
         }
       }
       _paint(obj) {
@@ -106,10 +89,10 @@
         if (!obj) return false
         //Draw Sankey chart and append the svg canvas to the page
         let parentG = d3.select(this.$.chartContainer).append("svg")
-            .attr("width", obj.width + obj.margin.left + obj.margin.right)
-            .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+            .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+            .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
           .append("g")
-            .attr("transform","translate(" + obj.margin.left + "," + obj.margin.top + ")");
+            .attr("transform","translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         // add in the links
         let link = parentG.append("g").selectAll(".link")
@@ -141,7 +124,7 @@
           node.append("rect")
               .attr("height", function(d) { return d.dy; })
               .attr("width", obj.sankey.nodeWidth())
-              .style("fill", function(d) {return d.color = obj.color(d.name.replace(/ .*/, "")); })
+              .style("fill", function(d) {return d.color = obj.chartProp.color(d.name.replace(/ .*/, "")); })
               .style("stroke", function(d) {return d3.rgb(d.color).darker(2); })
               .append("title")
                 .text(function(d) {return d.name + "\n" + obj.format(d.value); });
@@ -154,25 +137,25 @@
             .attr("text-anchor", "end")
             .attr("transform", null)
             .text(function(d) { return d.name; })
-          .filter(function(d) { return d.x < obj.width / 2; })
+          .filter(function(d) { return d.x < obj.chartProp.width / 2; })
             .attr("x", 6 + obj.sankey.nodeWidth())
             .attr("text-anchor", "start");
-        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         // the function for moving the nodes
         function dragmove(d) {
           d3.select(this).attr("transform",
               "translate(" + (
-              	   d.x = Math.max(0, Math.min(obj.width - d.dx, d3.event.x))
+              	   d.x = Math.max(0, Math.min(obj.chartProp.width - d.dx, d3.event.x))
               	) + "," + (
-                         d.y = Math.max(0, Math.min(obj.height - d.dy, d3.event.y))
+                         d.y = Math.max(0, Math.min(obj.chartProp.height - d.dy, d3.event.y))
                   ) + ")");
           obj.sankey.relayout();
           link.attr("d", obj.path);
         }
       }
       // populate chart data
-      getChartData(itemX, itemY,itemZ){
-        let formatDate = d3.time.format("%Y-%m-%d").parse;
+      getChartData(itemX, itemY,itemZ,formatDate){
+        //let formatDate = d3.time.format("%Y-%m-%d").parse;
         let itemXKeys=this.source.map(row=>row[itemX])
         let itemZKeys=this.source.map(row=>row[itemZ])
         let itemKeys = [...itemXKeys,...itemZKeys]

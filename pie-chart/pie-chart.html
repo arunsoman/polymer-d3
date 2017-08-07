@@ -11,6 +11,7 @@
   }
   #chartContainer{
     margin:0 auto;
+    font: 10px sans-serif;
   }
   .legend-items text{
     fill:black
@@ -51,25 +52,17 @@
       }
       _compute() {
         let axisIndex = 2
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
-        let width = this.settings.width.value,
-            height = this.settings.height.value,
-            label = this.settings.legend.values;
         let innerRadius;
-        let radius = Math.min(width, height) / 2;
+        let radius = Math.min(chartProp.width, chartProp.height) / 2;
         innerRadius = radius / 2
 
-        let color = d3.scale.category20c();
-
         // get chart data
-        let source = this.getChartData(itemX,itemY)
+        let source = this.getChartData(chartProp.itemX,chartProp.itemY)
         let chartData = d3.nest().key(d => d).entries(source);
 
         let pie = d3.layout.pie()
@@ -85,13 +78,10 @@
           .innerRadius(radius - 40);
 
         return {
-          width,
-          height,
-          color,
           arc,
           pie,
           chartData,
-          label
+          chartProp
         }
       }
       _paint(obj) {
@@ -101,21 +91,21 @@
         let parentG = d3.select(this.$.chartContainer)
           .selectAll("div#chartContainer")
           .data(obj.chartData).enter()
-
+        let width = obj.chartProp.width+obj.chartProp.margin.xMargin,
+            height = obj.chartProp.height+obj.chartProp.margin.yMargin
         parentG = parentG.append("div")
-          .style({"display":"inline-block","width":obj.width,"height":obj.height})
+          .style({"display":"inline-block","width":width,"height":height})
           .append("svg")
-          .attr("width", obj.width)
-          .attr("height", obj.height).append("g");
+          .attr("width", width)
+          .attr("height", height).append("g");
 
         let txt = this.externals[this.inputs[this.x].selectedValue[0]]["key"]
 
         parentG.append("text")
         .attr("dy", ".35em")
         .attr("text-anchor", "middle")
-        .attr("transform", "translate("+(obj.width/2)+","+(obj.height/2)+")")
+        .attr("transform", "translate("+(obj.chartProp.width/2)+","+(obj.chartProp.height/2)+")")
         .text(txt);
-
 
         let g = parentG.selectAll('.arc')
           .data(d => obj.pie(d.values))
@@ -126,7 +116,7 @@
           .attr('d', obj.arc)
           .attr('class', 'pie-slice');
 
-        segments.attr('transform', 'translate(' + obj.width / 2 + ',' + obj.height / 2 + ')');
+        segments.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
 
         // let legend = parentG.append("g")
         //   .attr("class","legend")

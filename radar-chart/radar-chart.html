@@ -4,6 +4,7 @@
     <style>
       #chartContainer{
         margin:0 auto;
+        font: 10px sans-serif;
       }
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -32,51 +33,32 @@
       }
       _compute() {
         let axisIndex = 3
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY,itemZ
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-        itemZ = this.inputs[this.z].selectedValue[0]
-
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right
-        height = height - margin.top - margin.bottom
-
-        let color = d3.scale.category10();
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
         let chartData = source.data
         let KeyMap = source.KeyMap
 
         //Options for the Radar chart, other than default
         let options = {
-          width: width,
-          height: height,
+          width: chartProp.width,
+          height: chartProp.height,
           maxValue: 0.6,
           levels: 6,
-          ExtraWidthX: (margin.left + margin.right),
-          ExtraHeightY: (margin.top + margin.bottom),
-          color:color
+          ExtraWidthX: chartProp.margin.xMargin,
+          ExtraHeightY: chartProp.margin.yMargin,
+          color:chartProp.color
         }
 
         return {
-          width,
-          height,
-          margin,
           chartData,
           options,
           KeyMap,
-          color,
-          label
+          chartProp
         }
       }
       _paint(obj) {
@@ -89,14 +71,14 @@
         var svg = d3.select(parentG)
                   	.selectAll('svg')
                   	.append('svg')
-                  	.attr("width", obj.width+obj.options.ExtraWidthX)
-                  	.attr("height", obj.height)
+                  	.attr("width", obj.options.width+obj.options.ExtraWidthX)
+                  	.attr("height", obj.options.height)
 
         //Create the title for the legend
         var text = svg.append("text")
                     	.attr("class", "title")
                     	.attr('transform', 'translate(90,0)')
-                    	.attr("x", obj.width - 70)
+                    	.attr("x", obj.options.width - 70)
                     	.attr("y", 10)
                     	.attr("font-size", "12px")
                     	.attr("fill", "#404040")
@@ -121,26 +103,26 @@
           	  .data(obj.KeyMap)
           	  .enter()
           	  .append("rect")
-          	  .attr("x", obj.width - 65)
+          	  .attr("x", obj.options.width - 65)
           	  .attr("y", function(d, i){ return i * 20;})
           	  .attr("width", 10)
           	  .attr("height", 10)
-          	  .style("fill", function(d, i){ return obj.color(i);})
+          	  .style("fill", function(d, i){ return obj.options.color(i);})
       	//Create text next to squares
       	legend.selectAll('text')
           	  .data(obj.KeyMap)
           	  .enter()
           	  .append("text")
-          	  .attr("x", obj.width - 52)
+          	  .attr("x", obj.options.width - 52)
           	  .attr("y", function(d, i){ return i * 20 + 9;})
           	  .attr("font-size", "11px")
           	  .attr("fill", "#737373")
           	  .text(function(d) { return d; })
-        d3.select(parentG).style({"width":obj.width+ obj.options.ExtraWidthX+"px"})
+        d3.select(parentG).style({"width":obj.options.width+ obj.options.ExtraWidthX+"px"})
       }
       // populate chart data
-      getChartData(itemX, itemY,itemZ){
-        let formatDate = d3.time.format("%Y-%m-%d").parse;
+      getChartData(itemX, itemY,itemZ,formatDate){
+        //let formatDate = d3.time.format("%Y-%m-%d").parse;
         let keys=this.source.map(row=>row[itemZ])
         let KeyMap = keys.filter((item, pos)=>keys.indexOf(item) == pos)
         let dateChk

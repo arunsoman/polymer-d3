@@ -206,6 +206,32 @@
       }
 
     }
+    getChartProperties(obj){
+      //"inputCheck" for avoid error from chart
+      if(!this.hasInputs(obj.axisIndex))return false
+      //axis are mentioned in the chart-input module
+      let itemX,itemY,itemZ
+      //axis inputs selectedValue assigin
+      itemX = this.inputs[this.x].selectedValue[0]
+      itemY = this.inputs[this.y].selectedValue[0]
+      this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
+      obj.group&&itemZ
+      obj.stacked&&itemZ
+
+      let parseDate = d3.time.format('%Y-%m-%d').parse;
+      let width = +this.settings.width.value,
+          height = +this.settings.height.value,
+          margin = {top: 5, right: 40, bottom: 20, left: 120},
+          label= this.settings.legend.values
+          //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+      margin.xMargin = margin.left + margin.right
+      margin.yMargin = margin.top + margin.bottom
+      width = parseFloat(width -margin.xMargin)
+      height = parseFloat(height - margin.yMargin)
+
+      let color = d3.scale.category20();
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color}
+    }
   }
   customElements.define(baseChart.is,baseChart)
 

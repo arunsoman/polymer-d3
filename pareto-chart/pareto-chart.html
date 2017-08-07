@@ -27,6 +27,7 @@
       }
       #chartContainer{
         margin:0 auto;
+        font: 10px sans-serif;
       }
     </style>
     <chart-input-group  uuid="[[uuid]]">
@@ -54,38 +55,24 @@
       }
       _compute() {
         let axisIndex = 2
-        //"inputCheck" for avoid error from chart
-        if(!this.hasInputs(axisIndex)) return false
-        //axis are mentioned in the chart-input module
-        let itemX,itemY
-        //axis inputs selectedValue assigin
-        itemX = this.inputs[this.x].selectedValue[0]
-        itemY = this.inputs[this.y].selectedValue[0]
-
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right
-        height = height - margin.top - margin.bottom
-
-        let color = d3.scale.category20c();
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY)
         let chartData = source.data
         let xKey = source.xKey
 
         //Axes and scales
-        let xScale = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
+        let xScale = d3.scale.ordinal().rangeRoundBands([0, chartProp.width], 0.1);
         xScale.domain(chartData.map(d=>d[xKey]));
 
         let yhist = d3.scale.linear()
                       .domain([0, d3.max(chartData, d=>d.value)])
-                      .range([height, 0]);
-        let ycum = d3.scale.linear().domain([0, 1]).range([height, 0]);
+                      .range([chartProp.height, 0]);
+        let ycum = d3.scale.linear().domain([0, 1]).range([chartProp.height, 0]);
         let xAxis = d3.svg.axis()
                       .scale(xScale)
                       .orient('bottom');
@@ -97,9 +84,6 @@
                        .scale(ycum)
                        .orient('right');
         return {
-          width,
-          height,
-          margin,
           xKey,
           xScale,
           yhist,
@@ -108,7 +92,7 @@
           yAxis,
           yAxis2,
           chartData,
-          label
+          chartProp
         }
       }
       _paint(obj) {
@@ -116,10 +100,10 @@
         if (!obj) return false
         //Draw svg
         let parentG = d3.select(this.$.chartContainer).append("svg")
-                        .attr("width", obj.width + obj.margin.left + obj.margin.right)
-                        .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+                        .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+                        .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
                         .append("g")
-                        .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+                        .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
         //Draw histogram
         let bar = parentG.selectAll(".bar")
                         .data(obj.chartData)
@@ -129,7 +113,7 @@
             .attr("x", d=>obj.xScale(d[obj.xKey]))
             .attr("width", obj.xScale.rangeBand())
             .attr("y", d=>obj.yhist(d.value))
-            .attr("height", d=>obj.height - obj.yhist(d.value));
+            .attr("height", d=>obj.chartProp.height - obj.yhist(d.value));
 
         //Draw CDF line
         let guide = d3.svg.line()
@@ -143,7 +127,7 @@
         //Draw axes
         parentG.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + obj.height + ")")
+            .attr("transform", "translate(0," + obj.chartProp.height + ")")
             .call(obj.xAxis);
 
         parentG.append("g")
@@ -158,7 +142,7 @@
 
         parentG.append("g")
             .attr("class", "y axis")
-            .attr("transform", "translate(" + [obj.width, 0] + ")")
+            .attr("transform", "translate(" + [obj.chartProp.width, 0] + ")")
             .call(obj.yAxis2)
             .append("text")
             .attr("transform", "rotate(-90)")
@@ -166,7 +150,7 @@
             .attr("dy", "-.71em")
             .style("text-anchor", "end")
             .text("Cumulative %");
-        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         this.addLegend({
             obj,
             container:parentG,
