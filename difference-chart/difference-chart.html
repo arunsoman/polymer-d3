@@ -102,7 +102,6 @@
      _paint(obj) {
        this.clear()
        if (!obj) return false
-       debugger
        //Draw Difference chart and append the svg canvas to the page
        let parentG = d3.select(this.$.chartContainer).append("svg")
                     .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
