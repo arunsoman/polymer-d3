@@ -17,7 +17,8 @@
     "paper-button": "PolymerElements/paper-button#^2.0.0",
     "paper-dialog": "PolymerElements/paper-dialog#^2.0.0",
     "paper-tabs": "PolymerElements/paper-tabs#^2.0.0",
-    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1"
+    "paper-checkbox": "PolymerElements/paper-checkbox#^2.0.1",
+    "flytxt-split-layout": "https://arunkumarthampiflytxt@bitbucket.org/flytxt/flytxt-split-layout.git"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
