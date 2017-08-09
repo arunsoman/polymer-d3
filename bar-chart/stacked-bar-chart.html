@@ -9,6 +9,9 @@
   .legend-items text{
     fill:black
   }
+  .legend-items circle{
+    cursor: pointer;
+  }
   .legend{
     fill:transparent;
     font-size: 12px;
@@ -37,10 +40,10 @@
       return {}
     }
     redraw() {
-      this.draw(this._paint(this._compute(this.inputCheck(3))));
+      this.draw(this._paint(this._compute()));
     }
     _compute(err) {
-      if (err) return false;
+      if (!this.hasInputs(3)) return false;
       let margin = {
           top: 20,
           right: 50,
@@ -54,7 +57,7 @@
       let xInput = this.x ? this.inputs[this.x].selectedValue : [];
       let yInput = this.y ? this.inputs[this.y].selectedValue : [];
       let zInput = this.z ? this.inputs[this.z].selectedValue : [];
-      let chartData = this.transformSource(xInput, yInput,zInput);
+      let chartData = this.transformToStackedData(xInput, yInput,zInput);
 
       let axis = {
         scale: {},
@@ -160,32 +163,12 @@
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
 
     }
-    transformSource(itemX, itemY, stacked) {
-      return stacked!==null ? this.transformToStackedData(itemX,itemY,stacked) : this.transformToBaseData(itemX,itemY);
-      
-    }
-    // transform data to basic bar chart data
-    transformToBaseData(itemX,itemY){
-      let sourcemap =
-        this.source.reduce((old, newVal) => {
-          old[newVal[itemX]] = (old[newVal[itemX]] || 0) + newVal[itemY]
-          return old
-        }, {})
-      let source = Object.keys(sourcemap).map(item => {
-        return {
-          item,
-          value: sourcemap[item]
-        }
-      })
-      return source
-    }
 
     // transform data to render chart in stacked format
     transformToStackedData(itemX,itemY,stacked){
       var keys = Object.keys(this.source.map(items=>items[stacked]).reduce((a,b)=>{a[b]=true; return a},{}));
       return keys.map(items=>this.source.map(source=>{return {
-x:source[itemX],y:source[itemY]}}));
-      // return this.source.map((items,i)=>{ return this.source.reduce((old,newVal)=>{ old[newVal[itemX]]=items[itemX]==newVal[itemX] ? items[itemY]:newVal[itemY]; return old},{total:stacked}) });
+        x:source[itemX],y:source[itemY]}}));
     }
   }
   window.customElements.define(stackedbarChart.is, stackedbarChart);

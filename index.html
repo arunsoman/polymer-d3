@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="bower_components/polymer/polymer.html">
     <link rel="import" href="polymer-d3-imports-internal.html">
     <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
@@ -38,8 +40,10 @@
     <!-- <polymerd3-table></polymerd3-table> -->
     <script src="data.js"></script>
     <script type="text/javascript">
-    // var piechartData = document.querySelector('chart-input-group');
-      var pd3 = document.querySelector('polymer-d3');
+      // alert('component ready')
+    addEventListener('WebComponentsReady', function() {
+       // var piechartData = document.querySelector('chart-input-group');
+      var pd3 = Polymer.dom(this.root).querySelector('polymer-d3');
       var config = {
 
           externals: datacsv.externals,
@@ -52,7 +56,9 @@
           source: datacsv.source
         }
         PolymerD3.dataSource = dataConfig
-
+    })
+   
+      
     </script>
   </body>
 </html>
