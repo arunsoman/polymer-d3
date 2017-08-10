@@ -147,7 +147,7 @@
     }
 
     initializeChart(){
-        this.set("uuid",PolymerD3.utilities.getUUID())
+        this.set("uuid",this.tagName)
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){
@@ -166,7 +166,7 @@
     }
     // to fill color for svg and legends
     colorFill(item,i){
-      return item.label.nodes[i] ? item.label.nodes[i].color : this.color(i);
+      return item.chartProp.label.nodes[i] ? item.chartProp.label.nodes[i].color : this.color(i);
     }
     clear(){
       d3.select(this.$.chartContainer).html("");
@@ -186,7 +186,9 @@
     }
 
     addLegend(obj){
-      this.chartKeys(obj.node,obj.key);
+      setTimeout(()=>{
+        // this.chartKeys(obj.node,obj.key);
+      })
       this.set('color',d3.scale.category20c());
       obj.container.selectAll(obj.selector)
         .style("fill", (d,i)=>{
@@ -197,7 +199,7 @@
 
       obj.container.append("g")
           .attr("class","legend")
-          .attr("transform","translate("+(obj.obj.width*obj.obj.label.position.x)/100+","+(obj.obj.height*obj.obj.label.position.y)/100+")")
+          .attr("transform","translate("+(obj.obj.chartProp.width*obj.obj.chartProp.label.position.x)/100+","+(obj.obj.chartProp.height*obj.obj.chartProp.label.position.y)/100+")")
           .call(d3.legend);
 
       // add tooltip if segments are provided
@@ -215,8 +217,8 @@
       itemX = this.inputs[this.x].selectedValue[0]
       itemY = this.inputs[this.y].selectedValue[0]
       this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
-      obj.group&&itemZ
-      obj.stacked&&itemZ
+      obj.group && itemZ
+      obj.stacked && itemZ
 
       let parseDate = d3.time.format('%Y-%m-%d').parse;
       let width = +this.settings.width.value,
