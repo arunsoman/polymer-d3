@@ -1,0 +1,184 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bar-chart/bar-chart.html">
+<dom-module id="grouped-bar-chart">
+    <template>
+        <style>
+        #chartContainer {
+            margin: 0 auto;
+        }
+
+        .legend-items text {
+            fill: black
+        }
+
+        .legend-items circle {
+            cursor: pointer;
+        }
+
+        .legend {
+            fill: transparent;
+            font-size: 12px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        </style>
+        <chart-input-group uuid="[[uuid]]">
+            <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>
+            <chart-input slot="chart-input" axis="y" label="Y axis" accept="number,date"></chart-input>
+            <chart-input slot="chart-input" axis="z" label="Group by"></chart-input>
+        </chart-input-group>
+        <chart-settings uuid="[[uuid]]"></chart-settings>
+        <div id="chartContainer"></div>
+    </template>
+    <script>
+    class groupedbarChart extends barChart {
+        static get is() {
+            return 'grouped-bar-chart'
+        }
+        static get properties() {
+            return {}
+        }
+        redraw() {
+            this.draw(this._paint(this._compute()));
+        }
+        _compute() {
+            if (!this.hasInputs(3)) return false;
+            let margin = {
+                    top: 20,
+                    right: 50,
+                    bottom: 70,
+                    left: 150
+                },
+                width = this.settings.width.value - margin.left - margin.right,
+                height = this.settings.height.value - margin.top - margin.bottom,
+                label = this.settings.legend.values;
+            let samples = 50;
+            let series = 10;
+
+            let xInput = this.x ? this.inputs[this.x].selectedValue : [];
+            let yInput = this.y ? this.inputs[this.y].selectedValue : [];
+            let zInput = this.z ? this.inputs[this.z].selectedValue : [];
+            let chartData = this.transformSource(xInput, yInput, zInput);
+
+            let axis = {
+                scale: {},
+                position: {}
+            }
+
+            axis.scale.x0 = d3.scale.ordinal().rangeRoundBands([0, width], 0.1);
+            axis.scale.x = d3.scale.ordinal().rangeRoundBands(0.05);
+            axis.scale.y = d3.scale.linear().range([height, 0]);
+            axis.scale.z = d3.scale.category10();
+            let keys = chartData.map(items => items.key);
+            let xKeys = this.getKeys(xInput);
+
+
+
+            axis.scale.x0.domain(keys);
+            axis.scale.x.domain(xKeys).rangeRoundBands([0, axis.scale.x0.rangeBand()]);
+            axis.scale.y.domain([0, d3.max(chartData, d => {
+                return d3.max(Object.keys(d.value).map(item => d.value[item]))
+            })]).nice();
+
+            axis.position.x = d3.svg.axis().scale(axis.scale.x0).orient("bottom");
+            axis.position.y = d3.svg.axis().scale(axis.scale.y).orient("left");
+
+
+            return {
+                width,
+                margin,
+                height,
+                axis,
+                label,
+                chartData,
+                keys
+            }
+
+        }
+        _paint(obj) {
+            this.clear();
+            if (!obj) return false;
+
+            let selector = d3.select(this.$.chartContainer)
+                .append("svg")
+                .attr("width", obj.width + obj.margin.left + obj.margin.right)
+                .attr("height", obj.height + obj.margin.top + obj.margin.bottom)
+
+            let svg = selector.append("g")
+                .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+
+            svg.append("g")
+                .selectAll("g")
+                .data(obj.chartData)
+                .enter().append("g")
+                .attr("transform", function(d, i) {
+                    return "translate(" + obj.axis.scale.x0(obj.keys[i]) + ",0)";
+                })
+                .selectAll("rect")
+                .data(d => Object.keys(d.value).map(item => { return { key: item, value: d.value[item] } }))
+                .enter().append("rect")
+                .attr("x", function(d) { return obj.axis.scale.x(d.key); })
+                .attr("y", function(d) { return obj.axis.scale.y(d.value); })
+                .attr("width", obj.axis.scale.x.rangeBand())
+                .attr("height", function(d) { return obj.height - obj.axis.scale.y(d.value); })
+                .attr("fill", function(d) { return obj.axis.scale.z(d.value); });
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(obj.axis.position.y)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 10)
+                .attr("dy", ".71em")
+                .style("text-anchor", "start");
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + obj.height + ")")
+                .call(obj.axis.position.x)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("transform", "rotate(-90)")
+
+
+            // this.addLegend({
+            //   obj,
+            //   container:svg,
+            //   selector:'.layer',
+            //   node:obj.keys.map(items=>{return {item:items}}),
+            //   key: 'item'
+            // });
+
+        }
+
+        getKeys(itemX) {
+            return Object.keys(this.source.map(items => items[itemX]).reduce((a, b) => { a[b] = true; return a }, {}));
+        }
+
+        // transform data to render chart in grouped format
+        transformSource(itemX, itemY, itemZ) {
+            let keys = this.getKeys(itemZ);
+            return keys.map(key => {
+                return {
+                    key,
+                    value: this.source.filter(items => items[itemZ] == key).reduce((prev,next)=>{
+                           if(prev[next[itemX]]!=0){
+                                prev[next[itemX]]= prev[next[itemX]] + next[itemY];
+                            }else{
+                                prev[next[itemX]]=next[itemY];
+                           }
+                        return prev
+                        },this.source.reduce((prev,next)=>{prev[next[itemX]]=0;return prev},{}))
+                }
+            })
+        }
+    }
+    window.customElements.define(groupedbarChart.is, groupedbarChart);
+    </script>
+</dom-module>

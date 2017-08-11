@@ -47,6 +47,9 @@ Could also be used as a custom visualization
       .content-table table {
         border-spacing: 0;
       }
+      .content-table td{
+        overflow: hidden;
+      }
       .content-table thead {
         display: none;
       }
@@ -76,7 +79,7 @@ Could also be used as a custom visualization
           <template is="dom-repeat" items="{{source}}" as="row">
             <tr>
               <template is="dom-repeat" items="{{row}}">
-                <th>{{item}}</th>
+                <td>{{item}}</td>
               </template>
             </tr>
           </template>

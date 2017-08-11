@@ -24,6 +24,7 @@
   }
   #chartContainer{
     margin:0 auto;
+    font: 10px sans-serif;
   }
   </style>
     <chart-input-group uuid="[[uuid]]">
@@ -52,36 +53,20 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        //axis are mentioned in the chart-input module
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
-
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0
-
-        if (itemChk) {
-            return false;
-        }
-        //axis inputs selectedValue assigin
-        itemX = itemX[0]
-        itemY=itemY[0]
-
-        let parseDate = d3.time.format('%Y-%m-%d').parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        let color = d3.scale.category20c();
+        let axisIndex = 2
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY)
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY)
         let chartSrcData = source.map((item,i)=>{
           return{"item":item.value,"date":item["item"]}
         })
         // debugger
         let chartData = d3.nest()
-              .key((d)=> parseDate(d.item.split(' ')[0]))
+              .key((d)=> chartProp.parseDate(d.item.split(' ')[0]))
               .rollup(function (n) {
                   return d3.sum(n, function (d) {
                       return d.value; // key
@@ -93,35 +78,28 @@
         let startYear =yearRange[0]
         let endYear =yearRange.pop()+1
 
-
         // create chart and source available in calendar-heatmap.js
         let self = this
         let calendarChart = d3.calendar.heatmap()
             .colourRangeStart('#FDBB30')
             .colourRangeEnd('#EE3124')
-            .height(height)
-            .width(width)
+            .height(chartProp.height)
+            .width(chartProp.width)
             .startYear(startYear)
             .endYear(endYear)
-            .margin(margin)
+            .margin(chartProp.margin)
 
         return {
-          width,
-          height,
           calendarChart,
-          itemChk,
           chartData,
-          label
+          chartProp
         }
 
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
+        this.clear()
+        if (!obj) return false
         // render chart
-
         d3.select(this.$.chartContainer)
           .datum(obj.chartData)
           .call(obj.calendarChart);
@@ -134,7 +112,7 @@
         //     key: 'date'
         //   });
 
-        d3.select(this.$.chartContainer).style({"width":obj.width+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
       getChartData(itemX, itemY){

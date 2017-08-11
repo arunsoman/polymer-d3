@@ -8,14 +8,15 @@
     stroke: #000;
     shape-rendering: crispEdges;
     }
-    .x.axis path {
+    /*.x.axis path {
     display: none;
-    }
+    }*/
     .area {
     fill: steelblue;
     }
     #chartContainer{
       margin:0 auto;
+      font: 10px sans-serif;
     }
     .legend-items text{
       fill:black
@@ -26,9 +27,16 @@
     }
     </style>
     <chart-input-group uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="Key" accept="number,date"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
-      <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
+        <template is="dom-if" if="{{!stacked}}">
+          <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+          <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+          <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+        </template>
+        <template is="dom-if" if="{{stacked}}">
+          <chart-input slot="chart-input" axis="x" label="Key" accept="number,date"></chart-input>
+          <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+          <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
+        </template>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
     <!-- <svg id="svg"></svg> -->
@@ -51,130 +59,125 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        //axis are mentioned in the chart-input module
-        let itemX = this.x ? this.inputs[this.x].selectedValue : []
-        let itemY = this.y ? this.inputs[this.y].selectedValue : []
+        //assign stacked value
+        let stacked = this.stacked
+        //Here checks the axis availability for avoid error from chart
+        let axisKeys = this.axisKeys.sort().join(",")
+        let chkXY = axisKeys == "x,y"
+        let chkXYZ = axisKeys == "x,y,z"
+        let axisIndex = chkXY?2:4
+        axisIndex = chkXYZ?3:axisIndex
+        axisIndex = stacked?3:axisIndex
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex,stacked}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
 
-        //"itemChk" for avoid error from chart
-        let itemChk = itemX.length <= 0 || itemY.length <= 0
-
-        if (itemChk) {
-            return false;
-        }
-        //axis inputs selectedValue assigin
-        let stacked = true
-        itemX = itemX[0]
-        itemY=itemY[0]
-
-        let itemZ = stacked && this.z ? this.inputs[this.z].selectedValue : []
-        itemZ = itemZ[0]
-
-        let formatDate = d3.time.format("%Y-%m-%d").parse;
-        let width = +this.settings.width.value,
-            height = +this.settings.height.value,
-            margin = {top: 5, right: 40, bottom: 20, left: 120},
-            label= this.settings.legend.values
-            //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
-        width = width - margin.left - margin.right,
-        height = height - margin.top - margin.bottom;
-
-        let color = d3.scale.category20c();
         //get chart data once pass "x and y" into the "getChartData" method
-        let source = this.getChartData(itemX, itemY,itemZ,stacked)
+        let itemZChk = !stacked&&chartProp.itemZ
+        itemZChk = (itemZChk==0)?true:itemZChk
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
-            areaChart,
-            dateVal
-        if(stacked){
-          color.domain(source.names);
-          let nest = d3.nest().key(function(d) { return d.key; });
-          debugger
-          let stack = d3.layout.stack()
-              .values(function(d) { return d.values; });
-          let srcData = //stack(
-            color.domain().map(function(name) {
-              // debugger
+            itemVal = source.itemVal
+        if(stacked || itemZChk){
+          chartProp.color.domain(source.names);
+          let stack = d3.layout.stack().values(function(d) { return d.values});
+          chartData = stack(chartProp.color.domain().map((name)=> {
                 return {
                   name: name,
-                  values: source.data[name].map(function(d) {
-                    // debugger
-                      dateVal = formatDate(String(d.item).split(" ")[0])
-                      let dateSet = dateVal?dateVal:d.item
-                    return {item: dateSet, y: d[name] * 1};
+                  values: source.data.map((d)=> {
+                    return {item: d.item, y: d[name] * 1};
                   })
                 };
-              })
-            //);
-          chartData = stack(srcData)
-debugger
+              }));
         }else{
           chartData = source.map((item,i)=>{
-            dateVal = formatDate(String(item["item"]).split(" ")[0])
-            let dateSet = dateVal?dateVal:item["item"]
-            return{"value":item.value,"item":dateSet}
+            itemVal = chartProp.parseDate(item["item"].split(" ")[0])
+            let itemSet = itemVal?itemVal:item["item"]
+            return{"value":item.value,"item":itemSet}
           })
         }
+        let srcData = stacked || itemZChk?source.data:chartData
 
-        let dateX = d3.time.scale().range([0, width]);
-        let stringX = d3.scale.ordinal().range([0, width]);
+        let dateX = d3.time.scale().range([0, chartProp.width]);
+        let stringX = d3.scale.ordinal().range([0, chartProp.width]);
 
-        let x = dateVal?dateX:stringX
-        let y = d3.scale.linear().range([height, 0]);
+        let x = itemVal?dateX:stringX
+        let y = d3.scale.linear().range([chartProp.height, 0]);
         let xAxis = d3.svg.axis()
             .scale(x).orient("bottom");
         let yAxis = d3.svg.axis()
             .scale(y).orient("left");
 
-        if(stacked){
+        // Define area chart and set chart values and item
+        let areaChart = d3.svg.area()
+            .x((d)=>x(d.item))
+            .y0((d)=>(stacked || itemZChk)?y(d.y0):chartProp.height)
+            .y1((d)=>(stacked || itemZChk)?y(d.y0 + d.y):y(d.value));
 
-
+        // Set domains for X axes
+        if(itemVal){
+          x.domain(d3.extent(srcData, function(d) { return d.item; }));
         }else{
-          areaChart = d3.svg.area()
-              .x(function(d) { return x(d.item); })
-              .y1(function(d) { return y(d.value); })
-              .y0(height)
-          if(dateVal){
-            x.domain(d3.extent(chartData, function(d) { return d.item; }));
-          }else{
-            x.domain(chartData.map(d=> d.item))
-            .rangeRoundBands([0 , width]);
-          }
-          y.domain([0, d3.max(chartData, function(d) { return d.value; })]);
+          x.domain(srcData.map(d=> d.item))
+          .rangeRoundBands([0 , chartProp.width]);
         }
-debugger
+        // Find the value of the item with highest total value
+        let maxItemVal = d3.max(srcData, function(d){
+          let vals = (stacked || itemZChk)&& d3.keys(d).map(function(key){ return key !== "item" ? d[key] : 0 })
+          return (stacked || itemZChk)?d3.sum(vals):d.value;
+        });
+        // Set domains for Y axes
+        y.domain([0, maxItemVal]);
 
         return {
-          width,
-          height,
-          margin,
+          x,
+          y,
           xAxis,
           yAxis,
           areaChart,
-          itemChk,
           chartData,
-          label
+          chartProp,
+          stacked,
+          itemZChk
         }
       }
       _paint(obj) {
-        d3.select(this.$.chartContainer).html("")
-        if (!obj || obj.itemChk) {
-          return false
-        }
-
+        this.clear()
+        if (!obj) return false
         let parentG = d3.select(this.$.chartContainer).append("svg")
-            .attr({"width": obj.width + obj.margin.left + obj.margin.right,
-                    "height": obj.height + obj.margin.top + obj.margin.bottom+40
+            .attr({"width": obj.chartProp.width + obj.chartProp.margin.xMargin,
+                    "height": obj.chartProp.height + obj.chartProp.margin.yMargin+40
             })
             .append("g")
-              .attr("transform", "translate(" + obj.margin.left + "," + obj.margin.top + ")");
+              .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+
+        if(obj.stacked || obj.itemZChk){
+          let chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
+            .enter().append("g")
+            .attr("class", "area-chart")
+          chartSvg.append("path")
+              .attr("class", "area")
+              .attr("d", function(d) {return obj.areaChart(d.values); })
+              .style("fill", function(d) { return obj.chartProp.color(d.name); });
+
+          chartSvg.append("text")
+              .datum(function(d) {return {name: d.name, value: d.values[d.values.length - 1]}; })
+              .attr("transform", function(d) { return "translate(" + obj.x(d.value.item) + "," + obj.y(d.value.y0 + d.value.y / 2) + ")"; })
+              .attr("x", -6)
+              .attr("dy", ".35em")
+              .text(function(d) { return d.name; });
+        }else{
           parentG.append("path")
             .datum(obj.chartData)
             .attr({"class":"area",
                     "fill": "steelblue",
                     "d": obj.areaChart
                   })
+        }
         parentG.append("g")
             .attr("class", "x axis")
-            .attr("transform", "translate(0," + obj.height + ")")
+            .attr("transform", "translate(0," + obj.chartProp.height + ")")
             .call(obj.xAxis);
         parentG.append("g")
             .attr("class", "y axis")
@@ -184,46 +187,58 @@ debugger
               .attr("y", 6)
               .attr("dy", ".71em")
               .style("text-anchor", "end")
-          this.addLegend({
-              obj,
-              container:parentG,
-              selector:'.area',
-              node:obj.chartData
-            });
+        this.addLegend({
+          obj,
+          container:parentG,
+          selector:'.area',
+          node:obj.chartData,
+          key: 'name'
+        });
         d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
       }
       // populate chart data
-      getChartData(itemX, itemY,itemZ,stacked){
-        let arr = []
+      getChartData(itemX, itemY,itemZ,stacked,itemZChk,formatDate){
+        // let formatDate = d3.time.format("%Y-%m-%d").parse;
+        let names=this.source.map(row=>row[itemZ])
+        let itemVal
+        let sourceData
+        if(stacked || itemZChk){
+          sourceData = this.source.map((items,i)=>{
+            itemVal = formatDate(String(items[itemX]).split(" ")[0])
+            let itemSet = itemVal?itemVal:items[itemX]
+            return this.source.reduce((old,newVal)=>{
+              old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:stacked?newVal[itemY]:0;
+              return old},{item:itemSet})
+            })
+        }
         if(stacked){
-          let names=this.source.map(row=>row[itemZ])
-          //let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
-
-          let source = this.source.map(row=>{
-
-            return {
-              item:row[itemX],
-              [row[itemZ]]:row[itemY]
-            }
-          })
-          let data = source.reduce((old,newVal)=>{
-
-               if(!old[Object.keys(newVal)[1]]){
-                old[Object.keys(newVal)[1]] = [newVal]
-               }else{
-                old[Object.keys(newVal)[1]].push(newVal)
-               }
-              return old
-              },{})
-          return {data,names}
-
+          let data=sourceData
+          return {data,names,itemVal}
         }else{
-          let sourcemap = this.source.map(row=>{
-            return{[row[itemX]]:row[itemY]}
-          })
-          // debugger
-          let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
-          return source
+          if(itemZChk){
+            let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
+            let obj = {}
+            let data = sourceData.filter((item,i)=>{
+                nameMap.forEach(name=>{
+                  if(i==0){
+                  	obj[name] = item[name]
+                  }else{
+                  	if(item[name] == 0){
+                  		item[name] = obj[name]
+                    }
+                    obj[name] = item[name]
+                  }
+                })
+                return item
+              })
+              return {data,names,itemVal}
+          }else{
+            let sourcemap = this.source.map(row=>{
+              return{[row[itemX]]:row[itemY]}
+            })
+            let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+            return source
+          }
         }
       }
     }

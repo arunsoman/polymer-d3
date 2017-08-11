@@ -6,36 +6,36 @@
     :host {
       display: block;
     }
-    
+
     .customizer-holder {
       height: 400px;
       width: 700px
     }
-    
+
     .dummy-txt {
       display: inline-block;
       transition: all 400ms ease;
     }
-    
+
     .flex {
       display: flex;
     }
-    
+
     .item {
       flex-grow: 1;
       display: inline-block;
       width: 20%;
     }
-    
+
     .inputs.flex {
       flex-wrap: wrap;
       margin: 0 2em;
     }
-    
+
     .inputs.flex paper-input {
       margin-left: 5px;
     }
-    
+
     .none {
       display: none!important;
     }
@@ -44,14 +44,14 @@
     <paper-dialog id="dialog" modal="">
       <h2>Chart Settings</h2>
       <paper-dialog-scrollable>
-        
+
         <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}"></legend-customizer>
 
         <div class="inputs flex">
           <template is="dom-repeat" items="{{_settings}}">
               <template is="dom-if" if="{{eq(item.value.uitype,'picker')}}">
                 <div class="item">
-                  
+
                 </div>
               </template>
               <template is="dom-if" if="{{eq(item.value.uitype,'text')}}">
@@ -64,6 +64,11 @@
                   <paper-input label="[[item.value.txt]]" type="[[item.value.uitype]]" value="{{item.value.value}}"></paper-input>
                 </div>
               </template>
+              <template is="dom-if" if="{{eq(item.value.uitype,'boolean')}}">
+                <div class="item">
+                  <paper-checkbox checked="{{item.value.value}}">[[item.value.txt]]</paper-checkbox>
+                </div>
+              </template>
           </template>
         </div>
       </paper-dialog-scrollable>
@@ -72,7 +77,7 @@
         <paper-button on-click="resetSettings" dialog-dismiss="">Cancel</paper-button>
       </div>
     </paper-dialog>
-    
+
     <!-- <template is="dom-if" if="[[isActive]]">
       <div class="tick-rotation flex">
         <template is='dom-repeat' items="{{_settings}}">

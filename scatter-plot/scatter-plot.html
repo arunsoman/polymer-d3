@@ -1,46 +1,167 @@
+<link rel="import" href="../display-component/base-chart.html">
 <dom-module id="scatter-plot">
-  <style>
-    g.tick.style-scope.scatter-plot {
-        font: 18px sans-serif;
-        color: red;
-    }
-
-    g.axis path,
-    g.axis line {
-      fill: none;
-      stroke: #000;
-      shape-rendering: crispEdges;
-    }
-
-    circle.dot {
-      stroke: #000;
-    }
-  </style>
-
   <template>
-    <h4>Scatter Plot</h4>
-    <template is="dom-if" if="{{editMode}}">
-      <div class="settings-wrap">
-        <template is="dom-if" if="{{!settingsVisibility}}">
-          <paper-icon-button class="settings-icon outer" icon="icons:expand-more" title="View Settings" on-tap="toggleSettingsVisibility"></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <paper-icon-button class="settings-icon outer" icon="icons:expand-less" title="Hide Settings" on-tap="toggleSettingsVisibility"></paper-icon-button>
-        </template>
-        <template is="dom-if" if="{{settingsVisibility}}">
-          <template is="dom-if" if="{{chartCustomizerFlag}}" restamp="">
-            <paper-dialog id="display-component" opened="">
-              <h2>Settings</h2>
-              <chart-customizer area="{{area}}" legend-settings="{{legendSettings}}" parent-g="{{parentG}}" chart-customizer-flag="{{chartCustomizerFlag}}"></chart-customizer>
-            </paper-dialog>
-          </template>
-          <div class="draggable-areabtn-wrap">
-            <draggable-input externals="[[externals]]" inputs="{{inputs}}"></draggable-input>
-            <paper-icon-button class="settings-icon inner" icon="icons:build" title="Area Settings" on-tap="showAreaSettings"></paper-icon-button>
-          </div>
-        </template>
-      </div>
-    </template>
+    <style>
+      #chartContainer{
+        margin:0 auto;
+        font: 10px sans-serif;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+      .dot {
+        stroke: #000;
+      }
+      .tooltip {
+        position: absolute;
+        width: 200px;
+        height: 28px;
+        pointer-events: none;
+      }
+    </style>
+    <chart-input-group uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div id="chartContainer"></div>
   </template>
+  <script>
+    class scatterPlot extends baseChart{
+      static get is(){
+        return "scatter-plot"
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        let axisIndex = 3
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
+
+        //get chart data once pass "x and y" into the "getChartData" method
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ)
+        let chartData = source.data,
+            xKeyStr = source.xKeyStr,
+            yKeyStr = source.yKeyStr
+
+        // define x and y
+        let x = d3.scale.linear().range([0, chartProp.width]),
+            y = d3.scale.linear().range([chartProp.height, 0]);
+
+        // define x and y values
+        let xValue = (d)=>d.xKey,
+            yValue = (d)=>d.yKey
+
+        // define x and y axis
+        let xAxis = d3.svg.axis()
+                      .scale(x)
+                      .orient("bottom");
+        let yAxis = d3.svg.axis()
+                      .scale(y)
+                      .orient("left");
+
+        // define x and y domain
+        x.domain(d3.extent(chartData, d=>d.xKey)).nice();
+        y.domain(d3.extent(chartData, d=>d.yKey)).nice();
+
+        return {
+          x,
+          y,
+          xValue,
+          yValue,
+          xAxis,
+          yAxis,
+          xKeyStr,
+          yKeyStr,
+          chartData,
+          chartProp
+        }
+      }
+      _paint(obj) {
+        this.clear()
+        if (!obj) return false
+        //Draw Scatter plot chart and append the svg canvas to the page
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+            .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+            .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
+          .append("g")
+            .attr("transform","translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+        // add the tooltip area to the webpage
+        let tooltip = d3.select(this.$.chartContainer).append("div")
+                        .attr("class", "tooltip")
+                        .style("opacity", 0);
+
+        parentG.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + obj.chartProp.height + ")")
+                .call(obj.xAxis)
+                .append("text")
+                  .attr("class", "label")
+                  .attr("x", obj.chartProp.width)
+                  .attr("y", -6)
+                  .style("text-anchor", "end")
+                  .text(obj.xKeyStr);
+
+        parentG.append("g")
+                .attr("class", "y axis")
+                .call(obj.yAxis)
+                .append("text")
+                  .attr("class", "label")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", 6)
+                  .attr("dy", ".71em")
+                  .style("text-anchor", "end")
+                  .text(obj.yKeyStr)
+
+        parentG.selectAll(".dot")
+                .data(obj.chartData)
+                .enter().append("circle")
+                  .attr("class", "dot")
+                  .attr("r", 3.5)
+                  .attr("cx", d=>obj.x(d.xKey))
+                  .attr("cy", d=>obj.y(d.yKey))
+                  .style("fill", d=>obj.chartProp.color(d.zKey))
+                  .on("mouseover", function(d) {
+                        tooltip.transition()
+                             .duration(200)
+                             .style("opacity", .9);
+                        tooltip.html(d.zKey + "<br/> (" + obj.xValue(d)+ ", " + obj.yValue(d) + ")")
+                             .style("left", (d3.event.pageX + 5) + "px")
+                             .style("top", (d3.event.pageY - 28) + "px");
+                    })
+                    .on("mouseout", d=>tooltip.transition().duration(500).style("opacity", 0));
+      // define Legends
+      this.addLegend({
+          obj,
+          container:parentG,
+          selector:'.dot',
+          node:obj.chartProp.color.domain()
+        });
+
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY,itemZ){
+        let xKeyStr = this.externals[itemX]["key"],
+            yKeyStr = this.externals[itemY]["key"]
+        let sourceData = this.source.map(item=>{
+          return{
+            xKey:+item[itemX],
+            yKey:+item[itemY],
+            zKey:item[itemZ]
+          }
+        })
+        let data = sourceData
+        return{data, xKeyStr, yKeyStr}
+      }
+    }
+    customElements.define(scatterPlot.is, scatterPlot)
+  </script>
 </dom-module>
-<script src="scatter-plot.js"></script>
