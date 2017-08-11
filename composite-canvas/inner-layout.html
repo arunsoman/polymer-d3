@@ -1,0 +1,79 @@
+<link rel="import" href="../bower_components/vaadin-split-layout/vaadin-split-layout.html">
+<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<dom-module id="inner-layout">
+  <template>
+    <style>
+      vaadin-split-layout{
+        border:1px #d3d3d3 solid;
+        position: relative;
+        min-height: 200px;
+        /*margin-top: 20px;*/
+      }
+      #dropDown{
+        margin-top:20px
+      }
+      #dropDown paper-item{
+        width:90px;
+        min-height:20px;
+        cursor: pointer;
+      }
+      .paperIconBtn{
+        /*border:1px blue solid;*/
+        padding:5px;
+      }
+    </style>
+    <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
+    <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown">
+      <div slot="dropdown-content">
+        <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
+        <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
+        <template is="dom-if" if="{{freeze}}">
+          <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
+        </template>
+      </div>
+    </iron-dropdown>
+    <vaadin-split-layout  vertical="{{align}}" id="grid">
+    </vaadin-split-layout>
+  </template>
+  <script>
+    class innerLayout extends Polymer.Element{
+      static get is(){
+        return "inner-layout"
+      }
+      static get properties(){
+        return{
+          align:{
+            type:Boolean,
+            default:false
+          },
+          freeze:{
+            type:String,
+            value:"false"
+          }
+        }
+      }
+      showDropDown(){
+        this.$.dropDown.open();
+      }
+      constructor(){
+        super()
+      }
+      createSplitLayout(e){
+        this.set('align',e.currentTarget.id=='horz');
+        let ele = document.createElement('inner-layout');
+        let ele2 = document.createElement('inner-layout');
+        this.$.grid.appendChild(ele);
+        this.$.grid.appendChild(ele2);
+        this.$.dropDown.close();
+      }
+      deleteSplitLayout(e){
+        this.remove()
+        this.$.dropDown.close();
+      }
+    }
+    customElements.define(innerLayout.is, innerLayout)
+  </script>
+</dom-module>

@@ -1,4 +1,6 @@
+
 <link rel="stylesheet" type="text/css" href="composite-canvas-global.css">
+<link rel="import" href="split-layout.html">
 <dom-module id="composite-canvas">
   <template>
     <style>
@@ -12,6 +14,7 @@
       <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
+    <split-layout></split-layout>
   </template>
   <script>
     class compositeCanvas extends baseChart{
