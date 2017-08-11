@@ -23,6 +23,9 @@
         uuid:{
           type:String
         },
+        parentId:{
+          type:String
+        },
         axisKeys:{
           type:String,
           statePath(state){
@@ -110,7 +113,6 @@
 
     constructor(){
       super();//baseChart
-      this.initializeChart();
 
     }
     static get actions() {
@@ -125,6 +127,7 @@
     }
     connectedCallback(){
       super.connectedCallback();
+      this.initializeChart();
       this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
     }
     _chartDraw(){
@@ -147,7 +150,7 @@
     }
 
     initializeChart(){
-        this.set("uuid",this.tagName)
+        this.set("uuid",this.parentId+this.tagName);
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){

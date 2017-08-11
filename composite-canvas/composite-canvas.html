@@ -5,13 +5,18 @@
       :host {
         display: block;
       }
+      .flex{
+        display: flex;
+      }
+      chart-holder{
+        flex:1;
+      }
     </style>
-    <chart-input-group  uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
-      <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
-    </chart-input-group>
-    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <div class="flex">
+      <chart-holder></chart-holder>
+      <chart-holder></chart-holder>
+      <chart-holder></chart-holder>
+    </div>
   </template>
   <script>
     class compositeCanvas extends baseChart{
