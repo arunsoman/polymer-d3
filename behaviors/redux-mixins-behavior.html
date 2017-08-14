@@ -2,14 +2,14 @@
 <script src="../../redux/index.js"></script>
 <script>
 
-  const initialState = {
+  const chartInitialState = {
       externals:[],
       source:[],
       charts:{}
 }
 
-  const appReducer = (state, action) => {
-      state = state || initialState
+  const chartAppReducer = (state, action) => {
+      state = state || chartInitialState
       let chartObj = {
           externals:externalsReducer(state.externals, action),
           source:sourceReducer(state.source, action),
@@ -80,9 +80,9 @@
   }
 
 
-  // const store = Redux.createStore(appReducer)
+  // const store = Redux.createStore(chartAppReducer)
 
-  const store = Redux.createStore(  appReducer,  initialState,
+  const chartStore = Redux.createStore(  chartAppReducer,  chartInitialState,
     Redux.compose(window.devToolsExtension ? window.devToolsExtension() : v => v)
   );
 
