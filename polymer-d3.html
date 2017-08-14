@@ -1,14 +1,22 @@
+<link rel="import" href="polymer-d3-imports.html">
 <link href="behaviors/redux-mixins-behavior.html" rel='import'>
 
 <dom-module id="polymer-d3">
 <template>
   <chart-holder settings-visible></chart-holder>
 </template>
-<script src="data.js"></script>
+<!-- <script src="data.js"></script> -->
 <script>
   class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
     static get is(){return 'polymer-d3'}
-    static get properties(){}
+    static get properties(){
+      return{
+        source:{
+          type:Object,
+          observer:'addStore'
+        }
+      }
+    }
      
   static get actions() {
     return {
@@ -17,7 +25,7 @@
           type: 'UPDATE_EXTERNALS',
           value: externals
         };
-      },
+      },      
       updateSource(source) {
         return {
           type: 'UPDATE_SOURCE',
@@ -26,63 +34,24 @@
       }
     }
   }
+  /*
+  add data to redux store, so that all available chart can subscribe to this data.
+  */
+  addStore(){
+    if(this.source!==undefined){
+      this.dispatch("updateSource",this.source.source)
+      this.dispatch("updateExternal",this.source.externals)
+    }
+  }
   constructor(){
     super();
-    this.dispatch("updateSource",datacsv.source)
-    this.dispatch("updateExternal",datacsv.externals)
+    
   }
 
   // Bootstraps element as per mode(view/edit)
   // This meathod avoids crazy rwo-way binding side effects
   bootstrapCharts(config) {
-    // data and externals are always required
     this.set('editMode', true);
-    // if (config.availableCharts) {
-    //   // to support new charts added to polymer-d3
-    //   // if a chart is avaiable in polymer d3, but wasn't avaiable in config stored at backend, this function fixes it
-    //   let cookedAvailableCharts = PolymerD3.utilities.compareAndMerge(config.availableCharts, this.availableCharts, elem => {
-    //     let avaiable = false;
-    //     for ( let i = 0; i < config.availableCharts.length; i++) {
-    //       if (config.availableCharts[i].label == elem.label) {
-    //         avaiable = true;
-    //       }
-    //     }
-    //     return !avaiable;
-    //   });
-    //   this.availableCharts = cookedAvailableCharts;
-    // }
-    // if (config.mode == 'view') {
-    //   this.set('editMode', false);
-    //   this.set('selectedChart', config.selectedChart);
-    //   this.set('settings', config.settings);
-    //   this.set('inputs', config.inputs);
-    // } else if (config.mode === 'create') {
-    //   // Fresh Polymer d3
-    //   this.set('editMode', true);
-    // } else {
-    //   this.set('selectedChart', config.selectedChart);
-    //   this.set('settings', config.settings);
-    //   this.set('inputs', config.inputs);
-    //   if (config.mode === 'edit') {
-    //     // Edit mode settings
-    //     this.set('editMode', true);
-    //   } else {
-    //     this.set('editMode', false);
-    //   }
-    //   // Find why legend settings has to added twice
-    //   this.set('legendSettings', config.legendSettings);
-    //   this.selectedChartObj.set('legendSettings', config.legendSettings);
-    //   // To set inputs to selected chart manually
-    //   this.selectedChartObj.set('inputs', config.inputs);
-    //   this.selectedChartObj.draw();
-    //   this.async(() => {
-    //     this.selectedChartObj.chartInfo.settings = this.selectedChartObj.extractData();
-    //     // gives color to selected chart
-    //     if(!this.editMode){
-    //       this.$$('chart-selector').setSelectedChart('[title="' + config.selectedChart.label +'"]');
-    //     }
-    //   }, 500);
-    // }
   }
 }
 

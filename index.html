@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-  <head>
+<!DOCTYPE html><html><head>
     <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
     <link rel="import" href="bower_components/polymer/polymer.html">
-    <link rel="import" href="polymer-d3-imports-internal.html">
+    <link href="polymer-d3.html" rel="import">
     <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
     <link href="bullet-chart/bullet-chart.html" rel="import">
@@ -36,29 +34,15 @@
 
 
 
-    <polymer-d3></polymer-d3>
-    <!-- <polymerd3-table></polymerd3-table> -->
     <script src="data.js"></script>
+    <polymer-d3 source="[[data]]"></polymer-d3>
+    <!-- <polymerd3-table></polymerd3-table> -->
     <script type="text/javascript">
-      // alert('component ready')
-    addEventListener('WebComponentsReady', function() {
-       // var piechartData = document.querySelector('chart-input-group');
-      var pd3 = Polymer.dom(this.root).querySelector('polymer-d3');
-      var config = {
-
-          externals: datacsv.externals,
-          mode: 'create'
-        }
-        pd3.bootstrapCharts(config);
-
-        var dataConfig={
-          externals: datacsv.externals,
-          source: datacsv.source
-        }
-        PolymerD3.dataSource = dataConfig
-    })
-   
-      
+      addEventListener('WebComponentsReady', function() {
+        var pd3 = Polymer.dom(this.root).querySelector('polymer-d3');
+        pd3.source = data
+      })
     </script>
-  </body>
-</html>
+  
+
+</body></html>

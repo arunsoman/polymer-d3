@@ -1,4 +1,3 @@
-<!-- This chart is specifically built to be transformed into a 100% chart -->
 <link rel="import" href="../display-component/base-chart.html">
 <dom-module id="waterfall-chart">
   <template>
@@ -44,6 +43,10 @@
     <div id="chartContainer"></div>
   </template>
   <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
     class waterfallChart extends baseChart{
       static get is(){
         return "waterfall-chart"

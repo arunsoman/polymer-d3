@@ -1,5 +1,4 @@
 
-<link rel="stylesheet" type="text/css" href="composite-canvas-global.css">
 <link rel="import" href="split-layout.html">
 <dom-module id="composite-canvas">
   <template>
@@ -23,6 +22,10 @@
     <split-layout></split-layout>
   </template>
   <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
     class compositeCanvas extends baseChart{
       static get is(){
         return "composite-canvas"

@@ -1,4 +1,4 @@
-var datacsv={
+var data={
   externals:[{
     key: 'Items',
     type: 'String',

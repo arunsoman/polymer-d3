@@ -1,5 +1,4 @@
 <link rel="import" href="../display-component/base-chart.html">
-<!-- <link href="../behaviors/redux-mixins-behavior.html" rel='import'> -->
 <dom-module id="pie-chart">
   <template>
 <style>
@@ -29,10 +28,13 @@
     <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
   </chart-input-group>
   <chart-settings uuid="[[uuid]]"></chart-settings>
-  <!-- <svg id="svg"></svg> -->
   <div id="chartContainer"></div>
 </template>
   <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
     class pieChart extends baseChart {
       static get is() {
         return 'pie-chart'
