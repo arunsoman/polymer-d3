@@ -1,6 +1,6 @@
 <!DOCTYPE html><html><head>
-    <script src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
-    <link rel="import" href="bower_components/polymer/polymer.html">
+    <script src="../webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="../polymer/polymer.html">
     <link href="polymer-d3.html" rel="import">
     <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
@@ -36,11 +36,9 @@
 
     <script src="data.js"></script>
     <polymer-d3 source="[[data]]"></polymer-d3>
-    <!-- <polymerd3-table></polymerd3-table> -->
     <script type="text/javascript">
       addEventListener('WebComponentsReady', function() {
-        var pd3 = Polymer.dom(this.root).querySelector('polymer-d3');
-        pd3.source = data
+        Polymer.dom(this.root).querySelector('polymer-d3').source = data;
       })
     </script>
   
