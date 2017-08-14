@@ -26,7 +26,5 @@
     "browser-sync": "^2.14.0",
     "jshint": "^2.9.3"
   },
-  "dependencies": {
-    "redux": "^3.7.0"
-  }
+  "dependencies": {}
 }
