@@ -23,7 +23,7 @@ PolymerD3.utilities.attachElement = function(elem, container,uuid) {
     } else {
         this.appendChild(dynamicEl);
     }
-
+    // debugger
     // if (cb && dynamicEl[cb]) {
     //     var callBack = dynamicEl[cb];
     //     callBack.call(dynamicEl);

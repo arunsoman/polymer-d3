@@ -1,0 +1,42 @@
+<link rel="import" href="../../vaadin-split-layout/vaadin-split-layout.html">
+<link rel="import" href="../../iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="inner-layout-div.html">
+<dom-module id="inner-layout-split">
+  <template>
+    <style>
+      vaadin-split-layout{
+        /*border:1px #d3d3d3 solid;*/
+        position: relative;
+        /*min-height: 200px;*/
+      }
+      :host #splitter{
+        display:none;
+      }
+    </style>
+      <vaadin-split-layout  vertical="{{align}}" id="grid" freeze>
+      </vaadin-split-layout>
+  </template>
+  <script>
+    class innerLayoutSplit extends Polymer.Element{
+      static get is(){
+        return "inner-layout-split"
+      }
+      static get properties(){
+        return{
+          freeze:{
+            type:String,
+            value:"false"
+          },
+          addRemove:{
+            type:Boolean,
+            value:true
+          }
+        }
+      }
+    }
+    customElements.define(innerLayoutSplit.is, innerLayoutSplit)
+  </script>
+</dom-module>

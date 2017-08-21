@@ -10,7 +10,7 @@
       ></chart-selector>
     </div>
   </template>
-<div class="chartHolder"></div>
+  <div class="chartHolder"></div>
 </template>
 <script>
   class chartHolder extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
@@ -107,6 +107,15 @@
           }
         }
       },
+      compositeValue:{
+        type:Boolean,
+        value:false
+      },
+      selectedItem:{
+        type:Object,
+        value:() => { return {}},
+        notify:true
+      },
       // Object desctibing selected chart type
       selectedChart: {
         type: Object,
@@ -163,22 +172,35 @@
     }
   }
 
+  constructor(){
+    super();
+    this.set('uuid',PolymerD3.utilities.getUUID())
+  }
+  connectedCallback(){
+    if(this.compositeValue){
+      this.availableCharts.shift()
+      this.availableCharts.pop()
+      this.set("availableCharts",this.availableCharts)
+    }
+    super.connectedCallback()
+  }
   static get observers(){
     return[
     '_selectedChanged(selectedChart)',
     ]
-  }
-  
-  constructor(){
-    super();
-    this.set('uuid',PolymerD3.utilities.getUUID())
   }
 
   // on selected chart changed
   // is also used to draw first chart
   _selectedChanged(selectedChart) {
     let elem;
-    this.$$('.chartHolder').innerHTML = '';
+    // debugger
+    if(!this.compositeValue){
+      this.$$('.chartHolder').innerHTML = ''
+    }else{
+      this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
+    }
+    let showCompChart = (this.selectedItem.showCompChart)
     elem = PolymerD3.utilities.attachElement.call(
       this,
       selectedChart.element,
@@ -187,6 +209,14 @@
       );
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
+      if(this.selectedItem.showCompChart){
+        this.parentNode.close()
+        elem.set("showCompChart",this.selectedItem.showCompChart)
+        this.getRootNode().querySelector("#splitBox").appendChild(elem)
+        debugger
+      }else {
+        this.selectedChartObj.showCompChart = false
+      }
   }
 
   // might be dead code

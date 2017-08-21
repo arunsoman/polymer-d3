@@ -1,8 +1,10 @@
-<link rel="import" href="../bower_components/vaadin-split-layout/vaadin-split-layout.html">
-<link rel="import" href="../bower_components/iron-dropdown/iron-dropdown.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../vaadin-split-layout/vaadin-split-layout.html">
+<link rel="import" href="../../iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="inner-layout-split.html">
+<link rel="import" href="inner-layout-split-default.html">
 <dom-module id="inner-layout">
   <template>
     <style>
@@ -20,7 +22,7 @@
         cursor: pointer;
         font: 10px sans-serif;
       }
-      .paperIconBtn{
+      .paperIconBtn, .addRemoveBtn{
         padding:5px;
         width: 25px;
         height: 25px;
@@ -29,18 +31,7 @@
         display:none;
       }
     </style>
-    <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
-    <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown">
-      <div slot="dropdown-content">
-        <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
-        <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
-        <template is="dom-if" if="{{freeze}}">
-          <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
-        </template>
-      </div>
-    </iron-dropdown>
-    <vaadin-split-layout  vertical="{{align}}" id="grid">
-    </vaadin-split-layout>
+    <inner-layout-split-default></inner-layout-split-default>
   </template>
   <script>
     class innerLayout extends Polymer.Element{
@@ -52,35 +43,8 @@
           align:{
             type:Boolean,
             default:false
-          },
-          freeze:{
-            type:String,
-            value:"false"
           }
         }
-      }
-      showDropDown(){
-        this.$.dropDown.open();
-      }
-      constructor(){
-        super()
-      }
-      createSplitLayout(e){
-        this.set('align',e.currentTarget.id=='horz');
-        let ele = document.createElement('inner-layout');
-        let ele2 = document.createElement('inner-layout');
-        let childElemCount = this.$.grid.children.length
-        if(childElemCount==0){
-          this.$.grid.appendChild(ele);
-          this.$.grid.appendChild(ele2);
-        }else if(childElemCount==1){
-          this.$.grid.appendChild(ele);
-        }
-        this.$.dropDown.close();
-      }
-      deleteSplitLayout(e){
-        this.remove()
-        this.$.dropDown.close();
       }
     }
     customElements.define(innerLayout.is, innerLayout)

@@ -1,0 +1,142 @@
+<link rel="import" href="../../vaadin-split-layout/vaadin-split-layout.html">
+<link rel="import" href="../../iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../iron-icons/iron-icons.html">
+<link rel="import" href="../../paper-item/paper-item.html">
+<link rel="import" href="../display-component/chart-holder.html">
+
+<dom-module id="inner-layout-div">
+  <template>
+    <style>
+      header{
+        border-bottom:1px #d3d3d3 solid;
+      }
+      #splitBox{
+        position: relative;
+        min-height: 200px;
+      }
+      #dropDown{
+        margin-top:20px
+      }
+      #dropDown paper-item{
+        width: 29px;
+        min-height: 16px;
+        cursor: pointer;
+        font: 10px sans-serif;
+      }
+      .paperIconBtn, .addRemoveBtn{
+        padding:5px;
+        width: 25px;
+        height: 25px;
+      }
+      :host #splitter{
+        display:none;
+      }
+      paper-dialog {
+        top: 5%;
+        left:5%;
+        width:90%;
+      }
+    </style>
+    <div id="splitBox">
+      <header>
+      <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
+      <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown">
+        <div slot="dropdown-content">
+          <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
+          <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
+          <template is="dom-if" if="{{freeze}}">
+            <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
+          </template>
+        </div>
+      </iron-dropdown>
+      <!-- <template is="dom-if" if="{{addRemove}}" restamp="true"> -->
+        <paper-icon-button icon="add" on-click="showChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
+        <paper-dialog id="chartSelectedModal" close="true">
+          <chart-holder settings-visible composite-value selected-item="{{selectedItem}}"></chart-holder>
+          <!-- <h2>Dialog Title</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
+            aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
+            sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> -->
+        </paper-dialog>
+      <!-- </template> -->
+    </header>
+    </div>
+  </template>
+  <script>
+    class innerLayoutDiv extends Polymer.Element{
+      static get is(){
+        return "inner-layout-div"
+      }
+      static get properties(){
+        return{
+          align:{
+            type:Boolean,
+            notify:true
+          },
+          valign:{
+            type:Boolean,
+            value:false,
+            notify:true
+          },
+          freeze:{
+            type:String,
+            value:"false",
+            notify:true
+          },
+          addRemove:{
+            type:Boolean,
+            value:true,
+            notify:true
+          },
+          selectedItem:{
+            type:Object,
+            value:() => {return {};},
+            notify:true
+          }
+        }
+      }
+      showDropDown(){
+        this.$.dropDown.open();
+      }
+      showChart() {
+        this.$.chartSelectedModal.open();
+        this.set("selectedItem",{showCompChart:true})
+      }
+      constructor(){
+        super()
+      }
+      createSplitLayout(e){
+        let eleDiv = document.createElement('inner-layout-div');
+        let eleDiv2 = document.createElement('inner-layout-div')
+        let eleSplit = document.createElement('inner-layout-split');
+        let vertical = e.currentTarget.id=='horz'
+        let childElemCount = this.parentNode.children.length
+        if(childElemCount==1){
+          this.set('align',vertical)
+          this.parentNode.appendChild(eleDiv)
+        }else if(childElemCount==2){
+          if(this.root.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
+            eleSplit.set('freeze',"true")
+            eleSplit.set('align',vertical)
+            this.$.splitBox.appendChild(eleSplit)
+            this.$.splitBox.lastChild.$.grid.appendChild(eleDiv)
+            this.$.splitBox.lastChild.$.grid.appendChild(eleDiv2)
+          }
+        }
+        this.$.dropDown.close();
+      }
+      deleteSplitLayout(e){
+        //   this.set('addRemove',true);
+        if(this.parentNode.children.length == 1){
+          this.parentNode.remove()
+        }else{
+          this.remove()
+        }
+        this.$.dropDown.close();
+      }
+    }
+    customElements.define(innerLayoutDiv.is, innerLayoutDiv)
+  </script>
+</dom-module>
