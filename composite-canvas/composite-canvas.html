@@ -30,6 +30,23 @@
       static get is(){
         return "composite-canvas"
       }
+      static get properties(){
+        return{}
+      }
+      redraw() {
+        this.draw(this._compute());
+      }
+      _compute() {
+        //assign axisIndex value
+        let axisIndex = 3
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
+
+        //get chart data once pass axis into the "getChartData" method
+        // let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
+      }
     }
     customElements.define(compositeCanvas.is,compositeCanvas)
   </script>

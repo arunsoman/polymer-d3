@@ -16,13 +16,19 @@
         min-height: 200px;
       }
       #dropDown{
-        margin-top:20px
+        margin-top:20px;
+        border: 1px lightgrey solid;
+        background-color: white;
       }
       #dropDown paper-item{
         width: 29px;
         min-height: 16px;
         cursor: pointer;
         font: 10px sans-serif;
+        border-bottom: 1px lightgrey solid;
+      }
+      #dropDown paper-item:last-child{
+        border-bottom:none;
       }
       .paperIconBtn, .addRemoveBtn{
         padding:5px;
@@ -34,9 +40,30 @@
       }
       paper-dialog {
         top: 5%;
-        left:5%;
-        width:90%;
+        left: 2%;
+        width: 90%;
+        margin: 0;
+        position: relative;
       }
+      paper-icon-button.dialog-close {
+        width: 25px;
+        height: 25px;
+        position: absolute;
+        right: -12px;
+        top: -12px;
+        background: white;
+        color:grey;
+        border: 1px solid #ededed;
+        border-radius: 50%;
+        padding: 4px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 999;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+    }
     </style>
     <div id="splitBox">
       <header>
@@ -50,17 +77,16 @@
           </template>
         </div>
       </iron-dropdown>
-      <!-- <template is="dom-if" if="{{addRemove}}" restamp="true"> -->
+      <template is="dom-if" if="{{!selectedItem.showCompChart}}" restamp="true">
         <paper-icon-button icon="add" on-click="showChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
-        <paper-dialog id="chartSelectedModal" close="true">
-          <chart-holder settings-visible composite-value selected-item="{{selectedItem}}"></chart-holder>
-          <!-- <h2>Dialog Title</h2>
-          <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-            aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur
-            sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p> -->
-        </paper-dialog>
-      <!-- </template> -->
+      </template>
+      <template is="dom-if" if="{{selectedItem.showCompChart}}" restamp="true">
+        <paper-icon-button icon="remove" on-click="removeChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
+      </template>
+      <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
+        <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
+        <chart-holder settings-visible composite-value selected-item="{{selectedItem}}"></chart-holder>
+      </paper-dialog>
     </header>
     </div>
   </template>
@@ -97,13 +123,30 @@
           }
         }
       }
+      // static get observers(){
+      //   return["checkDialog(selectedItem)"]
+      // }
       showDropDown(){
         this.$.dropDown.open();
       }
       showChart() {
         this.$.chartSelectedModal.open();
         this.set("selectedItem",{showCompChart:true})
+        this.$.chartSelectedModal.backdropElement.toggleAttribute("hidden",true)
+        // debugger
       }
+      dialogClose(){
+        this.$.chartSelectedModal.close();
+        this.set("selectedItem",{showCompChart:false})
+      }
+      removeChart(){
+        let chartBox = this.$.splitBox.querySelector("#chartBox")
+        chartBox.remove()
+        this.set("selectedItem",{showCompChart:false})
+      }
+      // checkDialog(){
+      //
+      // }
       constructor(){
         super()
       }
@@ -113,11 +156,12 @@
         let eleSplit = document.createElement('inner-layout-split');
         let vertical = e.currentTarget.id=='horz'
         let childElemCount = this.parentNode.children.length
-        if(childElemCount==1){
+        let chartBox = this.$.splitBox.querySelector("#chartBox")
+        if(childElemCount==1 || childElemCount==2 && chartBox){
           this.set('align',vertical)
           this.parentNode.appendChild(eleDiv)
         }else if(childElemCount==2){
-          if(this.root.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
+          if(this.$.splitBox.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
             eleSplit.set('freeze',"true")
             eleSplit.set('align',vertical)
             this.$.splitBox.appendChild(eleSplit)
