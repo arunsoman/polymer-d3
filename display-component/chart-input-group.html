@@ -46,16 +46,27 @@
         }
         static get properties(){
           return{
+            uuid:{
+              type:String,
+              observer:'init'
+            },
+            paragraphId:{
+              type:String
+            },
             externals:{
               type:Array,
               statePath(state){
-                return state.externals
+                if(this.paragraphId){
+                  return state.data[this.paragraphId].externals;
+                }
               }
             },
             source:{
               type:Array,
               statePath(state){
-                return state.source
+                if(this.paragraphId){
+                  return state.data[this.paragraphId].source
+                }
               }
             }//,
             // inputs:{
@@ -87,11 +98,14 @@
             }
           }
         }
+        init(e){
+          this.set('paragraphId',this.uuid.split('@')[0]);
+        }
         constructor() {
             super();
         }
         connectedCallback(){
-          super.connectedCallback()
+          super.connectedCallback();
         }
     }
     customElements.define(chartInputGroup.is, chartInputGroup)

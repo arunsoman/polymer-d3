@@ -80,13 +80,13 @@
         externals:{
           type:Array,
           statePath(state){
-            return state.externals
+            return state.data[this.parentId].externals
           }
         },
         source:{
           type:Array,
           statePath(state){
-            return state.source
+            return state.data[this.parentId].source
           }
         },
         stacked:{
@@ -150,7 +150,7 @@
     }
 
     initializeChart(){
-        this.set("uuid",this.parentId+this.tagName);
+      this.set("uuid",this.parentId+'@'+this.tagName);
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){

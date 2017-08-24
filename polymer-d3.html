@@ -3,7 +3,7 @@
 
 <dom-module id="polymer-d3">
 <template>
-  <chart-holder settings-visible></chart-holder>
+  <chart-holder settings-visible paragraph-id="[[paragraphId]]"></chart-holder settings-visible>
 </template>
 <!-- <script src="data.js"></script> -->
 <script>
@@ -14,6 +14,10 @@
         source:{
           type:Object,
           observer:'addStore'
+        },
+        paragraphId:{
+          type:String,
+          value:0
         }
       }
     }
@@ -38,9 +42,9 @@
   add data to redux store, so that all available chart can subscribe to this data.
   */
   addStore(){
-    if(this.source!==undefined){
-      this.dispatch("updateSource",this.source.source)
-      this.dispatch("updateExternal",this.source.externals)
+    if(this.source.source){
+      this.dispatch("updateSource",{id:this.paragraphId,source:this.source.source})
+      this.dispatch("updateExternal",{id:this.paragraphId,externals:this.source.externals})
     }
   }
   constructor(){

@@ -3,16 +3,14 @@
 <script>
 
   const chartInitialState = {
-      externals:[],
-      source:[],
+      data:{},
       charts:{}
 }
 
   const chartAppReducer = (state, action) => {
       state = state || chartInitialState
       let chartObj = {
-          externals:externalsReducer(state.externals, action),
-          source:sourceReducer(state.source, action),
+          data:chartDataReducer(state.data,action),
           charts: chartReducer(state.charts, action)
       }
       return chartObj
@@ -62,23 +60,20 @@
       }
   }
 
-  const externalsReducer =(state, action)=>{
+  const chartDataReducer = (state,action)=>{
     switch(action.type){
       case"UPDATE_EXTERNALS":
-        return state.concat(action.value)
-      default:
-          return state;
-    }
-  }
-  const sourceReducer =(state, action)=>{
-    switch(action.type){
+        return Object.assign({},state,{
+          [action.value.id]:Object.assign({},state[action.value.id],{externals:action.value.externals})
+        });
       case"UPDATE_SOURCE":
-        return state.concat(action.value)
+        return Object.assign({},state,{
+          [action.value.id]:Object.assign({},state[action.value.id],{source:action.value.source})
+        });
       default:
           return state;
     }
   }
-
 
   // const store = Redux.createStore(chartAppReducer)
 
