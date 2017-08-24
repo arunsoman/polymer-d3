@@ -23,7 +23,7 @@
     "paper-item": "PolymerElements/paper-item",
     "iron-dropdown": "PolymerElements/iron-dropdown#^2.0.0",
     "iron-icons": "PolymerElements/iron-icons#^2.0.1",
-    "redux":"https://cdnjs.cloudflare.com/ajax/libs/redux/1.0.1/redux.js"
+    "redux":"https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

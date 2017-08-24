@@ -35,6 +35,44 @@
           addRemove:{
             type:Boolean,
             value:true
+          },
+          allMainObjs:{
+            type:Object,
+            value:()=>{
+            }
+          },
+          allSubObjs:{
+            type:Object,
+            value:()=>{
+            }
+          },
+          defaultObj:{
+            type:Object,
+            value:()=>{
+              return{
+                vertical:false,
+                subObjs:["defaultSubObj"]
+              }
+            }
+          },
+          defaultSubObj:{
+            type:Object,
+            value:()=>{
+              return{
+                freeze:true,
+                style:"",
+                chart:"",
+                mainObj:""
+              }
+            }
+          },
+          newObjID:{
+            type:String,
+            value:"defaultObj"
+          },
+          newSubObjID:{
+            type:String,
+            value:"defaultSubObj"
           }
         }
       }
