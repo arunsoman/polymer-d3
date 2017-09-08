@@ -55,6 +55,17 @@
                 chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
               })
             })
+            case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  compositeChartData:Object.assign({},state[action.value.uuid].compositeChartData,action.value.chartData)
+                })})
+            case 'COMPOSITE_SPLIT_AREA_CHK':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  layoutAreaChk:Object.assign({},state[action.value.uuid].layoutAreaChk,action.value.layoutAreaChk)
+                })})
+
           default:
               return state;
       }

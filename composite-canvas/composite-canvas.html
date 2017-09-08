@@ -1,5 +1,6 @@
 <link rel="import" href="../display-component/base-chart.html">
-<link rel="import" href="split-layout.html">
+<!-- <link rel="import" href="split-layout.html"> -->
+<link rel="import" href="recursive.html">
 <dom-module id="composite-canvas">
   <template>
     <style>
@@ -19,7 +20,14 @@
       <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
-    <split-layout></split-layout>
+    <!-- <split-layout></split-layout> -->
+    <!-- <vaadin-split-layout>
+      <div>First content element</div>
+      <div>Second content element</div>
+    </vaadin-split-layout> -->
+    <div id="splitLayoutArea">
+      <recursive-node uuid="[[uuid]]"></recursive-node>
+    </div>
   </template>
   <script>
     /**
@@ -31,8 +39,78 @@
         return "composite-canvas"
       }
       static get properties(){
-        return{}
+        return{
+          compositeChartData:{
+            type:Object,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let compositeChartData = chartPath && chartPath.compositeChartData
+              return compositeChartData
+            }
+          },
+          compositeChartDefaultData:{
+            type:Object,
+            value:()=>{
+              return {
+              "id": "chartData",
+              "vertical": false,
+              "name": "top1",
+              "freeze": true,
+              "style": "",
+              "chart": "",
+              "chartId":"",
+              "showCompChart":false,
+              "parent":true,
+              "childLength":1,
+              "children": [
+                {
+                  "id": "chartData_0",
+                  "vertical": false,
+                  "name": "top1",
+                  "freeze": true,
+                  "style": "",
+                  "chart": "",
+                  "chartId":"",
+                  "showCompChart":false,
+                  "parent":false,
+                  "childLength":0,
+                  "children": []
+                }
+              ]
+            }
+          }
+        },
+        layoutAreaChk:{
+          type:Boolean,
+          observer:"areaChk",
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let layoutAreaChk = chartPath && chartPath.layoutAreaChk
+            return layoutAreaChk
+          }
+        }
       }
+    }
+    static get actions() {
+      return {
+        addUpdateChartData(addUpdateChartData) {
+          return {
+            type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
+            value: addUpdateChartData
+          }
+        }
+      }
+    }
+    connectedCallback(){
+      super.connectedCallback()
+      !this.compositeChartData && this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.compositeChartDefaultData})
+    }
+    areaChk(){
+      this.$.splitLayoutArea.innerHTML=""
+      let recursiveNode = document.createElement("recursive-node")
+      recursiveNode.set("uuid",this.uuid)
+      this.$.splitLayoutArea.appendChild(recursiveNode)
+    }
       redraw() {
         this.draw(this._compute());
       }

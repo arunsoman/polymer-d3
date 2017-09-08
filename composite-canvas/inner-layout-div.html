@@ -1,9 +1,10 @@
-<link rel="import" href="../../vaadin-split-layout/vaadin-split-layout.html">
 <link rel="import" href="../../iron-dropdown/iron-dropdown.html">
 <link rel="import" href="../../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../iron-icons/iron-icons.html">
 <link rel="import" href="../../paper-item/paper-item.html">
-<link rel="import" href="../display-component/chart-holder.html">
+<!-- <link rel="import" href="../display-component/chart-holder.html"> -->
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<link rel="import" href="recursive-elem.html">
 
 <dom-module id="inner-layout-div">
   <template>
@@ -72,15 +73,15 @@
         <div slot="dropdown-content">
           <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
           <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
-          <template is="dom-if" if="{{freeze}}">
+          <template is="dom-if" if="{{!freeze}}">
             <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
           </template>
         </div>
       </iron-dropdown>
-      <template is="dom-if" if="{{!selectedItem.showCompChart}}" restamp="true">
+      <template is="dom-if" if="{{!showCompChart}}" restamp="true">
         <paper-icon-button icon="add" on-click="showChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
       </template>
-      <template is="dom-if" if="{{selectedItem.showCompChart}}" restamp="true">
+      <template is="dom-if" if="{{showCompChart}}" restamp="true">
         <paper-icon-button icon="remove" on-click="removeChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
       </template>
       <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
@@ -88,10 +89,16 @@
         <chart-holder settings-visible composite-value selected-item="{{selectedItem}}"></chart-holder>
       </paper-dialog>
     </header>
+    <template is="dom-if" if="[[chartAvailabilityChk(itemObj,childSource)]]" restamp="true">
+      <div id="chartBox">[[itemObj.chart]]</div>
+    </template>
+    <template is="dom-if" if="[[childSource.length]]" restamp="true">
+      <recursive-elem uuid="[[uuid]]" split-data="{{childSource}}" id="{{id}}" vertical="[[itemObj.vertical]]"></recursive-elem>
+    </template>
     </div>
   </template>
   <script>
-    class innerLayoutDiv extends Polymer.Element{
+    class innerLayoutDiv extends ReduxMixinBehavior(Polymer.Element){
       static get is(){
         return "inner-layout-div"
       }
@@ -108,7 +115,7 @@
           },
           freeze:{
             type:String,
-            value:"false",
+            value:false,
             notify:true
           },
           addRemove:{
@@ -120,29 +127,100 @@
             type:Object,
             value:() => {return {};},
             notify:true
+          },
+          showCompChart:{
+            type:Boolean
+          },
+          style:{
+            type:String
+          },
+          chartIdChk:{
+            type:Boolean,
+            observer:"checkChartId"
+          },
+          childObj:{
+            type:Object,
+            value:()=>{
+              return{
+                "id": "",
+                "vertical": false,
+                "name": "",
+                "freeze": false,
+                "style": "ssss",
+                "chart": "",
+                "chartId":"",
+                "showCompChart":false,
+                "parent":false,
+                "childLength":0,
+                "children": []
+              }
+            }
+          },
+          chartData:{
+            type:Object,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let compositeChartData = chartPath && chartPath.compositeChartData
+              return compositeChartData
+            }
+          },
+          layoutAreaChk:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let layoutAreaChk = chartPath && chartPath.layoutAreaChk
+              return layoutAreaChk
+            }
+          }
+
+        }
+      }
+      static get actions() {
+        return {
+          addUpdateChartData(addUpdateChartData) {
+            return {
+              type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
+              value: addUpdateChartData
+            }
+          },
+          splitAreaChk(layoutAreaChk) {
+            return {
+              type: 'COMPOSITE_SPLIT_AREA_CHK',
+              value: layoutAreaChk
+            }
           }
         }
       }
-      // static get observers(){
-      //   return["checkDialog(selectedItem)"]
-      // }
+      chartAvailabilityChk(itemObj,child){
+        this.set("chartIdChk",child.length<=0 && itemObj.chart!="")
+        return child.length<=0 && itemObj.chart!=""
+      }
+      checkChartId(chartIdChk){
+        this.set("showCompChart",this.itemObj.showCompChart)
+        this.setAttribute("style",this.itemObj.style)
+        chartIdChk && setTimeout(()=>{
+          let chart = document.createElement(this.itemObj.chart)
+          chart.id=this.itemObj.chartId
+          this.root.querySelector("#chartBox").appendChild(chart)
+        })
+      }
       showDropDown(){
         this.$.dropDown.open();
       }
       showChart() {
         this.$.chartSelectedModal.open();
-        this.set("selectedItem",{showCompChart:true})
+        this.set("showCompChart",true)
         this.$.chartSelectedModal.backdropElement.toggleAttribute("hidden",true)
         // debugger
       }
       dialogClose(){
         this.$.chartSelectedModal.close();
-        this.set("selectedItem",{showCompChart:false})
+        this.set("showCompChart",false)
       }
       removeChart(){
         let chartBox = this.$.splitBox.querySelector("#chartBox")
         chartBox.remove()
-        this.set("selectedItem",{showCompChart:false})
+        this.set("showCompChart",false)
       }
       // checkDialog(){
       //
@@ -151,25 +229,80 @@
         super()
       }
       createSplitLayout(e){
-        let eleDiv = document.createElement('inner-layout-div');
-        let eleDiv2 = document.createElement('inner-layout-div')
-        let eleSplit = document.createElement('inner-layout-split');
-        let vertical = e.currentTarget.id=='horz'
-        let childElemCount = this.parentNode.children.length
-        let chartBox = this.$.splitBox.querySelector("#chartBox")
-        if(childElemCount==1 || childElemCount==2 && chartBox){
-          this.set('align',vertical)
-          this.parentNode.appendChild(eleDiv)
-        }else if(childElemCount==2){
-          if(this.$.splitBox.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
-            eleSplit.set('freeze',"true")
-            eleSplit.set('align',vertical)
-            this.$.splitBox.appendChild(eleSplit)
-            this.$.splitBox.lastChild.$.grid.appendChild(eleDiv)
-            this.$.splitBox.lastChild.$.grid.appendChild(eleDiv2)
-          }
+        let getId=this.id
+        let itemId, itemId1, parentObj
+        let getObj = this.createNewIdNestedObj(getId)
+
+        let parentId = getObj.parentId,
+            objIdx = getObj.objIdx,
+            ObjNested = getObj.ObjNested
+
+        let setParent=false
+
+        if(!this.get(getObj.parentObj+".childLength") && this.get(ObjNested).length==2){
+          setParent = true
+          itemId = getId+"_0"
+          this.set("childObj.id",itemId)
+          ObjNested = this.createNewIdNestedObj(itemId).ObjNested
+          this.push(ObjNested,this.childObj)
+
+          debugger
+        } else {
+          itemId = parentId+"_"+(objIdx+1)
+          this.set("childObj.id",itemId)
+          this.push(ObjNested,this.childObj)
+          debugger
         }
+
+        let verticalKey = getObj.parentObj+".vertical",
+            vertical = e.currentTarget.id=='horz'
+        this.set(verticalKey,vertical)
+        let childLengthKey = getObj.parentObj+".childLength",
+            childLength = setParent?2:0
+        this.set(childLengthKey,childLength)
+
+
+// debugger
+        this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
+        this.set("layoutAreaChk",!this.layoutAreaChk)
+        this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
+
+
+
+
+        // let eleDiv = document.createElement('inner-layout-div');
+        // let eleDiv2 = document.createElement('inner-layout-div')
+        // let eleSplit = document.createElement('inner-layout-split');
+        // let vertical = e.currentTarget.id=='horz'
+        // let childElemCount = this.parentNode.children.length
+        // let chartBox = this.$.splitBox.querySelector("#chartBox")
+        // if(childElemCount==1 || childElemCount==2 && chartBox){
+        //   this.set('align',vertical)
+        //   this.parentNode.appendChild(eleDiv)
+        // }else if(childElemCount==2){
+        //   if(this.$.splitBox.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
+        //     eleSplit.set('freeze',"true")
+        //     eleSplit.set('align',vertical)
+        //     this.$.splitBox.appendChild(eleSplit)
+        //     this.$.splitBox.lastChild.$.grid.appendChild(eleDiv)
+        //     this.$.splitBox.lastChild.$.grid.appendChild(eleDiv2)
+        //   }
+        // }
         this.$.dropDown.close();
+      }
+      createNewIdNestedObj(getId){
+        let splitId=getId.split("_")
+        let assignId = getId.split("_")
+        let splitIdSize = splitId.length
+        let objIdx = (+splitId[splitIdSize-1])
+        let parentId, ObjNested, parentObj
+        // let splitCheck = true
+        splitId.pop()
+        parentObj = splitId.join(".children.")
+        parentId = splitId.join("_")
+        ObjNested = splitId.join(".children.")+".children"
+
+        return{parentId,ObjNested,objIdx,parentObj}
       }
       deleteSplitLayout(e){
         //   this.set('addRemove',true);

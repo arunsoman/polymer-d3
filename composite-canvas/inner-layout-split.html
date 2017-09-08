@@ -33,6 +33,24 @@
           addRemove:{
             type:Boolean,
             value:true
+          },
+          allMainObjs:{
+            type:Array,
+            value:[]
+          },
+          allSubObjs:{
+            type:Array,
+            value:[]
+          },
+          mainObj:{
+            type:Object,
+            value:()=>{
+              return{
+                id:"",
+                vertical:false,
+                subObjs:[]
+              }
+            }
           }
         }
       }

@@ -43,10 +43,6 @@
     <div id="chartContainer"></div>
   </template>
   <script>
-    /**
-    * @polymer
-    * @extends HTMLElement
-    */
     class areaChart extends baseChart{
       static get is(){
         return "area-chart"
@@ -191,14 +187,14 @@
               .attr("y", 6)
               .attr("dy", ".71em")
               .style("text-anchor", "end")
-        this.addLegend({
-          obj,
-          container:parentG,
-          selector:'.area',
-          node:obj.chartData,
-          key: 'name'
-        });
-        d3.select(this.$.chartContainer).style({"width":obj.width+ obj.margin.left + obj.margin.right+"px"})
+
+        // this.addLegend({
+        //     obj,
+        //     container:parentG,
+        //     selector:'.area',
+        //     node:obj.chartData
+        //   });
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
       getChartData(itemX, itemY,itemZ,stacked,itemZChk,formatDate){

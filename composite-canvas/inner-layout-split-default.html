@@ -37,19 +37,18 @@
             value:true
           },
           allMainObjs:{
-            type:Object,
-            value:()=>{
-            }
+            type:Array,
+            value:[]
           },
           allSubObjs:{
-            type:Object,
-            value:()=>{
-            }
+            type:Array,
+            value:[]
           },
           defaultObj:{
             type:Object,
             value:()=>{
               return{
+                id:"defaultObj",
                 vertical:false,
                 subObjs:["defaultSubObj"]
               }
@@ -59,6 +58,7 @@
             type:Object,
             value:()=>{
               return{
+                id:"defaultSubObj",
                 freeze:true,
                 style:"",
                 chart:"",
@@ -73,6 +73,29 @@
           newSubObjID:{
             type:String,
             value:"defaultSubObj"
+          }
+        }
+      }
+      constructor(){
+        super()
+      }
+      connectedCallback(){
+
+        super.connectedCallback()
+      }
+      static get actions() {
+        return {
+          addMainObj(input) {
+            return {
+              type: 'ADD_MAIN_OBJ',
+              value: input
+            };
+          },
+          addSubObj(removeInput) {
+            return {
+              type: 'ADD_SUB_OBJ',
+              value: removeInput
+            };
           }
         }
       }

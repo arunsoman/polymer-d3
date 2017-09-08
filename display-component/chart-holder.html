@@ -116,6 +116,10 @@
         value:() => { return {}},
         notify:true
       },
+      showCompChart:{
+        type:Boolean,
+        notify:true
+      },
       // Object desctibing selected chart type
       selectedChart: {
         type: Object,
@@ -203,7 +207,11 @@
     }else{
       this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
     }
+<<<<<<< Updated upstream
     let showCompChart = (this.selectedItem.showCompChart);
+=======
+    let showCompChart = (this.showCompChart)
+>>>>>>> Stashed changes
     elem = PolymerD3.utilities.attachElement.call(
       this,
       selectedChart.element,
@@ -212,8 +220,8 @@
       );
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
-      if(this.selectedItem.showCompChart){
-        elem.set("showCompChart",this.selectedItem.showCompChart)
+      if(this.showCompChart){
+        elem.set("showCompChart",this.showCompChart)
         let chartBox = document.createElement("div")
         chartBox.id = "chartBox"
         chartBox.appendChild(elem)
