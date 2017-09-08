@@ -1,0 +1,139 @@
+<dom-module id="file-reader">
+
+    <template>
+      <style>
+        :host {
+          display: inline-block;
+          background: #FF5722;
+          cursor: pointer;
+          color: #fff;
+          padding: 2em;
+          border-radius: .5em;
+          position: relative;
+          box-shadow: 7px 7px 0px #CDDC39;
+        }
+        
+        [hidden] {
+          display: none;
+        }
+      </style>
+
+      <slot></slot>
+      <input
+        id="fileInput"
+        on-change="_onChange"
+        type="file"
+        accept="{{accept}}"
+        multiple="[[multiple]]"
+        hidden>
+      <!-- <div class="clickHere">Click here to Import csv file</div> -->
+    </template>
+
+
+
+    <script>
+      Polymer({
+        is: "file-reader",
+
+        /**
+         * Fired when a file has been read
+         *
+         * @event file-read
+         */
+
+        properties: {
+          /**
+           *  The types of files that the browser can read
+           *  Available types are :
+           *  - A file extension starting with the STOP character (U+002E). (E.g.: ".jpg,.png,.doc")
+           *  - A valid MIME type with no extensions
+           *  - audio/* representing sound files HTML5
+           *  - video/* representing video files HTML5
+           *  - image/* representing image files HTML5
+           * See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input
+           */
+          accept: {
+            type: String,
+            value: null,
+          },
+          /**
+           * How does the browser must read the file
+           * Available types are `text`, `binary`, `ArrayBuffer` and `dataURL`
+           * See https://developer.mozilla.org/en-US/docs/Web/API/FileReader
+           */
+          readAs: {
+            type: String,
+            value: "text"
+          },
+          /**
+           * If it should accept more than one file at a time
+           */
+          multiple: {
+            type: Boolean,
+            value: false
+          },
+          outputData:{
+            notify:true
+          }
+        },
+
+        observers: [
+        ],
+        listeners: {
+          // Safari don't get the on-evt on light DOM
+          "tap": "_onTap"
+        },
+        _onTap: function(evt) {
+          // console.log("[file-reader] _onTap", evt.target.localName);
+          // console.dir(evt)
+          // if it's the event on the light dom, I launch another on the file-reader
+          // (if I didn't tested it, it would loop...)
+          if (evt.target.localName != "file-reader" && evt.target.id != "fileInput") {
+            // Inspired by https://github.com/winhowes/file-upload/
+            var elem = this.$.fileInput;
+            if (elem && document.createEvent) { // sanity check
+              var evt = document.createEvent('MouseEvents');
+              evt.initEvent('click', true, false);
+              // console.log("[file-reader] _onTap - dispatch");
+              elem.dispatchEvent(evt);
+            }
+          }
+        },
+        _onChange: function(evt) {
+          if (!this.$.fileInput.files){
+            return;
+          }
+          // console.debug("[file-reader] _onChange", this.$.fileInput.files);
+
+          var file, i, n = this.$.fileInput.files.length;
+          for (i=0; i<n; i++) {
+            file = this.$.fileInput.files[i];
+            // console.debug("[file-reader] _onChange",file);
+            var reader = new FileReader();
+            var context = this;
+            reader.onload = function(event) {
+              // The file's text will be printed here
+              // console.debug("[file-reader] _onChange", event.target.result);
+              context.set('outputData',event.target.result)
+              // context.fire('file-read', event.target.result);
+            };
+            switch (this.readAs) {
+              case "binary" :
+                reader.readAsBinaryString(file);
+                break;
+              case "ArrayBuffer" :
+                reader.readAsArrayBuffer(file);
+                break;
+              case "dataURL":
+                reader.readAsDataURL(file);
+                break;
+              case "text":
+              default:
+                reader.readAsText(file);
+            };
+          }
+        },
+      });
+    </script>
+
+</dom-module>

@@ -95,11 +95,15 @@ Could also be used as a custom visualization
       return{
         source:{
           type:Array,
-          statePath:'source'
+          statePath(state){
+            return state.data[this.parentId].source;
+          }
         },
         externals:{
           type:Array,
-          statePath:'externals'
+          statePath(state){
+            return state.data[this.parentId].externals;
+          }
         }
       }
     }

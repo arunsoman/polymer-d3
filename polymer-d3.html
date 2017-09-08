@@ -3,9 +3,15 @@
 
 <dom-module id="polymer-d3">
 <template>
+<template is="dom-if" if="[[!source]]">
+<file-reader read-as="text" accept=".csv" output-data="{{file}}">
+    <div class="clickHere">Click here to Import csv file</div>
+</file-reader>
+</template>
+<template is="dom-if" if="[[source]]">
   <chart-holder settings-visible paragraph-id="[[paragraphId]]"></chart-holder settings-visible>
 </template>
-<!-- <script src="data.js"></script> -->
+</template>
 <script>
   class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
     static get is(){return 'polymer-d3'}
@@ -13,11 +19,15 @@
       return{
         source:{
           type:Object,
+          value:false,
           observer:'addStore'
         },
         paragraphId:{
           type:String,
           value:0
+        },
+        file:{
+          observer:'transformData'
         }
       }
     }
@@ -38,6 +48,73 @@
       }
     }
   }
+  transformData(e) {
+      var me = this;
+      let sourceObj={
+        source:[],
+        externals:[]
+      }
+      // if (data) {
+      var data = e.replace();
+      var headerObj = [];
+      var lines = data.split('\n');
+      var result = [];
+      var headers = lines[0].split(',');
+      var firstRow = lines[1].split(',');
+
+      headers.forEach(function(el, key) {
+        var type = me.getDataType(firstRow[key]);
+        headerObj.push({
+          key: headers[key],
+          value: key,
+          type: type
+        });
+      });
+
+      // me.set('externals', headerObj);
+
+      // this.dispatch({type:'SET_EXTERNAL',payload:{id:this.paragraphId,externals:headerObj}});
+
+      // lines.length - 1 is used because, last row is always just a '\n' with no data
+      for (var i = 1; i < lines.length - 1; i++) {
+        var obj = [];
+        var currentline = lines[i].split(',');
+        for (var j = 0; j < headers.length; j++) {
+          var converted = me.convertData(currentline[j], headerObj[j].type);
+          obj.push(converted);
+        }
+
+        result.push(obj);
+      }
+      sourceObj.externals = headerObj;
+      sourceObj.source = result;
+      this.set('source',sourceObj);
+    }
+    convertData(data, type) {
+      var result;
+      switch (type) {
+        case 'Number':
+          result = parseFloat(data);
+          break;
+        case 'Date':
+          result = new Date(data);
+          break;
+        default:
+          result = data;
+      }
+      return result;
+    }
+    getDataType(data) {
+      var result = '';
+      if (data.match(/^\d*\.?\d*$/g)) {
+        result = 'Number';
+      } else if (Date.parse(data)) {
+        result = 'Date';
+      } else {
+        result = 'String';
+      }
+      return result;
+    }
   /*
   add data to redux store, so that all available chart can subscribe to this data.
   */
