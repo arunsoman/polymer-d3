@@ -1,6 +1,11 @@
 <link rel="import" href="inner-layout-div.html">
 <dom-module id="recursive-elem">
   <template>
+    <style>
+      vaadin-split-layout{
+        height: 100%;
+      }
+    </style>
     <vaadin-split-layout  vertical="[[vertical]]" id="[[id]]_vaadin">
       <template is="dom-repeat" items="{{splitData}}">
         <inner-layout-div uuid="[[uuid]]" freeze="{{freeze}}" child-source="{{item.children}}" id="[[item.id]]" item-obj="[[item]]"></inner-layout-div>

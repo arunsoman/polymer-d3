@@ -9,12 +9,16 @@
 <dom-module id="inner-layout-div">
   <template>
     <style>
+      :host{
+        /*min-height: 20em;*/
+        min-height: 40vh;
+      }
       header{
         border-bottom:1px #d3d3d3 solid;
       }
       #splitBox{
         position: relative;
-        min-height: 200px;
+        /*min-height: 10em;*/
       }
       #dropDown{
         margin-top:20px;
@@ -151,7 +155,6 @@
                 "chartId":"",
                 "showCompChart":false,
                 "parent":false,
-                "childLength":0,
                 "children": []
               }
             }
@@ -230,87 +233,53 @@
       }
       createSplitLayout(e){
         let getId=this.id
-        let itemId, itemId1, parentObj
+        let itemId, itemId1
         let getObj = this.createNewIdNestedObj(getId)
 
         let parentId = getObj.parentId,
             objIdx = getObj.objIdx,
-            ObjNested = getObj.ObjNested
+            ObjNested = getObj.ObjNested,
+            parentObj = getObj.parentObj
 
-        let setParent=false
-
-        if(!this.get(getObj.parentObj+".childLength") && this.get(ObjNested).length==2){
-          setParent = true
+        if(this.get(ObjNested).length==2){
           itemId = getId+"_0"
-          this.set("childObj.id",itemId)
-          ObjNested = this.createNewIdNestedObj(itemId).ObjNested
-          this.push(ObjNested,this.childObj)
-
-          debugger
+          let getNewObj = this.createNewIdNestedObj(itemId)
+          ObjNested = getNewObj.ObjNested
+          parentObj = getNewObj.parentObj
         } else {
           itemId = parentId+"_"+(objIdx+1)
-          this.set("childObj.id",itemId)
-          this.push(ObjNested,this.childObj)
-          debugger
         }
-
-        let verticalKey = getObj.parentObj+".vertical",
+        this.set("childObj.id",itemId)
+        this.push(ObjNested,this.childObj)
+        let verticalKey = parentObj+".vertical",
             vertical = e.currentTarget.id=='horz'
         this.set(verticalKey,vertical)
-        let childLengthKey = getObj.parentObj+".childLength",
-            childLength = setParent?2:0
-        this.set(childLengthKey,childLength)
 
-
-// debugger
+        this.updateObjRedux()
+        this.$.dropDown.close();
+      }
+      updateObjRedux(){
         this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
         this.set("layoutAreaChk",!this.layoutAreaChk)
         this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
-
-
-
-
-        // let eleDiv = document.createElement('inner-layout-div');
-        // let eleDiv2 = document.createElement('inner-layout-div')
-        // let eleSplit = document.createElement('inner-layout-split');
-        // let vertical = e.currentTarget.id=='horz'
-        // let childElemCount = this.parentNode.children.length
-        // let chartBox = this.$.splitBox.querySelector("#chartBox")
-        // if(childElemCount==1 || childElemCount==2 && chartBox){
-        //   this.set('align',vertical)
-        //   this.parentNode.appendChild(eleDiv)
-        // }else if(childElemCount==2){
-        //   if(this.$.splitBox.lastChild.tagName!="INNER-LAYOUT-SPLIT"){
-        //     eleSplit.set('freeze',"true")
-        //     eleSplit.set('align',vertical)
-        //     this.$.splitBox.appendChild(eleSplit)
-        //     this.$.splitBox.lastChild.$.grid.appendChild(eleDiv)
-        //     this.$.splitBox.lastChild.$.grid.appendChild(eleDiv2)
-        //   }
-        // }
-        this.$.dropDown.close();
       }
       createNewIdNestedObj(getId){
         let splitId=getId.split("_")
         let assignId = getId.split("_")
         let splitIdSize = splitId.length
         let objIdx = (+splitId[splitIdSize-1])
-        let parentId, ObjNested, parentObj
-        // let splitCheck = true
         splitId.pop()
-        parentObj = splitId.join(".children.")
-        parentId = splitId.join("_")
-        ObjNested = splitId.join(".children.")+".children"
+        let parentObj = splitId.join(".children."),
+            parentId = splitId.join("_"),
+            ObjNested = splitId.join(".children.")+".children"
 
         return{parentId,ObjNested,objIdx,parentObj}
       }
       deleteSplitLayout(e){
-        //   this.set('addRemove',true);
-        if(this.parentNode.children.length == 1){
-          this.parentNode.remove()
-        }else{
-          this.remove()
-        }
+        let parentNested = this.createNewIdNestedObj(this.id).ObjNested
+        let updatedObj = this.get(parentNested).filter(item=>item.id!=this.id)
+        this.set(parentNested,updatedObj)
+        this.updateObjRedux()
         this.$.dropDown.close();
       }
     }
