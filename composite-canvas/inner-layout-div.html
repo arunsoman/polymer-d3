@@ -43,32 +43,7 @@
       :host #splitter{
         display:none;
       }
-      paper-dialog {
-        top: 5%;
-        left: 2%;
-        width: 90%;
-        margin: 0;
-        position: relative;
-      }
-      paper-icon-button.dialog-close {
-        width: 25px;
-        height: 25px;
-        position: absolute;
-        right: -12px;
-        top: -12px;
-        background: white;
-        color:grey;
-        border: 1px solid #ededed;
-        border-radius: 50%;
-        padding: 4px;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        z-index: 999;
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-    }
+
     </style>
     <div id="splitBox">
       <header>
@@ -88,10 +63,6 @@
       <template is="dom-if" if="{{showCompChart}}" restamp="true">
         <paper-icon-button icon="remove" on-click="removeChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
       </template>
-      <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
-        <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
-        <chart-holder settings-visible composite-value selected-item="{{selectedItem}}"></chart-holder>
-      </paper-dialog>
     </header>
     <template is="dom-if" if="[[chartAvailabilityChk(itemObj,childSource)]]" restamp="true">
       <div id="chartBox">[[itemObj.chart]]</div>
@@ -148,13 +119,12 @@
               return{
                 "id": "",
                 "vertical": false,
-                "name": "",
                 "freeze": false,
                 "style": "ssss",
                 "chart": "",
                 "chartId":"",
+                "paragraphId":"",
                 "showCompChart":false,
-                "parent":false,
                 "children": []
               }
             }
@@ -174,6 +144,22 @@
               let layoutAreaChk = chartPath && chartPath.layoutAreaChk
               return layoutAreaChk
             }
+          },
+          chartAvailableModalChk:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let chartAvailableModalChk = chartPath && chartPath.chartAvailableModalChk
+              return chartAvailableModalChk
+            }
+          },
+          currentObjNested:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let currentObjNested = chartPath && chartPath.currentObjNested
+              return currentObjNested
+            }
           }
 
         }
@@ -191,7 +177,20 @@
               type: 'COMPOSITE_SPLIT_AREA_CHK',
               value: layoutAreaChk
             }
+          },
+          chartAvailableModal(chartAvailableChk) {
+            return {
+              type: 'CHART_AVAILABLE_MODAL_CHK',
+              value: chartAvailableChk
+            }
+          },
+          currentObjNested(currentObjNested) {
+            return {
+              type: 'CURRENT_NESTED_OBJ',
+              value: currentObjNested
+            }
           }
+
         }
       }
       chartAvailabilityChk(itemObj,child){
@@ -204,6 +203,8 @@
         chartIdChk && setTimeout(()=>{
           let chart = document.createElement(this.itemObj.chart)
           chart.id=this.itemObj.chartId
+          chart.parentId=this.itemObj.paragraphId
+          chart.showCompChart=this.showCompChart
           this.root.querySelector("#chartBox").appendChild(chart)
         })
       }
@@ -211,19 +212,25 @@
         this.$.dropDown.open();
       }
       showChart() {
-        this.$.chartSelectedModal.open();
-        this.set("showCompChart",true)
-        this.$.chartSelectedModal.backdropElement.toggleAttribute("hidden",true)
-        // debugger
+        this.getCurrentNestedObj()
+        this.set("chartAvailableModalChk",!this.chartAvailableModalChk)
+        this.dispatch("chartAvailableModal", {uuid:this.uuid,chartAvailableModalChk:this.chartAvailableModalChk})
       }
-      dialogClose(){
-        this.$.chartSelectedModal.close();
-        this.set("showCompChart",false)
+      getCurrentNestedObj(){
+        let getObj = this.createNewIdNestedObj(this.id)
+        let curntObjNested = getObj.currentObjNested
+        this.set("currentNestedObj", curntObjNested)
+        this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:this.currentNestedObj})
       }
+
       removeChart(){
-        let chartBox = this.$.splitBox.querySelector("#chartBox")
-        chartBox.remove()
-        this.set("showCompChart",false)
+        // let chartBox = this.$.splitBox.querySelector("#chartBox")
+        // chartBox.remove()
+        // this.set("showCompChart",false)
+        let getObj = this.createNewIdNestedObj(this.id)
+        let chartRemoveChk = true
+        this.chartIsAvailableSetChildData("","",getObj,chartRemoveChk)
+        this.updateObjRedux()
       }
       // checkDialog(){
       //
@@ -246,6 +253,8 @@
           let getNewObj = this.createNewIdNestedObj(itemId)
           ObjNested = getNewObj.ObjNested
           parentObj = getNewObj.parentObj
+          let showCompChart = this.get(parentObj).showCompChart
+          showCompChart&&this.chartIsAvailableSetChildData(parentObj,showCompChart)
         } else {
           itemId = parentId+"_"+(objIdx+1)
         }
@@ -257,6 +266,34 @@
 
         this.updateObjRedux()
         this.$.dropDown.close();
+      }
+      chartIsAvailableSetChildData(parentObj,showCompChart,getObj,chartRemoveChk){
+        if(getObj){
+          let parentNested = getObj.ObjNested
+          let updatedObj = this.get(parentNested).filter(item=>item.id!=this.id)
+          let parentObj = getObj.parentObj
+          this.set(parentObj+".showCompChart",false)
+          this.set(parentObj+".chartId","")
+          this.set(parentObj+".chart","")
+          this.set(parentObj+".paragraphId","")
+          if(chartRemoveChk){
+            let currentObjNested = getObj.currentObjNested
+            this.set(currentObjNested+".showCompChart",false)
+            this.set(currentObjNested+".chartId","")
+            this.set(currentObjNested+".chart","")
+            this.set(currentObjNested+".paragraphId","")
+          }else{
+            this.set(parentNested,updatedObj)
+          }
+        }else{
+          let chartId = this.get(parentObj).chartId
+          let paragraphId = this.get(parentObj).paragraphId
+          let chart = this.get(parentObj).chart
+          this.set("childObj.showCompChart",showCompChart)
+          this.set("childObj.chartId",chartId)
+          this.set("childObj.chart",chart)
+          this.set("childObj.paragraphId",paragraphId)
+        }
       }
       updateObjRedux(){
         this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
@@ -271,14 +308,14 @@
         splitId.pop()
         let parentObj = splitId.join(".children."),
             parentId = splitId.join("_"),
-            ObjNested = splitId.join(".children.")+".children"
+            ObjNested = splitId.join(".children.")+".children",
+            currentObjNested = assignId.join(".children.")
 
-        return{parentId,ObjNested,objIdx,parentObj}
+        return{parentId,ObjNested,objIdx,parentObj,currentObjNested}
       }
       deleteSplitLayout(e){
-        let parentNested = this.createNewIdNestedObj(this.id).ObjNested
-        let updatedObj = this.get(parentNested).filter(item=>item.id!=this.id)
-        this.set(parentNested,updatedObj)
+        let getObj = this.createNewIdNestedObj(this.id)
+        this.chartIsAvailableSetChildData("","",getObj)
         this.updateObjRedux()
         this.$.dropDown.close();
       }

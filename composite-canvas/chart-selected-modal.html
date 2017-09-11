@@ -1,0 +1,55 @@
+<dom-module id="chart-selected-modal">
+  <template>
+    <style>
+      paper-dialog {
+        top: 5%;
+        left: 2%;
+        width: 90%;
+        margin: 0;
+        position: relative;
+      }
+      paper-icon-button.dialog-close {
+        width: 25px;
+        height: 25px;
+        position: absolute;
+        right: -12px;
+        top: -12px;
+        background: white;
+        color:grey;
+        border: 1px solid #ededed;
+        border-radius: 50%;
+        padding: 4px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 999;
+        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+    <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
+      <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
+      <chart-holder uuid="[[uuid]]" settings-visible composite-value model-check="{{modelCheck}}"></chart-holder>
+    </paper-dialog>
+  </template>
+  <script>
+    class chartSelectedModal extends Polymer.Element{
+      static get is(){
+        return "chart-selected-modal"
+      }
+      static get properties(){
+        return{
+          modelCheck:{
+            type:Boolean,
+            observer:"dialogClose"
+          }
+        }
+      }
+      dialogClose(){
+        this.$.chartSelectedModal.close();
+      }
+    }
+    customElements.define(chartSelectedModal.is, chartSelectedModal)
+  </script>
+</dom-module>

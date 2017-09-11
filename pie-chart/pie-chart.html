@@ -23,11 +23,13 @@
     font-size: 12px;
   }
   </style>
-  <chart-input-group  uuid="[[uuid]]">
-    <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
-    <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
-  </chart-input-group>
-  <chart-settings uuid="[[uuid]]"></chart-settings>
+  <template is="dom-if" if="[[!showCompChart]]" restamp="true">
+    <chart-input-group  uuid="[[uuid]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <chart-settings uuid="[[uuid]]"></chart-settings>
+  </template>
   <div id="chartContainer"></div>
 </template>
   <script>

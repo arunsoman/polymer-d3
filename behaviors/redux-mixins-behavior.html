@@ -63,8 +63,20 @@
             case 'COMPOSITE_SPLIT_AREA_CHK':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
-                  layoutAreaChk:Object.assign({},state[action.value.uuid].layoutAreaChk,action.value.layoutAreaChk)
+                  layoutAreaChk:action.value.layoutAreaChk
                 })})
+            case 'CHART_AVAILABLE_MODAL_CHK':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  chartAvailableModalChk:action.value.chartAvailableModalChk
+                })})
+            case 'CURRENT_NESTED_OBJ':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  currentNestedObj:action.value.currentNestedObj
+                })})
+
+
 
           default:
               return state;

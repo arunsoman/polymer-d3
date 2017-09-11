@@ -116,10 +116,7 @@
         value:() => { return {}},
         notify:true
       },
-      showCompChart:{
-        type:Boolean,
-        notify:true
-      },
+
       // Object desctibing selected chart type
       selectedChart: {
         type: Object,
@@ -175,8 +172,76 @@
       },
       paragraphId:{
         type:String
+      },
+
+      showCompChart:{
+        type:Boolean,
+        // notify:true
+        // statePath(state){
+        //   let chartPath = state.charts[this.uuid]
+        //   let currentNestedObj = chartPath && chartPath.currentNestedObj
+        //   let showCompChart = currentNestedObj && this.get(currentNestedObj).showCompChart
+        //   return showCompChart
+        // }
+      },
+      currentNestedObj:{
+        type:String,
+        statePath(state){
+          let chartPath = state.charts[this.uuid]
+          let currentNestedObj = chartPath && chartPath.currentNestedObj
+          return currentNestedObj
+        }
+      },
+      chartData:{
+        type:Object,
+        statePath(state){
+          let chartPath = state.charts[this.uuid]
+          let compositeChartData = chartPath && chartPath.compositeChartData
+          return compositeChartData
+        }
+      },
+      layoutAreaChk:{
+        type:Boolean,
+        statePath(state){
+          let chartPath = state.charts[this.uuid]
+          let layoutAreaChk = chartPath && chartPath.layoutAreaChk
+          return layoutAreaChk
+        }
+      },
+      modelCheck:{
+        type:Boolean,
+        notify:true
       }
     }
+  }
+
+  static get actions() {
+    return {
+      addUpdateChartData(addUpdateChartData) {
+        return {
+          type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
+          value: addUpdateChartData
+        }
+      },
+      splitAreaChk(layoutAreaChk) {
+        return {
+          type: 'COMPOSITE_SPLIT_AREA_CHK',
+          value: layoutAreaChk
+        }
+      },
+      currentObjNested(currentObjNested) {
+        return {
+          type: 'CURRENT_NESTED_OBJ',
+          value: currentObjNested
+        }
+      }
+    }
+  }
+  updateObjRedux(){
+    this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
+    this.set("layoutAreaChk",!this.layoutAreaChk)
+    this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
+    this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
   }
 
   constructor(){
@@ -200,7 +265,8 @@
   // on selected chart changed
   // is also used to draw first chart
   _selectedChanged(selectedChart) {
-    if(selectedChart && this.paragraphId){
+    let getparagraphId = this.uuid?this.uuid.split("@")[0]:this.paragraphId
+    if(selectedChart && getparagraphId){
       let elem;
     if(!this.compositeValue){
       this.$$('.chartHolder').innerHTML = ''
@@ -212,18 +278,25 @@
       this,
       selectedChart.element,
       '.chartHolder',
-      this.paragraphId
+      getparagraphId
       );
       this.selectedChartObj = elem;
       this.selectedChartObj.chartInfo = this.selectedChart;
-      if(this.showCompChart){
-        elem.set("showCompChart",this.showCompChart)
-        let chartBox = document.createElement("div")
-        chartBox.id = "chartBox"
-        chartBox.appendChild(elem)
-        this.getRootNode().querySelector("#splitBox").appendChild(chartBox)
-        this.parentNode.close()
-      }else {
+      if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){
+        let showCompChart = this.currentNestedObj+".showCompChart"
+        let chart = this.currentNestedObj+".chart"
+        let chartId = this.currentNestedObj+".chartId"
+        let areaId = this.get(this.currentNestedObj+".id")
+        let getChartId = this.uuid+"@_"+areaId
+        let chartElement = this.selectedChart.element
+        let paragraphId = this.currentNestedObj+".paragraphId"
+        this.set(showCompChart,true)
+        this.set(chart,chartElement)
+        this.set(chartId,getChartId)
+        this.set(paragraphId,getparagraphId)
+        this.set("modelCheck",!this.modelCheck)
+        this.updateObjRedux()
+      }else{
         this.selectedChartObj.showCompChart = false
       }
     }
