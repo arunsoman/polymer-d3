@@ -128,6 +128,7 @@
     connectedCallback(){
       super.connectedCallback();
       this.initializeChart();
+      debugger
       this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
     }
     _chartDraw(){
