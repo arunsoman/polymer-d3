@@ -10,35 +10,37 @@
   <template>
     <style>
       :host{
-        /*min-height: 20em;*/
         min-height: 40vh;
       }
       header{
-        border-bottom:1px #d3d3d3 solid;
+        border-bottom:1px #f6f6f6 solid;
       }
       #splitBox{
         position: relative;
-        /*min-height: 10em;*/
       }
       #dropDown{
         margin-top:20px;
-        border: 1px lightgrey solid;
+        border: 1px #e9e9e9 solid;
         background-color: white;
       }
       #dropDown paper-item{
-        width: 29px;
+        min-width: 49px;
         min-height: 16px;
         cursor: pointer;
         font: 10px sans-serif;
-        border-bottom: 1px lightgrey solid;
-      }
-      #dropDown paper-item:last-child{
         border-bottom:none;
+        padding: 2px 7px;
+      }
+      #dropDown paper-item+paper-item,
+      #dropDown paper-item+dom-if+paper-item,
+      #dropDown paper-item+dom-if+dom-if+paper-item{
+        border-top: 1px #e9e9e9 solid;
       }
       .paperIconBtn, .addRemoveBtn{
         padding:5px;
         width: 25px;
         height: 25px;
+        color: #939393
       }
       :host #splitter{
         display:none;
@@ -55,17 +57,25 @@
           <template is="dom-if" if="{{!freeze}}">
             <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
           </template>
+          <template is="dom-if" if="{{!showCompChart}}" restamp="true">
+            <paper-item on-click="showChart">Add Chart</paper-item>
+          </template>
+          <template is="dom-if" if="{{showCompChart}}" restamp="true">
+            <paper-item on-click="removeChart" >Remove Chart</paper-item>
+          </template>
         </div>
       </iron-dropdown>
-      <template is="dom-if" if="{{!showCompChart}}" restamp="true">
+      <!-- <template is="dom-if" if="{{!showCompChart}}" restamp="true">
         <paper-icon-button icon="add" on-click="showChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
       </template>
       <template is="dom-if" if="{{showCompChart}}" restamp="true">
         <paper-icon-button icon="remove" on-click="removeChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
-      </template>
+      </template> -->
     </header>
     <template is="dom-if" if="[[chartAvailabilityChk(itemObj,childSource)]]" restamp="true">
-      <div id="chartBox">[[itemObj.chart]]</div>
+      <div id="chartBox">
+        <!-- [[itemObj.chart]] -->
+      </div>
     </template>
     <template is="dom-if" if="[[childSource.length]]" restamp="true">
       <recursive-elem uuid="[[uuid]]" split-data="{{childSource}}" id="{{id}}" vertical="[[itemObj.vertical]]"></recursive-elem>
@@ -93,20 +103,13 @@
             value:false,
             notify:true
           },
-          addRemove:{
-            type:Boolean,
-            value:true,
-            notify:true
-          },
-          selectedItem:{
-            type:Object,
-            value:() => {return {};},
-            notify:true
-          },
           showCompChart:{
             type:Boolean
           },
           style:{
+            type:String
+          },
+          chartUUID:{
             type:String
           },
           chartIdChk:{
@@ -160,6 +163,34 @@
               let currentObjNested = chartPath && chartPath.currentObjNested
               return currentObjNested
             }
+          },
+          compChartObjs:{
+            type:Object,
+            statePath(state){
+              var chartPath = state.charts[this.uuid]
+              let keyChk = chartPath && Object.keys(chartPath.inputs).length
+              let compChartInputs = keyChk ? chartPath.inputs:{}
+              let compChartAxisKeys = keyChk && Object.keys(chartPath.inputs)
+              let compChartSettings = chartPath && state.charts[this.uuid].settings
+              let parentId=this.uuid.split("@")[0]
+              let source = state.data[parentId].source
+              let externals = state.data[parentId].externals
+              let objAssignChk = (chartPath && chartPath.settings)
+              let stacked = objAssignChk&&chartPath.settings.stacked.value
+              let group = objAssignChk&&chartPath.settings.group.value
+              return {compChartInputs,compChartAxisKeys,compChartSettings,source,externals,stacked,group}
+            }
+          },
+          chartWidth:{
+            type:String
+          },
+          trackWidth:{
+            type:Boolean,
+            observer:"getChildWidth"
+          },
+          trackChartObj:{
+            type:Object,
+            notify:true
           }
 
         }
@@ -189,9 +220,39 @@
               type: 'CURRENT_NESTED_OBJ',
               value: currentObjNested
             }
+          },
+          currentChartDeleted(currentChartDeleted) {
+            return {
+              type: 'CURRENT_CHART_DELETED',
+              value: currentChartDeleted
+            }
           }
 
         }
+      }
+      getChildWidth(){
+        let trackChartId = this.trackChartObj.trackChartId,
+            trackChartIdChk = this.trackChartObj.trackChartIdChk
+        trackChartIdChk?this.set("trackChartObj.trackChartId",[]):trackChartId
+        if(this.chartUUID){
+          let chart = this.root.querySelector("#chartBox").children[0]
+          trackChartIdChk?this.unshift("trackChartObj.trackChartId",chart):
+          trackChartId.indexOf(chart)==-1 && this.push("trackChartObj.trackChartId",chart)
+
+          let chartWidth = this.offsetWidth-50
+          trackChartId[1] == chart && (chartWidth = this.parentNode.offsetWidth - (trackChartId[0].chartWidth+70))
+
+          chart.set("chartWidth",chartWidth)
+          chart.redraw()
+
+          trackChartIdChk && this.set("trackChartObj.trackChartIdChk",false)
+        }
+        let getObj = this.createNewIdNestedObj(this.id)
+        let curntObjNested = getObj.currentObjNested
+        let style = this.getAttribute("style")
+        this.set(curntObjNested+".style",style)
+        this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
+
       }
       chartAvailabilityChk(itemObj,child){
         this.set("chartIdChk",child.length<=0 && itemObj.chart!="")
@@ -202,9 +263,13 @@
         this.setAttribute("style",this.itemObj.style)
         chartIdChk && setTimeout(()=>{
           let chart = document.createElement(this.itemObj.chart)
-          chart.id=this.itemObj.chartId
+          this.set("chartUUID",this.itemObj.chartId)
+          chart.id=this.chartUUID
           chart.parentId=this.itemObj.paragraphId
           chart.showCompChart=this.showCompChart
+          chart.set("compChartObjs",this.compChartObjs)
+          chart.set("chartWidth",(this.offsetWidth-50))
+
           this.root.querySelector("#chartBox").appendChild(chart)
         })
       }
@@ -215,6 +280,7 @@
         this.getCurrentNestedObj()
         this.set("chartAvailableModalChk",!this.chartAvailableModalChk)
         this.dispatch("chartAvailableModal", {uuid:this.uuid,chartAvailableModalChk:this.chartAvailableModalChk})
+        this.set("trackChartObj.trackChartIdChk",true)
       }
       getCurrentNestedObj(){
         let getObj = this.createNewIdNestedObj(this.id)
@@ -227,7 +293,9 @@
         let getObj = this.createNewIdNestedObj(this.id)
         let chartRemoveChk = true
         this.chartIsAvailableSetChildData("","",getObj,chartRemoveChk)
+        this.dispatch("currentChartDeleted", {uuid:this.chartUUID})
         this.updateObjRedux()
+        this.set("trackChartObj.trackChartIdChk",true)
       }
       // checkDialog(){
       //
@@ -260,7 +328,7 @@
         let verticalKey = parentObj+".vertical",
             vertical = e.currentTarget.id=='horz'
         this.set(verticalKey,vertical)
-
+        this.set("trackChartObj.trackChartIdChk",true)
         this.updateObjRedux()
         this.$.dropDown.close();
       }
@@ -314,6 +382,7 @@
         let getObj = this.createNewIdNestedObj(this.id)
         this.chartIsAvailableSetChildData("","",getObj)
         this.updateObjRedux()
+        this.set("trackChartObj.trackChartIdChk",true)
         this.$.dropDown.close();
       }
     }

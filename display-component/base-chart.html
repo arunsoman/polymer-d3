@@ -32,7 +32,7 @@
             let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
-            return keys
+            return this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
           }
         },
         inputs:{
@@ -41,7 +41,8 @@
           statePath(state){
             var chartPath = state.charts[this.uuid]
             let keyChk = chartPath && Object.keys(chartPath.inputs).length
-            return keyChk ? chartPath.inputs:{}
+            let inputData = keyChk ? chartPath.inputs:{}
+            return this.compChartObjs?this.compChartObjs.compChartInputs:inputData
           },
           readOnly:true
         },
@@ -128,7 +129,6 @@
     connectedCallback(){
       super.connectedCallback();
       this.initializeChart();
-      debugger
       this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
     }
     _chartDraw(){
@@ -151,7 +151,12 @@
     }
 
     initializeChart(){
+      if(this.showCompChart){
+        this.set("uuid",this.id)
+        // debugger
+      }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
+    }
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){
@@ -215,6 +220,15 @@
     getChartProperties(obj){
       //"inputCheck" for avoid error from chart
       if(!this.hasInputs(obj.axisIndex))return false
+
+      if(this.compChartObjs){
+        this.set("source",this.compChartObjs.source)
+        this.set("externals",this.compChartObjs.externals)
+        this.set("stacked",this.compChartObjs.stacked)
+        this.set("group",this.compChartObjs.group)
+        // chartWidth
+      }
+
       //axis are mentioned in the chart-input module
       let itemX,itemY,itemZ
       //axis inputs selectedValue assigin
@@ -225,18 +239,24 @@
       obj.stacked && itemZ
 
       let parseDate = d3.time.format('%Y-%m-%d').parse;
-      let width = +this.settings.width.value,
-          height = +this.settings.height.value,
-          margin = {top: 5, right: 40, bottom: 20, left: 120},
-          label= this.settings.legend.values
-          //margin = {top: +this.settings.margin.value.top, right: +this.settings.margin.value.right, bottom: +this.settings.margin.value.bottom, left: +this.settings.margin.value.left}
+      let settings = this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
+      let width = +settings.width.value,
+          height = +settings.height.value,
+          // margin = {top: 5, right: 40, bottom: 20, left: 120},
+          margin = {top: settings.margin.value.top, right: settings.margin.value.right, bottom: settings.margin.value.bottom, left: settings.margin.value.left},
+          label= settings.legend.values,
+          compMargin = {top: 5, right: 0, bottom: 0, left: 0}
+      margin = this.compChartObjs?compMargin:margin
+
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
       width = parseFloat(width -margin.xMargin)
       height = parseFloat(height - margin.yMargin)
 
+      width = this.chartWidth?this.chartWidth:width
+
       let color = d3.scale.category20();
-      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color}
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,settings}
     }
   }
   customElements.define(baseChart.is,baseChart)

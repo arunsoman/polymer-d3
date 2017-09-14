@@ -262,14 +262,7 @@
       this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
     }
     // let showCompChart = (this.showCompChart)
-    elem = PolymerD3.utilities.attachElement.call(
-      this,
-      selectedChart.element,
-      '.chartHolder',
-      getparagraphId
-      );
-      this.selectedChartObj = elem;
-      this.selectedChartObj.chartInfo = this.selectedChart;
+
       this.set("modelCheck",!this.modelCheck)
       if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){
         let showCompChart = this.currentNestedObj+".showCompChart"
@@ -285,7 +278,15 @@
         this.set(paragraphId,getparagraphId)
         this.updateObjRedux()
       }else{
-        this.selectedChartObj.showCompChart = false
+        elem = PolymerD3.utilities.attachElement.call(
+          this,
+          selectedChart.element,
+          '.chartHolder',
+          getparagraphId
+          );
+          this.selectedChartObj = elem;
+          this.selectedChartObj.chartInfo = this.selectedChart;
+          this.selectedChartObj.showCompChart = false
       }
     }
 
