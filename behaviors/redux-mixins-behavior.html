@@ -4,14 +4,16 @@
 
   const chartInitialState = {
       data:{},
-      charts:{}
+      charts:{},
+      commonsettings:{}
 }
 
   const chartAppReducer = (state, action) => {
       state = state || chartInitialState
       let chartObj = {
           data:chartDataReducer(state.data,action),
-          charts: chartReducer(state.charts, action)
+          charts: chartReducer(state.charts, action),
+          commonsettings: chartCommonSettings(state.commonsettings,action)
       }
       return chartObj
   }
@@ -102,6 +104,14 @@
         });
       default:
           return state;
+    }
+  }
+  const chartCommonSettings = (state,action)=>{
+    switch(action.type){
+      case "ADD_COMMON_SETTINGS":
+        return Object.assign({},state,{commonsettings:action.value.settings});
+      default:
+        return state;
     }
   }
 

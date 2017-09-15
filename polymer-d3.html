@@ -3,14 +3,7 @@
 
 <dom-module id="polymer-d3">
 <template>
-<template is="dom-if" if="[[!source]]">
-<file-reader read-as="text" accept=".csv" output-data="{{file}}">
-    <div class="clickHere">Click here to Import csv file</div>
-</file-reader>
-</template>
-<template is="dom-if" if="[[source]]">
-  <chart-holder settings-visible paragraph-id="[[paragraphId]]"></chart-holder settings-visible>
-</template>
+  <chart-holder vertical settings-visible paragraph-id="[[paragraphId]]"></chart-holder>
 </template>
 <script>
   class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
@@ -28,6 +21,11 @@
         },
         file:{
           observer:'transformData'
+        },
+        importFile:{
+          type:Boolean,
+          value:false,
+          observer:'addSettings'
         }
       }
     }
@@ -45,8 +43,17 @@
           type: 'UPDATE_SOURCE',
           value: source
         };
+      },
+      addCommonSettings(settings){
+        return{
+          type:'ADD_COMMON_SETTINGS',
+          value:settings
+        }
       }
     }
+  }
+  addSettings(){
+    this.dispatch('addCommonSettings',{id:this.paragraphId,settings:{importFile:this.importFile}});
   }
   transformData(e) {
       var me = this;

@@ -1,4 +1,5 @@
-<link rel="import" href="../../polymer/polymer-element.html">
+<!-- <link rel="import" href="../../polymer/polymer-element.html"> -->
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="chart-selector">
   <template>
     <style>
@@ -20,28 +21,22 @@
         height: 34px;
         width: 34px;
       }
-      /*paper-icon-button:after {
-        background: black;
-        border-radius: 2px;
-        color: white;
-        content: attr(data-title);
-        font-size: 10px;
-        left: -50%;
-        opacity: 0.8;
-        padding: 2px;
-        position: absolute;
-        top: -10px;
-        transform: scale(0);
-        transition: all 1s ease;
-        white-space: nowrap;
-      }*/
+      paper-tab[disabled]{
+        opacity: 0.2;
+      }
+     
       paper-tabs{
         --paper-tabs-selection-bar-color: #000000;
       }
     </style>
     <paper-tabs selected="0" scrollable>
-    <template is="dom-repeat" items="{{charts}}">
-      <paper-tab>
+    <template is="dom-if" if="[[fileImport]]">
+        <paper-tab>
+          <file-reader read-as="text" accept=".csv" paragraph-id="[[paragraphId]]" activate-tabs="{{activateTabs}}"></file-reader>
+        </paper-tab>
+    </template>
+    <template is="dom-repeat" items="{{charts}}" restamp>
+      <paper-tab disabled="{{!activateTabs}}">
         <paper-icon-button
           icon="[[item.icon]]"
           title="[[item.label]]"
@@ -53,13 +48,19 @@
 
   </template>
   <script>
-  class chartSelector extends Polymer.Element{
+  class chartSelector extends ReduxMixinBehavior(Polymer.Element){
     static get is(){return 'chart-selector'}
     static get properties(){
       return{
+        activateTabs:{
+          type:Boolean,
+          value:true
+        },
         charts: {
           type: Array,
-          value: () => { return [];}
+          notify:true,
+          value: () => { return [];},
+          observer:'chartChange'
         },
         selectedBtn: {
           type: Object,
@@ -69,10 +70,23 @@
           type: Object,
           value: () => { return {};},
           notify: true
+        },
+        fileImport:{
+          type:Array,
+          statePath:'commonsettings.commonsettings.importFile',
+          observer:'fileImported'
         }
       }
     }
+    checkTabActive(){
+      console.log(this.fileImport ? !this.activateTabs : !this.activateTabs);
+      return this.fileImport ? !this.activateTabs : !this.activateTabs;
+    }
+    fileImported(e){
+      this.set('activateTabs',!e);
+    }
     connectedCallback(){
+      super.connectedCallback();
       this.set('selected', {
             callBack:"initTable",
             element:"polymerd3-table",
