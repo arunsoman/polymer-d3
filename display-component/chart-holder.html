@@ -196,6 +196,14 @@
           return layoutAreaChk
         }
       },
+      compChartUUIDChk:{
+        type:Boolean,
+        statePath(state){
+          let chartPath = state.charts[this.uuid]
+          let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
+          return compChartUUIDChk?compChartUUIDChk:false
+        }
+      },
       modelCheck:{
         type:Boolean,
         notify:true
@@ -222,6 +230,12 @@
           type: 'CURRENT_NESTED_OBJ',
           value: currentObjNested
         }
+      },
+      compChartUUIDChk(compChartUUIDChk) {
+        return {
+          type: 'COMP_CHART_UUID_CHK',
+          value: compChartUUIDChk
+        }
       }
     }
   }
@@ -230,6 +244,10 @@
     this.set("layoutAreaChk",!this.layoutAreaChk)
     this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
     this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
+    if(!this.compChartUUIDChk){
+      this.set("compChartUUIDChk",!this.compChartUUIDChk)
+      this.dispatch("compChartUUIDChk", {uuid:this.uuid,compChartUUIDChk:this.compChartUUIDChk})
+    }
   }
 
   constructor(){

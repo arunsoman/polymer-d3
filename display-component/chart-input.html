@@ -199,6 +199,30 @@
         exclude:{
           type:Array,
           value:[]
+        },
+        compChartUUIDChk:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
+            return compChartUUIDChk
+          }
+        },
+        axisKeys:{
+          type:String,
+          statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            return keyChk && Object.keys(chartPath.inputs)
+          }
+        },
+        layoutAreaChk:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.parentNode.uuid]
+            let layoutAreaChk = chartPath && chartPath.layoutAreaChk
+            return layoutAreaChk
+          }
         }
       }
     }
@@ -215,6 +239,12 @@
             type: 'REMOVE_CHART_INPUTS',
             value: removeInput
           };
+        },
+        splitAreaChk(layoutAreaChk) {
+          return {
+            type: 'COMPOSITE_SPLIT_AREA_CHK',
+            value: layoutAreaChk
+          }
         }
       }
     }
@@ -223,11 +253,18 @@
     }
     constructor(){
       super();
-
     }
     connectedCallback(){
       super.connectedCallback()
     }
+    axisKeysAvailability(action){
+      let actionChk= action=="add"?this.axisKeys.length>=2:this.axisKeys.length<=2
+      if(this.compChartUUIDChk && actionChk){
+        this.set("layoutAreaChk",!this.layoutAreaChk)
+        this.dispatch("splitAreaChk", {uuid:this.parentNode.uuid,layoutAreaChk:this.layoutAreaChk})
+      }
+    }
+
     _transformAccept(item){
       if(item){
         this.set('_accepts',item.split(','));
@@ -247,6 +284,8 @@
         this.push("selectedObjs",selectedObject)
         this.push("itemGrp",selectedObject.key)
         this.setInputObj()
+        let action = "add"
+        this.axisKeysAvailability(action)
     }
     remove(e) {
         this.splice('selectedValue', e.model.tagIndex, 1);
@@ -256,6 +295,7 @@
         let slctedValLength= this.input[this.axis]?this.input[this.axis].selectedValue.length:0
         slctedValLength==0 ? this.dispatch("removeInputs", {uuid:this.parentNode.uuid,objKey:key})
           : this.setInputObj()
+        this.axisKeysAvailability()
     }
     setInputObj(){
       let input = {}

@@ -37,7 +37,7 @@
     </div>
 
   </template>
-  
+
 <script>
 
     class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
@@ -68,18 +68,7 @@
                   return state.data[this.paragraphId].source
                 }
               }
-            }//,
-            // inputs:{
-            //   type:Array,
-            //   statePath(state){
-            //     return state.charts[this.uuid]['inputs']
-            //   }
-            // },
-            // inputObj:{
-            //   type:Object,
-            //   value:{}
-            // }
-
+            }
           }
         }
         static get actions() {
@@ -98,6 +87,7 @@
             }
           }
         }
+
         init(e){
           this.set('paragraphId',this.uuid.split('@')[0]);
         }

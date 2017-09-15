@@ -108,10 +108,6 @@
         }
       }
     }
-    static get observers(){
-      // return["_chartDraw(inputs)"]
-    }
-
     constructor(){
       super();//baseChart
 
@@ -123,6 +119,12 @@
             type: 'UPDATE_CHART',
             value: chartProperies
           };
+        },
+        splitAreaChk(layoutAreaChk) {
+          return {
+            type: 'COMPOSITE_SPLIT_AREA_CHK',
+            value: layoutAreaChk
+          }
         }
       };
     }
@@ -153,7 +155,6 @@
     initializeChart(){
       if(this.showCompChart){
         this.set("uuid",this.id)
-        // debugger
       }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
     }
