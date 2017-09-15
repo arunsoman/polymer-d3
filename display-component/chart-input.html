@@ -258,7 +258,9 @@
       super.connectedCallback()
     }
     axisKeysAvailability(action){
+      let axisYKeyChk = this.axisKeys.indexOf("y")!=-1
       let actionChk= action=="add"?this.axisKeys.length>=2:this.axisKeys.length<=2
+      actionChk = axisYKeyChk && actionChk
       if(this.compChartUUIDChk && actionChk){
         this.set("layoutAreaChk",!this.layoutAreaChk)
         this.dispatch("splitAreaChk", {uuid:this.parentNode.uuid,layoutAreaChk:this.layoutAreaChk})
