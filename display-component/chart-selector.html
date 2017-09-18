@@ -88,7 +88,7 @@
     }
     fileImported(e){
       if(!this.activateImport){
-        e = !e;
+        e = false;
         this.fileImport = false;
       }
       this.set('activateTabs',!e);
