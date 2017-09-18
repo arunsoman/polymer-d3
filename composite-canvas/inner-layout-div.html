@@ -170,7 +170,6 @@
             type:Object,
             notify:true
           }
-
         }
       }
       static get actions() {
@@ -207,6 +206,10 @@
           }
 
         }
+      }
+      chartLayoutUpdate(){
+        this.set("layoutAreaChk",!this.layoutAreaChk)
+        this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
       }
 
       getChildWidth(){
@@ -341,8 +344,7 @@
       }
       updateObjRedux(){
         this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
-        this.set("layoutAreaChk",!this.layoutAreaChk)
-        this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
+        this.chartLayoutUpdate()
       }
       createNewIdNestedObj(getId){
         let splitId=getId.split("_")

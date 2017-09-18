@@ -91,6 +91,24 @@
             let chartAvailableModalChk = chartPath && chartPath.chartAvailableModalChk
             return chartAvailableModalChk
           }
+        },
+        group:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            return objAssignChk&&chartPath.settings.group.value
+          },
+          observer:"areaChk"
+        },
+        stacked:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            return objAssignChk&&chartPath.settings.stacked.value
+          },
+          observer:"areaChk"
         }
       }
     }

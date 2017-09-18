@@ -95,7 +95,9 @@
           statePath(state){
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
-            return objAssignChk&&chartPath.settings.stacked.value
+            let stacked = objAssignChk&&chartPath.settings.stacked.value
+            let compStacked = this.compChartObjs && this.compChartObjs.stacked
+            return compStacked?compStacked:stacked
           }
         },
         group:{
@@ -103,7 +105,9 @@
           statePath(state){
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
-            return objAssignChk&&chartPath.settings.group.value
+            let group = objAssignChk&&chartPath.settings.group.value
+            let compGroup = this.compChartObjs && this.compChartObjs.group
+            return compGroup?compGroup:group
           }
         },
         compChartUUIDChk:{
@@ -233,13 +237,9 @@
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
       if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
 
-
       if(this.compChartObjs){
         this.set("source",this.compChartObjs.source)
         this.set("externals",this.compChartObjs.externals)
-        this.set("stacked",this.compChartObjs.stacked)
-        this.set("group",this.compChartObjs.group)
-        // chartWidth
       }
 
       //axis are mentioned in the chart-input module
