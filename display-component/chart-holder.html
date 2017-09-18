@@ -5,6 +5,7 @@
   <template is="dom-if" if="{{settingsVisible}}">
     <div class="tool-bar">
       <chart-selector
+      activate-import="[[activateImport]]"
       charts="[[availableCharts]]"
       selected="{{selectedChart}}" paragraph-id="[[paragraphId]]" vertical="[[vertical]]"
       ></chart-selector>
@@ -111,7 +112,10 @@
         type:Boolean,
         value:false
       },
-
+      activateImport:{
+        type:Boolean,
+        value:false
+      },
       // Object desctibing selected chart type
       selectedChart: {
         type: Object,

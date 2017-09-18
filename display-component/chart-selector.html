@@ -71,6 +71,10 @@
           value: () => { return {};},
           notify: true
         },
+        activateImport:{
+          type:Boolean,
+          value:false
+        },
         fileImport:{
           type:Array,
           statePath:'commonsettings.commonsettings.importFile',
@@ -83,6 +87,10 @@
       return this.fileImport ? !this.activateTabs : !this.activateTabs;
     }
     fileImported(e){
+      if(!this.activateImport){
+        e = !e;
+        this.fileImport = false;
+      }
       this.set('activateTabs',!e);
     }
     connectedCallback(){
