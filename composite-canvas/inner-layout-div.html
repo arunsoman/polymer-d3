@@ -54,7 +54,7 @@
         <div slot="dropdown-content">
           <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
           <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
-          <template is="dom-if" if="{{!freeze}}">
+          <template is="dom-if" if="[[!itemObj.freeze]]">
             <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
           </template>
           <template is="dom-if" if="{{!showCompChart}}" restamp="true">
@@ -65,20 +65,12 @@
           </template>
         </div>
       </iron-dropdown>
-      <!-- <template is="dom-if" if="{{!showCompChart}}" restamp="true">
-        <paper-icon-button icon="add" on-click="showChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
-      </template>
-      <template is="dom-if" if="{{showCompChart}}" restamp="true">
-        <paper-icon-button icon="remove" on-click="removeChart" class="addRemoveBtn">Add/Remove Chart</paper-icon-button>
-      </template> -->
     </header>
     <template is="dom-if" if="[[chartAvailabilityChk(itemObj,childSource)]]" restamp="true">
-      <div id="chartBox">
-        <!-- [[itemObj.chart]] -->
-      </div>
+      <div id="chartBox"> </div>
     </template>
     <template is="dom-if" if="[[childSource.length]]" restamp="true">
-      <recursive-elem uuid="[[uuid]]" split-data="{{childSource}}" id="{{id}}" vertical="[[itemObj.vertical]]"></recursive-elem>
+      <recursive-elem uuid="[[uuid]]" split-data="{{childSource}}" id="{{id}}" vertical-pos="[[itemObj.vertical]]"></recursive-elem>
     </template>
     </div>
   </template>
@@ -89,20 +81,6 @@
       }
       static get properties(){
         return{
-          align:{
-            type:Boolean,
-            notify:true
-          },
-          valign:{
-            type:Boolean,
-            value:false,
-            notify:true
-          },
-          freeze:{
-            type:String,
-            value:false,
-            notify:true
-          },
           showCompChart:{
             type:Boolean
           },
@@ -123,7 +101,7 @@
                 "id": "",
                 "vertical": false,
                 "freeze": false,
-                "style": "ssss",
+                "style": "",
                 "chart": "",
                 "chartId":"",
                 "paragraphId":"",
@@ -382,6 +360,7 @@
       deleteSplitLayout(e){
         let getObj = this.createNewIdNestedObj(this.id)
         this.chartIsAvailableSetChildData("","",getObj)
+        this.chartUUID && this.dispatch("currentChartDeleted", {uuid:this.chartUUID})
         this.updateObjRedux()
         this.set("trackChartObj.trackChartIdChk",true)
         this.$.dropDown.close();

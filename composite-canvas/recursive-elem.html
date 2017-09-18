@@ -26,10 +26,10 @@
       }
 
     </style>
-    <vaadin-split-layout  vertical="[[vertical]]" id="[[id]]_vaadin" class="customStyle">
-      <div class$="[[getSplitterHandleClass(vertical)]]" on-track="getOnTrack">&nbsp;</div>
+    <vaadin-split-layout  vertical="[[verticalPos]]" id="[[id]]_vaadin" class="customStyle">
+      <div class$="[[getSplitterHandleClass(verticalPos)]]" on-track="getOnTrack">&nbsp;</div>
       <template is="dom-repeat" items="{{splitData}}">
-        <inner-layout-div uuid="[[uuid]]" freeze="{{freeze}}" child-source="{{item.children}}" id="[[item.id]]" item-obj="[[item]]" track-Width="[[trackWidth]]" track-chart-obj="{{trackChartObj}}"></inner-layout-div>
+        <inner-layout-div uuid="[[uuid]]" child-source="{{item.children}}" id="[[item.id]]" item-obj="[[item]]" track-Width="[[trackWidth]]" track-chart-obj="{{trackChartObj}}"></inner-layout-div>
       </template>
     </vaadin-split-layout>
   </template>
