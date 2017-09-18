@@ -14,6 +14,10 @@
   <div class="chartHolder"></div>
 </template>
 <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
   class chartHolder extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
     static get is(){return 'chart-holder'}
     static get properties(){

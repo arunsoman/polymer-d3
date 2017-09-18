@@ -1,4 +1,3 @@
-<!-- <link rel="import" href="../../polymer/polymer-element.html"> -->
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <dom-module id="chart-selector">
   <template>
@@ -48,6 +47,10 @@
 
   </template>
   <script>
+  /**
+* @polymer
+* @extends HTMLElement
+*/
   class chartSelector extends ReduxMixinBehavior(Polymer.Element){
     static get is(){return 'chart-selector'}
     static get properties(){

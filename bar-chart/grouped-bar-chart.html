@@ -1,5 +1,3 @@
-<link rel="import" href="../../polymer/polymer-element.html">
-<link rel="import" href="../bar-chart/bar-chart.html">
 <dom-module id="grouped-bar-chart">
     <template>
         <style>
@@ -38,6 +36,10 @@
         <div id="chartContainer"></div>
     </template>
     <script>
+    /**
+* @polymer
+* @extends HTMLElement
+*/
     class groupedbarChart extends barChart {
         static get is() {
             return 'grouped-bar-chart'

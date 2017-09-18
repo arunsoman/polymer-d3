@@ -1,4 +1,3 @@
-<link rel="import" href="../../polymer/polymer-element.html">
 <link rel="import" href="../bar-chart/bar-chart.html">
 <dom-module id="stacked-bar-chart">
   <template>
@@ -34,6 +33,10 @@
     <div id="chartContainer"></div>
   </template>
   <script>
+  /**
+* @polymer
+* @extends HTMLElement
+*/
   class stackedbarChart extends barChart {
     static get is() {
       return 'stacked-bar-chart'
