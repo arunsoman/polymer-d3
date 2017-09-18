@@ -227,10 +227,9 @@
 
         // append div for toolTip
         let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
-        let offsetTop = this.$.chartContainer.offsetTop+25
         bar.on("mousemove", function(d,i){
-              div.style("left", d3.event.pageX+10+"px");
-              div.style("top", d3.event.pageY-offsetTop+"px");
+              div.style("left", d3.event.offsetX+"px");
+              div.style("top", d3.event.offsetY+"px");
               div.style("display", "inline-block");
               let tTxt = obj.group?d:(d.xKey)+"<br>"+(d.yKey)
               tTxt = obj.group?obj.tlpLabels[i]+", "+tTxt:tTxt
