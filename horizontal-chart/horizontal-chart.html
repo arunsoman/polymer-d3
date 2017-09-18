@@ -233,7 +233,7 @@
               div.style("top", d3.event.pageY-offsetTop+"px");
               div.style("display", "inline-block");
               let tTxt = obj.group?d:(d.xKey)+"<br>"+(d.yKey)
-              tTxt = obj.tlpLabels[i]+", "+tTxt
+              tTxt = obj.group?obj.tlpLabels[i]+", "+tTxt:tTxt
               div.html(tTxt);
           });
         bar.on("mouseout", function(d){
