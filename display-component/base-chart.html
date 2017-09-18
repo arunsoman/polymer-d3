@@ -30,7 +30,7 @@
           type:String,
           statePath(state){
             let chartPath = state.charts[this.uuid]
-            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
             return this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
           }
@@ -40,7 +40,7 @@
           observer:'_chartDraw',
           statePath(state){
             var chartPath = state.charts[this.uuid]
-            let keyChk = chartPath && Object.keys(chartPath.inputs).length
+            let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
             return this.compChartObjs?this.compChartObjs.compChartInputs:inputData
           },
@@ -105,6 +105,14 @@
             let objAssignChk = (chartPath && chartPath.settings)
             return objAssignChk&&chartPath.settings.group.value
           }
+        },
+        compChartUUIDChk:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
+            return compChartUUIDChk
+          }
         }
       }
     }
@@ -126,7 +134,7 @@
             value: layoutAreaChk
           }
         }
-      };
+      }
     }
     connectedCallback(){
       super.connectedCallback();
@@ -144,7 +152,7 @@
     draw(paint){
       //this.debounce(arg,interval)
       //if(this.sufficiantInputs)
-        this.debouncer(paint,250)
+        this.debouncer(paint,2000)
     }
     debouncer(arg,interval){
       // debugger
@@ -157,7 +165,7 @@
         this.set("uuid",this.id)
       }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
-    }
+      }
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){
@@ -221,6 +229,10 @@
     getChartProperties(obj){
       //"inputCheck" for avoid error from chart
       if(!this.hasInputs(obj.axisIndex))return false
+      let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
+      let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
+      if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
+
 
       if(this.compChartObjs){
         this.set("source",this.compChartObjs.source)

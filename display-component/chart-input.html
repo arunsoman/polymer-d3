@@ -258,9 +258,15 @@
       super.connectedCallback()
     }
     axisKeysAvailability(action){
-      let axisYKeyChk = this.axisKeys.indexOf("y")!=-1
-      let actionChk= action=="add"?this.axisKeys.length>=2:this.axisKeys.length<=2
-      actionChk = axisYKeyChk && actionChk
+      let axisYKeyChk = this.axisKeys.length&&this.axisKeys.indexOf("y")!=-1
+      let axisXKeyChk = this.axisKeys.length&&this.axisKeys.indexOf("x")!=-1
+      let addKeyChk = axisYKeyChk&&axisXKeyChk
+
+      let actionAdd = action=="add"&&addKeyChk&&this.axisKeys.length>=2
+      let actionRemove = action=="remove"&&this.axisKeys.length<=2
+
+      let actionChk= actionAdd?actionAdd:actionRemove
+
       if(this.compChartUUIDChk && actionChk){
         this.set("layoutAreaChk",!this.layoutAreaChk)
         this.dispatch("splitAreaChk", {uuid:this.parentNode.uuid,layoutAreaChk:this.layoutAreaChk})
@@ -297,7 +303,8 @@
         let slctedValLength= this.input[this.axis]?this.input[this.axis].selectedValue.length:0
         slctedValLength==0 ? this.dispatch("removeInputs", {uuid:this.parentNode.uuid,objKey:key})
           : this.setInputObj()
-        this.axisKeysAvailability()
+        let action = "remove"
+        this.axisKeysAvailability(action)
     }
     setInputObj(){
       let input = {}

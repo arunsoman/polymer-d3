@@ -240,14 +240,14 @@
     }
   }
   updateObjRedux(){
-    this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
-    this.set("layoutAreaChk",!this.layoutAreaChk)
-    this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
-    this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
     if(!this.compChartUUIDChk){
       this.set("compChartUUIDChk",!this.compChartUUIDChk)
       this.dispatch("compChartUUIDChk", {uuid:this.uuid,compChartUUIDChk:this.compChartUUIDChk})
     }
+    this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
+    this.set("layoutAreaChk",!this.layoutAreaChk)
+    this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
+    this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
   }
 
   constructor(){

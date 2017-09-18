@@ -29,7 +29,7 @@
         }
       }
     }
-     
+
   static get actions() {
     return {
       updateExternal(externals) {
@@ -37,7 +37,7 @@
           type: 'UPDATE_EXTERNALS',
           value: externals
         };
-      },      
+      },
       updateSource(source) {
         return {
           type: 'UPDATE_SOURCE',
@@ -62,7 +62,7 @@
         externals:[]
       }
       // if (data) {
-      var data = e.replace();
+      var data = e.replace(/(".*)(,)(.*?")/g,'$1ˏ$3');
       var headerObj = [];
       var lines = data.split('\n');
       var result = [];
@@ -133,7 +133,7 @@
   }
   constructor(){
     super();
-    
+
   }
 
   // Bootstraps element as per mode(view/edit)
