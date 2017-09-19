@@ -17,7 +17,7 @@
         min-height: 50vh;
       }
     </style>
-    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
+    <template is="dom-if" if="[[!compSettingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
         <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
@@ -41,6 +41,10 @@
       }
       static get properties(){
         return{
+          compSettingsDisabled:{
+            type:Boolean,
+            value:false
+          },
           compositeChartData:{
             type:Object,
             statePath(state){
@@ -138,7 +142,7 @@
         let arg = {axisIndex}
         let chartProp = this.getChartProperties(arg)
         if(!chartProp)return false
-        
+
       }
     }
     customElements.define(compositeCanvas.is,compositeCanvas)

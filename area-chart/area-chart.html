@@ -64,14 +64,12 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        // let areaChart = true
         //Here checks the axis availability for avoid error from chart
         let axisKeys = this.axisKeys.sort().join(",")
         let chkXY = axisKeys == "x,y"
         let chkXYZ = axisKeys == "x,y,z"
         let axisIndex = chkXY?2:4
         axisIndex = chkXYZ?3:axisIndex
-        // axisIndex = stacked?3:axisIndex
         //"chartProp" define for chart axis and properties
         let arg = {axisIndex}
         let chartProp = this.getChartProperties(arg)
@@ -81,7 +79,7 @@
 
         //get chart data once pass "x and y" into the "getChartData" method
         let itemZChk = !stacked&&chartProp.itemZ
-        itemZChk = (itemZChk==0)?true:itemZChk
+        itemZChk = !itemZChk?true:itemZChk
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
             itemVal = source.itemVal
