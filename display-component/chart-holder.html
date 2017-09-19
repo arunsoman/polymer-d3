@@ -112,10 +112,6 @@
           }
         }
       },
-      compositeValue:{
-        type:Boolean,
-        value:false
-      },
       activateImport:{
         type:Boolean,
         value:false
@@ -177,8 +173,12 @@
         type:String
       },
 
-      showCompChart:{
+      settingsDisabled:{
         type:Boolean
+      },
+      settingsDisabled:{
+        type:Boolean,
+        value:false
       },
       currentNestedObj:{
         type:String,
@@ -215,6 +215,10 @@
       modelCheck:{
         type:Boolean,
         notify:true
+      },
+      modelChartHolder:{
+        type:Boolean,
+        value:false
       }
     }
   }
@@ -262,7 +266,7 @@
     super();
   }
   connectedCallback(){
-    if(this.compositeValue){
+    if(this.settingsDisabled){
       this.availableCharts.shift()
       this.availableCharts.pop()
       this.set("availableCharts",this.availableCharts)
@@ -282,23 +286,22 @@
     let getparagraphId = this.uuid?this.uuid.split("@")[0]:this.paragraphId
     if(selectedChart && getparagraphId){
       let elem;
-    if(!this.compositeValue){
-      this.$$('.chartHolder').innerHTML = ''
-    }else{
-      this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
-    }
-    // let showCompChart = (this.showCompChart)
-
+      if(!this.modelChartHolder){
+        this.$$('.chartHolder').innerHTML = ''
+      }else{
+        this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
+      }
+      // let settingsDisabled = (this.settingsDisabled)
       this.set("modelCheck",!this.modelCheck)
       if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){
-        let showCompChart = this.currentNestedObj+".showCompChart"
+        let settingsDisabled = this.currentNestedObj+".settingsDisabled"
         let chart = this.currentNestedObj+".chart"
         let chartId = this.currentNestedObj+".chartId"
         let areaId = this.get(this.currentNestedObj+".id")
         let chartElement = this.selectedChart.element
         let getChartId = this.uuid+"@_"+chartElement+"_"+areaId
         let paragraphId = this.currentNestedObj+".paragraphId"
-        this.set(showCompChart,true)
+        this.set(settingsDisabled,this.settingsDisabled)
         this.set(chart,chartElement)
         this.set(chartId,getChartId)
         this.set(paragraphId,getparagraphId)
@@ -312,7 +315,7 @@
           );
           this.selectedChartObj = elem;
           this.selectedChartObj.chartInfo = this.selectedChart;
-          this.selectedChartObj.showCompChart = false
+          this.selectedChartObj.settingsDisabled = false
       }
     }
 

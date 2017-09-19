@@ -23,7 +23,7 @@
     font-size: 12px;
   }
   </style>
-  <template is="dom-if" if="[[!showCompChart]]" restamp="true">
+  <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
     <chart-input-group  uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
       <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>

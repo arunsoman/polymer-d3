@@ -14,15 +14,17 @@
         flex:1;
       }
       #splitLayoutArea{
-        min-height: 100vh;
+        min-height: 50vh;
       }
     </style>
-    <chart-input-group  uuid="[[uuid]]">
-      <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
-      <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
-      <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
-    </chart-input-group>
-    <chart-settings uuid="[[uuid]]"></chart-settings>
+    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
+      <chart-input-group  uuid="[[uuid]]">
+        <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+      </chart-input-group>
+      <chart-settings uuid="[[uuid]]"></chart-settings>
+    </template>
     <chart-selected-modal id="chartsModal" uuid="[[uuid]]"></chart-selected-modal>
     <div id="splitLayoutArea">
       <recursive-node uuid="[[uuid]]"></recursive-node>
@@ -58,7 +60,7 @@
               "chart": "",
               "chartId":"",
               "paragraphId":"",
-              "showCompChart":false,
+              "settingsDisabled":false,
               "children": [
                 {
                   "id": "chartData_0",
@@ -67,7 +69,7 @@
                   "style": "",
                   "chart": "",
                   "chartId":"",
-                  "showCompChart":false,
+                  "settingsDisabled":false,
                   "children": []
                 }
               ]
@@ -92,23 +94,14 @@
             return chartAvailableModalChk
           }
         },
-        group:{
-          type:Boolean,
+        chartSettings:{
+          type:Object,
+          observer:'areaChk',
           statePath(state){
             let chartPath = state.charts[this.uuid]
-            let objAssignChk = (chartPath && chartPath.settings)
-            return objAssignChk&&chartPath.settings.group.value
-          },
-          observer:"areaChk"
-        },
-        stacked:{
-          type:Boolean,
-          statePath(state){
-            let chartPath = state.charts[this.uuid]
-            let objAssignChk = (chartPath && chartPath.settings)
-            return objAssignChk&&chartPath.settings.stacked.value
-          },
-          observer:"areaChk"
+            let chartSettings = chartPath && chartPath.settings
+            return chartSettings
+          }
         }
       }
     }
@@ -145,9 +138,7 @@
         let arg = {axisIndex}
         let chartProp = this.getChartProperties(arg)
         if(!chartProp)return false
-
-        //get chart data once pass axis into the "getChartData" method
-        // let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
+        
       }
     }
     customElements.define(compositeCanvas.is,compositeCanvas)

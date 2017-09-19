@@ -26,9 +26,12 @@
       font-size: 12px;
     }
     </style>
-    <template is="dom-if" if="[[!showCompChart]]" restamp="true">
+    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
-          <template is="dom-if" if="{{!stacked}}">
+        <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
+        <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis" ></chart-input>
+          <!-- <template is="dom-if" if="{{!stacked}}">
             <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
             <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
             <chart-input slot="chart-input" axis="z" label="z-axis" ></chart-input>
@@ -37,7 +40,7 @@
             <chart-input slot="chart-input" axis="x" label="Key"accept="number,date" ></chart-input>
             <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
             <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
-          </template>
+          </template> -->
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
     </template>
@@ -61,19 +64,20 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        //assign stacked value
-        let stacked = this.stacked
+        // let areaChart = true
         //Here checks the axis availability for avoid error from chart
         let axisKeys = this.axisKeys.sort().join(",")
         let chkXY = axisKeys == "x,y"
         let chkXYZ = axisKeys == "x,y,z"
         let axisIndex = chkXY?2:4
         axisIndex = chkXYZ?3:axisIndex
-        axisIndex = stacked?3:axisIndex
+        // axisIndex = stacked?3:axisIndex
         //"chartProp" define for chart axis and properties
-        let arg = {axisIndex,stacked}
+        let arg = {axisIndex}
         let chartProp = this.getChartProperties(arg)
         if(!chartProp)return false
+        //assign stacked value
+        let stacked = chartProp.stacked
 
         //get chart data once pass "x and y" into the "getChartData" method
         let itemZChk = !stacked&&chartProp.itemZ

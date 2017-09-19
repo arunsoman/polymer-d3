@@ -52,10 +52,10 @@
           <template is="dom-if" if="[[!itemObj.freeze]]">
             <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
           </template>
-          <template is="dom-if" if="{{!showCompChart}}" restamp="true">
+          <template is="dom-if" if="{{!settingsDisabled}}" restamp="true">
             <paper-item on-click="showChart">Add Chart</paper-item>
           </template>
-          <template is="dom-if" if="{{showCompChart}}" restamp="true">
+          <template is="dom-if" if="{{settingsDisabled}}" restamp="true">
             <paper-item on-click="removeChart" >Remove Chart</paper-item>
           </template>
         </div>
@@ -80,7 +80,7 @@
       }
       static get properties(){
         return{
-          showCompChart:{
+          settingsDisabled:{
             type:Boolean
           },
           style:{
@@ -104,7 +104,7 @@
                 "chart": "",
                 "chartId":"",
                 "paragraphId":"",
-                "showCompChart":false,
+                "settingsDisabled":false,
                 "children": []
               }
             }
@@ -240,14 +240,14 @@
         return child.length<=0 && itemObj.chart!=""
       }
       checkChartId(chartIdChk){
-        this.set("showCompChart",this.itemObj.showCompChart)
+        this.set("settingsDisabled",this.itemObj.settingsDisabled)
         this.setAttribute("style",this.itemObj.style)
         chartIdChk && setTimeout(()=>{
           let chart = document.createElement(this.itemObj.chart)
           this.set("chartUUID",this.itemObj.chartId)
           chart.id=this.chartUUID
           chart.parentId=this.itemObj.paragraphId
-          chart.showCompChart=this.showCompChart
+          chart.settingsDisabled=this.settingsDisabled
           chart.set("compChartObjs",this.compChartObjs)
           chart.set("chartWidth",(this.offsetWidth-50))
 
@@ -299,8 +299,8 @@
           let getNewObj = this.createNewIdNestedObj(itemId)
           ObjNested = getNewObj.ObjNested
           parentObj = getNewObj.parentObj
-          let showCompChart = this.get(parentObj).showCompChart
-          showCompChart&&this.chartIsAvailableSetChildData(parentObj,showCompChart)
+          let settingsDisabled = this.get(parentObj).settingsDisabled
+          settingsDisabled&&this.chartIsAvailableSetChildData(parentObj,settingsDisabled)
         } else {
           itemId = parentId+"_"+(objIdx+1)
         }
@@ -313,18 +313,18 @@
         this.updateObjRedux()
         this.$.dropDown.close();
       }
-      chartIsAvailableSetChildData(parentObj,showCompChart,getObj,chartRemoveChk){
+      chartIsAvailableSetChildData(parentObj,settingsDisabled,getObj,chartRemoveChk){
         if(getObj){
           let parentNested = getObj.ObjNested
           let updatedObj = this.get(parentNested).filter(item=>item.id!=this.id)
           let parentObj = getObj.parentObj
-          this.set(parentObj+".showCompChart",false)
+          this.set(parentObj+".settingsDisabled",false)
           this.set(parentObj+".chartId","")
           this.set(parentObj+".chart","")
           this.set(parentObj+".paragraphId","")
           if(chartRemoveChk){
             let currentObjNested = getObj.currentObjNested
-            this.set(currentObjNested+".showCompChart",false)
+            this.set(currentObjNested+".settingsDisabled",false)
             this.set(currentObjNested+".chartId","")
             this.set(currentObjNested+".chart","")
             this.set(currentObjNested+".paragraphId","")
@@ -335,7 +335,7 @@
           let chartId = this.get(parentObj).chartId
           let paragraphId = this.get(parentObj).paragraphId
           let chart = this.get(parentObj).chart
-          this.set("childObj.showCompChart",showCompChart)
+          this.set("childObj.settingsDisabled",settingsDisabled)
           this.set("childObj.chartId",chartId)
           this.set("childObj.chart",chart)
           this.set("childObj.paragraphId",paragraphId)

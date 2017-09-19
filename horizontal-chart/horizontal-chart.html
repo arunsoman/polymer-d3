@@ -80,7 +80,7 @@
         }
 
     </style>
-    <template is="dom-if" if="[[!showCompChart]]" restamp="true">
+    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <template is="dom-if" if="{{!group}}" restamp="true">
           <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
@@ -115,13 +115,14 @@
         this.draw(this._paint(this._compute()));
       }
       _compute() {
-        //assign group value
-        let group = this.group
-        let axisIndex = group?3:2
+        // let HorizontalChart = true
+        let axisIndex = 2
         //"chartProp" define for chart axis and properties
-        let arg = {axisIndex,group}
+        let arg = {axisIndex}
         let chartProp = this.getChartProperties(arg)
         if(!chartProp)return false
+        //assign group value
+        let group = chartProp.group
 
         //get chart data once pass axis into the "getChartData" method
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,group)

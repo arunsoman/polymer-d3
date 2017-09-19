@@ -32,7 +32,7 @@
             let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
-            return this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
+            return this.settingsDisabled&&this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
           }
         },
         inputs:{
@@ -42,13 +42,10 @@
             var chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
-            return this.compChartObjs?this.compChartObjs.compChartInputs:inputData
+            return this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartInputs:inputData
           },
           readOnly:true
         },
-        // groupBy:{
-        //   type:String
-        // },
         // x:{
         //   type:String
         // },
@@ -96,9 +93,10 @@
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let stacked = objAssignChk&&chartPath.settings.stacked.value
-            let compStacked = this.compChartObjs && this.compChartObjs.stacked
+            let compStacked = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.stacked
             return compStacked?compStacked:stacked
-          }
+          },
+          observer:"changedStackedAndGroup"
         },
         group:{
           type:Boolean,
@@ -106,9 +104,10 @@
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let group = objAssignChk&&chartPath.settings.group.value
-            let compGroup = this.compChartObjs && this.compChartObjs.group
+            let compGroup = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.group
             return compGroup?compGroup:group
-          }
+          },
+          observer:"changedStackedAndGroup"
         },
         compChartUUIDChk:{
           type:Boolean,
@@ -143,7 +142,16 @@
     connectedCallback(){
       super.connectedCallback();
       this.initializeChart();
-      this.dispatch("updateChart",{id:this.uuid,settings:this.settings,inputs:this.inputs});
+      let updateChartData
+      if(this.settingsDisabled&&this.compChartObjs){
+        updateChartData = {id:this.uuid,inputs:this.inputs}
+      }else{
+        updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
+      }
+      this.dispatch("updateChart",updateChartData);
+    }
+    changedStackedAndGroup(){
+      if(!this.settingsDisabled&&!this.compChartObjs){this._chartDraw()}
     }
     _chartDraw(){
       if(this.inputs && Object.keys(this.inputs).length!=0){
@@ -155,17 +163,15 @@
 
     draw(paint){
       //this.debounce(arg,interval)
-      //if(this.sufficiantInputs)
         this.debouncer(paint,2000)
     }
     debouncer(arg,interval){
-      // debugger
         return Polymer.Debouncer.debounce(this.debouncer,
           Polymer.Async.timeOut.after(interval), ()=>arg);
     }
 
     initializeChart(){
-      if(this.showCompChart){
+      if(this.settingsDisabled){
         this.set("uuid",this.id)
       }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
@@ -231,13 +237,18 @@
 
     }
     getChartProperties(obj){
+
+      //assign stacked and group value
+      let stacked = this.stacked,
+          group = this.group
       //"inputCheck" for avoid error from chart
+      let axisIndex = stacked||group?3:obj.axisIndex
       if(!this.hasInputs(obj.axisIndex))return false
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
       if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
 
-      if(this.compChartObjs){
+      if(this.settingsDisabled&&this.compChartObjs){
         this.set("source",this.compChartObjs.source)
         this.set("externals",this.compChartObjs.externals)
       }
@@ -248,17 +259,16 @@
       itemX = this.inputs[this.x].selectedValue[0]
       itemY = this.inputs[this.y].selectedValue[0]
       this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
-      obj.group && itemZ
-      obj.stacked && itemZ
+      group || stacked && itemZ
 
       let parseDate = d3.time.format('%Y-%m-%d').parse;
-      let settings = this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
+      let settings = this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
           // margin = {top: 5, right: 40, bottom: 20, left: 120},
           margin = {top: settings.margin.value.top, right: settings.margin.value.right, bottom: settings.margin.value.bottom, left: settings.margin.value.left},
           label= settings.legend.values,
-          compMargin = {top: 5, right: 0, bottom: 0, left: 0}
+          compMargin = {top: 15, right: 0, bottom: 25, left: 0}
       margin = this.compChartObjs?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
@@ -269,7 +279,7 @@
       width = this.chartWidth?this.chartWidth:width
 
       let color = d3.scale.category20();
-      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,settings}
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings}
     }
   }
   customElements.define(baseChart.is,baseChart)

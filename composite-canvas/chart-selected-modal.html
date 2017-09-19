@@ -30,7 +30,7 @@
     </style>
     <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
       <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
-      <chart-holder uuid="[[uuid]]" settings-visible composite-value model-check="{{modelCheck}}"></chart-holder>
+      <chart-holder uuid="[[uuid]]" settings-visible model-chart-holder model-check="{{modelCheck}}" settings-disabled></chart-holder>
     </paper-dialog>
   </template>
   <script>
