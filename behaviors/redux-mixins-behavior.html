@@ -55,19 +55,16 @@
                 chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
               })
             })
-            case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  compositeChartData:Object.assign({},
-                    state[action.value.uuid],
-                    action.value.chartData
-                  )
-                })})
             // case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
             //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
             //     state[action.value.uuid],{
-            //       compositeChartData:action.value.chartData
+            //       compositeChartData:Object.assign({},state[action.value.uuid],action.value.chartData)
             //     })})
+            case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  compositeChartData:action.value.chartData
+                })})
             case 'COMPOSITE_SPLIT_AREA_CHK':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
@@ -91,6 +88,11 @@
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
                   compChartUUIDChk:action.value.compChartUUIDChk
+                })})
+            case 'UPDATE_READ_ONLY':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  readOnly:action.value.readOnly
                 })})
 
           default:

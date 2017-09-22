@@ -43,24 +43,26 @@
 
     </style>
     <div id="splitBox">
-      <header>
-      <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
-      <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown">
-        <div slot="dropdown-content">
-          <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
-          <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
-          <template is="dom-if" if="[[!itemObj.freeze]]">
-            <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
-          </template>
-          <template is="dom-if" if="{{!settingsDisabled}}" restamp="true">
-            <paper-item on-click="showChart">Add Chart</paper-item>
-          </template>
-          <template is="dom-if" if="{{settingsDisabled}}" restamp="true">
-            <paper-item on-click="removeChart" >Remove Chart</paper-item>
-          </template>
-        </div>
-      </iron-dropdown>
-    </header>
+      <template is="dom-if" if="[[!readOnly]]">
+        <header>
+        <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
+        <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown" allow-outside-scroll>
+          <div slot="dropdown-content">
+            <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
+            <paper-item on-click="createSplitLayout" id="horz">Row </paper-item>
+            <template is="dom-if" if="[[!itemObj.freeze]]">
+              <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
+            </template>
+            <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
+              <paper-item on-click="showChart">Add Chart</paper-item>
+            </template>
+            <template is="dom-if" if="[[settingsDisabled]]" restamp="true">
+              <paper-item on-click="removeChart" >Remove Chart</paper-item>
+            </template>
+          </div>
+        </iron-dropdown>
+      </header>
+    </template>
     <template is="dom-if" if="[[chartAvailabilityChk(itemObj,childSource)]]" restamp="true">
       <div id="chartBox"> </div>
     </template>
@@ -80,6 +82,14 @@
       }
       static get properties(){
         return{
+          readOnly:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let readOnly = chartPath && chartPath.readOnly
+              return readOnly
+            }
+          },
           settingsDisabled:{
             type:Boolean
           },
@@ -220,10 +230,15 @@
           trackChartIdChk?this.unshift("trackChartObj.trackChartId",chart):
           trackChartId.indexOf(chart)==-1 && this.push("trackChartObj.trackChartId",chart)
 
-          let chartWidth = this.offsetWidth-50
-          trackChartId[1] == chart && (chartWidth = this.parentNode.offsetWidth - (trackChartId[0].chartWidth+70))
+          let chartWidth = this.offsetWidth
+          trackChartId[1] == chart && !this.parentNode.vertical && (chartWidth = this.parentNode.offsetWidth - (trackChartId[0].chartWidth))
+          let chartHeight = this.offsetHeight
+          trackChartId[1] == chart && this.parentNode.vertical && (chartHeight = this.parentNode.offsetHeight - (trackChartId[0].chartHeight))
 
+          chartWidth = chartWidth-50
+          chartHeight = chartHeight-50
           chart.set("chartWidth",chartWidth)
+          chart.set("chartHeight",chartHeight)
           chart.redraw()
 
           trackChartIdChk && this.set("trackChartObj.trackChartIdChk",false)
@@ -250,12 +265,14 @@
           chart.settingsDisabled=this.settingsDisabled
           chart.set("compChartObjs",this.compChartObjs)
           chart.set("chartWidth",(this.offsetWidth-50))
+          chart.set("chartHeight",this.offsetHeight)
 
           this.root.querySelector("#chartBox").appendChild(chart)
         })
       }
       showDropDown(){
-        this.$.dropDown.open();
+        let dialog = this.$.splitBox.querySelector("#dropDown")
+        dialog.open();
       }
       showChart() {
         this.getCurrentNestedObj()
@@ -311,7 +328,8 @@
         this.set(verticalKey,vertical)
         this.set("trackChartObj.trackChartIdChk",true)
         this.updateObjRedux()
-        this.$.dropDown.close();
+        let dialog = this.$.splitBox.querySelector("#dropDown")
+        dialog.close();
       }
       chartIsAvailableSetChildData(parentObj,settingsDisabled,getObj,chartRemoveChk){
         if(getObj){
@@ -364,7 +382,8 @@
         this.chartUUID && this.dispatch("currentChartDeleted", {uuid:this.chartUUID})
         this.updateObjRedux()
         this.set("trackChartObj.trackChartIdChk",true)
-        this.$.dropDown.close();
+        let dialog = this.$.splitBox.querySelector("#dropDown")
+        dialog.close();
       }
     }
     customElements.define(innerLayoutDiv.is, innerLayoutDiv)

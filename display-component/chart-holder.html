@@ -35,6 +35,10 @@
               label: 'Table',
               icon: 'chart:table-icon',
               element: 'polymerd3-table',
+            },{
+              label: 'Bar Chart',
+              icon: 'chart:composite-stacked',
+              element: 'bar-chart'
             }, {
               label: 'Stacked Bar Chart',
               icon: 'chart:stacked-bar-chart',
@@ -84,15 +88,7 @@
               label: 'Pareto Chart',
               icon: 'chart:pareto-chart',
               element: 'pareto-chart'
-            }, {
-              label: 'Stacked Composite Chart',
-              icon: 'chart:composite-stacked',
-              element: 'stacked-composite-chart'
-            }, {
-              label: 'Grouped Composite Chart',
-              icon: 'chart:composite-grouped',
-              element: 'grouped-composite-chart'
-            }, {
+            },{
               label: 'Horizontal Chart',
               icon: 'chart:horizontal-bar',
               element: 'horizontal-chart'
@@ -172,14 +168,6 @@
       paragraphId:{
         type:String
       },
-
-      settingsDisabled:{
-        type:Boolean
-      },
-      settingsDisabled:{
-        type:Boolean,
-        value:false
-      },
       currentNestedObj:{
         type:String,
         statePath(state){
@@ -219,6 +207,21 @@
       modelChartHolder:{
         type:Boolean,
         value:false
+      },
+      settingsDisabled:{
+        type:Boolean,
+        value:false,
+        observer:"checkSettingsDisabled"
+      },
+      readOnly:{
+        type:Boolean,
+        statePath(state){
+          let chartPath = state.charts[this.uuid]
+          let readOnly = chartPath && chartPath.readOnly
+          readOnly&&!this.settingsDisabled?this.set("settingsDisabled",readOnly):
+            this.modelChartHolder&&this.set("settingsDisabled",this.modelChartHolder)
+          return readOnly
+        }
       }
     }
   }
@@ -266,11 +269,6 @@
     super();
   }
   connectedCallback(){
-    if(this.settingsDisabled){
-      this.availableCharts.shift()
-      this.availableCharts.pop()
-      this.set("availableCharts",this.availableCharts)
-    }
     super.connectedCallback()
   }
   static get observers(){
@@ -279,7 +277,13 @@
     '_selectedChanged(paragraphId)',
     ]
   }
-
+  checkSettingsDisabled(){
+    if(this.settingsDisabled){
+      this.availableCharts.shift()
+      this.availableCharts.pop()
+      this.set("availableCharts",this.availableCharts)
+    }
+  }
   // on selected chart changed
   // is also used to draw first chart
   _selectedChanged(selectedChart) {

@@ -17,7 +17,7 @@
         min-height: 50vh;
       }
     </style>
-    <template is="dom-if" if="[[!compSettingsDisabled]]" restamp="true">
+    <template is="dom-if" if="[[!readOnly]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
         <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
@@ -41,9 +41,14 @@
       }
       static get properties(){
         return{
-          compSettingsDisabled:{
+          readOnly:{
             type:Boolean,
-            value:false
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let readOnly = chartPath && chartPath.readOnly
+              return readOnly?readOnly:false
+            },
+            observer:"chkReadOnly"
           },
           compositeChartData:{
             type:Object,
@@ -106,6 +111,9 @@
             let chartSettings = chartPath && chartPath.settings
             return chartSettings
           }
+        },
+        timer:{
+          type:Number
         }
       }
     }
@@ -116,12 +124,22 @@
             type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
             value: addUpdateChartData
           }
+        },
+        updateReadOnly(updateReadOnly) {
+          return {
+            type: 'UPDATE_READ_ONLY',
+            value: updateReadOnly
+          }
         }
       }
     }
     connectedCallback(){
       super.connectedCallback()
       !this.compositeChartData && this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.compositeChartDefaultData})
+    }
+    chkReadOnly(){
+      clearTimeout(this.timer)
+      this.timer = setTimeout(()=>{this.dispatch("updateReadOnly", {uuid:this.uuid,readOnly:this.readOnly})})
     }
     areaChk(){
       this.$.splitLayoutArea.innerHTML=""
