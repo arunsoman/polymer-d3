@@ -146,6 +146,10 @@
           .filter(function(d) { return d.x < obj.chartProp.width / 2; })
             .attr("x", 6 + obj.sankey.nodeWidth())
             .attr("text-anchor", "start");
+
+        // this.settingsDisabled&&this.compChartObjs&&
+        // node.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         // the function for moving the nodes
         function dragmove(d) {
@@ -157,6 +161,7 @@
                   ) + ")");
           obj.sankey.relayout();
           link.attr("d", obj.path);
+
         }
       }
       // populate chart data

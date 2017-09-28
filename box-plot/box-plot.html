@@ -149,7 +149,7 @@
         .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         // draw the boxplots
-    	parentG.selectAll(".box")
+    	let rect = parentG.selectAll(".box")
         .data(obj.chartData)
     	  .enter().append("g")
     		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.chartProp.margin.top + ")")
@@ -191,6 +191,10 @@
         node:obj.chartData,
         key: 0
       });
+
+
+      this.settingsDisabled&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
     }
     // Returns a function to compute the interquartile range.

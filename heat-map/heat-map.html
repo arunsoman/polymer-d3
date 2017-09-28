@@ -140,6 +140,8 @@
               .style("text-anchor", "start")
               .attr("transform", d=>"rotate(-65)");
 
+      this.settingsDisabled&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data

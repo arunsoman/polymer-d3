@@ -261,13 +261,16 @@
               return {
                 label:item,
                 value:this.source.filter(items => items[itemZ] == item).reduce((prev,next)=>{
+                  // prev[next[itemX]]= (prev[next[itemX]] || 0) + next[itemY];
                            if(prev[next[itemX]]!=0){
                                 prev[next[itemX]]= prev[next[itemX]] + next[itemY];
                             }else{
                                 prev[next[itemX]]=next[itemY];
                            }
                         return prev
-                        },this.source.reduce((prev,next)=>{prev[next[itemX]]=0;return prev},{}))
+                      },
+                        this.source.reduce((prev,next)=>{prev[next[itemX]]=0;return prev},{})
+                      )
               }
           })
           data = []

@@ -156,6 +156,9 @@
             .attr("dy", "-.71em")
             .style("text-anchor", "end")
             .text("Cumulative %");
+
+        this.settingsDisabled&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         this.addLegend({
             obj,

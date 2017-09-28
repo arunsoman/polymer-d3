@@ -103,14 +103,16 @@
             let svg = selector.append("g")
                 .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
-            svg.append("g")
-                .selectAll("g")
+
+
+                let group =   svg.selectAll("g")
                 .data(obj.chartData)
-                .enter().append("g")
+                .enter().append("g").attr("class","group")
                 .attr("transform", function(d, i) {
                     return "translate(" + obj.axis.scale.x0(obj.keys[i]) + ",0)";
                 })
-                .selectAll("rect")
+
+                group.selectAll("rect")
                 .data(d => Object.keys(d.value).map(item => { return { key: item, value: d.value[item] } }))
                 .enter().append("rect")
                 .attr("x", function(d) { return obj.axis.scale.x(d.key); })
@@ -136,6 +138,8 @@
                 .attr("dx", "-.8em")
                 .attr("dy", "-.55em")
                 .attr("transform", "rotate(-90)")
+
+            this.settingsDisabled&&group.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
 
             d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
 

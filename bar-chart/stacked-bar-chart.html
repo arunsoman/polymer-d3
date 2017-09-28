@@ -149,6 +149,9 @@
         key: 'item'
       });
 
+
+      this.settingsDisabled&&segments.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
 
       // debugger;

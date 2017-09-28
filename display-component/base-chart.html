@@ -26,23 +26,33 @@
         parentId:{
           type:String
         },
+        compUUID:{
+          type:String
+        },
         axisKeys:{
           type:String,
           statePath(state){
-            let chartPath = state.charts[this.uuid]
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
-            return this.settingsDisabled&&this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
+            return keys
+            // return this.settingsDisabled&&this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
           }
         },
         inputs:{
           type:Array,
           observer:'_chartDraw',
           statePath(state){
-            var chartPath = state.charts[this.uuid]
+            // debugger
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
-            return this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartInputs:inputData
+            return inputData
+            // return this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartInputs:inputData
           },
           readOnly:true
         },
@@ -59,8 +69,11 @@
           type:Object,
           observer:'_chartDraw',
           statePath(state){
-            if(state.charts[this.uuid]){
-              return state.charts[this.uuid].settings;
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            if(chartPath){
+              return chartPath.settings;
             }else{
               return {
                 title:{uitype:'text',txt:"Title",value:""},
@@ -81,41 +94,122 @@
             return state.data[this.parentId].externals
           }
         },
+        refSource:{
+          type:Array,
+          statePath(state){
+            let chartPath = state.charts
+            return chartPath
+            // return state.data[this.parentId].source
+          }
+        },
         source:{
           type:Array,
           statePath(state){
-            return state.data[this.parentId].source
+            // let compChartChk = this.settingsDisabled && this.compfilterChk
+            let refIdIdxChk = this.settingsDisabled && this.filterIdx>=0 && this.refIds.length
+            let refId = refIdIdxChk&& this.refIds[this.filterIdx]
+            refId = refId?refId:this.settingsDisabled &&this.refIds&&this.refIds.length&&this.refIds.slice(-1).pop()
+            let source = refId&&state.charts[refId]&&state.charts[refId].refrenceSrc
+            source = source?source:state.data[this.parentId].source
+            return source
+            // return state.data[this.parentId].source
           }
         },
         stacked:{
           type:Boolean,
           statePath(state){
-            let chartPath = state.charts[this.uuid]
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
             let objAssignChk = (chartPath && chartPath.settings)
             let stacked = objAssignChk&&chartPath.settings.stacked.value
-            let compStacked = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.stacked
-            return compStacked?compStacked:stacked
+            return stacked
+            // let compStacked = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.stacked
+            // return compStacked?compStacked:stacked
           },
           observer:"changedStackedAndGroup"
         },
         group:{
           type:Boolean,
           statePath(state){
-            let chartPath = state.charts[this.uuid]
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
             let objAssignChk = (chartPath && chartPath.settings)
             let group = objAssignChk&&chartPath.settings.group.value
-            let compGroup = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.group
-            return compGroup?compGroup:group
+            return group
+            // let compGroup = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.group
+            // return compGroup?compGroup:group
           },
           observer:"changedStackedAndGroup"
         },
         compChartUUIDChk:{
           type:Boolean,
           statePath(state){
-            let chartPath = state.charts[this.uuid]
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
             let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
             return compChartUUIDChk
           }
+        },
+        filterIdxGbl:{
+          type:Number,
+          statePath(state){
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            // let filterIdxGblChk = chartPath&&this.settingsDisabled&&this.compChartObjs
+            let filterIdxGbl = chartPath&&chartPath.filterIdxGbl
+            return filterIdxGbl?filterIdxGbl:0
+          }
+        },
+        refIds:{
+          type:Array,
+          statePath(state){
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            // let refIdsChk = chartPath&&this.settingsDisabled&&this.compChartObjs
+            let refIds =  chartPath && chartPath.refIds
+            return refIds?refIds:[]
+          }
+        },
+        filterIdx:{
+          type:Number,
+          statePath(state){
+            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            // let compChartChk = this.settingsDisabled&&this.compChartObjs
+            let filterIdx = chartIdChk && state.charts[this.id].filterIdx
+            return filterIdx>=0?filterIdx:-1
+          }
+        },
+        compfilterChk:{
+          type:Boolean,
+          statePath(state){
+            // let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            // let compChartChk = this.settingsDisabled&&this.compChartObjs
+            // let compfilterChk = chartIdChk && state.charts[this.id].compfilterChk
+            let chartId = this.settingsDisabled && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let compfilterChk = chartPath && chartPath.compfilterChk
+            return compfilterChk
+          },
+          observer:"filterSrcLoad"
+        },
+        filterTimer:{
+          type:Number
+        },
+        filterKeys:{
+          type:Array,
+          value:[]
+        },
+        chartTimer:{
+          type:Number
+        },
+        srcLoadTimer:{
+          type:Number
         }
       }
     }
@@ -136,6 +230,36 @@
             type: 'COMPOSITE_SPLIT_AREA_CHK',
             value: layoutAreaChk
           }
+        },
+        addRefrenceSrc(addRefrenceSrc) {
+          return {
+            type: 'ADD_COMP_REFRENCE_SRC',
+            value: addRefrenceSrc
+          }
+        },
+        filterIdxGbl(filterIdxGbl) {
+          return {
+            type: 'ADD_FILTER_IDX_GBL',
+            value: filterIdxGbl
+          }
+        },
+        addRefrenceIds(refIds) {
+          return {
+            type: 'ADD_REFRENCE_IDS_GBL',
+            value: refIds
+          }
+        },
+        addfilterIdx(filterIdx) {
+          return {
+            type: 'ADD_FILTER_IDX',
+            value: filterIdx
+          }
+        },
+        compfilterChk(compfilterChk) {
+          return {
+            type: 'COMP_FILTER_CHK',
+            value: compfilterChk
+          }
         }
       }
     }
@@ -143,7 +267,7 @@
       super.connectedCallback();
       this.initializeChart();
       let updateChartData
-      if(this.settingsDisabled&&this.compChartObjs){
+      if(this.settingsDisabled){
         updateChartData = {id:this.uuid,inputs:this.inputs}
       }else{
         updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
@@ -151,14 +275,27 @@
       this.dispatch("updateChart",updateChartData);
     }
     changedStackedAndGroup(){
-      if(!this.settingsDisabled&&!this.compChartObjs){this._chartDraw()}
+      if(!this.settingsDisabled){this._chartDraw()}
+    }
+    filterSrcLoad(){
+      if(this.settingsDisabled){
+        // return this.refIds.length>0
+        // debugger
+        clearTimeout(this.srcLoadTimer)
+        this.srcLoadTimer = setTimeout(()=>{
+          this.refIds.length && this.refIds.indexOf(this.id)==-1 && this._chartDraw()
+        })
+      }
     }
     _chartDraw(){
-      if(this.inputs && Object.keys(this.inputs).length!=0){
-        //chart axis dre set here, the axis key's defined in "chart-input" module
-        this.axisKeys.forEach(axis=>{this.set(axis,axis)})
-        this.redraw()
-      }
+      clearTimeout(this.chartTimer)
+      this.chartTimer = setTimeout(()=>{
+        if(this.inputs && Object.keys(this.inputs).length!=0){
+          //chart axis dre set here, the axis key's defined in "chart-input" module
+          this.axisKeys.forEach(axis=>{this.set(axis,axis)})
+          this.redraw()
+        }
+      })
     }
 
     draw(paint){
@@ -171,8 +308,10 @@
     }
 
     initializeChart(){
+
       if(this.settingsDisabled){
         this.set("uuid",this.id)
+        this.set("filterKeys",[])
       }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
       }
@@ -243,15 +382,10 @@
           group = this.group
       //"inputCheck" for avoid error from chart
       let axisIndex = stacked||group?3:obj.axisIndex
-      if(!this.hasInputs(obj.axisIndex))return false
+      if(!this.hasInputs(axisIndex))return false
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
       if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
-
-      if(this.settingsDisabled&&this.compChartObjs){
-        this.set("source",this.compChartObjs.source)
-        this.set("externals",this.compChartObjs.externals)
-      }
 
       //axis are mentioned in the chart-input module
       let itemX,itemY,itemZ
@@ -262,13 +396,15 @@
       group || stacked && itemZ
 
       let parseDate = d3.time.format('%Y-%m-%d').parse;
-      let settings = this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
+      // let settings = this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
+      let settings = this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
           margin = {top: settings.margin.value.top, right: settings.margin.value.right, bottom: settings.margin.value.bottom, left: settings.margin.value.left},
           label= settings.legend.values,
           compMargin = {top: 15, right: 0, bottom: 75, left: 0}
-      margin = this.compChartObjs?compMargin:margin
+      // margin = this.compChartObjs?compMargin:margin
+      margin = this.settingsDisabled?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
@@ -277,9 +413,60 @@
 
       width = this.chartWidth?this.chartWidth:width
       height = this.chartHeight?this.chartHeight:height
-
+      let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
-      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings}
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis}
+    }
+    compSourcePopulate(itemXYZ,eArg){
+      // debugger
+      clearTimeout(this.filterTimer)
+      let axis
+      let eArgChk = (eArg.data||eArg.xKey&&typeof eArg.xKey!="number"||eArg.Genre||eArg.Movie||eArg[0]||eArg.title)
+      if(eArgChk){
+        //Pie chart - eArg.data.item, Waterfall chart - eArg.xKey, Heat map chart - eArg.Genre
+        //Pareto chart - eArg.Movie, Box plot chart - eArg[0], Bullet chart - eArg.title
+        let filterKeys =  (eArg.data.item||eArg.xKey||eArg.Genre||eArg.Movie||eArg[0]||eArg.title)
+        this.push("filterKeys",filterKeys)
+        axis = itemXYZ.itemX
+      }else if(eArg.zKey||eArg.name || eArg.item || eArg.key){
+        //Radar chart, Scatter plot, Area chart, Bar chart and Grouped bar chart
+        this.push("filterKeys",(eArg.zKey||eArg.name || eArg.item || eArg.key))
+        axis = itemXYZ.itemZ?itemXYZ.itemZ:itemXYZ.itemX
+      }
+
+
+      this.filterTimer = setTimeout(()=>{
+        let filterKeys = this.filterKeys.filter((item, pos)=>this.filterKeys.indexOf(item) == pos)
+        let filterSrc = []
+        filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
+        let propData = {}
+        propData.filterSrc = filterSrc
+        this.set("filterKeys",[])
+        let compfilterChk = !this.compfilterChk
+        propData.compfilterChk = compfilterChk
+        let refIds = this.refIds
+        let filterIdxGbl = this.filterIdxGbl
+        let filterIdx = this.filterIdx
+        this.refIds.indexOf(this.compUUID)==-1 && refIds.push(this.compUUID)
+        if(this.refIds.indexOf(this.uuid)==-1){
+          refIds.push(this.uuid)
+          filterIdxGbl = filterIdxGbl+1
+          filterIdx = filterIdx+filterIdxGbl
+        }
+        propData.refIds = refIds
+        propData.filterIdx = filterIdx
+        propData.filterIdxGbl = filterIdxGbl
+        this.reduxUpdateSrc(propData)
+      },1210)
+    }
+    reduxUpdateSrc(propData){
+      this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
+      this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:propData.filterSrc})
+
+      this.dispatch("compfilterChk", {uuid:this.compUUID,compfilterChk:propData.compfilterChk})
+      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:propData.refIds})
+      this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:propData.filterIdxGbl})
+
     }
   }
   customElements.define(baseChart.is,baseChart)

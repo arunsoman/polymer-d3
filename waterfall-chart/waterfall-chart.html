@@ -125,7 +125,7 @@
             .attr("transform", "translate(" + obj.chartProp.margin.xMargin + "," + (obj.chartProp.margin.yMargin-20) + ")");
 
         // Calculate and add rectangles to the chart
-        parentG.selectAll("rect")
+        let rect = parentG.selectAll("rect")
             .data(obj.chartData)
             .enter()
             .append("rect")
@@ -160,6 +160,8 @@
               .datum(obj.chartData)
               .attr("class", "trend-line")
               .attr("d", obj.line);
+
+        this.settingsDisabled&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data

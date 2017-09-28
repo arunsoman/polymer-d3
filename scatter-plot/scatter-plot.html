@@ -126,10 +126,11 @@
                   .style("text-anchor", "end")
                   .text(obj.yKeyStr)
 
-        parentG.selectAll(".dot")
-                .data(obj.chartData)
-                .enter().append("circle")
-                  .attr("class", "dot")
+      let circle = parentG.selectAll(".dot")
+              .data(obj.chartData)
+              .enter().append("circle")
+
+                  circle.attr("class", "dot")
                   .attr("r", 3.5)
                   .attr("cx", d=>obj.x(d.xKey))
                   .attr("cy", d=>obj.y(d.yKey))
@@ -150,6 +151,9 @@
           selector:'.dot',
           node:obj.chartProp.color.domain()
         });
+
+
+        this.settingsDisabled&&circle.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }

@@ -114,6 +114,9 @@
         },
         timer:{
           type:Number
+        },
+        filterTimer:{
+          type:Number
         }
       }
     }
@@ -130,12 +133,23 @@
             type: 'UPDATE_READ_ONLY',
             value: updateReadOnly
           }
+        },
+        updateReadOnly(updateReadOnly) {
+          return {
+            type: 'UPDATE_READ_ONLY',
+            value: updateReadOnly
+          }
         }
       }
     }
     connectedCallback(){
       super.connectedCallback()
       !this.compositeChartData && this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.compositeChartDefaultData})
+      this.addRefrenceSource()
+    }
+    addRefrenceSource(){
+      clearTimeout(this.filterTimer)
+      this.filterTimer = setTimeout(()=>{this.source && this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:this.source})})
     }
     chkReadOnly(){
       clearTimeout(this.timer)

@@ -96,17 +96,18 @@
       _paint(obj) {
         this.clear()
         if (!obj) return false
-        var parentG = d3.select(this.$.chartContainer).selectAll("div")
+        let parentG = d3.select(this.$.chartContainer).selectAll("div")
             .data(obj.chartData)
             .enter().append("svg")
-            .attr("class", "bullet")
-            .attr("width", obj.chartProp.width+ obj.chartProp.margin.xMargin)
-            .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin)
-            .append("g")
-            .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")")
-            .call(obj.chart);
 
-      var title = parentG.append("g")
+        let bullet =  parentG.attr("class", "bullet")
+          .attr("width", obj.chartProp.width+ obj.chartProp.margin.xMargin)
+          .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin)
+          .append("g")
+          .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")")
+          .call(obj.chart);
+
+      let title = bullet.append("g")
           .style("text-anchor", "end")
           .attr("transform", "translate(-6," + obj.chartProp.height / 2 + ")");
 
@@ -120,6 +121,9 @@
           node:obj.chartData,
           key: 'date'
         });
+
+      this.settingsDisabled&& bullet.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data

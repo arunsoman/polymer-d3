@@ -57,7 +57,10 @@
           levels: 6,
           ExtraWidthX: chartProp.margin.xMargin,
           ExtraHeightY: chartProp.margin.yMargin,
-          color:chartProp.color
+          color:chartProp.color,
+          KeyMap:KeyMap,
+          compSourcePopulate:this.compSourcePopulate.bind(this,chartProp.axis),
+          compChartChk:this.settingsDisabled
         }
 
         return {

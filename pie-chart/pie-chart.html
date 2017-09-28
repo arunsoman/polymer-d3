@@ -138,6 +138,8 @@
             key: 'item',
             segments
           });
+          
+      this.settingsDisabled&& g.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
 
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.settings.width.value+"px",
           "height":obj.chartProp.settings.height.value+"px"})

@@ -112,11 +112,13 @@ chart.radarChart = function(parentG, chartData, options){
     		  ]);
     		});
     //create polygon for Radar chart
-    svg.selectAll(".area")
+    let polygon = svg.selectAll(".area")
 			 .data([dataValues])
 			 .enter()
 			 .append("polygon")
-			 .attr("class", "radar-chart-serie"+series)
+       .attr("zKey",options.KeyMap[series])
+
+			 polygon.attr("class", "radar-chart-serie"+series)
 			 .style("stroke-width", "2px")
 			 .style("stroke", cfg.color(series))
 			 .attr("points",function(d) {
@@ -191,6 +193,12 @@ chart.radarChart = function(parentG, chartData, options){
      		.append("svg:title")
      		.text(function(j){return Math.max(j.value, 0)});
 	  series++;
+
+    options.compChartChk && polygon.on("click",function(){
+      let zKey = this.getAttribute("zKey")
+      options.compSourcePopulate({zKey})
+    })
+
   })
   //Tooltip
 	tooltip = svg.append('text')

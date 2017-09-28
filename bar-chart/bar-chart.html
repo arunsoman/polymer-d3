@@ -126,6 +126,9 @@
         key: 'item',
         segments
       });
+
+      this.settingsDisabled&&segments.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})

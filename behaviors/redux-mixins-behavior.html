@@ -94,6 +94,31 @@
                 state[action.value.uuid],{
                   readOnly:action.value.readOnly
                 })})
+            case 'ADD_COMP_REFRENCE_SRC':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  refrenceSrc:action.value.refrenceSrc
+                })})
+            case 'COMP_FILTER_CHK':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  compfilterChk:action.value.compfilterChk
+                })})
+            case 'ADD_FILTER_IDX':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  filterIdx:action.value.filterIdx
+                })})
+            case 'ADD_REFRENCE_IDS_GBL':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  refIds:action.value.refIds
+                })})
+            case 'ADD_FILTER_IDX_GBL':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  filterIdxGbl:action.value.filterIdxGbl
+                })})
 
           default:
               return state;
