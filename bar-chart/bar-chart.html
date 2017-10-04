@@ -148,6 +148,10 @@
         let elem = this, item = e.item
         compSourcePopulate({item,elem})
       })
+      this.settingsDisabled&&segments.on("dblclick",function(e){
+        let elem = this, item = e.item, dblClick=true
+        compSourcePopulate({item,elem,dblClick})
+      })
 
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);

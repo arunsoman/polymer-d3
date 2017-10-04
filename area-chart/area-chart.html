@@ -194,6 +194,10 @@
           let elem = this, item = e.name,zAxis=true
           compSourcePopulate({item,elem,zAxis})
         })
+        this.settingsDisabled&&chartSvg.on("dblclick",function(e){
+          let elem = this, item = e.name, zAxis=true, dblClick=true
+          compSourcePopulate({item,elem,zAxis,dblClick})
+        })
 
         }else{
           parentG.append("path")

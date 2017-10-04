@@ -125,6 +125,11 @@
                 state[action.value.uuid],{
                   filterKeys:action.value.filterKeys
                 })})
+            case 'COMP_FILTER_DBL_CLICK':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  dblClick:action.value.dblClick
+                })})
 
           default:
               return state;

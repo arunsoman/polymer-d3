@@ -161,6 +161,32 @@
           trackChartObj:{
             type:Object,
             notify:true
+          },
+          refIds:{
+            type:Array,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let refIds =  chartPath && chartPath.refIds
+              return refIds?refIds:[]
+            }
+          },
+          filterIdx:{
+            type:Number,
+            statePath(state){
+              let chartId = this.itemObj.chartId
+              // chartId = chartId?chartId:this.chartUUID
+              let chartPath = state.charts[chartId]
+              let filterIdx = chartPath && chartPath.filterIdx
+              return filterIdx>=0?filterIdx:-1
+            }
+          },
+          compfilterGblChk:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts[this.uuid]
+              let compfilterGblChk = chartPath && chartPath.compfilterGblChk
+              return compfilterGblChk
+            }
           }
         }
       }
@@ -194,6 +220,48 @@
             return {
               type: 'CURRENT_CHART_DELETED',
               value: currentChartDeleted
+            }
+          },
+          addRefrenceSrc(addRefrenceSrc) {
+            return {
+              type: 'ADD_COMP_REFRENCE_SRC',
+              value: addRefrenceSrc
+            }
+          },
+          filterIdxGbl(filterIdxGbl) {
+            return {
+              type: 'ADD_FILTER_IDX_GBL',
+              value: filterIdxGbl
+            }
+          },
+          addRefrenceIds(refIds) {
+            return {
+              type: 'ADD_REFRENCE_IDS_GBL',
+              value: refIds
+            }
+          },
+          addfilterIdx(filterIdx) {
+            return {
+              type: 'ADD_FILTER_IDX',
+              value: filterIdx
+            }
+          },
+          compfilterGblChk(compfilterGblChk) {
+            return {
+              type: 'COMP_FILTER_GBL_CHK',
+              value: compfilterGblChk
+            }
+          },
+          compfilterChk(compfilterChk) {
+            return {
+              type: 'COMP_FILTER_CHK',
+              value: compfilterChk
+            }
+          },
+          compFilterKeys(filterKeys) {
+            return {
+              type: 'COMP_FILTER_KEYS',
+              value: filterKeys
             }
           }
 
@@ -275,9 +343,27 @@
         let getObj = this.createNewIdNestedObj(this.id)
         let chartRemoveChk = true
         this.chartIsAvailableSetChildData("","",getObj,chartRemoveChk)
+        this.filterIdx!=-1 && this.deleteChartFilter()
         this.dispatch("currentChartDeleted", {uuid:this.chartUUID})
         this.updateObjRedux()
         this.set("trackChartObj.trackChartIdChk",true)
+      }
+      deleteChartFilter(){
+        let refIds = this.refIds
+        let filterIdx = this.filterIdx
+        let spliceIds = refIds.splice(filterIdx+1)
+        let filterIdxGbl = refIds.length==0?0:refIds.length==2?1:filterIdx
+        this.dispatch("compfilterGblChk", {uuid:this.uuid,compfilterGblChk:!this.compfilterGblChk})
+        this.dispatch("addRefrenceIds", {uuid:this.uuid,refIds:refIds})
+        this.dispatch("filterIdxGbl", {uuid:this.uuid,filterIdxGbl:filterIdxGbl})
+        spliceIds.forEach(itemId=>{
+          if(this.chartUUID!=itemId){
+            this.dispatch("addfilterIdx", {uuid:itemId,filterIdx:-1})
+            this.dispatch("compfilterChk", {uuid:itemId,compfilterChk:false})
+            this.dispatch("addRefrenceSrc", {uuid:itemId,refrenceSrc:[]})
+            this.dispatch("compFilterKeys", {uuid:itemId,filterKeys:[]})
+          }
+        })
       }
       // checkDialog(){
       //
@@ -363,6 +449,7 @@
       deleteSplitLayout(e){
         let getObj = this.createNewIdNestedObj(this.id)
         this.chartIsAvailableSetChildData("","",getObj)
+        this.filterIdx!=-1 && this.deleteChartFilter()
         this.chartUUID && this.dispatch("currentChartDeleted", {uuid:this.chartUUID})
         this.updateObjRedux()
         this.set("trackChartObj.trackChartIdChk",true)

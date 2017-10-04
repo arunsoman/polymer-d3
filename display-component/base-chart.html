@@ -195,9 +195,6 @@
         compfilterGblChk:{
           type:Boolean,
           statePath(state){
-            // let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
-            // let compChartChk = this.settingsDisabled&&this.compChartObjs
-            // let compfilterGblChk = chartIdChk && state.charts[this.id].compfilterGblChk
             let chartId = this.settingsDisabled && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
@@ -205,9 +202,6 @@
             return compfilterGblChk
           },
           observer:"filterSrcLoad"
-        },
-        filterTimer:{
-          type:Number
         },
         filterKeys:{
           type:Array,
@@ -222,6 +216,14 @@
         },
         srcLoadTimer:{
           type:Number
+        },
+        dblClick:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let dblClick = chartIdChk && state.charts[this.id].dblClick
+            return dblClick?dblClick:false
+          }
         }
       }
     }
@@ -284,6 +286,12 @@
             type: 'COMP_FILTER_KEYS',
             value: filterKeys
           }
+        },
+        compDblClick(dblClick) {
+          return {
+            type: 'COMP_FILTER_DBL_CLICK',
+            value: dblClick
+          }
         }
       }
     }
@@ -307,7 +315,7 @@
         // debugger
         clearTimeout(this.srcLoadTimer)
         this.srcLoadTimer = setTimeout(()=>{
-          this.refIds.length && this.refIds.indexOf(this.id)==-1 && this._chartDraw()
+          (this.refIds.length && this.refIds.indexOf(this.id)==-1 || this.dblClick)&& this._chartDraw()
         })
       }
     }
@@ -443,42 +451,46 @@
     }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
-      clearTimeout(this.filterTimer)
+      eArg.dblClick&&this.chartDoubleClick()
       let axis = eArg.zAxis?itemXYZ.itemZ:itemXYZ.itemX
       let propData = {}
-      let compfilterKeys = this.filterKeys
-      // this.push("filterKeys",eArg.item)
-      compfilterKeys.push(eArg.item)
-      propData.filterKeys=compfilterKeys
       let elemClass =eArg.elem.getAttribute("class")
-      elemClass = elemClass+" selected"
+      let refIds = this.refIds, compfilterKeys = this.filterKeys
+      let filterIdx = this.filterIdx
+      if(eArg.dblClick){
+         let dblFilterIdx = filterIdx+1
+         refIds.splice(dblFilterIdx, 0, this.uuid)
+        //  debugger
+      }else{
+        this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
+      }
+      if(compfilterKeys.indexOf(eArg.item)==-1){
+        compfilterKeys.push(eArg.item)
+        elemClass = elemClass+" selected"
+      }
+      propData.filterKeys=compfilterKeys
       eArg.elem.setAttribute("class",elemClass)
 
-      this.filterTimer = setTimeout(()=>{
-        let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
-        let filterSrc = []
-        filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
-
-        propData.filterSrc = filterSrc
-        // this.set("filterKeys",[])
-        let compfilterGblChk = !this.compfilterGblChk
-        propData.compfilterGblChk = compfilterGblChk
-        let refIds = this.refIds
-        let filterIdxGbl = this.filterIdxGbl
-        let filterIdx = this.filterIdx
-        this.refIds.indexOf(this.compUUID)==-1 && refIds.push(this.compUUID)
-        if(this.refIds.indexOf(this.uuid)==-1){
-          refIds.push(this.uuid)
-          filterIdxGbl = filterIdxGbl+1
-          filterIdx = filterIdx+filterIdxGbl
-          this.set("compfilterChk",true)
-        }
-        propData.compfilterChk = this.compfilterChk
-        propData.refIds = refIds
-        propData.filterIdx = filterIdx
-        propData.filterIdxGbl = filterIdxGbl
-        this.reduxUpdateSrc(propData)
-      },630)
+      let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
+      let filterSrc = []
+      filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
+      propData.filterSrc = filterSrc
+      let compfilterGblChk = !this.compfilterGblChk
+      propData.compfilterGblChk = compfilterGblChk
+      let filterIdxGbl = this.filterIdxGbl
+      refIds.indexOf(this.compUUID)==-1 && refIds.push(this.compUUID)
+      if(refIds.indexOf(this.uuid)==-1){
+        refIds.push(this.uuid)
+        filterIdxGbl = filterIdxGbl+1
+        filterIdx = filterIdx+filterIdxGbl
+        this.set("compfilterChk",true)
+      }
+      this.set("dblClick",false)
+      propData.compfilterChk = this.compfilterChk
+      propData.refIds = refIds
+      propData.filterIdx = filterIdx
+      propData.filterIdxGbl = filterIdxGbl
+      this.reduxUpdateSrc(propData)
     }
     reduxUpdateSrc(propData){
       this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
@@ -508,13 +520,17 @@
       })
 
     }
-    updateClasses(d,cls){
-      let classes = cls
-      // debugger
-      if(this.filterKeys.length && this.filterKeys.indexOf(d.name)!=-1){
-        classes+=" selected"
-      }
-      return classes
+    chartDoubleClick(){
+      let refIds = this.refIds
+      let filterIdx = this.filterIdx
+      filterIdx = filterIdx+1
+      let spliceIds = refIds.splice(filterIdx,1)
+
+      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:refIds})
+      this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:[]})
+      this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:[]})
+      this.dispatch("compDblClick", {uuid:this.uuid,dblClick:true})
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:!this.compfilterGblChk})
     }
   }
   customElements.define(baseChart.is,baseChart)
