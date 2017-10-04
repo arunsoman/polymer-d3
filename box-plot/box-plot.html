@@ -49,6 +49,16 @@
       fill:transparent;
       stroke-width:0;
     }
+    paper-button.resetBtn {
+      font-size: x-small;
+      float: right;
+      padding: 4px;
+      margin-top: 5px;
+    }
+    #chartContainer rect.selected {
+      fill-opacity: .25;
+      cursor:not-allowed;
+    }
   </style>
   <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
     <chart-input-group  uuid="[[uuid]]">
@@ -58,6 +68,9 @@
     <chart-settings uuid="[[uuid]]"></chart-settings>
   </template>
   <!-- <svg id="svg"></svg> -->
+  <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+    <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
+  </template>
   <div id="chartContainer"></div>
 </template>
 <script>
@@ -193,7 +206,12 @@
       });
 
 
-      this.settingsDisabled&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      // this.settingsDisabled&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+      this.settingsDisabled&&rect.on("click",function(e){
+        let elem = this, item = e[0]
+        compSourcePopulate({item,elem})
+      })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
     }

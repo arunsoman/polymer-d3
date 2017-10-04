@@ -17,14 +17,27 @@
         margin:0 auto;
         font: 10px sans-serif;
       }
+      paper-button.resetBtn {
+        font-size: x-small;
+        float: right;
+        padding: 4px;
+        margin-top: 5px;
+      }
+      #chartContainer rect.selected {
+        fill-opacity: .25;
+        cursor:not-allowed;
+      }
     </style>
     <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
-        <chart-input slot="chart-input" axis="y" label="Key"></chart-input>
-        <chart-input slot="chart-input" axis="z" label="Value" accept="number"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="Z-Key"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
+    </template>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
     <div id="chartContainer"></div>
   </template>
@@ -61,13 +74,13 @@
         let chartData = source.data;
 
         let xKey=source.xKey,
-            yKey = source.yKey
+            zKey = source.zKey
 
         let itemSize = 18,
             cellSize = itemSize - 1
 
         let x_elements = d3.set(chartData.map(item=>item[xKey])).values(),
-            y_elements = d3.set(chartData.map(item=>item[yKey])).values();
+            y_elements = d3.set(chartData.map(item=>item[zKey])).values();
 
         let xScale = d3.scale.ordinal()
             .domain(x_elements)
@@ -99,7 +112,7 @@
           xScale,
           yScale,
           xKey,
-          yKey,
+          zKey,
           colorScale,
           calendarChart,
           chartData,
@@ -121,7 +134,7 @@
                     .data(obj.chartData)
                     .enter().append('g').append('rect')
                     .attr({'class':'cell','width':obj.cellSize, 'height':obj.cellSize})
-                    .attr('y', d=>obj.yScale(d[obj.yKey]))
+                    .attr('y', d=>obj.yScale(d[obj.zKey]))
                     .attr('x', d=>obj.xScale(d[obj.xKey]))
                     .attr('fill', (d)=>{return obj.colorScale(d.value)})
                     // .append("title")
@@ -140,30 +153,36 @@
               .style("text-anchor", "start")
               .attr("transform", d=>"rotate(-65)");
 
-      this.settingsDisabled&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      // this.settingsDisabled&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+      this.settingsDisabled&&cells.on("click",function(e){
+        let elem = this, item = e.zKey,zAxis=true
+        compSourcePopulate({item,elem,zAxis})
+      })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }
       // populate chart data
       getChartData(itemX,itemY,itemZ,parseDate){
-          let xKey = this.externals[itemX]["key"],
-              yKey = this.externals[itemY]["key"]
+          // let xKey = this.externals[itemX]["key"],
+          //     yKey = this.externals[itemY]["key"]
           // let parseDate = d3.time.format('%Y-%m-%d').parse
+          let xKey = "xKey",zKey = "zKey"
 
           let data = this.source.map(row=>{
             let splitRowX = String(row[itemX]).split(" ")[0],
-                splitRowY = String(row[itemY]).split(" ")[0],
+                splitRowZ = String(row[itemZ]).split(" ")[0],
                 dateParseRowX = parseDate(String(row[itemX]).split(" ")[0]),
                 xRow = dateParseRowX?splitRowX:row[itemX],
-                dateParseRowY = parseDate(String(row[itemY]).split(" ")[0]),
-                yRow = dateParseRowY?splitRowY:row[itemY]
+                dateParseRowZ = parseDate(String(row[itemZ]).split(" ")[0]),
+                zRow = dateParseRowZ?splitRowZ:row[itemZ]
             return{
               [xKey]:xRow,
-              [yKey]:yRow,
-              value:row[itemZ]
+              [zKey]:zRow,
+              value:row[itemY]
             }
           })
-          return {data,xKey,yKey}
+          return {data,xKey,zKey}
       }
     }
     customElements.define(heatMap.is, heatMap)

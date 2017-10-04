@@ -105,7 +105,7 @@
         source:{
           type:Array,
           statePath(state){
-            // let compChartChk = this.settingsDisabled && this.compfilterChk
+            // let compChartChk = this.settingsDisabled && this.compfilterGblChk
             let refIdIdxChk = this.settingsDisabled && this.filterIdx>=0 && this.refIds.length
             let refId = refIdIdxChk&& this.refIds[this.filterIdx]
             refId = refId?refId:this.settingsDisabled &&this.refIds&&this.refIds.length&&this.refIds.slice(-1).pop()
@@ -187,14 +187,22 @@
         compfilterChk:{
           type:Boolean,
           statePath(state){
+            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let compfilterChk = chartIdChk && state.charts[this.id].compfilterChk
+            return compfilterChk
+          }
+        },
+        compfilterGblChk:{
+          type:Boolean,
+          statePath(state){
             // let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
             // let compChartChk = this.settingsDisabled&&this.compChartObjs
-            // let compfilterChk = chartIdChk && state.charts[this.id].compfilterChk
+            // let compfilterGblChk = chartIdChk && state.charts[this.id].compfilterGblChk
             let chartId = this.settingsDisabled && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
-            let compfilterChk = chartPath && chartPath.compfilterChk
-            return compfilterChk
+            let compfilterGblChk = chartPath && chartPath.compfilterGblChk
+            return compfilterGblChk
           },
           observer:"filterSrcLoad"
         },
@@ -203,7 +211,11 @@
         },
         filterKeys:{
           type:Array,
-          value:[]
+          statePath(state){
+            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let filterKeys = chartIdChk && state.charts[this.id].filterKeys
+            return filterKeys?filterKeys:[]
+          }
         },
         chartTimer:{
           type:Number
@@ -255,10 +267,22 @@
             value: filterIdx
           }
         },
+        compfilterGblChk(compfilterGblChk) {
+          return {
+            type: 'COMP_FILTER_GBL_CHK',
+            value: compfilterGblChk
+          }
+        },
         compfilterChk(compfilterChk) {
           return {
             type: 'COMP_FILTER_CHK',
             value: compfilterChk
+          }
+        },
+        compFilterKeys(filterKeys) {
+          return {
+            type: 'COMP_FILTER_KEYS',
+            value: filterKeys
           }
         }
       }
@@ -311,7 +335,7 @@
 
       if(this.settingsDisabled){
         this.set("uuid",this.id)
-        this.set("filterKeys",[])
+        // this.set("filterKeys",[])
       }else{
       this.set("uuid",this.parentId+'@'+this.tagName);
       }
@@ -420,30 +444,25 @@
     compSourcePopulate(itemXYZ,eArg){
       // debugger
       clearTimeout(this.filterTimer)
-      let axis
-      let eArgChk = (eArg.data||eArg.xKey&&typeof eArg.xKey!="number"||eArg.Genre||eArg.Movie||eArg[0]||eArg.title)
-      if(eArgChk){
-        //Pie chart - eArg.data.item, Waterfall chart - eArg.xKey, Heat map chart - eArg.Genre
-        //Pareto chart - eArg.Movie, Box plot chart - eArg[0], Bullet chart - eArg.title
-        let filterKeys =  (eArg.data.item||eArg.xKey||eArg.Genre||eArg.Movie||eArg[0]||eArg.title)
-        this.push("filterKeys",filterKeys)
-        axis = itemXYZ.itemX
-      }else if(eArg.zKey||eArg.name || eArg.item || eArg.key){
-        //Radar chart, Scatter plot, Area chart, Bar chart and Grouped bar chart
-        this.push("filterKeys",(eArg.zKey||eArg.name || eArg.item || eArg.key))
-        axis = itemXYZ.itemZ?itemXYZ.itemZ:itemXYZ.itemX
-      }
-
-
+      let axis = eArg.zAxis?itemXYZ.itemZ:itemXYZ.itemX
+      let propData = {}
+      let compfilterKeys = this.filterKeys
+      // this.push("filterKeys",eArg.item)
+      compfilterKeys.push(eArg.item)
+      propData.filterKeys=compfilterKeys
+      let elemClass =eArg.elem.getAttribute("class")
+      elemClass = elemClass+" selected"
+      eArg.elem.setAttribute("class",elemClass)
+      
       this.filterTimer = setTimeout(()=>{
-        let filterKeys = this.filterKeys.filter((item, pos)=>this.filterKeys.indexOf(item) == pos)
+        let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
         let filterSrc = []
         filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
-        let propData = {}
+
         propData.filterSrc = filterSrc
-        this.set("filterKeys",[])
-        let compfilterChk = !this.compfilterChk
-        propData.compfilterChk = compfilterChk
+        // this.set("filterKeys",[])
+        let compfilterGblChk = !this.compfilterGblChk
+        propData.compfilterGblChk = compfilterGblChk
         let refIds = this.refIds
         let filterIdxGbl = this.filterIdxGbl
         let filterIdx = this.filterIdx
@@ -452,20 +471,41 @@
           refIds.push(this.uuid)
           filterIdxGbl = filterIdxGbl+1
           filterIdx = filterIdx+filterIdxGbl
+          this.set("compfilterChk",true)
         }
+        propData.compfilterChk = this.compfilterChk
         propData.refIds = refIds
         propData.filterIdx = filterIdx
         propData.filterIdxGbl = filterIdxGbl
         this.reduxUpdateSrc(propData)
-      },1210)
+      },630)
     }
     reduxUpdateSrc(propData){
       this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
       this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:propData.filterSrc})
+      this.dispatch("compfilterChk", {uuid:this.uuid,compfilterChk:propData.compfilterChk})
+      this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:propData.filterKeys})
 
-      this.dispatch("compfilterChk", {uuid:this.compUUID,compfilterChk:propData.compfilterChk})
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:propData.compfilterGblChk})
       this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:propData.refIds})
       this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:propData.filterIdxGbl})
+
+    }
+    chartReset(){
+      let refIds = this.refIds
+      let filterIdx = this.filterIdx
+      let spliceIds = refIds.splice(filterIdx+1)
+      let filterIdxGbl = refIds.length==0?0:refIds.length==2?1:filterIdx
+
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:!this.compfilterGblChk})
+      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:refIds})
+      this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:filterIdxGbl})
+      spliceIds.forEach(itemId=>{
+        this.dispatch("addfilterIdx", {uuid:itemId,filterIdx:-1})
+        this.dispatch("compfilterChk", {uuid:itemId,compfilterChk:false})
+        this.dispatch("addRefrenceSrc", {uuid:itemId,refrenceSrc:[]})
+        this.dispatch("compFilterKeys", {uuid:itemId,filterKeys:[]})
+      })
 
     }
   }

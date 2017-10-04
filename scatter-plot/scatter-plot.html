@@ -21,6 +21,16 @@
         height: 28px;
         pointer-events: none;
       }
+      paper-button.resetBtn {
+        font-size: x-small;
+        float: right;
+        padding: 4px;
+        margin-top: 5px;
+      }
+      #chartContainer circle.selected {
+        fill-opacity: .25;
+        cursor:not-allowed;
+      }
     </style>
     <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
@@ -29,6 +39,9 @@
         <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
+    </template>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
     <div id="chartContainer"></div>
   </template>
@@ -153,7 +166,12 @@
         });
 
 
-        this.settingsDisabled&&circle.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        // this.settingsDisabled&&circle.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+        this.settingsDisabled&&circle.on("click",function(e){
+          let elem = this, item = e.zKey,zAxis=true
+          compSourcePopulate({item,elem,zAxis})
+        })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }

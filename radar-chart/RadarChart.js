@@ -195,8 +195,8 @@ chart.radarChart = function(parentG, chartData, options){
 	  series++;
 
     options.compChartChk && polygon.on("click",function(){
-      let zKey = this.getAttribute("zKey")
-      options.compSourcePopulate({zKey})
+      let elem = this, item = this.getAttribute("zKey"),zAxis=true
+      options.compSourcePopulate({item,elem,zAxis})
     })
 
   })

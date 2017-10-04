@@ -29,6 +29,16 @@
         margin:0 auto;
         font: 10px sans-serif;
       }
+      paper-button.resetBtn {
+        font-size: x-small;
+        float: right;
+        padding: 4px;
+        margin-top: 5px;
+      }
+      #chartContainer rect.selected {
+        fill-opacity: .25;
+        cursor:not-allowed;
+      }
     </style>
     <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
@@ -36,6 +46,9 @@
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
+    </template>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
     <div id="chartContainer"></div>
   </template>
@@ -69,7 +82,7 @@
         //get chart data once pass "x and y" into the "getChartData" method
         let source = this.getChartData(chartProp.itemX, chartProp.itemY)
         let chartData = source.data
-        let xKey = source.xKey
+        let xKey = "xKey"
 
         //Axes and scales
         let xScale = d3.scale.ordinal().rangeRoundBands([0, chartProp.width], 0.1);
@@ -157,7 +170,12 @@
             .style("text-anchor", "end")
             .text("Cumulative %");
 
-        this.settingsDisabled&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        // this.settingsDisabled&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+        this.settingsDisabled&&bar.on("click",function(e){
+          let elem = this, item = e.xKey
+          compSourcePopulate({item,elem})
+        })
 
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         this.addLegend({
@@ -169,13 +187,13 @@
           });
       }
       getChartData(itemX, itemY){
-          let xKey = this.externals[itemX]["key"]
+          // let xKey = this.externals[itemX]["key"]
 
           let sourcemap = this.source.reduce((old,newVal)=>{
             old[newVal[itemX]]=(old[newVal[itemX]]||0)+newVal[itemY]
             return old
           },{})
-          let source  = Object.keys(sourcemap).map(item=>{return {[xKey]:item,value:sourcemap[item]}})
+          let source  = Object.keys(sourcemap).map(item=>{return {xKey:item,value:sourcemap[item]}})
           let totalValue = 0
           //now calculate cumulative value from "item value + previous item value".
           source.forEach((item,i)=>{
@@ -187,7 +205,7 @@
           let data = source.filter(item=>{
             return item.CumulativePercentage = parseFloat((item.CumulativeValue/ totalValue).toFixed(2));
           })
-          return {data,xKey}
+          return {data}
       }
     }
     customElements.define(paretoChart.is, paretoChart)

@@ -55,11 +55,6 @@
                 chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
               })
             })
-            // case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
-            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-            //     state[action.value.uuid],{
-            //       compositeChartData:Object.assign({},state[action.value.uuid],action.value.chartData)
-            //     })})
             case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
@@ -104,6 +99,12 @@
                 state[action.value.uuid],{
                   compfilterChk:action.value.compfilterChk
                 })})
+              case 'COMP_FILTER_GBL_CHK':
+                return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                  state[action.value.uuid],{
+                    compfilterGblChk:action.value.compfilterGblChk
+                  })})
+
             case 'ADD_FILTER_IDX':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
@@ -118,6 +119,11 @@
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
                   filterIdxGbl:action.value.filterIdxGbl
+                })})
+            case 'COMP_FILTER_KEYS':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  filterKeys:action.value.filterKeys
                 })})
 
           default:

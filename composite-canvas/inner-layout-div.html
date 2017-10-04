@@ -151,33 +151,6 @@
               return currentObjNested
             }
           },
-          // compChartObjs:{
-          //   type:Object,
-          //   statePath(state){
-          //     var chartPath = state.charts[this.uuid]
-          //     let keyChk = chartPath && Object.keys(chartPath.inputs).length
-          //     let compChartInputs = keyChk ? chartPath.inputs:{}
-          //     let compChartAxisKeys = keyChk && Object.keys(chartPath.inputs)
-          //     let compChartSettings = chartPath && state.charts[this.uuid].settings
-          //     let parentId=this.uuid.split("@")[0]
-          //     // debugger
-          //     let selfChartPath =state.charts[this.itemObj.chartId]
-          //     let compfilterChk = selfChartPath&&selfChartPath.compfilterChk
-          //     let filterIdx = selfChartPath&&selfChartPath.filterIdx
-          //     let refIds = chartPath&&chartPath.refIds
-          //     let srcChk = compfilterChk && filterIdx>0
-          //     let refId = srcChk&& refIds && refIds[filterIdx]
-          //     refId = refId?refId:refIds&&refIds.slice(-1).pop()
-          //     let source = refId&&state.charts[refId].refrenceSrc
-          //     source = source?source:state.data[parentId].source
-          //     // let source = state.data[parentId].source
-          //     let externals = state.data[parentId].externals
-          //     let objAssignChk = (chartPath && chartPath.settings)
-          //     let stacked = objAssignChk&&chartPath.settings.stacked.value
-          //     let group = objAssignChk&&chartPath.settings.group.value
-          //     return {compChartInputs,compChartAxisKeys,compChartSettings,source,externals,stacked,group,compfilterChk,filterIdx,refIds}
-          //   }
-          // },
           chartWidth:{
             type:String
           },
