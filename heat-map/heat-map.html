@@ -133,7 +133,12 @@
         let cells = parentG.selectAll('rect')
                     .data(obj.chartData)
                     .enter().append('g').append('rect')
-                    .attr({'class':'cell','width':obj.cellSize, 'height':obj.cellSize})
+                    .attr("class",function(d){
+                      let classes = "cell"
+                      this.filterKeys.length && this.filterKeys.indexOf(d.zKey)!=-1&&(classes+=" selected")
+                      return classes
+                    }.bind(this))
+                    .attr({'width':obj.cellSize, 'height':obj.cellSize})
                     .attr('y', d=>obj.yScale(d[obj.zKey]))
                     .attr('x', d=>obj.xScale(d[obj.xKey]))
                     .attr('fill', (d)=>{return obj.colorScale(d.value)})

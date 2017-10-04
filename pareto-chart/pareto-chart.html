@@ -35,7 +35,7 @@
         padding: 4px;
         margin-top: 5px;
       }
-      #chartContainer rect.selected {
+      #chartContainer g.selected {
         fill-opacity: .25;
         cursor:not-allowed;
       }
@@ -127,7 +127,11 @@
         let bar = parentG.selectAll(".bar")
                         .data(obj.chartData)
                         .enter().append("g")
-                        .attr("class", "bar");
+                        .attr("class",function(d){
+                          let classes = "bar"
+                          this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
+                          return classes
+                        }.bind(this))
         bar.append("rect")
             .attr("x", d=>obj.xScale(d[obj.xKey]))
             .attr("width", obj.xScale.rangeBand())

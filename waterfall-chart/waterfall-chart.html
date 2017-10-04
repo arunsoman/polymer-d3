@@ -142,7 +142,11 @@
             .data(obj.chartData)
             .enter()
             .append("rect")
-            .attr("class", d=>(d.value < 0) ? "negative" : "positive")
+            .attr("class",function(d){
+              let classes = (d.value < 0) ? "negative" : "positive"
+              this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
+              return classes
+            }.bind(this))
             .attr("x", (d, i)=>(i * obj.xDelta + obj.chartProp.margin.xAxisMrgn))
             .attr("y", (d, i)=>(d.value < 0) ? obj.chartProp.height - obj.yScale(d.cumulativeSum - d.value) : obj.chartProp.height - obj.yScale(d.cumulativeSum))
             .attr("width", d=>obj.xDelta)

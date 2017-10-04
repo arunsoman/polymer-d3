@@ -132,7 +132,11 @@
       let segments = svg.selectAll(".layer")
         .data(obj.layers)
         .enter().append("g")
-        .attr('class', 'layer')
+        .attr("class",function(d){
+          let classes = "layer"
+          this.filterKeys.length && this.filterKeys.indexOf(d.x)!=-1&&(classes+=" selected")
+          return classes
+        }.bind(this))
         .style("fill", function(d, i) { return obj.axis.scale.z(i); });
         // .style("fill", "steelblue");
 
@@ -166,7 +170,7 @@
       // this.settingsDisabled&&segments.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
       let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
       this.settingsDisabled&&segments.on("click",function(e){
-        let elem = this, item = e.key,zAxis=true
+        let elem = this, item = e.x,zAxis=true
         compSourcePopulate({item,elem,zAxis})
       })
 

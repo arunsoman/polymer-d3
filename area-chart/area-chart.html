@@ -168,11 +168,14 @@
             })
             .append("g")
               .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
-
         if(obj.stacked || obj.itemZChk){
           let chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
             .enter().append("g")
-            .attr("class", "area-chart")
+            .attr("class",function(d){
+              let classes = "area-chart"
+              this.filterKeys.length && this.filterKeys.indexOf(d.name)!=-1&&(classes+=" selected")
+              return classes
+            }.bind(this))
           chartSvg.append("path")
               .attr("class", "area")
               .attr("d", function(d) {return obj.areaChart(d.values); })

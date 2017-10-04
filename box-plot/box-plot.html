@@ -55,7 +55,7 @@
       padding: 4px;
       margin-top: 5px;
     }
-    #chartContainer rect.selected {
+    #chartContainer g.selected {
       fill-opacity: .25;
       cursor:not-allowed;
     }
@@ -168,7 +168,11 @@
     		.attr("transform", (d)=>"translate(" +  obj.x(d[0])  + "," + obj.chartProp.margin.top + ")")
         .attr('class', 'box-g')
         .call(obj.chart.width(obj.x.rangeBand()))
-        .attr('class', 'rect')
+        .attr("class",function(d){
+          let classes = "rect"
+          this.filterKeys.length && this.filterKeys.indexOf(d[0])!=-1&&(classes+=" selected")
+          return classes
+        }.bind(this))
 
       // add a title
      parentG.append("text")

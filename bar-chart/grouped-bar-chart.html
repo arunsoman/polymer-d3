@@ -120,7 +120,12 @@
 
                 let group =   svg.selectAll("g")
                 .data(obj.chartData)
-                .enter().append("g").attr("class","group")
+                .enter().append("g")
+                .attr("class",function(d){
+                  let classes = "group"
+                  this.filterKeys.length && this.filterKeys.indexOf(d.key)!=-1&&(classes+=" selected")
+                  return classes
+                }.bind(this))
                 .attr("transform", function(d, i) {
                     return "translate(" + obj.axis.scale.x0(obj.keys[i]) + ",0)";
                 })

@@ -113,12 +113,16 @@
             .data(obj.chartData)
             .enter().append("svg")
 
-        let bullet =  parentG.attr("class", "bullet")
-          .attr("width", obj.chartProp.width+ obj.chartProp.margin.xMargin)
+        let bullet =  parentG.attr("width", obj.chartProp.width+ obj.chartProp.margin.xMargin)
           .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin)
           .append("g")
           .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")")
-          .call(obj.chart);
+          .call(obj.chart)
+          .attr("class",function(d){
+            let classes = "bullet"
+            this.filterKeys.length && this.filterKeys.indexOf(d.title)!=-1&&(classes+=" selected")
+            return classes
+          }.bind(this))
 
       let title = bullet.append("g")
           .style("text-anchor", "end")

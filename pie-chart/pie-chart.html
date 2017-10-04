@@ -130,7 +130,11 @@
         let g = parentG.selectAll('.arc')
           .data(d => obj.pie(d.values))
           .enter().append('g')
-          .attr('class', 'arc')
+          .attr("class",function(d){
+            let classes = "arc"
+            this.filterKeys.length && this.filterKeys.indexOf(d.data.item)!=-1&&(classes+=" selected")
+            return classes
+          }.bind(this))
 
         let segments = g.append('path')
           .attr('d', obj.arc)

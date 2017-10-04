@@ -118,7 +118,11 @@
       let segments = svg.selectAll("bar")
         .data(obj.chartData)
         .enter().append("rect")
-        .attr('class', 'bar')
+        .attr("class",function(d){
+          let classes = "bar"
+          this.filterKeys.length && this.filterKeys.indexOf(d.item)!=-1&&(classes+=" selected")
+          return classes
+        }.bind(this))
         .style("fill", "steelblue")
         .attr("x", function(d) {
           return obj.axis.scale.x(d.item);

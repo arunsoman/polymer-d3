@@ -143,7 +143,11 @@
               .data(obj.chartData)
               .enter().append("circle")
 
-                  circle.attr("class", "dot")
+                  circle.attr("class",function(d){
+                    let classes = "dot"
+                    this.filterKeys.length && this.filterKeys.indexOf(d.zKey)!=-1&&(classes+=" selected")
+                    return classes
+                  }.bind(this))
                   .attr("r", 3.5)
                   .attr("cx", d=>obj.x(d.xKey))
                   .attr("cy", d=>obj.y(d.yKey))

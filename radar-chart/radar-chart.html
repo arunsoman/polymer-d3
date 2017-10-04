@@ -13,7 +13,7 @@
         margin-top: 5px;
       }
       #chartContainer polygon.selected {
-        fill-opacity: .25;
+        fill-opacity: .25 !important;
         cursor:not-allowed;
       }
     </style>
@@ -73,7 +73,8 @@
           color:chartProp.color,
           KeyMap:KeyMap,
           compSourcePopulate:this.compSourcePopulate.bind(this,chartProp.axis),
-          compChartChk:this.settingsDisabled
+          compChartChk:this.settingsDisabled,
+          filterKeys:this.filterKeys
         }
 
         return {

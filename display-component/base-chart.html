@@ -453,7 +453,7 @@
       let elemClass =eArg.elem.getAttribute("class")
       elemClass = elemClass+" selected"
       eArg.elem.setAttribute("class",elemClass)
-      
+
       this.filterTimer = setTimeout(()=>{
         let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
         let filterSrc = []
@@ -507,6 +507,14 @@
         this.dispatch("compFilterKeys", {uuid:itemId,filterKeys:[]})
       })
 
+    }
+    updateClasses(d,cls){
+      let classes = cls
+      // debugger
+      if(this.filterKeys.length && this.filterKeys.indexOf(d.name)!=-1){
+        classes+=" selected"
+      }
+      return classes
     }
   }
   customElements.define(baseChart.is,baseChart)

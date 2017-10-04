@@ -118,7 +118,12 @@ chart.radarChart = function(parentG, chartData, options){
 			 .append("polygon")
        .attr("zKey",options.KeyMap[series])
 
-			 polygon.attr("class", "radar-chart-serie"+series)
+			 polygon.attr("class",function(d,series){
+         let classes = "radar-chart-serie"+series
+         options.filterKeys.length && options.filterKeys.indexOf(options.KeyMap[series])!=-1&&(classes+=" selected")
+         return classes
+       })
+      //  .attr("class", "radar-chart-serie"+series)
 			 .style("stroke-width", "2px")
 			 .style("stroke", cfg.color(series))
 			 .attr("points",function(d) {
