@@ -163,6 +163,10 @@
               let elem = this, item = e.key,zAxis=true
               compSourcePopulate({item,elem,zAxis})
             })
+            this.settingsDisabled&&group.on("dblclick",function(e){
+              let elem = this, item = e.key,zAxis=true,dblClick=true
+              compSourcePopulate({item,elem,zAxis,dblClick})
+            })
             d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
 
             // this.addLegend({

@@ -176,6 +176,10 @@
           let elem = this, item = e.zKey,zAxis=true
           compSourcePopulate({item,elem,zAxis})
         })
+        this.settingsDisabled&&circle.on("dblclick",function(e){
+          let elem = this, item = e.zKey, zAxis=true, dblClick=true
+          compSourcePopulate({item,elem,zAxis,dblClick})
+        })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }

@@ -145,6 +145,10 @@
         let elem = this, item = e.title
         compSourcePopulate({item,elem})
       })
+      this.settingsDisabled&&bullet.on("dblclick",function(e){
+        let elem = this, item = e.title, dblClick=true
+        compSourcePopulate({item,elem,dblClick})
+      })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
       }

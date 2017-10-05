@@ -216,6 +216,10 @@
         let elem = this, item = e[0]
         compSourcePopulate({item,elem})
       })
+      this.settingsDisabled&&rect.on("dblclick",function(e){
+        let elem = this, item = e[0], dblClick=true
+        compSourcePopulate({item,elem,dblClick})
+      })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
     }

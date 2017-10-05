@@ -457,13 +457,7 @@
       let elemClass =eArg.elem.getAttribute("class")
       let refIds = this.refIds, compfilterKeys = this.filterKeys
       let filterIdx = this.filterIdx
-      if(eArg.dblClick){
-         let dblFilterIdx = filterIdx+1
-         refIds.splice(dblFilterIdx, 0, this.uuid)
-        //  debugger
-      }else{
-        this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
-      }
+      !eArg.dblClick&&this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
       if(compfilterKeys.indexOf(eArg.item)==-1){
         compfilterKeys.push(eArg.item)
         elemClass = elemClass+" selected"
@@ -521,12 +515,6 @@
 
     }
     chartDoubleClick(){
-      let refIds = this.refIds
-      let filterIdx = this.filterIdx
-      filterIdx = filterIdx+1
-      let spliceIds = refIds.splice(filterIdx,1)
-
-      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:refIds})
       this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:[]})
       this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:[]})
       this.dispatch("compDblClick", {uuid:this.uuid,dblClick:true})

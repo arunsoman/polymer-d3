@@ -203,6 +203,10 @@ chart.radarChart = function(parentG, chartData, options){
       let elem = this, item = this.getAttribute("zKey"),zAxis=true
       options.compSourcePopulate({item,elem,zAxis})
     })
+    options.compChartChk && polygon.on("dblclick",function(e){
+      let elem = this, item = this.getAttribute("zKey"), zAxis=true, dblClick=true
+      compSourcePopulate({item,elem,zAxis,dblClick})
+    })
 
   })
   //Tooltip

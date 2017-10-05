@@ -270,11 +270,13 @@
                         return prev
                       },
                         this.source.reduce((prev,next)=>{prev[next[itemX]]=0;return prev},{})
+                        // {}
                       )
               }
           })
           data = []
           let tlpLabels=[]
+
           zKeys.forEach((key,k)=>{
             xKeys.forEach((label,i)=>{
                 data.push(sourceData[k].value[label])
