@@ -281,6 +281,7 @@
             xKeys.forEach((label,i)=>{
                 data.push(sourceData[k].value[label])
             })
+            // data = data.filter(item=>item!=0)
             tlpLabels = tlpLabels.concat(Object.keys(sourceData[k].value));
           })
           return{data, sourceData, xKeys, zKeys, tlpLabels}
@@ -332,8 +333,7 @@
 
       }
       paintHorizontalGrpChart(parentG,bar,obj){
-
-            bar.attr("transform", function(d, i) {
+          bar.attr("transform", function(d, i) {
               return "translate(" + obj.chartProp.margin.xMargin + "," + (i * obj.barHeight + obj.chartProp.margin.axisMargin * (0.5 + Math.floor(i/obj.xKeys.length))) + ")";
             });
         // Create rectangles of the correct width
@@ -358,6 +358,7 @@
             .attr("y", obj.groupHeight / 2)
             .attr("dy", ".35em")
             .text(function(d,i) {
+              this.parentElement.setAttribute("zKey",obj.zKeys[Math.floor(i/obj.xKeys.length)])
               if (i % obj.xKeys.length === 0)
                 return obj.zKeys[Math.floor(i/obj.xKeys.length)];
               else
