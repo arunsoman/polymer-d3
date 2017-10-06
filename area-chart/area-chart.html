@@ -109,7 +109,7 @@
               }));
         }else{
           chartData = source.map((item,i)=>{
-            itemVal = chartProp.parseDate(item["item"].split(" ")[0])
+            itemVal = item["item"].indexOf("GMT")!=-1 ?item["item"]:chartProp.parseDate(item["item"].split(" ")[0])
             let itemSet = itemVal?itemVal:item["item"]
             return{"value":item.value,"item":itemSet}
           })
@@ -235,7 +235,7 @@
         let sourceData
         if(stacked || itemZChk){
           sourceData = this.source.map((items,i)=>{
-            itemVal = formatDate(String(items[itemX]).split(" ")[0])
+            itemVal = items[itemX].indexOf("GMT")!=-1 ?items[itemX]:formatDate(String(items[itemX]).split(" ")[0])
             let itemSet = itemVal?itemVal:items[itemX]
             return this.source.reduce((old,newVal)=>{
               old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:stacked?newVal[itemY]:0;

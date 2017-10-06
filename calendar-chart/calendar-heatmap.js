@@ -146,6 +146,9 @@ d3.calendar={};
                         return colour(nestedData[d]);
                     })
                     .on('mouseover', dispatch._hover);
+                // rect.on("click",function(d){
+                //   debugger
+                // })
             });
         }
 

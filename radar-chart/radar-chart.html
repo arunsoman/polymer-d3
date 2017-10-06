@@ -162,8 +162,10 @@
         let data = sourceData.map((items,i)=>{
           let clsName = KeyMap[i]
           return items[clsName].map(item=>{
-              let dateV = String(item[itemX]).split(" ")[0]
-              dateChk = formatDate(dateV)
+              let stringX =String(item[itemX]),
+              dateV = stringX.indexOf("GMT")!=-1 ?new Date(stringX).toISOString().split("-")[0]:stringX.split(" ")[0]
+
+              dateChk = stringX.indexOf("GMT")!=-1 ?true:formatDate(dateV)
               let dateSet = dateChk?dateV:item[itemX]
               return{
                 axis:dateSet,

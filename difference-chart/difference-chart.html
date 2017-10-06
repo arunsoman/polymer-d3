@@ -31,6 +31,7 @@
         stroke: #000;
         stroke-width: 1px;
       }
+
     </style>
     <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
@@ -64,6 +65,13 @@
        let arg = {axisIndex}
        let chartProp = this.getChartProperties(arg)
        if(!chartProp)return false
+       if(this.externals[chartProp.itemZ].type!="Number"){
+         let span = document.createElement("span")
+         span.textContent="Difference chart Z-Axis value accept as a Number"
+         span.setAttribute("class","warningMsg")
+         this.parentNode.appendChild(span)
+         return false
+       }
 
        //get chart data once pass axis into the "getChartData" method
        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
@@ -158,9 +166,10 @@
        //let parseDate = d3.time.format("%Y-%m-%d").parse;
        let dateChk
        let sourceData = this.source.map(items=>{
-         let dateV = String(items[itemX]).split(" ")[0]
-         dateChk = parseDate(dateV)
-         let itemSet = dateChk?dateChk:items[itemX]
+        let stringX =String(items[itemX]),
+        dateV = stringX.indexOf("GMT")!=-1 ?new Date(stringX).toISOString().split("-")[0]:parseDate(stringX.split(" ")[0])
+
+         let itemSet = dateV?dateV:items[itemX]
           return{
             xKey:itemSet,
             yKey:+items[itemY],

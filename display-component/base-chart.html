@@ -415,6 +415,13 @@
       //"inputCheck" for avoid error from chart
       let axisIndex = stacked||group?3:obj.axisIndex
       if(!this.hasInputs(axisIndex))return false
+      if(this.chartWidth&&this.chartWidth<=171){
+        let span = document.createElement("span")
+        span.textContent="Need more width for visible a chart"
+        span.setAttribute("class","warningMsg chartMsg")
+        this.parentNode.appendChild(span)
+        return false
+      }
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
       if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
@@ -426,7 +433,6 @@
       itemY = this.inputs[this.y].selectedValue[0]
       this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
       group || stacked && itemZ
-
       let parseDate = d3.time.format('%Y-%m-%d').parse;
       // let settings = this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
       let settings = this.settings
@@ -455,13 +461,13 @@
       let axis = eArg.zAxis?itemXYZ.itemZ:itemXYZ.itemX
       let propData = {}
       let elemClass =eArg.elem.getAttribute("class")
+      elemClass = elemClass!=null?elemClass:""
       let refIds = this.refIds, compfilterKeys = this.filterKeys
       let filterIdx = this.filterIdx
       !eArg.dblClick&&this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
-      if(compfilterKeys.indexOf(eArg.item)==-1){
-        compfilterKeys.push(eArg.item)
-        elemClass = elemClass+" selected"
-      }
+      compfilterKeys.indexOf(eArg.item)==-1 && compfilterKeys.push(eArg.item)
+      elemClass.indexOf("selected") ==-1&&(elemClass = elemClass+" selected")
+
       propData.filterKeys=compfilterKeys
       eArg.elem.setAttribute("class",elemClass)
 

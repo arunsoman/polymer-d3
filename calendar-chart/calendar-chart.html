@@ -72,7 +72,7 @@
         })
         // debugger
         let chartData = d3.nest()
-              .key((d)=> chartProp.parseDate(d.item.split(' ')[0]))
+              .key((d)=> d.item.indexOf("GMT")!=-1 ?d.item:chartProp.parseDate(d.item.split(' ')[0]))
               .rollup(function (n) {
                   return d3.sum(n, function (d) {
                       return d.value; // key
@@ -80,7 +80,7 @@
               })
               .map(source);
         //get years and calculated for year range(start and end year)
-        let yearRange = chartSrcData.map(date=>+date.date.split("-")[0]).sort((a, b)=> a-b)
+        let yearRange = chartSrcData.map(date=>date.date.indexOf("GMT")!=-1 ? +new Date(date.date).toISOString().split("-")[0]:+date.date.split("-")[0]).sort((a, b)=> a-b)
         let startYear =yearRange[0]
         let endYear =yearRange.pop()+1
 

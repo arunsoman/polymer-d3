@@ -179,12 +179,18 @@
           let xKey = "xKey",zKey = "zKey"
 
           let data = this.source.map(row=>{
-            let splitRowX = String(row[itemX]).split(" ")[0],
-                splitRowZ = String(row[itemZ]).split(" ")[0],
-                dateParseRowX = parseDate(String(row[itemX]).split(" ")[0]),
-                xRow = dateParseRowX?splitRowX:row[itemX],
-                dateParseRowZ = parseDate(String(row[itemZ]).split(" ")[0]),
-                zRow = dateParseRowZ?splitRowZ:row[itemZ]
+            let rowX = String(row[itemX]),
+                rowZ = String(row[itemZ]),
+                splitRowX = rowX.split(" ")[0],
+                splitRowZ = rowZ.split(" ")[0],
+                dateParseRowX = rowX.indexOf("GMT")!=-1 ?true:parseDate(rowX.split(" ")[0]),
+                dateParseRowZ = rowZ.indexOf("GMT")!=-1 ?true:parseDate(rowZ.split(" ")[0])
+
+            splitRowX = rowX.indexOf("GMT")!=-1 ?new Date(rowX).toISOString().split("-")[0]:splitRowX
+            splitRowZ = rowZ.indexOf("GMT")!=-1 ?new Date(rowZ).toISOString().split("-")[0]:splitRowZ
+
+            let xRow = dateParseRowX?splitRowX:row[itemX],
+              zRow = dateParseRowZ?splitRowZ:row[itemZ]
             return{
               [xKey]:xRow,
               [zKey]:zRow,

@@ -198,9 +198,9 @@
         },{})
         let parseDate = d3.time.format('%Y-%m-%d').parse;
         let source  = Object.keys(sourceData).map(item=>{
-          let dateV = String(item).split(" ")[0]
-          let dateChk = parseDate(dateV)
-          let itemSet = dateChk?dateV:item
+          let dateV = item.indexOf("GMT")!=-1 ?item:parseDate(String(item).split(" ")[0])
+          // let dateChk = parseDate(dateV)
+          let itemSet = dateV?dateV:item
           return {xKey:itemSet,yKey:sourceData[item]}
         })
 
