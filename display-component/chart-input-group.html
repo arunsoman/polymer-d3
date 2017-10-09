@@ -7,25 +7,27 @@
     .input-drag-wrapper{
       padding: 1em;
     }
-    :host{
+    #chartSelector{
         position: relative;
-        overflow: hidden;
+        /*overflow: hidden;*/
         background: #2f3238;
-        border-bottom: solid 1px #e66c13;
-        display: block;
-        overflow: hidden;
+        /*border-bottom: solid 1px #e66c13;*/
+        /*display: block;*/
+        /*overflow: hidden;*/
         text-align: center;
     }
     .input-drag-wrapper{
-      padding: 1em;
+      padding: 1em 1em 0;
     }
     #inputItems{
       background: #fd8d3c;
+      margin-top: 7px;
     }
 
     </style>
 
-    <!-- <div uuid = [[getUUID]]></div> -->
+     <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
+    <paper-dialog id="chartSelector" with-backdrop>
     <div class="input-drag-wrapper">
       <template is="dom-repeat" items="[[ externals ]]">
         <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
@@ -34,8 +36,10 @@
 
     <div id="inputItems">
       <slot name="chart-input"></slot>
+      <chart-settings uuid="[[uuid]]"></chart-settings>
     </div>
 
+    </paper-dialog>
   </template>
 
 <script>
@@ -87,8 +91,11 @@
             }
           }
         }
+        showChartOptions(){
+          this.$.chartSelector.open();
+        }
 
-        init(e){
+        init(){
           this.set('paragraphId',this.uuid.split('@')[0]);
         }
         constructor() {
