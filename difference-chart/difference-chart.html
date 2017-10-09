@@ -98,7 +98,12 @@
             .x(d=>x(d.xKey))
             .y1(d=>y(d.yKey));
       // define x and y domain
-      x.domain(d3.extent(chartData, d=>d.xKey));
+      if(dateChk){
+        x.domain(d3.extent(chartData, d=>d.xKey));
+      } else{
+        x.domain(chartData.map(d=> d.xKey))
+        .rangeRoundBands([0 , chartProp.width]);
+      }
       y.domain([
         d3.min(chartData, d=>Math.min(d.yKey, d.zKey)),
         d3.max(chartData, d=>Math.max(d.yKey, d.zKey))
@@ -167,8 +172,8 @@
        let dateChk
        let sourceData = this.source.map(items=>{
         let stringX =String(items[itemX]),
-        dateV = stringX.indexOf("GMT")!=-1 ?new Date(stringX).toISOString().split("-")[0]:parseDate(stringX.split(" ")[0])
-
+        dateV = stringX.indexOf("GMT")!=-1 ?items[itemX]:parseDate(stringX.split(" ")[0])
+        dateChk = dateV
          let itemSet = dateV?dateV:items[itemX]
           return{
             xKey:itemSet,

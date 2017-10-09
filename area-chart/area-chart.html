@@ -235,7 +235,7 @@
         let sourceData
         if(stacked || itemZChk){
           sourceData = this.source.map((items,i)=>{
-            itemVal = items[itemX].indexOf("GMT")!=-1 ?items[itemX]:formatDate(String(items[itemX]).split(" ")[0])
+            itemVal = String(items[itemX]).indexOf("GMT")!=-1 ?items[itemX]:formatDate(String(items[itemX]).split(" ")[0])
             let itemSet = itemVal?itemVal:items[itemX]
             return this.source.reduce((old,newVal)=>{
               old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:stacked?newVal[itemY]:0;
