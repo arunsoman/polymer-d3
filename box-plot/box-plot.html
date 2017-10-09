@@ -60,13 +60,11 @@
       cursor:not-allowed;
     }
   </style>
-  <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
     <chart-input-group  uuid="[[uuid]]">
       <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
       <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
     </chart-input-group>
     <chart-settings uuid="[[uuid]]"></chart-settings>
-  </template>
   <!-- <svg id="svg"></svg> -->
   <template is="dom-if" if="[[compfilterChk]]" restamp="true">
     <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
@@ -210,13 +208,13 @@
       });
 
 
-      // this.settingsDisabled&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      // this.isCompsiteChart&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
       let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-      this.settingsDisabled&&rect.on("click",function(e){
+      this.isCompsiteChart&&rect.on("click",function(e){
         let elem = this, item = e[0]
         compSourcePopulate({item,elem})
       })
-      this.settingsDisabled&&rect.on("dblclick",function(e){
+      this.isCompsiteChart&&rect.on("dblclick",function(e){
         let elem = this, item = e[0], dblClick=true
         compSourcePopulate({item,elem,dblClick})
       })

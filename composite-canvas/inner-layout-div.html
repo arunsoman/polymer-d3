@@ -62,10 +62,10 @@
             <template is="dom-if" if="[[!itemObj.freeze]]">
               <paper-item on-click="deleteSplitLayout" id="delete">Delete</paper-item>
             </template>
-            <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
+            <template is="dom-if" if="[[!isCompsiteChart]]" restamp="true">
               <paper-item on-click="showChart">Add Chart</paper-item>
             </template>
-            <template is="dom-if" if="[[settingsDisabled]]" restamp="true">
+            <template is="dom-if" if="[[isCompsiteChart]]" restamp="true">
               <paper-item on-click="removeChart" >Remove Chart</paper-item>
             </template>
           </div>
@@ -99,7 +99,7 @@
               return readOnly
             }
           },
-          settingsDisabled:{
+          isCompsiteChart:{
             type:Boolean
           },
           style:{
@@ -123,7 +123,7 @@
                 "chart": "",
                 "chartId":"",
                 "paragraphId":"",
-                "settingsDisabled":false,
+                "isCompsiteChart":false,
                 "children": []
               }
             }
@@ -315,7 +315,7 @@
         return child.length<=0 && itemObj.chart!=""
       }
       checkChartId(chartIdChk){
-        this.set("settingsDisabled",this.itemObj.settingsDisabled)
+        this.set("isCompsiteChart",this.itemObj.isCompsiteChart)
         this.setAttribute("style",this.itemObj.style)
         chartIdChk && setTimeout(()=>{
           let chart = document.createElement(this.itemObj.chart)
@@ -323,7 +323,7 @@
           chart.compUUID = this.uuid
           chart.id=this.chartUUID
           chart.parentId=this.itemObj.paragraphId
-          chart.settingsDisabled=this.settingsDisabled
+          chart.isCompsiteChart=this.isCompsiteChart
           // chart.set("compChartObjs",this.compChartObjs)
           chart.set("chartWidth",(this.offsetWidth-50))
           chart.set("chartHeight",this.offsetHeight)
@@ -395,8 +395,8 @@
           let getNewObj = this.createNewIdNestedObj(itemId)
           ObjNested = getNewObj.ObjNested
           parentObj = getNewObj.parentObj
-          let settingsDisabled = this.get(parentObj).settingsDisabled
-          settingsDisabled&&this.chartIsAvailableSetChildData(parentObj,settingsDisabled)
+          let isCompsiteChart = this.get(parentObj).isCompsiteChart
+          isCompsiteChart&&this.chartIsAvailableSetChildData(parentObj,isCompsiteChart)
         } else {
           itemId = parentId+"_"+(objIdx+1)
         }
@@ -410,18 +410,18 @@
         let dialog = this.$.splitBox.querySelector("#dropDown")
         dialog.close();
       }
-      chartIsAvailableSetChildData(parentObj,settingsDisabled,getObj,chartRemoveChk){
+      chartIsAvailableSetChildData(parentObj,isCompsiteChart,getObj,chartRemoveChk){
         if(getObj){
           let parentNested = getObj.ObjNested
           let updatedObj = this.get(parentNested).filter(item=>item.id!=this.id)
           let parentObj = getObj.parentObj
-          this.set(parentObj+".settingsDisabled",false)
+          this.set(parentObj+".isCompsiteChart",false)
           this.set(parentObj+".chartId","")
           this.set(parentObj+".chart","")
           this.set(parentObj+".paragraphId","")
           if(chartRemoveChk){
             let currentObjNested = getObj.currentObjNested
-            this.set(currentObjNested+".settingsDisabled",false)
+            this.set(currentObjNested+".isCompsiteChart",false)
             this.set(currentObjNested+".chartId","")
             this.set(currentObjNested+".chart","")
             this.set(currentObjNested+".paragraphId","")
@@ -432,7 +432,7 @@
           let chartId = this.get(parentObj).chartId
           let paragraphId = this.get(parentObj).paragraphId
           let chart = this.get(parentObj).chart
-          this.set("childObj.settingsDisabled",settingsDisabled)
+          this.set("childObj.isCompsiteChart",isCompsiteChart)
           this.set("childObj.chartId",chartId)
           this.set("childObj.chart",chart)
           this.set("childObj.paragraphId",paragraphId)

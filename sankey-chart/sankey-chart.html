@@ -24,14 +24,12 @@
         font: 10px sans-serif;
       }
     </style>
-    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
         <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
-    </template>
     <div id="chartContainer"></div>
   </template>
   <script>
@@ -147,7 +145,7 @@
             .attr("x", 6 + obj.sankey.nodeWidth())
             .attr("text-anchor", "start");
 
-        // this.settingsDisabled&&this.compChartObjs&&
+        // this.isCompsiteChart&&this.compChartObjs&&
         // node.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
 
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})

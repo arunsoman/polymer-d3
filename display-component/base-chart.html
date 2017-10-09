@@ -32,27 +32,22 @@
         axisKeys:{
           type:String,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
-            chartId = chartId?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[chartId]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
             return keys
-            // return this.settingsDisabled&&this.compChartObjs ? this.compChartObjs.compChartAxisKeys:keys
           }
         },
         inputs:{
           type:Array,
           observer:'_chartDraw',
           statePath(state){
-            // debugger
-            let chartId = this.settingsDisabled && this.compUUID!=""
-            chartId = chartId?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[chartId]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
             return inputData
-            // return this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartInputs:inputData
           },
           readOnly:true
         },
@@ -69,8 +64,7 @@
           type:Object,
           observer:'_chartDraw',
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
-            chartId = chartId?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[chartId]
             if(chartPath){
               return chartPath.settings;
@@ -94,59 +88,51 @@
             return state.data[this.parentId].externals
           }
         },
-        refSource:{
-          type:Array,
-          statePath(state){
-            let chartPath = state.charts
-            return chartPath
-            // return state.data[this.parentId].source
-          }
-        },
+        // refSource:{
+        //   type:Array,
+        //   statePath(state){
+        //     let chartPath = state.charts
+        //     return chartPath
+        //     // return state.data[this.parentId].source
+        //   }
+        // },
         source:{
           type:Array,
           statePath(state){
-            // let compChartChk = this.settingsDisabled && this.compfilterGblChk
-            let refIdIdxChk = this.settingsDisabled && this.filterIdx>=0 && this.refIds.length
+            let refIdIdxChk = this.isCompsiteChart && this.filterIdx>=0 && this.refIds.length
             let refId = refIdIdxChk&& this.refIds[this.filterIdx]
-            refId = refId?refId:this.settingsDisabled &&this.refIds&&this.refIds.length&&this.refIds.slice(-1).pop()
+            refId = refId?refId:this.isCompsiteChart &&this.refIds&&this.refIds.length&&this.refIds.slice(-1).pop()
             let source = refId&&state.charts[refId]&&state.charts[refId].refrenceSrc
             source = source?source:state.data[this.parentId].source
             return source
-            // return state.data[this.parentId].source
           }
         },
         stacked:{
           type:Boolean,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
-            chartId = chartId?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[chartId]
             let objAssignChk = (chartPath && chartPath.settings)
             let stacked = objAssignChk&&chartPath.settings.stacked.value
             return stacked
-            // let compStacked = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.stacked
-            // return compStacked?compStacked:stacked
           },
           observer:"changedStackedAndGroup"
         },
         group:{
           type:Boolean,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
-            chartId = chartId?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[chartId]
             let objAssignChk = (chartPath && chartPath.settings)
             let group = objAssignChk&&chartPath.settings.group.value
             return group
-            // let compGroup = this.settingsDisabled&&this.compChartObjs && this.compChartObjs.group
-            // return compGroup?compGroup:group
           },
           observer:"changedStackedAndGroup"
         },
         compChartUUIDChk:{
           type:Boolean,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
+            let chartId = this.isCompsiteChart && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
             let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
@@ -156,10 +142,9 @@
         filterIdxGbl:{
           type:Number,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
+            let chartId = this.isCompsiteChart && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
-            // let filterIdxGblChk = chartPath&&this.settingsDisabled&&this.compChartObjs
             let filterIdxGbl = chartPath&&chartPath.filterIdxGbl
             return filterIdxGbl?filterIdxGbl:0
           }
@@ -167,10 +152,9 @@
         refIds:{
           type:Array,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
+            let chartId = this.isCompsiteChart && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
-            // let refIdsChk = chartPath&&this.settingsDisabled&&this.compChartObjs
             let refIds =  chartPath && chartPath.refIds
             return refIds?refIds:[]
           }
@@ -178,8 +162,7 @@
         filterIdx:{
           type:Number,
           statePath(state){
-            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
-            // let compChartChk = this.settingsDisabled&&this.compChartObjs
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
             let filterIdx = chartIdChk && state.charts[this.id].filterIdx
             return filterIdx>=0?filterIdx:-1
           }
@@ -187,7 +170,7 @@
         compfilterChk:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
             let compfilterChk = chartIdChk && state.charts[this.id].compfilterChk
             return compfilterChk
           }
@@ -195,7 +178,7 @@
         compfilterGblChk:{
           type:Boolean,
           statePath(state){
-            let chartId = this.settingsDisabled && this.compUUID!=""
+            let chartId = this.isCompsiteChart && this.compUUID!=""
             chartId = chartId?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
             let compfilterGblChk = chartPath && chartPath.compfilterGblChk
@@ -206,7 +189,7 @@
         filterKeys:{
           type:Array,
           statePath(state){
-            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
             let filterKeys = chartIdChk && state.charts[this.id].filterKeys
             return filterKeys?filterKeys:[]
           }
@@ -220,7 +203,7 @@
         dblClick:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.settingsDisabled && this.id!=""&&state.charts[this.id]
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
             let dblClick = chartIdChk && state.charts[this.id].dblClick
             return dblClick?dblClick:false
           }
@@ -298,19 +281,19 @@
     connectedCallback(){
       super.connectedCallback();
       this.initializeChart();
-      let updateChartData
-      if(this.settingsDisabled){
-        updateChartData = {id:this.uuid,inputs:this.inputs}
-      }else{
-        updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
-      }
+      let updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
+      // if(this.isCompsiteChart){
+      //   updateChartData = {id:this.uuid,inputs:this.inputs}
+      // }else{
+      //   updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
+      // }
       this.dispatch("updateChart",updateChartData);
     }
     changedStackedAndGroup(){
-      if(!this.settingsDisabled){this._chartDraw()}
+      if(!this.isCompsiteChart){this._chartDraw()}
     }
     filterSrcLoad(){
-      if(this.settingsDisabled){
+      if(this.isCompsiteChart){
         // return this.refIds.length>0
         // debugger
         clearTimeout(this.srcLoadTimer)
@@ -341,7 +324,7 @@
 
     initializeChart(){
 
-      if(this.settingsDisabled){
+      if(this.isCompsiteChart){
         this.set("uuid",this.id)
         // this.set("filterKeys",[])
       }else{
@@ -434,7 +417,7 @@
       this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
       group || stacked && itemZ
       let parseDate = d3.time.format('%Y-%m-%d').parse;
-      // let settings = this.settingsDisabled&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
+      // let settings = this.isCompsiteChart&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
       let settings = this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
@@ -442,7 +425,7 @@
           label= settings.legend.values,
           compMargin = {top: 15, right: 0, bottom: 75, left: 0}
       // margin = this.compChartObjs?compMargin:margin
-      margin = this.settingsDisabled?compMargin:margin
+      margin = this.isCompsiteChart?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom

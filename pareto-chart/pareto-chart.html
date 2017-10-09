@@ -40,13 +40,11 @@
         cursor:not-allowed;
       }
     </style>
-    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
-    </template>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
@@ -174,13 +172,13 @@
             .style("text-anchor", "end")
             .text("Cumulative %");
 
-        // this.settingsDisabled&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        // this.isCompsiteChart&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-        this.settingsDisabled&&bar.on("click",function(e){
+        this.isCompsiteChart&&bar.on("click",function(e){
           let elem = this, item = e.xKey
           compSourcePopulate({item,elem})
         })
-        this.settingsDisabled&&bar.on("dblclick",function(e){
+        this.isCompsiteChart&&bar.on("dblclick",function(e){
           let elem = this, item = e.xKey, dblClick=true
           compSourcePopulate({item,elem,dblClick})
         })

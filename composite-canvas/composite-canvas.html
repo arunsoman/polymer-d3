@@ -17,14 +17,14 @@
         min-height: 50vh;
       }
     </style>
-    <template is="dom-if" if="[[!readOnly]]" restamp="true">
+    <!-- <template is="dom-if" if="[[!readOnly]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
         <chart-input slot="chart-input" axis="y" label="value" accept="number"></chart-input>
         <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
-    </template>
+    </template> -->
     <chart-selected-modal id="chartsModal" uuid="[[uuid]]"></chart-selected-modal>
     <div id="splitLayoutArea">
       <recursive-node uuid="[[uuid]]"></recursive-node>
@@ -69,7 +69,7 @@
               "chart": "",
               "chartId":"",
               "paragraphId":"",
-              "settingsDisabled":false,
+              "isCompsiteChart":false,
               "children": [
                 {
                   "id": "chartData_0",
@@ -78,7 +78,7 @@
                   "style": "",
                   "chart": "",
                   "chartId":"",
-                  "settingsDisabled":false,
+                  "isCompsiteChart":false,
                   "children": []
                 }
               ]

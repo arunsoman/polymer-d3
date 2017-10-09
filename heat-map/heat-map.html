@@ -28,14 +28,12 @@
         cursor:not-allowed;
       }
     </style>
-    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
         <chart-input slot="chart-input" axis="z" label="Z-Key"></chart-input>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
-    </template>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
@@ -158,13 +156,13 @@
               .style("text-anchor", "start")
               .attr("transform", d=>"rotate(-65)");
 
-      // this.settingsDisabled&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+      // this.isCompsiteChart&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
       let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-      this.settingsDisabled&&cells.on("click",function(e){
+      this.isCompsiteChart&&cells.on("click",function(e){
         let elem = this, item = e.zKey,zAxis=true
         compSourcePopulate({item,elem,zAxis})
       })
-      this.settingsDisabled&&cells.on("dblclick",function(e){
+      this.isCompsiteChart&&cells.on("dblclick",function(e){
         let elem = this, item = e.zKey, zAxis=true, dblClick=true
         compSourcePopulate({item,elem,zAxis,dblClick})
       })

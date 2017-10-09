@@ -93,7 +93,6 @@
         }
 
     </style>
-    <template is="dom-if" if="[[!settingsDisabled]]" restamp="true">
       <chart-input-group  uuid="[[uuid]]">
         <template is="dom-if" if="{{!group}}" restamp="true">
           <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
@@ -106,7 +105,6 @@
         </template>
       </chart-input-group>
       <chart-settings uuid="[[uuid]]"></chart-settings>
-    </template>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
@@ -147,9 +145,9 @@
         chartProp.margin.yMargin = chartProp.margin.yMargin>40?chartProp.margin.yMargin:40
         chartProp.margin.axisMargin = group?10:20
         let labelData = group?source.zKeys:chartData
-        chartProp.height = this.settingsDisabled?+chartProp.settings.height.value:chartProp.height
+        chartProp.height = this.isCompsiteChart?+chartProp.settings.height.value:chartProp.height
         let compBarHeight = (chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin*2)
-        compBarHeight = this.settingsDisabled?(chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin)*2:compBarHeight
+        compBarHeight = this.isCompsiteChart?(chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin)*2:compBarHeight
         let barHeight=group?(chartProp.height-tMargin):compBarHeight
         let keysLength
         group&&(keysLength = (source.zKeys.length>12?source.xKeys.length:source.zKeys.length)+1)
@@ -174,7 +172,7 @@
           let key = group?d:d.xKey
           labelWidth = Math.ceil(Math.max(labelWidth, ctx.measureText(key).width));
         })
-        labelWidth = this.settingsDisabled?0:labelWidth
+        labelWidth = this.isCompsiteChart?0:labelWidth
 
         let xScale = d3.scale.linear()
             .domain([0, max])
@@ -200,7 +198,7 @@
                         .orient("left");
         }else{
           barPadding = (chartProp.height-chartProp.margin.axisMargin-chartProp.margin.yMargin*2)*0.6/dataLength
-          barPadding = this.settingsDisabled?barPadding-(barHeight/2):barPadding
+          barPadding = this.isCompsiteChart?barPadding-(barHeight/2):barPadding
         }
         return {
           valueMargin,
@@ -248,7 +246,7 @@
 
         // append div for toolTip
         let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
-        let offsetXY = this.settingsDisabled?10:0
+        let offsetXY = this.isCompsiteChart?10:0
         bar.on("mousemove", function(d,i){
               div.style("left", (d3.event.offsetX-offsetXY)+"px");
               div.style("top", (d3.event.offsetY+offsetXY)+"px");
@@ -262,12 +260,12 @@
           });
 
           let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-          this.settingsDisabled&&bar.on("click",function(e){
+          this.isCompsiteChart&&bar.on("click",function(e){
             let zKey = this.getAttribute("zKey")
             let elem = this, item = obj.group?zKey:e.xKey,zAxis=obj.group
             compSourcePopulate({item,elem,zAxis})
           })
-          this.settingsDisabled&&bar.on("dblclick",function(e){
+          this.isCompsiteChart&&bar.on("dblclick",function(e){
             let zKey = this.getAttribute("zKey")
             let elem = this, item = obj.group?zKey:e.xKey, zAxis=obj.group, dblClick=true
             compSourcePopulate({item,elem,zAxis,dblClick})
@@ -339,7 +337,7 @@
                 return "translate(" + obj.chartProp.margin.xMargin + "," + (i * (obj.barHeight + obj.barPadding)) + ")";
             });
 
-        !this.settingsDisabled&&bar.append("text")
+        !this.isCompsiteChart&&bar.append("text")
               .attr("class", "label")
               .attr("y", obj.barHeight / 2)
               .attr("dy", ".35em") //vertical align middle
