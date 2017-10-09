@@ -4,107 +4,106 @@
 <dom-module id="chart-input-group">
   <template>
     <style>
-    .input-drag-wrapper{
-      padding: 1em;
-    }
-    #chartSelector{
+      .input-drag-wrapper{
+        padding: 1em;
+      }
+      #chartSelector{
         position: relative;
-        /*overflow: hidden;*/
         background: #2f3238;
-        /*border-bottom: solid 1px #e66c13;*/
-        /*display: block;*/
-        /*overflow: hidden;*/
         text-align: center;
-    }
-    .input-drag-wrapper{
-      padding: 1em 1em 0;
-    }
-    #inputItems{
-      background: #fd8d3c;
-      margin-top: 7px;
-    }
+        margin: 0;
+        padding: 0;
+      }
+      .input-drag-wrapper{
+        padding: 1em 1em 0;
+      }
+      #inputItems{
+        background: #fd8d3c;
+        margin-top: 7px;
+      }
 
     </style>
 
-     <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
-    <paper-dialog id="chartSelector" with-backdrop>
-    <div class="input-drag-wrapper">
-      <template is="dom-repeat" items="[[ externals ]]">
-        <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
-      </template>
-    </div>
+    <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
+    <paper-dialog id="chartSelectorModal" with-backdrop>
+      <div id="chartSelector">
+        <div class="input-drag-wrapper">
+          <template is="dom-repeat" items="[[ externals ]]">
+            <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
+          </template>
+        </div>
 
-    <div id="inputItems">
-      <slot name="chart-input"></slot>
-      <chart-settings uuid="[[uuid]]"></chart-settings>
-    </div>
-
+        <div id="inputItems">
+          <slot name="chart-input"></slot>
+          <chart-settings uuid="[[uuid]]"></chart-settings>
+        </div>
+      </div>
     </paper-dialog>
   </template>
 
-<script>
+  <script>
 
     class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
-        static get is() {
-            return 'chart-input-group';
-        }
-        static get properties(){
-          return{
-            uuid:{
-              type:String,
-              observer:'init'
-            },
-            paragraphId:{
-              type:String
-            },
-            externals:{
-              type:Array,
-              statePath(state){
-                if(this.paragraphId){
-                  return state.data[this.paragraphId].externals;
-                }
+      static get is() {
+        return 'chart-input-group';
+      }
+      static get properties(){
+        return{
+          uuid:{
+            type:String,
+            observer:'init'
+          },
+          paragraphId:{
+            type:String
+          },
+          externals:{
+            type:Array,
+            statePath(state){
+              if(this.paragraphId){
+                return state.data[this.paragraphId].externals;
               }
-            },
-            source:{
-              type:Array,
-              statePath(state){
-                if(this.paragraphId){
-                  return state.data[this.paragraphId].source
-                }
+            }
+          },
+          source:{
+            type:Array,
+            statePath(state){
+              if(this.paragraphId){
+                return state.data[this.paragraphId].source
               }
             }
           }
         }
-        static get actions() {
-          return {
-            updateExternal(externals) {
-              return {
-                type: 'UPDATE_EXTERNALS',
-                value: externals
-              };
-            },
-            updateSource(source) {
-              return {
-                type: 'UPDATE_SOURCE',
-                value: source
-              };
-            }
+      }
+      static get actions() {
+        return {
+          updateExternal(externals) {
+            return {
+              type: 'UPDATE_EXTERNALS',
+              value: externals
+            };
+          },
+          updateSource(source) {
+            return {
+              type: 'UPDATE_SOURCE',
+              value: source
+            };
           }
         }
-        showChartOptions(){
-          this.$.chartSelector.open();
-        }
+      }
+      showChartOptions(){
+        this.$.chartSelectorModal.open();
+      }
 
-        init(){
-          this.set('paragraphId',this.uuid.split('@')[0]);
-        }
-        constructor() {
-            super();
-        }
-        connectedCallback(){
-          super.connectedCallback();
-        }
+      init(){
+        this.set('paragraphId',this.uuid.split('@')[0]);
+      }
+      constructor() {
+        super();
+      }
+      connectedCallback(){
+        super.connectedCallback();
+      }
     }
     customElements.define(chartInputGroup.is, chartInputGroup)
-</script>
+  </script>
 </dom-module>
