@@ -2,11 +2,16 @@
   <template>
     <style>
       paper-dialog {
-        top: 5%;
+        top: 50%;
         left: 5%;
         width: 90%;
         margin: 0;
-        position: relative;
+        position: absolute;
+      }
+      #chartSelectorArea {
+        padding: 0;
+        margin-top: 15px;
+        margin-bottom: 15px;
       }
       paper-icon-button.dialog-close {
         width: 25px;
@@ -29,8 +34,10 @@
       }
     </style>
     <paper-dialog id="chartSelectedModal" modal noCancelOnOutsideClick>
-      <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
-      <chart-holder uuid="[[uuid]]" settings-visible model-chart-holder model-check="{{modelCheck}}"></chart-holder>
+      <div id="chartSelectorArea">
+        <paper-icon-button icon="close" on-click="dialogClose" class="dialog-close">close</paper-icon-button>
+        <chart-holder uuid="[[uuid]]" settings-visible model-chart-holder model-check="{{modelCheck}}"></chart-holder>
+      </div>
     </paper-dialog>
   </template>
   <script>

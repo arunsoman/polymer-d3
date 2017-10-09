@@ -4,6 +4,7 @@
     <style>
       vaadin-split-layout{
         height: 100%;
+        transform: none;
       }
       .splitter-handle{
         min-height: 1px;
@@ -24,7 +25,6 @@
           fill: none;
         };
       }
-
     </style>
     <vaadin-split-layout  vertical="[[verticalPos]]" id="[[id]]_vaadin" class="customStyle">
       <div class$="[[getSplitterHandleClass(verticalPos)]]" on-track="getOnTrack">&nbsp;</div>
