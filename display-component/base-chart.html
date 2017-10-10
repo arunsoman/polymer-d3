@@ -451,15 +451,20 @@
       let refIds = this.refIds, compfilterKeys = this.filterKeys
       let filterIdx = this.filterIdx
       !eArg.dblClick&&this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
-      compfilterKeys.indexOf(eArg.item)==-1 && compfilterKeys.push(eArg.item)
-      elemClass.indexOf("selected") ==-1&&(elemClass = elemClass+" selected")
-
+      if(compfilterKeys.indexOf(eArg.item)==-1) {
+        compfilterKeys.push(eArg.item)
+        elemClass.indexOf("selected") ==-1&&(elemClass = elemClass+" selected")
+      }else {
+        compfilterKeys.splice(eArg.item,1)
+        elemClass = elemClass.replace(" selected","")
+      }
       propData.filterKeys=compfilterKeys
       eArg.elem.setAttribute("class",elemClass)
 
       let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
       let filterSrc = []
-      filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
+      filterKeys.length?filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
+        : (filterSrc = filterSrc.concat(this.source))
       propData.filterSrc = filterSrc
       let compfilterGblChk = !this.compfilterGblChk
       propData.compfilterGblChk = compfilterGblChk
