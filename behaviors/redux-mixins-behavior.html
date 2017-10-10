@@ -130,6 +130,11 @@
                 state[action.value.uuid],{
                   dblClick:action.value.dblClick
                 })})
+            case 'COMP_FILTER_RELOAD':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  filterReload:action.value.filterReload
+                })})
 
           default:
               return state;

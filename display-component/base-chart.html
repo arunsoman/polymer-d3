@@ -207,6 +207,14 @@
             let dblClick = chartIdChk && state.charts[this.id].dblClick
             return dblClick?dblClick:false
           }
+        },
+        filterReload:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
+            let filterReload = chartIdChk && state.charts[this.id].filterReload
+            return filterReload?filterReload:false
+          }
         }
       }
     }
@@ -275,6 +283,11 @@
             type: 'COMP_FILTER_DBL_CLICK',
             value: dblClick
           }
+        },compFilterReload(filterReload) {
+          return {
+            type: 'COMP_FILTER_RELOAD',
+            value: filterReload
+          }
         }
       }
     }
@@ -298,7 +311,7 @@
         // debugger
         clearTimeout(this.srcLoadTimer)
         this.srcLoadTimer = setTimeout(()=>{
-          (this.refIds.length && this.refIds.indexOf(this.id)==-1 || this.dblClick)&& this._chartDraw()
+          (this.refIds.length && this.refIds.indexOf(this.id)==-1 || this.filterReload || this.dblClick)&& this._chartDraw()
         })
       }
     }
@@ -480,7 +493,7 @@
         this.set("compfilterChk",true)
       }
       this.set("dblClick",false)
-      propData.compfilterChk = this.compfilterChk
+      propData.compfilterChk =this.compfilterChk
       propData.refIds = refIds
       propData.filterIdx = filterIdx
       propData.filterIdxGbl = filterIdxGbl
@@ -491,11 +504,21 @@
       this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:propData.filterSrc})
       this.dispatch("compfilterChk", {uuid:this.uuid,compfilterChk:propData.compfilterChk})
       this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:propData.filterKeys})
+      this.dispatch("compFilterReload", {uuid:this.uuid,filterReload:false})
 
       this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:propData.compfilterGblChk})
       this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:propData.refIds})
       this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:propData.filterIdxGbl})
-
+      let refIds = []
+      refIds = refIds.concat(propData.refIds)
+      if(refIds.length>=3){
+        let spliceIds = refIds.splice(propData.filterIdx+1)
+        spliceIds.shift()
+        spliceIds.length&&spliceIds.forEach(itemId=>{
+          let FRvalue = itemId!=this.uuid?true:false
+          this.dispatch("compFilterReload", {uuid:itemId,filterReload:true})
+        })
+      }
     }
     chartReset(){
       let refIds = this.refIds
