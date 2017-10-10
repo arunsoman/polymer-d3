@@ -401,9 +401,12 @@
       if(this.chartWidth&&this.chartWidth<=171){
         let span = document.createElement("span")
         span.textContent="Need more width for visible a chart"
+        span.id="warningMsg"
         span.setAttribute("class","warningMsg chartMsg")
-        this.parentNode.appendChild(span)
+        !this.nextSibling && this.parentNode.appendChild(span)
         return false
+      }else{
+        this.nextSibling && this.nextSibling.remove()
       }
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
@@ -433,7 +436,7 @@
       height = parseFloat(height - margin.yMargin)
 
       width = this.chartWidth?this.chartWidth:width
-      height = this.chartHeight?this.chartHeight:height
+      height = this.chartVertical && this.chartHeight?this.chartHeight:height
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
       return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis}

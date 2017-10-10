@@ -41,13 +41,13 @@
         display:none;
       }
       .warningMsg{
-        position: relative;
-        top: 70px;
+        position: absolute;
+        top: 171px;
         left: 15%;
         font-weight: bold;
       }
       .warningMsg.chartMsg{
-        left: 1%;
+        left: 5%;
       }
 
     </style>
@@ -299,6 +299,7 @@
           chartHeight = chartHeight-50
           chart.set("chartWidth",chartWidth)
           chart.set("chartHeight",chartHeight)
+          chart.set("chartVertical",this.parentNode.vertical)
           chart.redraw()
 
           trackChartIdChk && this.set("trackChartObj.trackChartIdChk",false)
@@ -327,6 +328,7 @@
           // chart.set("compChartObjs",this.compChartObjs)
           chart.set("chartWidth",(this.offsetWidth-50))
           chart.set("chartHeight",this.offsetHeight)
+          chart.set("chartVertical",this.parentNode.vertical)
 
           this.root.querySelector("#chartBox").appendChild(chart)
         })

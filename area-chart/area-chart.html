@@ -76,7 +76,7 @@
       }
       _compute() {
         //Here checks the axis availability for avoid error from chart
-        let axisKeys = this.axisKeys.sort().join(",")
+        let axisKeys = this.axisKeys&&this.axisKeys.sort().join(",")
         let chkXY = axisKeys == "x,y"
         let chkXYZ = axisKeys == "x,y,z"
         let axisIndex = chkXY?2:4
