@@ -426,17 +426,19 @@
           height = +settings.height.value,
           margin = {top: settings.margin.value.top, right: settings.margin.value.right, bottom: settings.margin.value.bottom, left: settings.margin.value.left},
           label= settings.legend.values,
-          compMargin = {top: 15, right: 0, bottom: 75, left: 0}
+          compMargin = {top: 15, right: 35, bottom: 75, left: 35}
       // margin = this.compChartObjs?compMargin:margin
       margin = this.isCompsiteChart?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
-      width = parseFloat(width -margin.xMargin)
-      height = parseFloat(height - margin.yMargin)
 
       width = this.chartWidth?this.chartWidth:width
       height = this.chartVertical && this.chartHeight?this.chartHeight:height
+
+      width = parseFloat(width -margin.xMargin)
+      height = parseFloat(height - margin.yMargin)
+
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
       return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis}
@@ -455,7 +457,8 @@
         compfilterKeys.push(eArg.item)
         elemClass.indexOf("selected") ==-1&&(elemClass = elemClass+" selected")
       }else {
-        compfilterKeys.splice(eArg.item,1)
+        let findIndex = compfilterKeys.findIndex(e=>e==eArg.item)
+        compfilterKeys.splice(findIndex,1)
         elemClass = elemClass.replace(" selected","")
       }
       propData.filterKeys=compfilterKeys
