@@ -164,7 +164,7 @@
     }
     settingsToArray() {
       // transform object to array with object key value.
-      this.set('_settings', Object.keys(this.settings).map(item => {
+        this.settings && this.set('_settings', Object.keys(this.settings).map(item => {
         return {
           item,
           value: Object.assign({}, this.settings[item])
