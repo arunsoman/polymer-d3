@@ -23,8 +23,11 @@
         padding: 4px;
         margin-top: 5px;
       }
-      #chartContainer rect.selected {
+      #chartContainer.selected rect {
         fill-opacity: .25;
+      }
+      #chartContainer.selected rect.selected {
+        fill-opacity: 1;
         cursor:pointer;
       }
     </style>
@@ -36,6 +39,9 @@
       <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
+    </template>
+    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+      <paper-button raised class="resetBtn"  on-click="">Export filter data</paper-button>
     </template>
     <div id="chartContainer"></div>
   </template>

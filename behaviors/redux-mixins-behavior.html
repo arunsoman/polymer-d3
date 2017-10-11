@@ -135,6 +135,11 @@
                 state[action.value.uuid],{
                   filterReload:action.value.filterReload
                 })})
+            case 'COMP_FILTER_LAST_ACTIVATED':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  lastFilterActivated:action.value.lastFilterActivated
+                })})
 
           default:
               return state;

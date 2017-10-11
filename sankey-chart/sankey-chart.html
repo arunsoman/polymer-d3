@@ -125,7 +125,7 @@
                     .on("drag", dragmove));
 
           // add the rectangles for the nodes
-          node.append("rect")
+            node.append("rect")
               .attr("height", function(d) { return d.dy; })
               .attr("width", obj.sankey.nodeWidth())
               .style("fill", function(d) {return d.color = obj.chartProp.color(d.name.replace(/ .*/, "")); })
@@ -147,6 +147,7 @@
 
         // this.isCompsiteChart&&this.compChartObjs&&
         // node.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        // rect.on("click", function(){debugger})
 
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         // the function for moving the nodes
