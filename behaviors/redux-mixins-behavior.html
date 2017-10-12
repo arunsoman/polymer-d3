@@ -140,7 +140,11 @@
                 state[action.value.uuid],{
                   lastFilterActivated:action.value.lastFilterActivated
                 })})
-
+            case 'COMP_AXIS_XYZ':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  itemXYZ:action.value.itemXYZ
+                })})
           default:
               return state;
       }
@@ -156,6 +160,11 @@
         return Object.assign({},state,{
           [action.value.id]:Object.assign({},state[action.value.id],{source:action.value.source})
         });
+        case 'EXPORT_FILTER_DATA':
+          return  Object.assign({},state,{[action.value.id]:Object.assign({},
+            state[action.value.id],{
+              exportFilterData:action.value.exportFilterData
+            })})
       default:
           return state;
     }

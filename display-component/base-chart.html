@@ -88,14 +88,15 @@
             return state.data[this.parentId].externals
           }
         },
-        // refSource:{
-        //   type:Array,
-        //   statePath(state){
-        //     let chartPath = state.charts
-        //     return chartPath
-        //     // return state.data[this.parentId].source
-        //   }
-        // },
+        refSource:{
+          type:Array,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[chartId]
+            let refSource =  chartPath && chartPath.refrenceSrc
+            return refSource?refSource:[]
+          }
+        },
         source:{
           type:Array,
           statePath(state){
@@ -227,6 +228,14 @@
             let lastFilterActivated = chartIdChk && state.charts[this.id].lastFilterActivated
             return lastFilterActivated?lastFilterActivated:false
           }
+        },
+        itemXYZ:{
+          type:Object,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
+            let itemXYZ = chartIdChk && state.charts[this.id].itemXYZ
+            return itemXYZ?itemXYZ:{}
+          }
         }
       }
     }
@@ -304,6 +313,16 @@
           return {
             type: 'COMP_FILTER_LAST_ACTIVATED',
             value: lastFilterActivated
+          }
+        },compAxisXYZ(itemXYZ) {
+          return {
+            type: 'COMP_AXIS_XYZ',
+            value: itemXYZ
+          }
+        },exportFilterData(exportFilterData) {
+          return {
+            type: 'EXPORT_FILTER_DATA',
+            value: exportFilterData
           }
         }
       }
@@ -442,6 +461,11 @@
       }else{
         this.nextSibling && this.nextSibling.remove()
       }
+
+      let contCls = this.$.chartContainer.getAttribute("class")
+      contCls&&contCls.indexOf("selected") ==-1&&(contCls = contCls+" selected")
+      this.compfilterChk&&this.$.chartContainer.setAttribute("class",contCls)
+
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
       let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
       if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
@@ -518,12 +542,13 @@
         this.set("compfilterChk",true)
       }
       this.set("dblClick",false)
-      // let compfilterChk = filterKeys.length?true:false
-      propData.compfilterChk = this.compfilterChk
+      let compfilterChk = filterKeys.length?true:false
+      propData.compfilterChk = compfilterChk
       propData.refIds = refIds
       propData.filterIdx = filterIdx
       propData.filterIdxGbl = filterIdxGbl
-      this.reduxUpdateSrc(propData)
+      propData.itemXYZ = itemXYZ
+      filterKeys.length?this.reduxUpdateSrc(propData):this.chartReset()
     }
     reduxUpdateSrc(propData){
       this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
@@ -532,6 +557,7 @@
       this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:propData.filterKeys})
       this.dispatch("compFilterReload", {uuid:this.uuid,filterReload:false})
       this.dispatch("compLastFilterActivated", {uuid:this.uuid,lastFilterActivated:propData.filterKeys.length})
+      this.dispatch("compAxisXYZ", {uuid:this.uuid,itemXYZ:propData.itemXYZ})
 
       this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:propData.compfilterGblChk})
       this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:propData.refIds})
@@ -569,6 +595,7 @@
         this.dispatch("addRefrenceSrc", {uuid:itemId,refrenceSrc:[]})
         this.dispatch("compFilterKeys", {uuid:itemId,filterKeys:[]})
         this.dispatch("compLastFilterActivated", {uuid:itemId,lastFilterActivated:false})
+        this.dispatch("compAxisXYZ", {uuid:itemId,itemXYZ:{}})
       })
 
     }
@@ -577,6 +604,22 @@
       this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:[]})
       this.dispatch("compDblClick", {uuid:this.uuid,dblClick:true})
       this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:!this.compfilterGblChk})
+    }
+    exportFilterData(){
+      let exportFilterData,
+          itemXYZ = this.itemXYZ,
+          itemX = itemXYZ.itemX,
+          itemY = itemXYZ.itemY,
+          extKeyX = this.getExternalsKey(itemX),
+          extKeyY = this.getExternalsKey(itemY)
+
+      exportFilterData  = this.refSource.map(items=>{
+        return {[extKeyX]:items[itemX],[extKeyY]:items[itemY]}
+      })
+      this.dispatch("exportFilterData", {id:this.parentId,exportFilterData:exportFilterData})
+    }
+    getExternalsKey(axis){
+      return this.externals.filter(ext=>ext.value==axis)[0].key
     }
   }
   customElements.define(baseChart.is,baseChart)

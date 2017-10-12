@@ -31,6 +31,15 @@
           type:Boolean,
           value:false,
           observer:'addSettings'
+        },
+        filterData:{
+          type:Array,
+          statePath(state){
+            let dataChk = state.data[this.paragraphId]
+            let exportFilterData = dataChk && dataChk.exportFilterData
+            return exportFilterData
+          },
+          notify: true
         }
       }
     }

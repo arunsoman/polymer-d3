@@ -137,7 +137,7 @@
         .append("path")
           .attr("d", obj.area.y0(0))
 
-        parentG.append("path").attr("class", "area above")
+      parentG.append("path").attr("class", "area above")
         .attr("clip-path", "url(#clip-above)")
         .attr("d", obj.area.y0(d=>obj.y(d.zKey)));
 
