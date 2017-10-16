@@ -31,10 +31,18 @@
       padding: 4px;
       margin-top: 5px;
     }
-    #chartContainer.selected g {
+    #chartContainer.selected g.area-chart,
+    #chartContainer.selected g.area-chart .dot {
       fill-opacity: .25;
     }
-    #chartContainer.selected g.selected {
+    #chartContainer.selected g.area-chart.xAxis {
+      fill-opacity: 1;
+    }
+    #chartContainer.selected g.area-chart.xAxis .dot {
+      fill-opacity: .25;
+    }
+    #chartContainer.selected g.selected,
+    #chartContainer.selected g.area-chart.xAxis .dot.selected {
       fill-opacity: 1;
       cursor:pointer;
     }
@@ -96,7 +104,9 @@
 
         //get chart data once pass "x and y" into the "getChartData" method
         let itemZChk = !stacked&&chartProp.itemZ
+        let circleChk = !itemZChk?true:false
         itemZChk = !itemZChk?true:itemZChk
+
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
             itemVal = source.itemVal
@@ -160,7 +170,8 @@
           chartData,
           chartProp,
           stacked,
-          itemZChk
+          itemZChk,
+          circleChk
         }
       }
       _paint(obj) {
@@ -172,8 +183,9 @@
             })
             .append("g")
               .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+          let chartSvg
         if(obj.stacked || obj.itemZChk){
-          let chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
+          chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
             .enter().append("g")
             .attr("class",function(d){
               let classes = "area-chart"
@@ -192,25 +204,63 @@
               .attr("dy", ".35em")
               .text(function(d) { return d.name; });
 
+        }else{
+          chartSvg = parentG.append("path")
+            .datum(obj.chartData)
+            .attr({"class":"area",
+                    "fill": "steelblue"
+                  })
+            .attr("d",(d)=>obj.areaChart(d))
+
+
+        }
         // this.isCompsiteChart&&chartSvg.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-        this.isCompsiteChart&&chartSvg.on("click",function(e){
+        this.isCompsiteChart&&!obj.circleChk && chartSvg.on("click",function(e){
           let elem = this, item = e.name,zAxis=true
           compSourcePopulate({item,elem,zAxis})
         })
-        this.isCompsiteChart&&chartSvg.on("dblclick",function(e){
+        this.isCompsiteChart&&!obj.circleChk && chartSvg.on("dblclick",function(e){
           let elem = this, item = e.name, zAxis=true, dblClick=true
           compSourcePopulate({item,elem,zAxis,dblClick})
         })
 
-        }else{
-          parentG.append("path")
-            .datum(obj.chartData)
-            .attr({"class":"area",
-                    "fill": "steelblue",
-                    "d": obj.areaChart
-                  })
+        // for adding dots
+        let circle = obj.circleChk && chartSvg.selectAll(".dot")
+          .data((d)=>d.values)
+          .enter()
+          .append("circle")
+          .attr("r", 4.5)
+          .attr("cx", (d,i)=>obj.x(d.item))
+          .attr("cy", d=>obj.y(d.y))
+          .attr("fill", d=>obj.chartProp.color(d.item))
+          .attr("class",function(d){
+            let classes = "dot"
+            this.filterKeys.length && this.filterKeys.indexOf(d.item)!=-1&&(classes+=" selected")
+            return classes
+          }.bind(this))
+          .attr("",function(d){
+            let pCls = this.parentElement.getAttribute("class")
+            pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+            this.parentElement.setAttribute("class",pCls)
+          });
+          if(this.isCompsiteChart&& obj.circleChk){
+            circle.on("click",function(e){
+            let elem = this, item = e.item
+            let pCls = this.parentElement.getAttribute("class")
+            pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+            this.parentElement.setAttribute("class",pCls)
+            compSourcePopulate({item,elem})
+          })
+          circle.on("dblclick",function(e){
+            let elem = this, item = e.item, dblClick=true
+            let pCls = this.parentElement.getAttribute("class")
+            pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+            this.parentElement.setAttribute("class",pCls)
+            compSourcePopulate({item,elem,dblClick})
+          })
         }
+
         parentG.append("g")
             .attr("class", "x axis")
             .attr("transform", "translate(0," + obj.chartProp.height + ")")

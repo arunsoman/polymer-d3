@@ -463,7 +463,7 @@
       }
 
       let contCls = this.$.chartContainer.getAttribute("class")
-      contCls&&contCls.indexOf("selected") ==-1&&(contCls = contCls+" selected")
+      contCls = contCls != null ?contCls:" selected"
       this.compfilterChk&&this.$.chartContainer.setAttribute("class",contCls)
 
       let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
@@ -505,6 +505,7 @@
       // debugger
       eArg.dblClick&&this.chartDoubleClick()
       let axis = eArg.zAxis?itemXYZ.itemZ:itemXYZ.itemX
+      axis = eArg.xVlaue?itemXYZ.itemX:axis
       let propData = {}
       let elemClass =eArg.elem.getAttribute("class")
       elemClass = elemClass!=null?elemClass:""
@@ -610,11 +611,15 @@
           itemXYZ = this.itemXYZ,
           itemX = itemXYZ.itemX,
           itemY = itemXYZ.itemY,
+          itemZ = itemXYZ.itemZ,
           extKeyX = this.getExternalsKey(itemX),
-          extKeyY = this.getExternalsKey(itemY)
+          extKeyY = this.getExternalsKey(itemY),
+          extKeyZ = itemZ!=undefined&&itemZ!=-1&&this.getExternalsKey(itemZ)
 
       exportFilterData  = this.refSource.map(items=>{
-        return {[extKeyX]:items[itemX],[extKeyY]:items[itemY]}
+        let item = {[extKeyX]:items[itemX],[extKeyY]:items[itemY]}
+        item = itemZ!=undefined&&itemZ!=-1?Object.assign(item,{[extKeyZ]:items[itemZ]}):item
+        return item
       })
       this.dispatch("exportFilterData", {id:this.parentId,exportFilterData:exportFilterData})
     }

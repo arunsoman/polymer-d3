@@ -149,10 +149,11 @@
 
                   circle.attr("class",function(d){
                     let classes = "dot"
-                    this.filterKeys.length && this.filterKeys.indexOf(d.zKey)!=-1&&(classes+=" selected")
+                    this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
                     return classes
                   }.bind(this))
-                  .attr("r", 3.5)
+                  // .attr("r",function(d){debugger})
+                  .attr("r",5)
                   .attr("cx", d=>obj.x(d.xKey))
                   .attr("cy", d=>obj.y(d.yKey))
                   .style("fill", d=>obj.chartProp.color(d.zKey))
@@ -177,12 +178,12 @@
         // this.isCompsiteChart&&circle.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
         this.isCompsiteChart&&circle.on("click",function(e){
-          let elem = this, item = e.zKey,zAxis=true
-          compSourcePopulate({item,elem,zAxis})
+          let elem = this, item = e.xKey,zAxis=true, xVlaue=true
+          compSourcePopulate({item,elem,zAxis,xVlaue})
         })
         this.isCompsiteChart&&circle.on("dblclick",function(e){
-          let elem = this, item = e.zKey, zAxis=true, dblClick=true
-          compSourcePopulate({item,elem,zAxis,dblClick})
+          let elem = this, item = e.xKey, zAxis=true, dblClick=true, xVlaue=true
+          compSourcePopulate({item,elem,zAxis,dblClick,xVlaue})
         })
 
       d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
