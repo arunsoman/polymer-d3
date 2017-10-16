@@ -51,19 +51,7 @@
         <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
         <chart-input slot="chart-input" axis="z" label="z-axis" ></chart-input>
-          <!-- <template is="dom-if" if="{{!stacked}}">
-            <chart-input slot="chart-input" axis="x" label="Key" ></chart-input>
-            <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
-            <chart-input slot="chart-input" axis="z" label="z-axis" ></chart-input>
-          </template>
-          <template is="dom-if" if="{{stacked}}">
-            <chart-input slot="chart-input" axis="x" label="Key"accept="number,date" ></chart-input>
-            <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
-            <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
-          </template> -->
       </chart-input-group>
-      <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
-    <!-- <svg id="svg"></svg> -->
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>
@@ -104,8 +92,8 @@
 
         //get chart data once pass "x and y" into the "getChartData" method
         let itemZChk = !stacked&&chartProp.itemZ
-        let circleChk = !itemZChk?true:false
         itemZChk = !itemZChk?true:itemZChk
+        let circleChk = !chartProp.itemZ?true:false
 
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
         let chartData,
@@ -211,7 +199,6 @@
                     "fill": "steelblue"
                   })
             .attr("d",(d)=>obj.areaChart(d))
-
 
         }
         // this.isCompsiteChart&&chartSvg.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
