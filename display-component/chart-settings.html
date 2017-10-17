@@ -1,5 +1,6 @@
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
 <link href="legend-customizer.html" rel='import'>
+<link href="resizer-element.html" rel='import'>
 <dom-module id="chart-settings">
   <template>
     <style>
@@ -24,7 +25,8 @@
     .item {
       flex-grow: 1;
       display: inline-block;
-      width: 20%;
+      width: 40%;
+      margin:0 1em;
     }
 
     .inputs.flex {
@@ -39,15 +41,34 @@
     .none {
       display: none!important;
     }
+    h2{
+      display: inline;
+    }
+    .buttons{
+      float: right;
+      margin-top: -10px;
+    }
+    paper-button{
+      background: #ffec93;
+    }
+    paper-button.cancel{
+      background: #fff;
+    }
+    .animate{
+      transition: transform .5s linear;
+    }
     </style>
-    <paper-icon-button icon="icons:settings" on-click="showSettings"></paper-icon-button>
-    <paper-dialog id="dialog" modal>
-      <h2>Chart Settings</h2>
-      <paper-dialog-scrollable>
+    <!-- <paper-icon-button icon="icons:settings" on-click="showSettings"></paper-icon-button> -->
+    <!-- <paper-dialog id="dialog" modal> -->
+      <h2>Chart Settings </h2>
+      <div class="buttons">
+        <paper-button on-click="applySettings" dialog-dismiss><strong>Apply</strong></paper-button>
+        <paper-button on-click="resetSettings" class="cancel" dialog-dismiss>Cancel</paper-button>
+      </div>
+      <div class="flex" style="width: 100%">
+        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}" style="width: 40%;" margin="{{settings.margin.value}}"></legend-customizer>
 
-        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}"></legend-customizer>
-
-        <div class="inputs flex">
+        <div class="inputs flex" style="width: 60%;">
           <template is='dom-repeat' items="{{_settings}}">
               <template is="dom-if" if="{{eq(item.value.uitype,'picker')}}">
                 <div class="item">
@@ -64,6 +85,14 @@
                   <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
                 </div>
               </template>
+              <template is="dom-if" if="{{eq(item.value.uitype,'range')}}">
+                <div class="item">
+                  <div>[[item.value.txt]]</div>
+                  <div style$="transform: rotateZ({{item.value.value}}deg); transform-origin: center; display: inline-block; float: left; margin-top: 20px;" class="animate">Label</div>
+                  <paper-slider style="float: left;" class="red" value="{{item.value.value}}" max="360" editable></paper-slider>
+                  
+                </div>
+              </template>
               <template is="dom-if" if="{{eq(item.value.uitype,'boolean')}}">
                 <div class="item">
                   <paper-checkbox checked="{{item.value.value}}">[[item.value.txt]]</paper-checkbox>
@@ -71,12 +100,9 @@
               </template>
           </template>
         </div>
-      </paper-dialog-scrollable>
-      <div class="buttons">
-        <paper-button on-click="applySettings" dialog-dismiss>Apply</paper-button>
-        <paper-button on-click="resetSettings" dialog-dismiss>Cancel</paper-button>
       </div>
-    </paper-dialog>
+     
+    <!-- </paper-dialog> -->
 
     <!-- <template is="dom-if" if="[[isActive]]">
       <div class="tick-rotation flex">

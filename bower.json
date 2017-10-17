@@ -21,7 +21,9 @@
     "vaadin-split-layout": "^2.0.0",
     "paper-item": "PolymerElements/paper-item",
     "iron-dropdown": "PolymerElements/iron-dropdown#^2.0.0",
-    "redux": "https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js"
+    "redux": "https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.min.js",
+    "iron-pages": "PolymerElements/iron-pages#^2.0.0",
+    "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^2.1.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

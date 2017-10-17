@@ -1,0 +1,169 @@
+<dom-module id="resizer-element">
+  <template>
+    <style>
+    .resizable{
+    /*border: solid 1px #bbbab9;*/
+    overflow: auto;
+    background: rgba(255, 236, 147, 0.32);
+    position: absolute;
+    overflow: hidden;
+    }
+    .resizable.right{
+      width: 10px;
+      right: 0;
+      top:0;
+      bottom: 0;
+      height: 263px!important;
+      border-left: solid 1px #bbbab9;
+    }
+    .resizable.left{
+     width: 10px;
+     left: 0;
+     top:0;
+     bottom: 0;
+     height: 263px!important;
+     z-index: 9;
+     border-right: solid 1px #bbbab9;
+    }
+    .resizable.top{
+     left: 0;
+     top:0;
+     right: 0;
+     width: 100%!important;
+     transform: rotateX(180deg);
+     border-top: solid 1px #bbbab9;
+    }
+    .resizable.bottom{
+    left: 0;
+    bottom: 0;
+    right: 0;
+    width: 100%!important;
+    border-top: solid 1px #bbbab9;
+    }
+
+#rsz {
+  position: absolute;
+  right: 0;
+  width: 10px;
+  height: 100%;
+  background-color: rgba(255, 236, 147, 0.74);
+  cursor: pointer;
+}
+.right #rsz{
+  right: auto;
+  left: 0;
+
+}
+.top #rsz{
+    position: relative;
+    top: 0;
+    width: 100%;
+  height: 10px;
+}
+.bottom #rsz{
+    top: 0;
+    position: relative;
+    width: 100%;
+  height: 10px;
+}
+
+    </style>
+    [[margin.left]]
+    [[margin.right]]
+    [[margin.top]]
+    [[margin.bottom]]
+    <div class$="resizable {{elementAlign}}" style$="width:[[wd]]px;height:[[ht]]px">
+      <div id="rsz"></div>
+    </div>
+<!--     <div class="resizable top"></div>
+    <div class="resizable right"></div>
+    <div class="resizable bottom"></div>
+ -->    
+  </template>
+  <script>
+  /**
+  * @polymer
+  * @extends HTMLElement
+  */
+  class resizerElement extends Polymer.Element {
+    static get is() {
+      return 'resizer-element'
+    }
+
+    static get properties() {
+      return {
+        position:{
+          type:String,
+          value:'left'
+        },
+        x:{
+          type:Number
+        },
+        y:{
+          type:Number
+        },
+        dx:{
+          type:Number,
+          value:0
+        },
+        dy:{
+          type:Number,
+          value:0
+        },
+        mousedown:{
+          type:Boolean,
+          value:false
+        },
+        wd:{
+          type:Number,
+          value:10
+        },
+        ht:{
+          type:Number,
+          value:10
+        },
+        elementAlign:{
+          type:String
+        },
+        marginValue:{
+          type:Number,
+          notify:true
+        }
+      }
+    }
+
+    constructor() {
+      super();
+    }
+    startResize(event){
+      this.x = event.screenX;
+      this.y = event.screenY;
+    }
+    resize(evt){
+      console.log(this.elementAlign);
+      this.dx = evt.screenX - this.x;
+      this.dy = evt.screenY - this.y;
+      this.x = evt.screenX;
+      this.y = evt.screenY;
+      this.wd += this.elementAlign=="right" ? this.dx * -1 : this.dx ;
+      this.ht += this.elementAlign=="bottom" ? this.dy*-1 : this.dy ;
+      this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? this.wd: this.ht)
+    }
+    ready(){
+      super.ready();
+      this.addEventListener('mousedown',(event)=>{
+        this.mousedown = true;
+        this.startResize(event);
+      });
+      document.body.addEventListener('mouseup',(event)=>{
+        this.mousedown = false;
+      })
+      document.body.addEventListener("mousemove",(evt)=>{
+        this.mousedown && this.resize(event)
+      },true);
+    }
+    
+  }
+  customElements.define(resizerElement.is, resizerElement)
+  </script>
+</dom-module>

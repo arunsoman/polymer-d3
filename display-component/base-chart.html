@@ -73,6 +73,9 @@
                 title:{uitype:'text',txt:"Title",value:""},
                 margin:{uitype:'visual',txt:'Margin',value:{top: 5, right: 20, bottom: 50, left: 20}},
                 legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
+                xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
+                yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
+                zLabel:{uitype:'range',txt:"Z Axis label transform (degree)",value:0},
                 width:{uitype:'number',txt:"Chart width", value:"960"},
                 height:{uitype:'number',txt:"Chart Height", value:"500"},
                 stacked:{uitype:'boolean',value:false,txt:"Stacked Chart"},
@@ -499,7 +502,10 @@
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
-      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis}
+      let xLabel = settings.xLabel.value;
+      let yLabel = settings.yLabel.value;
+      let zLabel = settings.zLabel.value;
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis,xLabel,yLabel,zLabel}
     }
     compSourcePopulate(itemXYZ,eArg){
       // debugger

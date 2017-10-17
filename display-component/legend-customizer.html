@@ -2,11 +2,15 @@
   <template>
     <style>
     #chartArea {
-      min-height: 150px;
-      margin: 2em;
+      height: 263px;
+      /*height: 150px;*/
+      margin: 2em 0;
       position: relative;
       background: #f2f0ee;
       box-shadow: 0px 0px 22px rgba(0, 0, 0, 0.2) inset;
+      /*resize: both;*/
+      /*overflow: auto;*/
+      width: 100%;
     }
 
     #legends {
@@ -16,6 +20,7 @@
       border-radius: 11px;
       color: #c39c19;
       border: solid 1px;
+      z-index: 99;
     }
 
     #legends iron-icon {
@@ -37,14 +42,83 @@
       display: inline-block;
       width: 20%;
     }
+    .resizable{
+    border: solid 1px #bbbab9;
+    overflow: auto;
+    background: rgba(255, 236, 147, 0.32);
+    position: absolute;
+    }
+    .resizable.right{
+      width: 10px;
+      resize: horizontal;
+      right: 0;
+      top:0;
+      bottom: 0;
+      direction: rtl;
+      border-top: 0;
+      border-bottom: 0; 
+      max-width: 80%; 
+    }
+    .resizable.left{
+     width: 10px;
+     resize: horizontal;
+     left: 0;
+     top:0;
+     bottom: 0;
+     border-top: 0;
+     border-bottom: 0;
+     max-width: 80%; 
+    }
+    .resizable.top{
+     resize: vertical;
+     left: 0;
+     top:0;
+     right: 0;
+     height: 10px;
+     z-index: 9;
+     position: relative;
+    }
+    .resizable.bottom{
+      resize: vertical;
+      left: 0;
+      top: 0;
+      right: 0;
+      height: 10px;
+      position: relative;
+    }
+    .resizable-wrapper{
+      position: relative;
+    }
+    .resizable-wrapper .inner{
+      min-height: 150px;
+      position: relative;
+    }
+    .resizable-wrapper.middle{
+      min-height: 150px;
+    }
+
     </style>
     <div id="chartArea" on-drop="drop" on-dragover="allowDrop">
+    <resizer-element element-align="left" margin-value="{{margin.left}}"></resizer-element>
+    <resizer-element element-align="top" margin-value="{{margin.top}}"></resizer-element>
+    <resizer-element element-align="right" margin-value="{{margin.right}}"></resizer-element>
+    <resizer-element element-align="bottom" margin-value="{{margin.bottom}}"></resizer-element>
+    <!-- <div class="resizable-wrapper top">
+      <div class="resizable top"></div>
+    </div>
+    <div class="resizable-wrapper middle">
+      <div class="inner">
+        <div class="resizable left" ></div>
+        <div class="resizable right"></div>
+      </div>
+      <div class="resizable bottom"></div>
+    </div> -->
       <div id="legends" draggable="true" style$="left:[[legendData.position.x]]%;top:[[legendData.position.y]]%;">Legend
         <iron-icon icon="icons:invert-colors" label="legends" on-click="showColorPicker"></iron-icon>
       </div>
     </div>
     <paper-dialog id="dialog" modal>
-      <h2>Label Color picker</h2>
+      <h2>Label color picker</h2>
       <paper-dialog-scrollable>
         <div class="flex">
           <template is="dom-repeat" items="[[keys]]">
@@ -81,6 +155,16 @@
         legendKeys:{
           type:Object,
           observer:'tansformKeys'
+        },
+        margin:{
+          type:Object,
+          value:{
+            left:0,
+            right:0,
+            top:0,
+            bottom:0
+          },
+          notify:true
         }
       }
     }
@@ -110,6 +194,19 @@
 
     constructor() {
       super();
+    }
+    ready(){
+      super.ready();
+    }
+    connectedCallback(){
+      // debugger;
+    }
+    getOnTrack(){
+      setTimeout(()=>{
+       debugger; 
+      })
+      console.log('change');
+      debugger;
     }
     save(){
       this.set('legendData.nodes',this.keys)

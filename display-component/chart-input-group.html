@@ -24,89 +24,117 @@
       paper-dialog{
         min-width: 710px;
       }
+      paper-tabs{
+        background: #45c1e0;
+        margin-bottom: 0;
+      }
+      paper-tabs[no-bar] paper-tab.iron-selected {
+        color: #ffff8d;
+      }
 
     </style>
 
     <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
     <paper-dialog id="chartSelectorModal" with-backdrop>
-      <div id="chartSelector">
-        <div class="input-drag-wrapper">
-          <template is="dom-repeat" items="[[ externals ]]">
-            <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
-          </template>
-        </div>
+      <iron-pages selected="{{selected}}">
+        <div>
+         <div id="chartSelector">
+          <div class="input-drag-wrapper">
+            <template is="dom-repeat" items="[[ externals ]]">
+              <drag-element item="[[item]]" draggable="true"  data-index$="[[item.value]]"></drag-element>
+            </template>
+          </div>
 
-        <div id="inputItems">
-          <slot name="chart-input"></slot>
-          <chart-settings uuid="[[uuid]]"></chart-settings>
+          <div id="inputItems">
+            <slot name="chart-input"></slot>
+          </div>
         </div>
       </div>
-    </paper-dialog>
-  </template>
+      
+      <div>
+          <chart-settings uuid="[[uuid]]"></chart-settings>
+      </div>
+    </iron-pages>
 
-  <script>
+    <paper-tabs selected="{{selected}}" no-bar>
+      <paper-tab>Chart Source</paper-tab>
+      <paper-tab>Settings</paper-tab>
+    </paper-tabs>
 
-    class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
-      static get is() {
-        return 'chart-input-group';
-      }
-      static get properties(){
-        return{
-          uuid:{
-            type:String,
-            observer:'init'
-          },
-          paragraphId:{
-            type:String
-          },
-          externals:{
-            type:Array,
-            statePath(state){
-              if(this.paragraphId){
-                return state.data[this.paragraphId].externals;
-              }
+  </paper-dialog>
+</template>
+
+<script>
+
+  class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
+    static get is() {
+      return 'chart-input-group';
+    }
+    static get properties(){
+      return{
+        uuid:{
+          type:String,
+          observer:'init'
+        },
+        paragraphId:{
+          type:String
+        },
+        externals:{
+          type:Array,
+          statePath(state){
+            if(this.paragraphId){
+              return state.data[this.paragraphId].externals;
             }
-          },
-          source:{
-            type:Array,
-            statePath(state){
-              if(this.paragraphId){
-                return state.data[this.paragraphId].source
-              }
+          }
+        },
+        selected:{
+          type:Number,
+          value:0,
+          observer:'tabChange'
+        },
+        source:{
+          type:Array,
+          statePath(state){
+            if(this.paragraphId){
+              return state.data[this.paragraphId].source
             }
           }
         }
-      }
-      static get actions() {
-        return {
-          updateExternal(externals) {
-            return {
-              type: 'UPDATE_EXTERNALS',
-              value: externals
-            };
-          },
-          updateSource(source) {
-            return {
-              type: 'UPDATE_SOURCE',
-              value: source
-            };
-          }
-        }
-      }
-      showChartOptions(){
-        this.$.chartSelectorModal.open();
-      }
-
-      init(){
-        this.set('paragraphId',this.uuid.split('@')[0]);
-      }
-      constructor() {
-        super();
-      }
-      connectedCallback(){
-        super.connectedCallback();
       }
     }
-    customElements.define(chartInputGroup.is, chartInputGroup)
-  </script>
+    static get actions() {
+      return {
+        updateExternal(externals) {
+          return {
+            type: 'UPDATE_EXTERNALS',
+            value: externals
+          };
+        },
+        updateSource(source) {
+          return {
+            type: 'UPDATE_SOURCE',
+            value: source
+          };
+        }
+      }
+    }
+    tabChange(){
+      this.$.chartSelectorModal.notifyResize();
+    }
+    showChartOptions(){
+      this.$.chartSelectorModal.open();
+    }
+
+    init(){
+      this.set('paragraphId',this.uuid.split('@')[0]);
+    }
+    constructor() {
+      super();
+    }
+    connectedCallback(){
+      super.connectedCallback();
+    }
+  }
+  customElements.define(chartInputGroup.is, chartInputGroup)
+</script>
 </dom-module>
