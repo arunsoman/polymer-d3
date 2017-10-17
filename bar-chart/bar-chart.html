@@ -97,6 +97,8 @@
         .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
 
       let svg = selector.append("g")
+        .attr("width",obj.chartProp.width-obj.chartProp.margin.right)
+        .attr("height", obj.chartProp.height-obj.chartProp.margin.bottom)
         .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         svg.append("g")
@@ -140,7 +142,7 @@
 
       this.addLegend({
         obj,
-        container:svg,
+        container:selector,
         selector:'rect.bar',
         node:obj.chartData,
         key: 'item',
