@@ -485,7 +485,11 @@
       let settings = this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
-          margin = {top: settings.margin.value.top, right: settings.margin.value.right, bottom: settings.margin.value.bottom, left: settings.margin.value.left},
+          mTop= +settings.margin.value.top,
+          mRight = +settings.margin.value.right,
+          mBottom = +settings.margin.value.bottom,
+          mLeft = +settings.margin.value.left
+          margin = {top:mTop, right: mRight, bottom: mBottom, left: mLeft},
           label= settings.legend.values,
           compMargin = {top: 15, right: 35, bottom: 75, left: 35}
       // margin = this.compChartObjs?compMargin:margin
@@ -506,6 +510,9 @@
       let yLabel = settings.yLabel.value;
       let zLabel = settings.zLabel.value;
       return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis,xLabel,yLabel,zLabel}
+    }
+    calculateMargin(diemension,margin){
+
     }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
