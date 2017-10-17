@@ -147,7 +147,7 @@
       this.y = evt.screenY;
       this.wd += this.elementAlign=="right" ? this.dx * -1 : this.dx ;
       this.ht += this.elementAlign=="bottom" ? this.dy*-1 : this.dy ;
-      this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? this.wd: this.ht)
+      this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? (this.wd/500)*100: (this.ht/263)*100)
     }
     ready(){
       super.ready();

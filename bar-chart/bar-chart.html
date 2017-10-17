@@ -93,12 +93,12 @@
 
       let selector = d3.select(this.$.chartContainer)
         .append("svg")
-        .attr("width", obj.chartProp.width+obj.chartProp.margin.right)
-        .attr("height", obj.chartProp.height+obj.chartProp.margin.bottom)
+        .attr("width", obj.chartProp.width+obj.chartProp.margin.xMargin)
+        .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin)
 
       let svg = selector.append("g")
-        .attr("width",obj.chartProp.width-obj.chartProp.margin.right)
-        .attr("height", obj.chartProp.height-obj.chartProp.margin.bottom)
+        .attr("width",obj.chartProp.width)
+        .attr("height", obj.chartProp.height)
         .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
         svg.append("g")

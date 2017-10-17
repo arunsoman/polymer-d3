@@ -424,9 +424,6 @@
     }
 
     addLegend(obj){
-      setTimeout(()=>{
-        // this.chartKeys(obj.node,obj.key);
-      })
       this.set('color',d3.scale.category20c());
       obj.container.selectAll(obj.selector)
         .style("fill", (d,i)=>{
@@ -437,7 +434,7 @@
 
       obj.container.append("g")
           .attr("class","legend")
-          .attr("transform","translate("+(obj.obj.chartProp.width*obj.obj.chartProp.label.position.x)/100+","+(obj.obj.chartProp.height*obj.obj.chartProp.label.position.y)/100+")")
+          .attr("transform","translate("+((obj.obj.chartProp.width+obj.obj.chartProp.margin.xMargin)*obj.obj.chartProp.label.position.x)/100+","+(obj.obj.chartProp.height*obj.obj.chartProp.label.position.y)/100+")")
           .call(d3.legend);
 
       // add tooltip if segments are provided
@@ -489,7 +486,7 @@
           mRight = +settings.margin.value.right,
           mBottom = +settings.margin.value.bottom,
           mLeft = +settings.margin.value.left,
-          margin = {top:mTop, right: mRight, bottom: mBottom, left: mLeft},
+          margin = {top:this.calculateMargin(height,mTop), right: this.calculateMargin(width,mRight), bottom: this.calculateMargin(height,mBottom), left: this.calculateMargin(width,mLeft)},
           label= settings.legend.values,
           compMargin = {top: 15, right: 35, bottom: 75, left: 35}
       // margin = this.compChartObjs?compMargin:margin
@@ -501,8 +498,8 @@
       width = this.chartWidth?this.chartWidth:width
       height = this.chartVertical && this.chartHeight?this.chartHeight:height
 
-      width = parseFloat(width -margin.xMargin)
-      height = parseFloat(height - margin.yMargin)
+      // width = parseFloat(width +margin.xMargin)
+      // height = parseFloat(height + margin.yMargin)
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
@@ -511,7 +508,8 @@
       let zLabel = settings.zLabel.value;
       return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis,xLabel,yLabel,zLabel}
     }
-    calculateMargin(diemension,margin){
+    calculateMargin(dimension,margin){
+      return (dimension * margin)/100;
 
     }
     compSourcePopulate(itemXYZ,eArg){
