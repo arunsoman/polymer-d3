@@ -3,7 +3,7 @@
   <template>
   <style>
     #chartContainer{
-      margin:0 auto;
+      /*margin:0 auto;*/
       font: 10px sans-serif;
     }
     .legend-items text{
@@ -93,8 +93,8 @@
 
       let selector = d3.select(this.$.chartContainer)
         .append("svg")
-        .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
-        .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
+        .attr("width", obj.chartProp.width+obj.chartProp.margin.right)
+        .attr("height", obj.chartProp.height+obj.chartProp.margin.bottom)
 
       let svg = selector.append("g")
         .attr("width",obj.chartProp.width-obj.chartProp.margin.right)
@@ -160,7 +160,7 @@
 
       // debugger;
       // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
-      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.left+"px"})
     }
     getChartData(itemX, itemY) {
       let sourcemap =
