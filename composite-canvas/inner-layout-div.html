@@ -38,7 +38,7 @@
         padding:0px;
         width: 17px;
         height: 17px;
-        color: rgb(196, 196, 196)
+        color: #a9a9a9;
       }
       :host #splitter{
         display:none;
@@ -57,7 +57,7 @@
     <div id="splitBox">
       <template is="dom-if" if="[[!readOnly]]">
         <header>
-        <paper-icon-button icon="more-horiz" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
+        <paper-icon-button icon="menu" slot="dropdown-trigger" on-click="showDropDown" class="paperIconBtn">select</paper-icon-button>
         <iron-dropdown horizontal-align="left" vertical-align="top" id="dropDown" allow-outside-scroll>
           <div slot="dropdown-content">
             <paper-item on-click="createSplitLayout" id="vert">Column</paper-item>
