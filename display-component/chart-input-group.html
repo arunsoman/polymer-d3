@@ -26,16 +26,36 @@
       }
       paper-tabs{
         background: #45c1e0;
-        margin-bottom: 0;
+        /*margin-bottom: 0;*/
+        margin-top: 0;
       }
       paper-tabs[no-bar] paper-tab.iron-selected {
         color: #ffff8d;
+      }
+      .chart-wrapper{
+        overflow: auto;
+        resize: both;
+        border: dotted 3px red;
+        position: absolute;
+      }
+      .chart-wrapper:active{
+        width: 0;
+        height: 0;
       }
 
     </style>
 
     <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
+    <template is="dom-if" if="{{live}}">
+      <button on-tap="toggleEdit">Exit live edit</button>
+      <resizer-element resize-both element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
+    </template>
     <paper-dialog id="chartSelectorModal" with-backdrop>
+
+    <paper-tabs selected="{{selected}}" no-bar>
+      <paper-tab>Chart Source</paper-tab>
+      <paper-tab>Settings</paper-tab>
+    </paper-tabs>
       <iron-pages selected="{{selected}}">
         <div>
          <div id="chartSelector">
@@ -52,15 +72,9 @@
       </div>
       
       <div>
-          <chart-settings uuid="[[uuid]]"></chart-settings>
+          <chart-settings uuid="[[uuid]]" live="{{live}}"></chart-settings>
       </div>
     </iron-pages>
-
-    <paper-tabs selected="{{selected}}" no-bar>
-      <paper-tab>Chart Source</paper-tab>
-      <paper-tab>Settings</paper-tab>
-    </paper-tabs>
-
   </paper-dialog>
 </template>
 
@@ -87,6 +101,11 @@
             }
           }
         },
+        live:{
+          type:Boolean,
+          value:false,
+          observer:'liveEdit'
+        },
         selected:{
           type:Number,
           value:0,
@@ -97,6 +116,18 @@
           statePath(state){
             if(this.paragraphId){
               return state.data[this.paragraphId].source
+            }
+          }
+        },
+        updateCallback:{
+          type:Number,
+          observer:'applySettings'
+        },
+        settings:{
+          type:Object,
+          statePath(state){
+            if(this.uuid){
+              return state.charts[this.uuid].settings
             }
           }
         }
@@ -117,6 +148,23 @@
           };
         }
       }
+    }
+    applySettings(){
+      let newSettings = Object.assign({},this.newSettings);
+      this.dispatch({
+        type: 'UPDATE_SETTINGS',
+        value: {
+          id: this.uuid,
+          settings: newSettings
+        }
+      })
+    }
+    toggleEdit(){
+      this.set('live',!this.live);
+    }
+    liveEdit(){
+      this.$.chartSelectorModal.close();
+      this.newSettings = Object.assign({},this.settings);
     }
     tabChange(){
       this.$.chartSelectorModal.notifyResize();

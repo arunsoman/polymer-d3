@@ -1,86 +1,189 @@
 <dom-module id="resizer-element">
   <template>
     <style>
-    .resizable{
-    /*border: solid 1px #bbbab9;*/
-    overflow: auto;
-    background: rgba(255, 236, 147, 0.32);
-    position: absolute;
-    overflow: hidden;
-    }
-    .resizable.right{
-      width: 10px;
-      right: 0;
-      top:0;
+      .resizable{
+        background: rgba(255, 236, 147, 0.32);
+        position: absolute;
+      }
+      .resizable.right{
+        width: 10px;
+        right: 0;
+        top:0;
+        bottom: 0;
+        height: 263px!important;
+        border-left: solid 1px #bbbab9;
+      }
+      .resizable.left{
+       width: 10px;
+       left: 0;
+       top:0;
+       bottom: 0;
+       height: 263px!important;
+       z-index: 9;
+       border-right: solid 1px #bbbab9;
+     }
+     .resizable.top{
+       left: 0;
+       top:0;
+       right: 0;
+       width: 100%!important;
+       transform: rotateX(180deg);
+       border-top: solid 1px #bbbab9;
+     }
+     .resizable.bottom{
+      left: 0;
       bottom: 0;
-      height: 263px!important;
-      border-left: solid 1px #bbbab9;
+      right: 0;
+      width: 100%!important;
+      border-top: solid 1px #bbbab9;
     }
-    .resizable.left{
-     width: 10px;
-     left: 0;
-     top:0;
-     bottom: 0;
-     height: 263px!important;
-     z-index: 9;
-     border-right: solid 1px #bbbab9;
+    .count-label{
+      user-select:none;
+      position: absolute;
+      min-width: 30px;
     }
-    .resizable.top{
-     left: 0;
-     top:0;
-     right: 0;
-     width: 100%!important;
-     transform: rotateX(180deg);
-     border-top: solid 1px #bbbab9;
+    #rsz {
+      position: absolute;
+      right: 0;
+      width: 10px;
+      height: 100%;
+      background-color: rgba(255, 236, 147, 0.74);
+      cursor: pointer;
     }
-    .resizable.bottom{
-    left: 0;
-    bottom: 0;
-    right: 0;
-    width: 100%!important;
-    border-top: solid 1px #bbbab9;
+    .left .count-label{
+      top: 50%;
+      right: 0;
+    }
+    .right .count-label{
+      top: 50%;
+    }
+    .top .count-label{
+      position: relative;
+      display: inline-block;
+      transform: rotateX(180deg);
+    }
+    .bottom .count-label{
+      position: relative;
+      display: inline-block;
+    }
+    .right #rsz{
+      right: auto;
+      left: 0;
+
+    }
+    .top #rsz{
+      position: relative;
+      top: 0;
+      width: 100%;
+      height: 10px;
+      text-align: center;
+    }
+    .bottom #rsz{
+      top: 0;
+      position: relative;
+      width: 100%;
+      height: 10px;
+      text-align: center;
+    }
+    .width-info{
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: -10px;
+      border-bottom: solid 1px #d8d2d2;
+      text-align: center;
+    }
+    .width-info span{
+      background: #fff;
+      position: absolute;
+      top: -9px;
+      padding: 0 10px;
+      margin-left: -31px;
+    }
+    .width-info:after {
+      content: "";
+      position: absolute;
+      right: 1px;
+      top: 0;
+      height: 8px;
+      background: #d8d2d2;
+      width: 1px;
+    }
+    .width-info:before {
+      content: "";
+      position: absolute;
+      left: 1px;
+      top: 0;
+      height: 8px;
+      background: #d8d2d2;
+      width: 1px;
+    }
+    .info{
+      user-select:none;
+    }
+    .info span{
+      background: #fff;
+    }
+    .height-info {
+      position: absolute;
+      right: -40px;
+      top: 0;
+      bottom: 0;
+      border-left: solid 1px #d8d2d2;
+    }
+    .height-info:before {
+      content: "";
+      position: absolute;
+      right: 0;
+      background: #d8d2d2;
+      width: 40px;
+      height: 1px;
+    }
+    .height-info span {
+      top: 42%;
+      position: absolute;
+      left: -18px;
+      min-width: 50px;
+      padding: 10px 0;
+    }
+    .height-info:after {
+      content: "";
+      position: absolute;
+      right: 0;
+      background: #d8d2d2;
+      width: 40px;
+      height: 1px;
+      bottom: 0;
+    }
+    .height-info span{
+      margin-top: 30%;
     }
 
-#rsz {
-  position: absolute;
-  right: 0;
-  width: 10px;
-  height: 100%;
-  background-color: rgba(255, 236, 147, 0.74);
-  cursor: pointer;
-}
-.right #rsz{
-  right: auto;
-  left: 0;
 
-}
-.top #rsz{
-    position: relative;
-    top: 0;
-    width: 100%;
-  height: 10px;
-}
-.bottom #rsz{
-    top: 0;
-    position: relative;
-    width: 100%;
-  height: 10px;
-}
+  </style>
+  <div class$="resizable {{elementAlign}}" style$="width:[[wd]]px;height:[[ht]]px">
+    <template is="dom-if" if="[[resizeBoth]]">
+    <div class="width-info info"> <span><small><i>[[wd]] px</i></small></span></div>
+      <div class="height-info info"> <span><small><i>[[ht]] px</i></small></span></div>
+    </template>
+    <template is="dom-if" if="[[!resizeBoth]]">
+      <div id="rsz">
+        <template is="dom-if" if="[[inputVal]]">
+          <div class="count-label"><paper-input label="Margin Left" type="number" value="[[marginValue]]"></paper-input></div>
+        </template>
+        <template is="dom-if" if="[[!inputVal]]">
+          <div class="count-label">[[marginRound]] %</div>
+        </template>
+      </div>
+    </template>
 
-    </style>
-    [[margin.left]]
-    [[margin.right]]
-    [[margin.top]]
-    [[margin.bottom]]
-    <div class$="resizable {{elementAlign}}" style$="width:[[wd]]px;height:[[ht]]px">
-      <div id="rsz"></div>
-    </div>
+  </div>
 <!--     <div class="resizable top"></div>
     <div class="resizable right"></div>
     <div class="resizable bottom"></div>
- -->    
-  </template>
-  <script>
+  -->    
+</template>
+<script>
   /**
   * @polymer
   * @extends HTMLElement
@@ -125,13 +228,47 @@
         elementAlign:{
           type:String
         },
+        elementWidth:{
+          type:Number,
+          notify:true
+        },
+        elementHeight:{
+          type:Number,
+          notify:true
+        },
         marginValue:{
+          type:Number,
+          notify:true,
+          observer:'marginPercentage'
+        },
+        resizeBoth:{
+          type:Boolean,
+          value:false
+        },
+        marginRound:{
+          type:Number
+        },
+        inputVal:{
+          type:Number,
+          value:null
+        },
+        timer:{
+          type:Number
+        },
+        updateCallback:{
           type:Number,
           notify:true
         }
       }
     }
-
+    marginPercentage(e){
+      if(!this.resizeBoth){
+        this.set('marginRound',this.marginValue.toFixed());
+      }
+    }
+    settingsChange() {
+      this.set('updateCallback',Date.now());
+    }
     constructor() {
       super();
     }
@@ -140,17 +277,36 @@
       this.y = event.screenY;
     }
     resize(evt){
-      console.log(this.elementAlign);
       this.dx = evt.screenX - this.x;
       this.dy = evt.screenY - this.y;
       this.x = evt.screenX;
       this.y = evt.screenY;
       this.wd += this.elementAlign=="right" ? this.dx * -1 : this.dx ;
-      this.ht += this.elementAlign=="bottom" ? this.dy*-1 : this.dy ;
-      this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? (this.wd/500)*100: (this.ht/263)*100)
+      this.ht += this.elementAlign=="bottom" ? this.dy*-1 : this.dy;
+      this.settingsChange();
+      if(this.resizeBoth){
+        this.set('elementWidth',this.wd);
+        this.set('elementHeight',this.ht);
+      }else{
+        this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? (this.wd/500)*100: (this.ht/263)*100)
+      }
+    }
+    callback(){
+
     }
     ready(){
       super.ready();
+      if(this.inputVal){
+
+      }else{
+        this.resizeEvents();
+      }
+      if(this.resizeBoth){
+        this.set('wd',parseInt(this.elementWidth));
+        this.set('ht',parseInt(this.elementHeight));
+      }
+    }
+    resizeEvents(){
       this.addEventListener('mousedown',(event)=>{
         this.mousedown = true;
         this.startResize(event);
@@ -165,5 +321,5 @@
     
   }
   customElements.define(resizerElement.is, resizerElement)
-  </script>
+</script>
 </dom-module>

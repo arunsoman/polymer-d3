@@ -62,6 +62,7 @@
     <!-- <paper-dialog id="dialog" modal> -->
       <h2>Chart Settings </h2>
       <div class="buttons">
+        <paper-button on-click="liveEdit" dialog-dismiss><strong>Live Edit</strong></paper-button>
         <paper-button on-click="applySettings" dialog-dismiss><strong>Apply</strong></paper-button>
         <paper-button on-click="resetSettings" class="cancel" dialog-dismiss>Cancel</paper-button>
       </div>
@@ -150,6 +151,11 @@
         legend:{
           type:Object
         },
+        live:{
+          type:Boolean,
+          value:false,
+          notify:true
+        },
         chartKeys:{
           type:Object,
           statePath(state){
@@ -187,6 +193,9 @@
           settings: newSettings
         }
       })
+    }
+    liveEdit(){
+      this.set('live',true);
     }
     settingsToArray() {
       // transform object to array with object key value.

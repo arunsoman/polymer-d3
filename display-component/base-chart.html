@@ -71,7 +71,7 @@
             }else{
               return {
                 title:{uitype:'text',txt:"Title",value:""},
-                margin:{uitype:'visual',txt:'Margin',value:{top: 5, right: 20, bottom: 50, left: 20}},
+                margin:{uitype:'visual',txt:'Margin',value:{top: 1, right: 1, bottom: 1, left: 1}},
                 legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
                 xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
                 yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
@@ -480,7 +480,6 @@
         })
         .attr("data-legend",(d,i)=>(d[obj.key] || (d.data && d.data[obj.key]))|| (obj.obj.keys && obj.obj.keys[i]) ||this.inputs[this.y].selectedObjs[0].key)
         .attr("data-legend-color",(d,i)=>{return this.colorFill(obj.obj,i);})
-
       obj.container.append("g")
           .attr("class","legend")
           .attr("transform","translate("+((obj.obj.chartProp.width+obj.obj.chartProp.margin.xMargin)*obj.obj.chartProp.label.position.x)/100+","+(obj.obj.chartProp.height*obj.obj.chartProp.label.position.y)/100+")")
