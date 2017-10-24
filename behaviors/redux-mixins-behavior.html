@@ -75,10 +75,12 @@
                 state[action.value.uuid],{
                   currentNestedObj:action.value.currentNestedObj
                 })})
+                
             case 'CURRENT_CHART_DELETED':
               delete state[action.value.uuid]
               // return state
               return  Object.assign({},state)
+
             case 'COMP_CHART_UUID_CHK':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{

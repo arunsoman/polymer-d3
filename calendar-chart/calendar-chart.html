@@ -33,6 +33,9 @@
     </chart-input-group>
     <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
     <!-- <svg id="svg"></svg> -->
+    <template is="dom-if" if="[[isCompsiteChart]]" restamp="true">
+      <paper-button raised class="resetBtn"  on-click="chartRemove">Delete</paper-button>
+    </template>
     <div id="chartContainer"></div>
   </template>
 
