@@ -126,7 +126,7 @@
         settings:{
           type:Object,
           statePath(state){
-            if(this.uuid){
+            if(this.uuid && state.charts[this.uuid]){
               return state.charts[this.uuid].settings
             }
           }
