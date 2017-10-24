@@ -32,8 +32,8 @@
         axisKeys:{
           type:String,
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
-            let chartPath = state.charts[chartId]
+            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
             return keys
@@ -43,8 +43,8 @@
           type:Array,
           observer:'_chartDraw',
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
-            let chartPath = state.charts[chartId]
+            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
             return inputData
@@ -64,8 +64,8 @@
           type:Object,
           observer:'_chartDraw',
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
-            let chartPath = state.charts[chartId]
+            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[this.uuid]
             if(chartPath){
               return chartPath.settings;
             }else{
@@ -94,7 +94,7 @@
         refSource:{
           type:Array,
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartId = this.isCompsiteChart && this.uuid
             let chartPath = state.charts[chartId]
             let refSource =  chartPath && chartPath.refrenceSrc
             return refSource?refSource:[]
@@ -114,8 +114,8 @@
         stacked:{
           type:Boolean,
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
-            let chartPath = state.charts[chartId]
+            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let stacked = objAssignChk&&chartPath.settings.stacked.value
             return stacked
@@ -125,8 +125,8 @@
         group:{
           type:Boolean,
           statePath(state){
-            let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
-            let chartPath = state.charts[chartId]
+            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
+            let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let group = objAssignChk&&chartPath.settings.group.value
             return group
@@ -166,16 +166,16 @@
         filterIdx:{
           type:Number,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let filterIdx = chartIdChk && state.charts[this.id].filterIdx
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterIdx = chartIdChk && chartIdChk.filterIdx
             return filterIdx>=0?filterIdx:-1
           }
         },
         compfilterChk:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let compfilterChk = chartIdChk && state.charts[this.id].compfilterChk
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let compfilterChk = chartIdChk && chartIdChk.compfilterChk
             return compfilterChk
           },
           observer:"filterCheckSelected"
@@ -194,8 +194,8 @@
         filterKeys:{
           type:Array,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let filterKeys = chartIdChk && state.charts[this.id].filterKeys
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterKeys = chartIdChk && chartIdChk.filterKeys
             return filterKeys?filterKeys:[]
           }
         },
@@ -211,32 +211,32 @@
         dblClick:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let dblClick = chartIdChk && state.charts[this.id].dblClick
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let dblClick = chartIdChk && chartIdChk.dblClick
             return dblClick?dblClick:false
           }
         },
         filterReload:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let filterReload = chartIdChk && state.charts[this.id].filterReload
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterReload = chartIdChk && chartIdChk.filterReload
             return filterReload?filterReload:false
           }
         },
         lastFilterActivated:{
           type:Boolean,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let lastFilterActivated = chartIdChk && state.charts[this.id].lastFilterActivated
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let lastFilterActivated = chartIdChk && chartIdChk.lastFilterActivated
             return lastFilterActivated?lastFilterActivated:false
           }
         },
         itemXYZ:{
           type:Object,
           statePath(state){
-            let chartIdChk = this.isCompsiteChart && this.id!=""&&state.charts[this.id]
-            let itemXYZ = chartIdChk && state.charts[this.id].itemXYZ
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let itemXYZ = chartIdChk && chartIdChk.itemXYZ
             return itemXYZ?itemXYZ:{}
           }
         },
@@ -256,7 +256,7 @@
         layoutData:{
           type:Array,
           statePath(state){
-            let chartId = this.compUUID?this.compUUID:this.uuid
+            let chartId = this.isCompsiteChart && this.compUUID?this.compUUID:this.uuid
             let chartPath = state.charts[chartId]
             let layoutData = chartPath && chartPath.layoutData
             return layoutData?layoutData:[]
@@ -585,6 +585,7 @@
     chartRemove(){
       let layoutData = this.layoutData.filter(item=>item.id!=this.uuid)
       this.remove()
+      this.chartReset()
       this.dispatch("updateLayoutItem",{uuid:this.compUUID,layoutData:layoutData})
       this.dispatch("currentChartDeleted", {uuid:this.uuid})
     }
@@ -637,6 +638,10 @@
       propData.filterIdxGbl = filterIdxGbl
       propData.itemXYZ = itemXYZ
       filterKeys.length?this.reduxUpdateSrc(propData):this.chartReset()
+      
+      let body = document.getElementsByTagName("body")
+      let d3Tip = body[0].querySelectorAll(".d3-tip")
+      d3Tip.length && d3Tip.forEach(item=>item.remove())
     }
     reduxUpdateSrc(propData){
       this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})

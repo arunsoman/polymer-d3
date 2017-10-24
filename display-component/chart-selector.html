@@ -119,7 +119,7 @@
       this.set('selected',e.model.item);
     }
     draggable(e){
-      let charts=["composite-canvas"]
+      let charts=["composite-canvas","polymerd3-table"]
       let chartChk = charts.indexOf(e.path[0].dataset.elem)
       if(!e.path[0].dataset.elem || chartChk!=-1) return;
       e.dataTransfer.effectAllowed = "move";

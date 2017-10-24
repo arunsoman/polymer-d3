@@ -81,7 +81,7 @@
           let chartItem={}
           chartItem.chartCls="resize col-md-5"
           chartItem.elem=chartElem
-          chartItem.chartWidth = this.$.layoutArea.offsetWidth/2
+          chartItem.chartWidth = (this.$.layoutArea.offsetWidth* 41)/100
           chartItem.chartHeight = this.$.layoutArea.offsetHeight/2
           chartItem.chartCreate = true
           chartBox.set("uuid",this.uuid)

@@ -168,49 +168,49 @@
       paragraphId:{
         type:String
       },
-      currentNestedObj:{
-        type:String,
-        statePath(state){
-          let chartPath = state.charts[this.uuid]
-          let currentNestedObj = chartPath && chartPath.currentNestedObj
-          return currentNestedObj
-        }
-      },
-      chartData:{
-        type:Object,
-        statePath(state){
-          let chartPath = state.charts[this.uuid]
-          let compositeChartData = chartPath && chartPath.compositeChartData
-          return compositeChartData
-        }
-      },
-      layoutAreaChk:{
-        type:Boolean,
-        statePath(state){
-          let chartPath = state.charts[this.uuid]
-          let layoutAreaChk = chartPath && chartPath.layoutAreaChk
-          return layoutAreaChk
-        }
-      },
-      compChartUUIDChk:{
-        type:Boolean,
-        statePath(state){
-          let chartPath = state.charts[this.uuid]
-          let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
-          return compChartUUIDChk?compChartUUIDChk:false
-        }
-      },
-      modelCheck:{
-        type:Boolean,
-        notify:true
-      },
-      modelChartHolder:{
-        type:Boolean,
-        value:false
-      },
-      isCompsiteChart:{
-        type:Boolean
-      },
+      // currentNestedObj:{
+      //   type:String,
+      //   statePath(state){
+      //     let chartPath = state.charts[this.uuid]
+      //     let currentNestedObj = chartPath && chartPath.currentNestedObj
+      //     return currentNestedObj
+      //   }
+      // },
+      // chartData:{
+      //   type:Object,
+      //   statePath(state){
+      //     let chartPath = state.charts[this.uuid]
+      //     let compositeChartData = chartPath && chartPath.compositeChartData
+      //     return compositeChartData
+      //   }
+      // },
+      // layoutAreaChk:{
+      //   type:Boolean,
+      //   statePath(state){
+      //     let chartPath = state.charts[this.uuid]
+      //     let layoutAreaChk = chartPath && chartPath.layoutAreaChk
+      //     return layoutAreaChk
+      //   }
+      // },
+      // compChartUUIDChk:{
+      //   type:Boolean,
+      //   statePath(state){
+      //     let chartPath = state.charts[this.uuid]
+      //     let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
+      //     return compChartUUIDChk?compChartUUIDChk:false
+      //   }
+      // },
+      // modelCheck:{
+      //   type:Boolean,
+      //   notify:true
+      // },
+      // modelChartHolder:{
+      //   type:Boolean,
+      //   value:false
+      // },
+      // isCompsiteChart:{
+      //   type:Boolean
+      // },
       // compsiteChart:{
       //   type:Boolean,
       //   statePath(state){
@@ -221,57 +221,57 @@
       //   //value:false,
       //   // observer:"checkIsCompsiteChart"
       // },
-      readOnly:{
-        type:Boolean,
-        statePath(state){
-          let chartPath = state.charts[this.uuid]
-          let readOnly = chartPath && chartPath.readOnly
-          readOnly&&!this.isCompsiteChart?this.set("isCompsiteChart",readOnly):
-            this.modelChartHolder&&this.set("isCompsiteChart",this.modelChartHolder)
-          return readOnly
-        }
-      }
+      // readOnly:{
+      //   type:Boolean,
+      //   statePath(state){
+      //     let chartPath = state.charts[this.uuid]
+      //     let readOnly = chartPath && chartPath.readOnly
+      //     readOnly&&!this.isCompsiteChart?this.set("isCompsiteChart",readOnly):
+      //       this.modelChartHolder&&this.set("isCompsiteChart",this.modelChartHolder)
+      //     return readOnly
+      //   }
+      // }
     }
   }
 
   static get actions() {
     return {
-      addUpdateChartData(addUpdateChartData) {
-        return {
-          type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
-          value: addUpdateChartData
-        }
-      },
-      splitAreaChk(layoutAreaChk) {
-        return {
-          type: 'COMPOSITE_SPLIT_AREA_CHK',
-          value: layoutAreaChk
-        }
-      },
-      currentObjNested(currentObjNested) {
-        return {
-          type: 'CURRENT_NESTED_OBJ',
-          value: currentObjNested
-        }
-      },
-      compChartUUIDChk(compChartUUIDChk) {
-        return {
-          type: 'COMP_CHART_UUID_CHK',
-          value: compChartUUIDChk
-        }
-      }
+      // addUpdateChartData(addUpdateChartData) {
+      //   return {
+      //     type: 'ADD_UPDATE_COMPOSITE_CHART_DATA',
+      //     value: addUpdateChartData
+      //   }
+      // },
+      // splitAreaChk(layoutAreaChk) {
+      //   return {
+      //     type: 'COMPOSITE_SPLIT_AREA_CHK',
+      //     value: layoutAreaChk
+      //   }
+      // },
+      // currentObjNested(currentObjNested) {
+      //   return {
+      //     type: 'CURRENT_NESTED_OBJ',
+      //     value: currentObjNested
+      //   }
+      // },
+      // compChartUUIDChk(compChartUUIDChk) {
+      //   return {
+      //     type: 'COMP_CHART_UUID_CHK',
+      //     value: compChartUUIDChk
+      //   }
+      // }
     }
   }
-  updateObjRedux(){
-    if(!this.compChartUUIDChk){
-      this.set("compChartUUIDChk",!this.compChartUUIDChk)
-      this.dispatch("compChartUUIDChk", {uuid:this.uuid,compChartUUIDChk:this.compChartUUIDChk})
-    }
-    this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
-    this.set("layoutAreaChk",!this.layoutAreaChk)
-    this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
-    this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
-  }
+  // updateObjRedux(){
+  //   if(!this.compChartUUIDChk){
+  //     this.set("compChartUUIDChk",!this.compChartUUIDChk)
+  //     this.dispatch("compChartUUIDChk", {uuid:this.uuid,compChartUUIDChk:this.compChartUUIDChk})
+  //   }
+  //   this.dispatch("addUpdateChartData", {uuid:this.uuid,chartData:this.chartData})
+  //   this.set("layoutAreaChk",!this.layoutAreaChk)
+  //   this.dispatch("splitAreaChk", {uuid:this.uuid,layoutAreaChk:this.layoutAreaChk})
+  //   this.dispatch("currentObjNested", {uuid:this.uuid,currentNestedObj:""})
+  // }
 
   constructor(){
     super();
@@ -285,24 +285,25 @@
     '_selectedChanged(paragraphId)',
     ]
   }
-  checkIsCompsiteChart(){
-    if(this.isCompsiteChart){
-      this.availableCharts.shift()
-      this.availableCharts.pop()
-      this.set("availableCharts",this.availableCharts)
-    }
-  }
+  // checkIsCompsiteChart(){
+  //   if(this.isCompsiteChart){
+  //     this.availableCharts.shift()
+  //     this.availableCharts.pop()
+  //     this.set("availableCharts",this.availableCharts)
+  //   }
+  // }
   // on selected chart changed
   // is also used to draw first chart
   _selectedChanged(selectedChart) {
     let getparagraphId = this.uuid?this.uuid.split("@")[0]:this.paragraphId
     if(selectedChart && getparagraphId){
       let elem;
-      if(!this.modelChartHolder){
-        this.$$('.chartHolder').innerHTML = ''
-      }else{
-        this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
-      }
+      this.$$('.chartHolder').innerHTML = ''
+      // if(!this.modelChartHolder){
+      //   this.$$('.chartHolder').innerHTML = ''
+      // }else{
+      //   this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
+      // }
       // let isCompsiteChart = (this.isCompsiteChart)
       // this.set("modelCheck",!this.modelCheck)
       // if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){

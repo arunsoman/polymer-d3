@@ -55,42 +55,41 @@
                 chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
               })
             })
-            case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  compositeChartData:action.value.chartData
-                })})
-            case 'COMPOSITE_SPLIT_AREA_CHK':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  layoutAreaChk:action.value.layoutAreaChk
-                })})
-            case 'CHART_AVAILABLE_MODAL_CHK':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  chartAvailableModalChk:action.value.chartAvailableModalChk
-                })})
-            case 'CURRENT_NESTED_OBJ':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  currentNestedObj:action.value.currentNestedObj
-                })})
-                
+            // case 'ADD_UPDATE_COMPOSITE_CHART_DATA':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       compositeChartData:action.value.chartData
+            //     })})
+            // case 'COMPOSITE_SPLIT_AREA_CHK':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       layoutAreaChk:action.value.layoutAreaChk
+            //     })})
+            // case 'CHART_AVAILABLE_MODAL_CHK':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       chartAvailableModalChk:action.value.chartAvailableModalChk
+            //     })})
+            // case 'CURRENT_NESTED_OBJ':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       currentNestedObj:action.value.currentNestedObj
+            //     })})
+
+            // case 'COMP_CHART_UUID_CHK':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       compChartUUIDChk:action.value.compChartUUIDChk
+            //     })})
+            // case 'UPDATE_READ_ONLY':
+            //   return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+            //     state[action.value.uuid],{
+            //       readOnly:action.value.readOnly
+            //     })})
             case 'CURRENT_CHART_DELETED':
               delete state[action.value.uuid]
               // return state
               return  Object.assign({},state)
-
-            case 'COMP_CHART_UUID_CHK':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  compChartUUIDChk:action.value.compChartUUIDChk
-                })})
-            case 'UPDATE_READ_ONLY':
-              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
-                state[action.value.uuid],{
-                  readOnly:action.value.readOnly
-                })})
             case 'ADD_COMP_REFRENCE_SRC':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
@@ -147,11 +146,6 @@
                 state[action.value.uuid],{
                   itemXYZ:action.value.itemXYZ
                 })})
-
-
-
-
-
             case 'IS_COMPOSITE_CHART':
               return  Object.assign({},state,{isCompsiteChart:action.value.isCompsiteChart})
             case 'NEW_ITEM_CHK':
