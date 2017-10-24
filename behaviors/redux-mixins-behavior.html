@@ -145,6 +145,25 @@
                 state[action.value.uuid],{
                   itemXYZ:action.value.itemXYZ
                 })})
+
+
+
+
+
+            case 'IS_COMPOSITE_CHART':
+              return  Object.assign({},state,{isCompsiteChart:action.value.isCompsiteChart})
+            case 'NEW_ITEM_CHK':
+              return  Object.assign({},state,{newItemChk:action.value.newItemChk})
+            case 'UPDATE_LAYOUT_ITEM':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  layoutData:action.value.layoutData
+                })})
+
+
+
+
+
           default:
               return state;
       }

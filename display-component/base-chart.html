@@ -239,6 +239,21 @@
             let itemXYZ = chartIdChk && state.charts[this.id].itemXYZ
             return itemXYZ?itemXYZ:{}
           }
+        },
+
+
+
+
+
+        isCompsiteChart:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts
+            let compsiteChart = chartPath && chartPath.isCompsiteChart
+            return compsiteChart
+          }
+          //value:false,
+          // observer:"checkIsCompsiteChart"
         }
       }
     }
@@ -327,7 +342,27 @@
             type: 'EXPORT_FILTER_DATA',
             value: exportFilterData
           }
+        },
+
+
+
+
+
+
+
+        isCompsiteChart(isCompsiteChart) {
+          return {
+            type: 'IS_COMPOSITE_CHART',
+            value: isCompsiteChart
+          };
+        },
+        newItemChk(itemChk){
+          return {
+            type: 'NEW_ITEM_CHK',
+            value: itemChk
+          };
         }
+
       }
     }
     connectedCallback(){
@@ -340,6 +375,15 @@
       //   updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
       // }
       this.dispatch("updateChart",updateChartData);
+      this.updateCommonChartProp()
+      // this.isCompsiteChart&&this.dispatch("isCompsiteChart",{isCompsiteChart:false});
+
+    }
+    updateCommonChartProp(){
+      if(this.uuid&&this.uuid.indexOf("@_")==-1){
+        this.dispatch("isCompsiteChart", {uuid:this.uuid,isCompsiteChart:false})
+        this.dispatch("newItemChk",{uuid:this.uuid,newItemChk:false})
+      }
     }
     changedStackedAndGroup(){
       if(!this.isCompsiteChart){this._chartDraw()}
@@ -379,12 +423,17 @@
     }
 
     initializeChart(){
+// debugger
+      // if(this.isCompsiteChart){
+      //   this.set("uuid",this.id)
+      //   // this.set("filterKeys",[])
+      // }else{
+      // this.set("uuid",this.parentId+'@'+this.tagName);
+      // }
 
-      if(this.isCompsiteChart){
-        this.set("uuid",this.id)
-        // this.set("filterKeys",[])
+      if(this.uuid&&this.isCompsiteChart){
       }else{
-      this.set("uuid",this.parentId+'@'+this.tagName);
+        this.set("uuid",this.parentId+'@'+this.tagName)
       }
     }
     // add keys and colors to chartstore as keys
@@ -488,7 +537,7 @@
           mLeft = +settings.margin.value.left,
           margin = {top:this.calculateMargin(height,mTop), right: this.calculateMargin(width,mRight), bottom: this.calculateMargin(height,mBottom), left: this.calculateMargin(width,mLeft)},
           label= settings.legend.values,
-          compMargin = {top: 15, right: 35, bottom: 75, left: 35}
+          compMargin = {top: 15, right: 2, bottom: 45, left: 15}
       // margin = this.compChartObjs?compMargin:margin
       margin = this.isCompsiteChart?compMargin:margin
 
@@ -496,7 +545,10 @@
       margin.yMargin = margin.top + margin.bottom
 
       width = this.chartWidth?this.chartWidth:width
-      height = this.chartVertical && this.chartHeight?this.chartHeight:height
+      height = this.chartHeight?this.chartHeight:height
+
+      // width = this.isCompsiteChart?(width-margin.xMargin):width
+      // height = this.isCompsiteChart?(height-margin.yMargin):height
 
       // width = parseFloat(width +margin.xMargin)
       // height = parseFloat(height + margin.yMargin)

@@ -1,0 +1,144 @@
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<dom-module id="chart-box">
+  <template>
+    <style>
+    .col-md-1,
+    .col-md-10,
+    .col-md-11,
+    .col-md-12,
+    .col-md-2,
+    .col-md-3,
+    .col-md-4,
+    .col-md-5,
+    .col-md-6,
+    .col-md-7,
+    .col-md-8,
+    .col-md-9 {
+      float: left
+    }
+
+    .col-md-12 {
+      width: 100%
+    }
+
+    .col-md-11 {
+      width: 91.66666667%
+    }
+
+    .col-md-10 {
+      width: 83.33333333%
+    }
+
+    .col-md-9 {
+      width: 75%
+    }
+
+    .col-md-8 {
+      width: 66.66666667%
+    }
+
+    .col-md-7 {
+      width: 58.33333333%
+    }
+
+    .col-md-6 {
+      width: 50%
+    }
+
+    .col-md-5 {
+      width: 41.66666667%
+    }
+
+    .col-md-4 {
+      width: 33.33333333%
+    }
+
+    .col-md-3 {
+      width: 25%
+    }
+
+    .col-md-2 {
+      width: 16.66666667%
+    }
+
+    .col-md-1 {
+      width: 8.33333333%
+    }
+    .resize{
+      resize: both;
+      display: block;
+      overflow: hidden;
+      border-right:1px solid #f6f6f6;
+      border-bottom:1px #f6f6f6 solid;
+    }
+    </style>
+
+  </template>
+  <script>
+    class chartBox extends ReduxMixinBehavior(Polymer.Element){
+        static get is(){
+          return "chart-box"
+        }
+        static get properties(){
+          return{
+            layoutData:{
+              type:Array,
+              statePath(state){
+                let chartPath = state.charts[this.uuid]
+                let layoutData = chartPath && chartPath.layoutData
+                return layoutData?layoutData:[]
+              }
+            }
+          }
+        }
+        static get actions() {
+          return{
+            updateLayoutItem(layoutData){
+              return {
+                type: 'UPDATE_LAYOUT_ITEM',
+                value: layoutData
+              };
+            }
+          }
+        }
+        constructor(){
+          super()
+        }
+        connectedCallback(){
+          super.connectedCallback()
+          this.createChart()
+        }
+        createChart(){
+          let chart = document.createElement(this.chartData.elem)
+          let chartId = this.chartData.id
+          let chartNewId = this.uuid+"@_"+this.chartData.elem+"_"+this.getUUID()
+          chartId=chartId?chartId:chartNewId
+          chart.set("parentId",this.parentId)
+          chart.set("uuid",chartId)
+          chart.set("chartWidth",this.chartData.chartWidth)
+          chart.set("chartHeight",this.chartData.chartHeight)
+          chart.setAttribute("class",this.chartData.chartCls)
+          if(this.chartData.chartCreate){
+            let layoutItem=this.chartData
+            delete layoutItem.chartCreate
+            layoutItem.id=chartNewId
+
+            let layoutData = this.layoutData
+            layoutData.push(layoutItem)
+            this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
+          }
+          // debugger
+          this.root.appendChild(chart)
+        }
+        getUUID(){
+          function uuid() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+              .toString(16)
+              .substring(1);
+          }
+          return uuid() + uuid() + '-' + uuid() + '-' + uuid();
+        }
+    }
+    customElements.define(chartBox.is,chartBox)
+  </script>
+</dom-module>

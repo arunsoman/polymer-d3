@@ -1,0 +1,97 @@
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<link href="chart-box.html" rel='import'>
+<dom-module id="layout-area">
+  <template>
+    <style>
+      :host #layoutArea{
+        width:100%;
+        min-height: 70vh;
+        /*border:1px solid red;*/
+      }
+      #layoutArea:after{
+        content: "";
+        display:block;
+        clear:both;
+      }
+
+    </style>
+    <div id="layoutArea" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
+      <template is="dom-if" if="[[!newItemChk]]" restamp="true">
+        <template is="dom-repeat" items="[[layoutData]]">
+          <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
+        </template>
+      </template>
+    </div>
+  </template>
+  <script>
+    class layoutArea extends ReduxMixinBehavior(Polymer.Element){
+        static get is(){
+          return "layout-area"
+        }
+        static get properties(){
+          return{
+            uuid:{
+              type:String
+            },
+            layoutData:{
+              type:Array,
+              statePath(state){
+                let chartPath = state.charts[this.uuid]
+                let layoutData = chartPath && chartPath.layoutData
+                return layoutData?layoutData:[]
+              }
+            },
+            newItemChk:{
+              type:Object,
+              statePath(state){
+                let chartPath = state.charts
+                let newItemChk = chartPath && chartPath.newItemChk
+                return newItemChk
+              }
+            }
+          }
+        }
+        static get actions() {
+          return{
+            newItemChk(itemChk){
+              return {
+                type: 'NEW_ITEM_CHK',
+                value: itemChk
+              };
+            }
+          }
+        }
+
+        dragLeave(e){
+          // e.target.classList.remove('hover');
+        }
+        allowDrop(e){
+          e.preventDefault();
+        }
+        drop(e){
+          e.preventDefault();
+          let chartElem = e.dataTransfer.getData('chartElem');
+          if(chartElem){
+            this.createChartBox(chartElem)
+            e.dataTransfer.clearData('chartElem');
+          }
+        }
+        createChartBox(chartElem){
+          let chartBox = document.createElement("chart-box")
+          let chartItem={}
+          chartItem.chartCls="resize col-md-6"
+          chartItem.elem=chartElem
+          chartItem.chartWidth = this.$.layoutArea.offsetWidth/2
+          chartItem.chartHeight = this.$.layoutArea.offsetHeight/2
+          chartItem.chartCreate = true
+          chartBox.set("uuid",this.uuid)
+          chartBox.set("parentId",this.parentId)
+          chartBox.set("chartData",chartItem)
+          this.$.layoutArea.appendChild(chartBox)
+
+          this.layoutData.length==1&&this.dispatch("newItemChk",{uuid:this.uuid,newItemChk:true})
+        }
+    }
+    customElements.define(layoutArea.is,layoutArea)
+  </script>
+</dom-module>

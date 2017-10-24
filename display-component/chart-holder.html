@@ -209,10 +209,18 @@
         value:false
       },
       isCompsiteChart:{
-        type:Boolean,
-        value:false,
-        observer:"checkIsCompsiteChart"
+        type:Boolean
       },
+      // compsiteChart:{
+      //   type:Boolean,
+      //   statePath(state){
+      //     let chartPath = state.charts
+      //     let compsiteChart = chartPath && chartPath.isCompsiteChart
+      //     return compsiteChart
+      //   }
+      //   //value:false,
+      //   // observer:"checkIsCompsiteChart"
+      // },
       readOnly:{
         type:Boolean,
         statePath(state){
@@ -296,21 +304,21 @@
         this.$$('.chartHolder')&&this.$$('.chartHolder').remove()
       }
       // let isCompsiteChart = (this.isCompsiteChart)
-      this.set("modelCheck",!this.modelCheck)
-      if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){
-        let isCompsiteChart = this.currentNestedObj+".isCompsiteChart"
-        let chart = this.currentNestedObj+".chart"
-        let chartId = this.currentNestedObj+".chartId"
-        let areaId = this.get(this.currentNestedObj+".id")
-        let chartElement = this.selectedChart.element
-        let getChartId = this.uuid+"@_"+chartElement+"_"+areaId
-        let paragraphId = this.currentNestedObj+".paragraphId"
-        this.set(isCompsiteChart,this.isCompsiteChart)
-        this.set(chart,chartElement)
-        this.set(chartId,getChartId)
-        this.set(paragraphId,getparagraphId)
-        this.updateObjRedux()
-      }else{
+      // this.set("modelCheck",!this.modelCheck)
+      // if(this.uuid && this.currentNestedObj&&this.currentNestedObj!=""){
+      //   let isCompsiteChart = this.currentNestedObj+".isCompsiteChart"
+      //   let chart = this.currentNestedObj+".chart"
+      //   let chartId = this.currentNestedObj+".chartId"
+      //   let areaId = this.get(this.currentNestedObj+".id")
+      //   let chartElement = this.selectedChart.element
+      //   let getChartId = this.uuid+"@_"+chartElement+"_"+areaId
+      //   let paragraphId = this.currentNestedObj+".paragraphId"
+      //   this.set(isCompsiteChart,this.isCompsiteChart)
+      //   this.set(chart,chartElement)
+      //   this.set(chartId,getChartId)
+      //   this.set(paragraphId,getparagraphId)
+      //   this.updateObjRedux()
+      // }else{
         elem = PolymerD3.utilities.attachElement.call(
           this,
           selectedChart.element,
@@ -319,8 +327,8 @@
           );
           this.selectedChartObj = elem;
           this.selectedChartObj.chartInfo = this.selectedChart;
-          this.selectedChartObj.isCompsiteChart = false
-      }
+          // this.selectedChartObj.isCompsiteChart = false
+      // }
     }
 
   }

@@ -40,6 +40,8 @@
           icon="[[item.icon]]"
           title="[[item.label]]"
           on-tap="notifyTap"
+          draggable="[[isCompsiteChart]]"
+          data-elem$ ="[[item.element]]"
         ></paper-icon-button>
       </paper-tab>
     </template>
@@ -81,6 +83,14 @@
           type:Array,
           statePath:'commonsettings.commonsettings.importFile',
           observer:'fileImported'
+        },
+        isCompsiteChart:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts
+            let compsiteChart = chartPath && chartPath.isCompsiteChart
+            return compsiteChart
+          }
         }
       }
     }
@@ -96,6 +106,7 @@
       this.set('activateTabs',!e);
     }
     connectedCallback(){
+      this.addEventListener("dragstart",this.draggable.bind(this))
       super.connectedCallback();
       this.set('selected', {
             callBack:"initTable",
@@ -106,6 +117,13 @@
     }
     notifyTap(e) {
       this.set('selected',e.model.item);
+    }
+    draggable(e){
+      let charts=["composite-canvas"]
+      let chartChk = charts.indexOf(e.path[0].dataset.elem)
+      if(!e.path[0].dataset.elem || chartChk!=-1) return;
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("chartElem",e.path[0].dataset.elem);
     }
   }
   window.customElements.define(chartSelector.is,chartSelector);

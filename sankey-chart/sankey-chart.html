@@ -27,7 +27,7 @@
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
-        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis" accept="string"></chart-input>
       </chart-input-group>
       <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
     <div id="chartContainer"></div>
@@ -45,9 +45,6 @@
         return{
 
         }
-      }
-      constructor(){
-        super()
       }
       redraw() {
         this.draw(this._paint(this._compute()));
