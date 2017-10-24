@@ -252,8 +252,15 @@
             let compsiteChart = chartPath && chartPath.isCompsiteChart
             return compsiteChart
           }
-          //value:false,
-          // observer:"checkIsCompsiteChart"
+        },
+        layoutData:{
+          type:Array,
+          statePath(state){
+            let chartId = this.compUUID?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let layoutData = chartPath && chartPath.layoutData
+            return layoutData?layoutData:[]
+          }
         }
       }
     }
@@ -360,6 +367,18 @@
           return {
             type: 'NEW_ITEM_CHK',
             value: itemChk
+          };
+        },
+        currentChartDeleted(currentChartDeleted) {
+          return {
+            type: 'CURRENT_CHART_DELETED',
+            value: currentChartDeleted
+          }
+        },
+        updateLayoutItem(layoutData){
+          return {
+            type: 'UPDATE_LAYOUT_ITEM',
+            value: layoutData
           };
         }
 
@@ -546,7 +565,7 @@
       width = this.chartWidth?this.chartWidth:width
       height = this.chartHeight?this.chartHeight:height
 
-      // width = this.isCompsiteChart?(width-margin.xMargin):width
+      width = this.isCompsiteChart?(width-margin.xMargin):width
       // height = this.isCompsiteChart?(height-margin.yMargin):height
 
       // width = parseFloat(width +margin.xMargin)
@@ -562,6 +581,12 @@
     calculateMargin(dimension,margin){
       return (dimension * margin)/100;
 
+    }
+    chartRemove(){
+      let layoutData = this.layoutData.filter(item=>item.id!=this.uuid)
+      this.remove()
+      this.dispatch("updateLayoutItem",{uuid:this.compUUID,layoutData:layoutData})
+      this.dispatch("currentChartDeleted", {uuid:this.uuid})
     }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
