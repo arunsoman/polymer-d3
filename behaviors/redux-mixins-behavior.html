@@ -155,9 +155,11 @@
                 state[action.value.uuid],{
                   layoutData:action.value.layoutData
                 })})
-
-
-
+            case 'CHART_BOX_DELETED':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  deleteTrigger:action.value.deleteTrigger
+                })})
 
 
           default:

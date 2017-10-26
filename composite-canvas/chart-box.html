@@ -1,4 +1,5 @@
 <link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<link href="../display-component/resizer-element.html" rel='import'>
 <dom-module id="chart-box">
   <template>
     <style>
@@ -71,8 +72,17 @@
       border-right:1px solid #f6f6f6;
       border-bottom:1px #f6f6f6 solid;
     }
+    paper-button.resetBtn {
+      font-size: x-small;
+      float: right;
+      padding: 4px;
+      margin-top: 5px;
+    }
     </style>
-
+    <div id="chartBox" class$="[[chartData.chartCls]]" style$="height:[[chartData.chartHeight]]px">
+      <paper-button raised class="resetBtn"  on-click="chartBoxRemove">Delete</paper-button>
+      <resizer-element resize-both element-width="{{chartData.chartWidth}}" element-height="{{chartData.chartHeight}}" ></resizer-element>
+    </div>
   </template>
   <script>
     class chartBox extends ReduxMixinBehavior(Polymer.Element){
@@ -88,6 +98,24 @@
                 let layoutData = chartPath && chartPath.layoutData
                 return layoutData?layoutData:[]
               }
+            },
+            settings: {
+              type: Object,
+              statePath(state) {
+                if (state.charts[this.chartData.id]) {
+                  return state.charts[this.chartData.id].settings
+                }
+              }
+            },
+            chartsObj: {
+              type: Object,
+              statePath(state) {
+                  return state.charts
+              }
+            },
+            grids:{
+              type:Array,
+              value:[8.33333333,16.66666667,25,33.33333333,41.66666667,50,58.33333333,66.66666667,75,83.33333333,91.66666667,100]
             }
           }
         }
@@ -98,8 +126,29 @@
                 type: 'UPDATE_LAYOUT_ITEM',
                 value: layoutData
               };
+            },
+            updateSettings(settings){
+              return {
+                type: 'UPDATE_SETTINGS',
+                value: settings
+              };
+            },
+            currentChartDeleted(chartId) {
+              return {
+                type: 'CURRENT_CHART_DELETED',
+                value: chartId
+              }
+            },
+            chartBoxDeleted(deleteTrigger) {
+              return {
+                type: 'CHART_BOX_DELETED',
+                value: deleteTrigger
+              }
             }
           }
+        }
+        static get observers(){
+          return["onResize(chartData.chartWidth)"]
         }
         constructor(){
           super()
@@ -111,25 +160,35 @@
         createChart(){
           let chart = document.createElement(this.chartData.elem)
           let chartId = this.chartData.id
-          let chartNewId = this.uuid+"@_"+this.chartData.elem+"_"+this.getUUID()
-          chartId=chartId?chartId:chartNewId
-          chart.set("parentId",this.parentId)
-          chart.set("uuid",chartId)
-          chart.set("compUUID",this.uuid)
-          chart.set("chartWidth",this.chartData.chartWidth)
-          chart.set("chartHeight",this.chartData.chartHeight)
-          chart.setAttribute("class",this.chartData.chartCls)
+
           if(this.chartData.chartCreate){
+            chartId = this.uuid+"@_"+this.chartData.elem+"_"+this.getUUID()
             let layoutItem=this.chartData
             delete layoutItem.chartCreate
-            layoutItem.id=chartNewId
+            layoutItem.id=chartId
 
             let layoutData = this.layoutData
             layoutData.push(layoutItem)
             this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
           }
           // debugger
-          this.root.appendChild(chart)
+          chart.set("parentId",this.parentId)
+          chart.set("uuid",chartId)
+          chart.set("compUUID",this.uuid)
+          this.$.chartBox.appendChild(chart)
+
+          this.settingstoObj(chartId)
+          // debugger
+        }
+        settingstoObj(chartId) {
+          let settings = Object.assign({},this.settings)
+          settings.width.value=this.chartData.chartWidth
+          settings.height.value=this.chartData.chartHeight
+          this.dispatch("updateSettings",{uuid:chartId,settings:settings})
+          if(this.chartsObj["undefined"]){
+            this.dispatch("currentChartDeleted",{uuid:"undefined"})
+          }
+          // return settings
         }
         getUUID(){
           function uuid() {
@@ -138,6 +197,20 @@
               .substring(1);
           }
           return uuid() + uuid() + '-' + uuid() + '-' + uuid();
+        }
+        onResize(width){
+          let grid = (width/this.parentNode.offsetWidth)*100
+          let gridValue = this.grids.reduce((a,b)=>{
+            return  b <= grid ? b : a
+          },{})
+          let gridIdx = this.grids.indexOf(gridValue)
+          let resizeWidth = (this.parentNode.offsetWidth*gridValue)/100
+          this.set("chartData.chartCls","col-md-"+(gridIdx+1))
+          this.set("chartData.chartWidth",resizeWidth)
+        }
+        chartBoxRemove(){
+          this.dispatch("chartBoxDeleted",{uuid:this.chartData.id,deleteTrigger:true})
+          this.remove()
         }
     }
     customElements.define(chartBox.is,chartBox)

@@ -240,11 +240,6 @@
             return itemXYZ?itemXYZ:{}
           }
         },
-
-
-
-
-
         isCompsiteChart:{
           type:Boolean,
           statePath(state){
@@ -261,6 +256,15 @@
             let layoutData = chartPath && chartPath.layoutData
             return layoutData?layoutData:[]
           }
+        },
+        deleteTrigger:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let deleteTrigger = chartIdChk && chartIdChk.deleteTrigger
+            return deleteTrigger
+          },
+          observer:"chartRemove"
         }
       }
     }
@@ -276,12 +280,12 @@
             value: chartProperies
           };
         },
-        splitAreaChk(layoutAreaChk) {
-          return {
-            type: 'COMPOSITE_SPLIT_AREA_CHK',
-            value: layoutAreaChk
-          }
-        },
+        // splitAreaChk(layoutAreaChk) {
+        //   return {
+        //     type: 'COMPOSITE_SPLIT_AREA_CHK',
+        //     value: layoutAreaChk
+        //   }
+        // },
         addRefrenceSrc(addRefrenceSrc) {
           return {
             type: 'ADD_COMP_REFRENCE_SRC',
@@ -350,13 +354,6 @@
             value: exportFilterData
           }
         },
-
-
-
-
-
-
-
         isCompsiteChart(isCompsiteChart) {
           return {
             type: 'IS_COMPOSITE_CHART',
@@ -562,8 +559,8 @@
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
 
-      width = this.chartWidth?this.chartWidth:width
-      height = this.chartHeight?this.chartHeight:height
+      // width = this.chartWidth?this.chartWidth:width
+      // height = this.chartHeight?this.chartHeight:height
 
       width = this.isCompsiteChart?(width-margin.xMargin):width
       // height = this.isCompsiteChart?(height-margin.yMargin):height
@@ -583,11 +580,13 @@
 
     }
     chartRemove(){
-      let layoutData = this.layoutData.filter(item=>item.id!=this.uuid)
-      this.remove()
-      this.chartReset()
-      this.dispatch("updateLayoutItem",{uuid:this.compUUID,layoutData:layoutData})
-      this.dispatch("currentChartDeleted", {uuid:this.uuid})
+      if(this.isCompsiteChart&&this.deleteTrigger){
+        let layoutData = this.layoutData.filter(item=>item.id!=this.uuid)
+        this.remove()
+        this.chartReset()
+        this.dispatch("updateLayoutItem",{uuid:this.compUUID,layoutData:layoutData})
+        this.dispatch("currentChartDeleted", {uuid:this.uuid})
+      }
     }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
@@ -638,7 +637,7 @@
       propData.filterIdxGbl = filterIdxGbl
       propData.itemXYZ = itemXYZ
       filterKeys.length?this.reduxUpdateSrc(propData):this.chartReset()
-      
+
       let body = document.getElementsByTagName("body")
       let d3Tip = body[0].querySelectorAll(".d3-tip")
       d3Tip.length && d3Tip.forEach(item=>item.remove())
