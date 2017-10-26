@@ -265,6 +265,15 @@
             return deleteTrigger
           },
           observer:"chartRemove"
+        },
+        chartReDraw:{
+          type: Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let chartReDraw = chartIdChk && chartIdChk.chartReDraw
+            return chartReDraw
+          },
+          observer:"compChartReDraw"
         }
       }
     }
@@ -280,12 +289,6 @@
             value: chartProperies
           };
         },
-        // splitAreaChk(layoutAreaChk) {
-        //   return {
-        //     type: 'COMPOSITE_SPLIT_AREA_CHK',
-        //     value: layoutAreaChk
-        //   }
-        // },
         addRefrenceSrc(addRefrenceSrc) {
           return {
             type: 'ADD_COMP_REFRENCE_SRC',
@@ -404,6 +407,9 @@
     changedStackedAndGroup(){
       if(!this.isCompsiteChart){this._chartDraw()}
     }
+    compChartReDraw(){
+      if(this.isCompsiteChart){this._chartDraw()}
+    }
     filterCheckSelected(){
       clearTimeout(this.filterCheckTimer)
       this.filterCheckTimer = setTimeout(()=>{!this.compfilterChk&&this.$.chartContainer&&this.$.chartContainer.setAttribute("class","")})
@@ -515,7 +521,8 @@
       //"inputCheck" for avoid error from chart
       let axisIndex = stacked||group?3:obj.axisIndex
       if(!this.hasInputs(axisIndex))return false
-      if(this.chartWidth&&this.chartWidth<=171){
+      let body = document.getElementsByTagName("body")
+      if(this.isCompsiteChart&&(+this.settings.width.value/body[0].offsetWidth)*100<=16.66666667){
         let span = document.createElement("span")
         span.textContent="Need more width for visible a chart"
         span.id="warningMsg"
@@ -562,8 +569,8 @@
       // width = this.chartWidth?this.chartWidth:width
       // height = this.chartHeight?this.chartHeight:height
 
-      width = this.isCompsiteChart?(width-margin.xMargin):width
-      // height = this.isCompsiteChart?(height-margin.yMargin):height
+      // width = this.isCompsiteChart?(width-margin.xMargin):width
+      height = this.isCompsiteChart?(height-margin.yMargin):height
 
       // width = parseFloat(width +margin.xMargin)
       // height = parseFloat(height + margin.yMargin)

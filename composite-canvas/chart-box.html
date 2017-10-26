@@ -77,6 +77,16 @@
       float: right;
       padding: 4px;
       margin-top: 5px;
+      z-index: 9;
+    }
+    #chartBox{
+      position: relative;
+    }
+    #chartBox .warningMsg.chartMsg{
+      position: absolute;
+      top: 43px;
+      left: 12px;
+      width: 100%;
     }
     </style>
     <div id="chartBox" class$="[[chartData.chartCls]]" style$="height:[[chartData.chartHeight]]px">
@@ -107,6 +117,14 @@
                 }
               }
             },
+            chartReDraw:{
+              type: Boolean,
+              statePath(state) {
+                if (state.charts[this.chartData.id]) {
+                  return state.charts[this.chartData.id].chartReDraw
+                }
+              }
+            },
             chartsObj: {
               type: Object,
               statePath(state) {
@@ -115,7 +133,7 @@
             },
             grids:{
               type:Array,
-              value:[8.33333333,16.66666667,25,33.33333333,41.66666667,50,58.33333333,66.66666667,75,83.33333333,91.66666667,100]
+              value:[0,8.33333333,16.66666667,25,33.33333333,41.66666667,50,58.33333333,66.66666667,75,83.33333333,91.66666667,100]
             }
           }
         }
@@ -143,6 +161,12 @@
               return {
                 type: 'CHART_BOX_DELETED',
                 value: deleteTrigger
+              }
+            },
+            chartRedraw(chartReDraw) {
+              return {
+                type: 'CHART_RE_DRAW',
+                value: chartReDraw
               }
             }
           }
@@ -180,14 +204,17 @@
           this.settingstoObj(chartId)
           // debugger
         }
-        settingstoObj(chartId) {
+        settingstoObj(chartId,resize) {
           let settings = Object.assign({},this.settings)
-          settings.width.value=this.chartData.chartWidth
+          settings.width.value=this.chartData.chartWidth?this.chartData.chartWidth:settings.width.value
           settings.height.value=this.chartData.chartHeight
+
           this.dispatch("updateSettings",{uuid:chartId,settings:settings})
           if(this.chartsObj["undefined"]){
             this.dispatch("currentChartDeleted",{uuid:"undefined"})
           }
+          resize&&this.dispatch("chartRedraw",{uuid:chartId,chartReDraw:!this.chartReDraw})
+
           // return settings
         }
         getUUID(){
@@ -205,8 +232,20 @@
           },{})
           let gridIdx = this.grids.indexOf(gridValue)
           let resizeWidth = (this.parentNode.offsetWidth*gridValue)/100
-          this.set("chartData.chartCls","col-md-"+(gridIdx+1))
+          this.set("chartData.chartCls","col-md-"+gridIdx)
           this.set("chartData.chartWidth",resizeWidth)
+          if(this.layoutData){
+            let layoutData = this.layoutData.map(item=>{
+              if(item.id == this.chartData.id){
+                item.chartWidth = this.chartData.chartWidth
+                item.chartHeight = this.chartData.chartHeight
+                item.chartCls = this.chartData.chartCls
+              }
+              return item
+            })
+            this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
+          }
+          this.chartData.id&&this.settings&&this.settingstoObj(this.chartData.id,true)
         }
         chartBoxRemove(){
           this.dispatch("chartBoxDeleted",{uuid:this.chartData.id,deleteTrigger:true})

@@ -79,10 +79,12 @@
         createChartBox(chartElem){
           let chartBox = document.createElement("chart-box")
           let chartItem={}
-          chartItem.chartCls="col-md-5"
+          chartItem.chartCls="col-md-6"
           chartItem.elem=chartElem
-          chartItem.chartWidth = (this.$.layoutArea.offsetWidth* 41)/100
-          chartItem.chartHeight = this.$.layoutArea.offsetHeight/2
+          chartItem.chartWidth = (this.$.layoutArea.offsetWidth* 50)/100
+          let chartHeight = this.$.layoutArea.offsetHeight/2
+          chartHeight = chartHeight+(chartHeight/2)
+          chartItem.chartHeight = chartHeight
           chartItem.chartCreate = true
           chartBox.set("uuid",this.uuid)
           chartBox.set("parentId",this.parentId)

@@ -160,6 +160,11 @@
                 state[action.value.uuid],{
                   deleteTrigger:action.value.deleteTrigger
                 })})
+            case 'CHART_RE_DRAW':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  chartReDraw:action.value.chartReDraw
+                })})
 
 
           default:
