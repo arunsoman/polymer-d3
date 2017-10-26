@@ -2,11 +2,11 @@
   <template>
     <style>
       .resizable{
-        background: rgba(255, 236, 147, 0.32);
         position: absolute;
+        background: rgba(255, 236, 147, 0.32);
       }
-      .resizable.single-true{
-        background: rgba(255,255,255,0.1);
+      .resizable.resize-true{
+        background: transparent;
       }
       .resizable.right{
         width: 10px;
@@ -161,13 +161,28 @@
     .height-info span{
       margin-top: 30%;
     }
+    #resizeHandler{
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      width: 50px;
+      height: 50px;
+      background: red;
+      display: none;
+    }
+    .resizable.resize-true #resizeHandler{
+      display: block;
+    }
 
 
   </style>
-  <div class$="resizable {{elementAlign}}" style$="width:[[wd]]px;height:[[ht]]px">
+  <div class$="resizable {{elementAlign}} resize-{{resizeBoth}}" style$="width:{{wd}}px;height:{{ht}}px">
+    <div id="resizeHandler"></div>
     <template is="dom-if" if="[[resizeBoth]]">
-    <div class="width-info info"> <span><small><i>[[wd]] px</i></small></span></div>
-      <div class="height-info info"> <span><small><i>[[ht]] px</i></small></span></div>
+      <template is="dom-if" if="[[showInfo]]">
+        <div class="width-info info"> <span><small><i>[[wd]] px</i></small></span></div>
+        <div class="height-info info"> <span><small><i>[[ht]] px</i></small></span></div>
+      </template>
     </template>
     <template is="dom-if" if="[[!resizeBoth]]">
       <div id="rsz">
@@ -184,7 +199,7 @@
 <!--     <div class="resizable top"></div>
     <div class="resizable right"></div>
     <div class="resizable bottom"></div>
-  -->    
+  -->
 </template>
 <script>
   /**
@@ -277,6 +292,10 @@
         updateCallback:{
           type:Number,
           notify:true
+        },
+        showInfo:{
+          type:Boolean,
+          value:false
         }
       }
     }
@@ -287,6 +306,10 @@
     }
     settingsChange() {
       this.set('updateCallback',Date.now());
+      setTimeout(()=>{
+        this.set('wd',this.elementWidth)
+        this.set('ht',this.elementHeight)
+      })
     }
     constructor() {
       super();
@@ -302,7 +325,6 @@
       this.y = evt.screenY;
       this.wd += this.reverseHorizontal ? this.dx * -1 : this.dx ;
       this.ht += this.reverseVertical ? this.dy*-1 : this.dy;
-      this.settingsChange();
       if(this.resizeBoth){
         this.set('elementWidth',this.wd);
         this.set('elementHeight',this.ht);
@@ -326,18 +348,20 @@
       }
     }
     resizeEvents(){
-      this.addEventListener('mousedown',(event)=>{
+      let handlerItem = this.resizeBoth ? this.$.resizeHandler : this;
+      handlerItem.addEventListener('mousedown',(event)=>{
         this.mousedown = true;
         this.startResize(event);
       });
       document.body.addEventListener('mouseup',(event)=>{
+        if(this.mousedown) this.settingsChange();
         this.mousedown = false;
       })
       document.body.addEventListener("mousemove",(evt)=>{
         this.mousedown && this.resize(event)
       },true);
     }
-    
+
   }
   customElements.define(resizerElement.is, resizerElement)
 </script>

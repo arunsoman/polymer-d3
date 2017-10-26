@@ -63,16 +63,16 @@
           <paper-radio-button name="zLabel"> Z Label</paper-radio-button>
       </paper-radio-group>
       <template is="dom-if" if="{{eq(live,'canvas')}}">
-        <resizer-element resize-both left-pos="[[newSettings.margin.value.left]]" top-pos="[[newSettings.margin.value.top]]" element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
+        <resizer-element resize-both show-info left-pos="[[newSettings.margin.value.left]]" top-pos="[[newSettings.margin.value.top]]" element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
       </template>
       <template is="dom-if" if="{{eq(live,'margin')}}">
       <div class="margin-wrapper" style$="width:[[newSettings.width.value]]px; height: [[newSettings.height.value]]px; ">
-        <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}" update-callback="{{updateCallback}}"></resizer-element>
-        <resizer-element element-align="top" margin-value="{{newSettings.margin.value.top}}" update-callback="{{updateCallback}}"></resizer-element>
-        <resizer-element element-align="right" margin-value="{{newSettings.margin.value.right}}" update-callback="{{updateCallback}}"></resizer-element>
-        <resizer-element element-align="bottom" margin-value="{{newSettings.margin.value.bottom}}" update-callback="{{updateCallback}}"></resizer-element>
+        <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}"></resizer-element>
+        <resizer-element element-align="top" margin-value="{{newSettings.margin.value.top}}"></resizer-element>
+        <resizer-element element-align="right" margin-value="{{newSettings.margin.value.right}}"></resizer-element>
+        <resizer-element element-align="bottom" margin-value="{{newSettings.margin.value.bottom}}"></resizer-element>
       </div>
-          
+
       </template>
       <template is="dom-if" if="{{eq(live,'legend')}}">
         <div class="legend-drop-target">Legend position tracker</div>
