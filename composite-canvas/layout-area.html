@@ -13,9 +13,13 @@
         display:block;
         clear:both;
       }
+      .row {
+        margin-left: -5px;
+        margin-right: -5px;
+      }
 
     </style>
-    <div id="layoutArea" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
+    <div id="layoutArea" class="row" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
       <template is="dom-if" if="[[!newItemChk]]" restamp="true">
         <template is="dom-repeat" items="[[layoutData]]">
           <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
