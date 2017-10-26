@@ -194,8 +194,8 @@
         }
       })
     }
-    liveEdit(){
-      this.set('live',true);
+    liveEdit(key){
+      this.set('live',{key:true});
     }
     settingsToArray() {
       // transform object to array with object key value.

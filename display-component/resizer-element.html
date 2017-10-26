@@ -5,6 +5,9 @@
         background: rgba(255, 236, 147, 0.32);
         position: absolute;
       }
+      .resizable.single-true{
+        background: rgba(255,255,255,0.1);
+      }
       .resizable.right{
         width: 10px;
         right: 0;
@@ -90,7 +93,7 @@
       left: 0;
       right: 0;
       top: -10px;
-      border-bottom: solid 1px #d8d2d2;
+      border-bottom: dotted 1px #ccc;
       text-align: center;
     }
     .width-info span{
@@ -129,7 +132,7 @@
       right: -40px;
       top: 0;
       bottom: 0;
-      border-left: solid 1px #d8d2d2;
+      border-left: dotted 1px #ccc;
     }
     .height-info:before {
       content: "";
@@ -199,6 +202,14 @@
           type:String,
           value:'left'
         },
+        leftPos:{
+          type:Number,
+          value:0
+        },
+        topPos:{
+          type:Number,
+          value:0
+        },
         x:{
           type:Number
         },
@@ -255,6 +266,14 @@
         timer:{
           type:Number
         },
+        reverseVertical:{
+          type:Boolean,
+          value:false
+        },
+        reverseHorizontal:{
+          type:Boolean,
+          value:false
+        },
         updateCallback:{
           type:Number,
           notify:true
@@ -281,8 +300,8 @@
       this.dy = evt.screenY - this.y;
       this.x = evt.screenX;
       this.y = evt.screenY;
-      this.wd += this.elementAlign=="right" ? this.dx * -1 : this.dx ;
-      this.ht += this.elementAlign=="bottom" ? this.dy*-1 : this.dy;
+      this.wd += this.reverseHorizontal ? this.dx * -1 : this.dx ;
+      this.ht += this.reverseVertical ? this.dy*-1 : this.dy;
       this.settingsChange();
       if(this.resizeBoth){
         this.set('elementWidth',this.wd);

@@ -4,6 +4,9 @@
 <dom-module id="chart-input-group">
   <template>
     <style>
+    ::host{
+      position: relative;
+    };
       .input-drag-wrapper{
         padding: 1em;
       }
@@ -42,19 +45,44 @@
         width: 0;
         height: 0;
       }
+      .margin-wrapper{
+        position: absolute;
+      }
 
     </style>
 
     <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
     <template is="dom-if" if="{{live}}">
       <button on-tap="toggleEdit">Exit live edit</button>
-      <resizer-element resize-both element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
+        <paper-radio-group selected="{{live}}" attr-for-selected="name">
+          <paper-radio-button name="canvas">Canvas</paper-radio-button>
+          <paper-radio-button name="margin">Margin</paper-radio-button>
+          <paper-radio-button name="legend">Legend</paper-radio-button>
+          <paper-radio-button name="xLabel"> X Label</paper-radio-button>
+          <paper-radio-button name="yLabel"> Y Label</paper-radio-button>
+          <paper-radio-button name="zLabel"> Z Label</paper-radio-button>
+      </paper-radio-group>
+      <template is="dom-if" if="{{eq(live,'canvas')}}">
+        <resizer-element resize-both left-pos="[[newSettings.margin.value.left]]" top-pos="[[newSettings.margin.value.top]]" element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
+      </template>
+      <template is="dom-if" if="{{eq(live,'margin')}}">
+      <div class="margin-wrapper" style$="width:[[newSettings.width.value]]px; height: [[newSettings.height.value]]px; ">
+        <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}" update-callback="{{updateCallback}}"></resizer-element>
+        <resizer-element element-align="top" margin-value="{{newSettings.margin.value.top}}" update-callback="{{updateCallback}}"></resizer-element>
+        <resizer-element element-align="right" margin-value="{{newSettings.margin.value.right}}" update-callback="{{updateCallback}}"></resizer-element>
+        <resizer-element element-align="bottom" margin-value="{{newSettings.margin.value.bottom}}" update-callback="{{updateCallback}}"></resizer-element>
+      </div>
+          
+      </template>
+      <template is="dom-if" if="{{eq(live,'legend')}}">
+        <div class="legend-drop-target">Legend position tracker</div>
+      </template>
     </template>
     <paper-dialog id="chartSelectorModal" with-backdrop>
 
     <paper-tabs selected="{{selected}}" no-bar>
       <paper-tab>Chart Source</paper-tab>
-      <paper-tab>Settings</paper-tab>
+      <paper-tab>Edit</paper-tab>
     </paper-tabs>
       <iron-pages selected="{{selected}}">
         <div>
@@ -149,6 +177,9 @@
         }
       }
     }
+    eq(object, args) {
+      return object == args
+    }
     applySettings(){
       let newSettings = Object.assign({},this.newSettings);
       this.dispatch({
@@ -158,6 +189,9 @@
           settings: newSettings
         }
       })
+    }
+    eq(data,val){
+      return data == val;
     }
     toggleEdit(){
       this.set('live',!this.live);
