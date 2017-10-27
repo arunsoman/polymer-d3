@@ -32,7 +32,6 @@
         axisKeys:{
           type:String,
           statePath(state){
-            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let keys = keyChk && Object.keys(chartPath.inputs)
@@ -43,7 +42,6 @@
           type:Array,
           observer:'_chartDraw',
           statePath(state){
-            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[this.uuid]
             let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
             let inputData = keyChk ? chartPath.inputs:{}
@@ -64,7 +62,6 @@
           type:Object,
           observer:'_chartDraw',
           statePath(state){
-            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[this.uuid]
             if(chartPath){
               return chartPath.settings;
@@ -114,7 +111,6 @@
         stacked:{
           type:Boolean,
           statePath(state){
-            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let stacked = objAssignChk&&chartPath.settings.stacked.value
@@ -125,7 +121,6 @@
         group:{
           type:Boolean,
           statePath(state){
-            // let chartId = this.isCompsiteChart && this.id!=""?this.id:this.uuid
             let chartPath = state.charts[this.uuid]
             let objAssignChk = (chartPath && chartPath.settings)
             let group = objAssignChk&&chartPath.settings.group.value
@@ -279,7 +274,6 @@
     }
     constructor(){
       super();//baseChart
-
     }
     static get actions() {
       return {
@@ -387,15 +381,8 @@
       super.connectedCallback();
       this.initializeChart();
       let updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
-      // if(this.isCompsiteChart){
-      //   updateChartData = {id:this.uuid,inputs:this.inputs}
-      // }else{
-      //   updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
-      // }
       this.dispatch("updateChart",updateChartData);
       this.updateCommonChartProp()
-      // this.isCompsiteChart&&this.dispatch("isCompsiteChart",{isCompsiteChart:false});
-
     }
     updateCommonChartProp(){
       if(this.uuid&&this.uuid.indexOf("@_")==-1){
@@ -444,13 +431,6 @@
     }
 
     initializeChart(){
-// debugger
-      // if(this.isCompsiteChart){
-      //   this.set("uuid",this.id)
-      //   // this.set("filterKeys",[])
-      // }else{
-      // this.set("uuid",this.parentId+'@'+this.tagName);
-      // }
 
       if(this.uuid&&this.isCompsiteChart){
       }else{
@@ -548,7 +528,6 @@
       this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
       group || stacked && itemZ
       let parseDate = d3.time.format('%Y-%m-%d').parse;
-      // let settings = this.isCompsiteChart&&this.compChartObjs?this.compChartObjs.compChartSettings:this.settings
       let settings = this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
@@ -558,21 +537,14 @@
           mLeft = +settings.margin.value.left,
           margin = {top:this.calculateMargin(height,mTop), right: this.calculateMargin(width,mRight), bottom: this.calculateMargin(height,mBottom), left: this.calculateMargin(width,mLeft)},
           label= settings.legend.values,
-          compMargin = {top: 15, right: 2, bottom: 45, left: 15}
-      // margin = this.compChartObjs?compMargin:margin
+          compMargin = {top:this.calculateMargin(height,.1), right: this.calculateMargin(width,3), bottom: this.calculateMargin(height,20), left: this.calculateMargin(width,7)}
       margin = this.isCompsiteChart?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
 
-      // width = this.chartWidth?this.chartWidth:width
-      // height = this.chartHeight?this.chartHeight:height
-
       width = this.isCompsiteChart?(width-margin.xMargin):width
       height = this.isCompsiteChart?(height-margin.yMargin):height
-
-      // width = parseFloat(width +margin.xMargin)
-      // height = parseFloat(height + margin.yMargin)
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();

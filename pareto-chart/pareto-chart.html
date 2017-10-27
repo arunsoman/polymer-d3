@@ -48,9 +48,6 @@
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
       </chart-input-group>
       <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
-      <template is="dom-if" if="[[isCompsiteChart]]" restamp="true">
-        <paper-button raised class="resetBtn"  on-click="chartRemove">Delete</paper-button>
-      </template>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
     </template>

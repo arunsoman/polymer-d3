@@ -126,7 +126,7 @@
         .attr("dy", ".35em")
         .attr("text-anchor", "middle")
         .attr("transform", "translate("+(width/2)+","+(height/2)+")")
-        .text(txt);
+        .text(txt)
 
         let g = parentG.selectAll('.arc')
           .data(d => obj.pie(d.values))

@@ -90,7 +90,8 @@
       /*border-right:1px solid #f6f6f6;
       border-bottom:1px #f6f6f6 solid;*/
       border:1px solid #f6f6f6;
-      /*overflow: hidden;*/
+      overflow: hidden;
+      background-color: #fff
     }
     #chartBox .warningMsg.chartMsg{
       position: absolute;
@@ -107,12 +108,11 @@
       position: relative;
     }
     </style>
-    <div id="chartBox" class$="[[chartData.chartCls]]" style$="height:[[chartData.chartHeight]]px">
+    <div id="chartBox" class$="[[chartData.chartCls]]" style$="width:[[chartData.chartWidth]]px;height:[[chartData.chartHeight]]px">
       <paper-button raised class="resetBtn"  on-click="chartBoxRemove">Delete</paper-button>
       <paper-toggle-button class="toggleBtn" checked="{{toggle}}">RESIZE</paper-toggle-button>
-
       <template is="dom-if" if="{{toggle}}">
-        <resizer-element resize-both element-width="{{chartDataResize.chartWidth}}" element-height="{{chartData.chartHeight}}" ></resizer-element>
+        <resizer-element resize-both element-width="{{chartData.chartWidth}}" element-height="{{chartData.chartHeight}}" mouseup-callback="{{updateCallback}}"></resizer-element>
       </template>
     </div>
   </template>
@@ -159,11 +159,11 @@
             },
             toggle:{
               type:Boolean,
-              value:false,
-              observer:"getChartObj"
+              value:false
             },
-            chartDataResize:{
-              type:Object
+            updateCallback:{
+              type:Number,
+              observer:'onResize'
             }
           }
         }
@@ -201,9 +201,6 @@
             }
           }
         }
-        static get observers(){
-          return["onResize(chartDataResize.chartWidth)"]
-        }
         constructor(){
           super()
         }
@@ -211,14 +208,12 @@
           super.connectedCallback()
           this.createChart()
         }
-        getChartObj(){
-          if(this.toggle){
-            this.set("chartDataResize",this.chartData)
-          }
-        }
         createChart(){
           let chart = document.createElement(this.chartData.elem)
           let chartId = this.chartData.id
+          let pNode = this.parentNode
+          let chartBox = pNode.querySelectorAll("chart-box")
+          chartBox.length&&pNode.classList.value.indexOf("compArea")!=-1&&pNode.classList.remove("compArea")
 
           if(this.chartData.chartCreate){
             chartId = this.uuid+"@_"+this.chartData.elem+"_"+this.getUUID()
@@ -260,7 +255,8 @@
           }
           return uuid() + uuid() + '-' + uuid() + '-' + uuid();
         }
-        onResize(width){
+        onResize(){
+          let width = this.chartData.chartWidth
           let grid = (width/this.parentNode.offsetWidth)*100
           let gridValue = this.grids.reduce((a,b)=>{
             return  b <= grid ? b : a
@@ -268,7 +264,7 @@
           let gridIdx = this.grids.indexOf(gridValue)
           let resizeWidth = (this.parentNode.offsetWidth*gridValue)/100
           this.set("chartData.chartCls","col-md-"+gridIdx)
-          this.set("chartDataResize.chartWidth",resizeWidth)
+          this.set("chartData.chartWidth",resizeWidth)
           if(this.layoutData){
             let layoutData = this.layoutData.map(item=>{
               if(item.id == this.chartData.id){
@@ -283,6 +279,9 @@
           this.chartData.id&&this.settings&&this.settingstoObj(this.chartData.id,true)
         }
         chartBoxRemove(){
+          let pNode = this.parentNode
+          let chartBox = pNode.querySelectorAll("chart-box")
+          chartBox.length<=1&&pNode.setAttribute("class","compArea")
           this.dispatch("chartBoxDeleted",{uuid:this.chartData.id,deleteTrigger:true})
           this.remove()
         }

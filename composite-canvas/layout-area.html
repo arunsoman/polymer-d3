@@ -5,7 +5,7 @@
     <style>
       :host #layoutArea{
         width:100%;
-        min-height: 70vh;
+        min-height: 90vh;
         /*border:1px solid red;*/
       }
       #layoutArea:after{
@@ -17,9 +17,29 @@
         margin-left: -5px;
         margin-right: -5px;
       }
+      #layoutArea.drop{
+        /*width:95%;*/
+        transform: scale3d(1,1,1);
+        background-color: #f6f6f6;
+        box-shadow: 7px 1px 22px #474646;
+        margin: 0;
+      }
+      #layoutArea.drop chart-box{
+        opacity:.4;
+      }
+      div#layoutArea.compArea:after {
+        content: "chart icons are drop here";
+        display: block;
+        position: absolute;
+        width: 50%;
+        font-size: 3.1em;
+        top: 36%;
+        left: 25%;
+        color: #dadada
+      }
 
     </style>
-    <div id="layoutArea" class="row" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
+    <div id="layoutArea" class="row compArea" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
       <template is="dom-if" if="[[!newItemChk]]" restamp="true">
         <template is="dom-repeat" items="[[layoutData]]">
           <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
@@ -65,17 +85,19 @@
             }
           }
         }
-
         dragLeave(e){
-          // e.target.classList.remove('hover');
+          e.target.classList.remove('drop');
         }
         allowDrop(e){
           e.preventDefault();
+          e.target.classList.add('drop');
         }
         drop(e){
           e.preventDefault();
           let chartElem = e.dataTransfer.getData('chartElem');
           if(chartElem){
+            e.target.classList.remove('drop');
+            e.target.classList.remove('compArea');
             this.createChartBox(chartElem)
             e.dataTransfer.clearData('chartElem');
           }
@@ -85,8 +107,10 @@
           let chartItem={}
           chartItem.chartCls="col-md-6"
           chartItem.elem=chartElem
-          chartItem.chartWidth = (this.$.layoutArea.offsetWidth* 50)/100
-          let chartHeight = this.$.layoutArea.offsetHeight/2
+          chartItem.chartWidth = ((this.$.layoutArea.offsetWidth* 50)/100)-22
+          let chartHeight = this.$.layoutArea.offsetHeight
+          chartHeight = this.$.layoutArea.offsetHeight<=554?chartHeight:554
+          chartHeight = chartHeight/2
           chartHeight = chartHeight+(chartHeight/2)
           chartItem.chartHeight = chartHeight
           chartItem.chartCreate = true
