@@ -4,6 +4,7 @@
       .resizable{
         position: absolute;
         background: rgba(255, 236, 147, 0.32);
+        cursor: move;
       }
       .resizable.resize-true{
         background: transparent;
@@ -161,7 +162,7 @@
     .height-info span{
       margin-top: 30%;
     }
-    #resizeHandler{
+    /*#resizeHandler{
       position: absolute;
       right: 0;
       bottom: 0;
@@ -173,7 +174,7 @@
     .resizable.resize-true #resizeHandler{
       display: block;
       cursor: move;
-    }
+    }*/
 
 
   </style>
@@ -290,7 +291,11 @@
           type:Boolean,
           value:false
         },
-        updateCallback:{
+        resizeCallback:{
+          type:Number,
+          notify:true
+        },
+        mouseupCallback:{
           type:Number,
           notify:true
         },
@@ -305,12 +310,18 @@
         this.set('marginRound',this.marginValue.toFixed());
       }
     }
-    settingsChange() {
-      this.set('updateCallback',Date.now());
-      setTimeout(()=>{
-        this.set('wd',this.elementWidth)
-        this.set('ht',this.elementHeight)
-      })
+    mouseupCallbackFn() {
+      this.set('mouseupCallback',Date.now());
+      // added timeout rest for resier element to snap to the parent grid;
+      if(this.resizeBoth){
+        setTimeout(()=>{
+          this.set('wd',this.elementWidth)
+          this.set('ht',this.elementHeight)
+        })
+      }
+    }
+    resizeCallbackFn(){
+      this.set('resizeCallback',Date.now());
     }
     constructor() {
       super();
@@ -330,11 +341,9 @@
         this.set('elementWidth',this.wd);
         this.set('elementHeight',this.ht);
       }else{
-        this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? (this.wd/500)*100: (this.ht/263)*100)
+        this.set('marginValue',["left","right"].indexOf(this.elementAlign)!=-1 ? this.wd : this.ht);
       }
-    }
-    callback(){
-
+      this.resizeCallbackFn();
     }
     ready(){
       super.ready();
@@ -349,13 +358,13 @@
       }
     }
     resizeEvents(){
-      let handlerItem = this.resizeBoth ? this.$.resizeHandler : this;
-      handlerItem.addEventListener('mousedown',(event)=>{
+      // let handlerItem = this.resizeBoth ? this.$.resizeHandler : this;
+      this.addEventListener('mousedown',(event)=>{
         this.mousedown = true;
         this.startResize(event);
       });
       document.body.addEventListener('mouseup',(event)=>{
-        if(this.mousedown) this.settingsChange();
+        if(this.mousedown) this.mouseupCallbackFn();
         this.mousedown = false;
       })
       document.body.addEventListener("mousemove",(evt)=>{

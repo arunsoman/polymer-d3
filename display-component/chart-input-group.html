@@ -48,6 +48,9 @@
       .margin-wrapper{
         position: absolute;
       }
+      .canvas-resizer{
+        position: relative;
+      }
 
     </style>
 
@@ -63,7 +66,9 @@
           <paper-radio-button name="zLabel"> Z Label</paper-radio-button>
       </paper-radio-group>
       <template is="dom-if" if="{{eq(live,'canvas')}}">
-        <resizer-element resize-both show-info left-pos="[[newSettings.margin.value.left]]" top-pos="[[newSettings.margin.value.top]]" element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" update-callback="{{updateCallback}}"></resizer-element>
+        <div class="canvas-resizer" style$="left:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;">
+            <resizer-element resize-both show-info element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+        </div>
       </template>
       <template is="dom-if" if="{{eq(live,'margin')}}">
       <div class="margin-wrapper" style$="width:[[newSettings.width.value]]px; height: [[newSettings.height.value]]px; ">
@@ -98,7 +103,7 @@
           </div>
         </div>
       </div>
-      
+
       <div>
           <chart-settings uuid="[[uuid]]" live="{{live}}"></chart-settings>
       </div>
