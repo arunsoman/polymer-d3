@@ -98,10 +98,22 @@
       left: 12px;
       width: 100%;
     }
+    paper-toggle-button.toggleBtn{
+      float: right;
+      font-size: x-small;
+      margin-right: 10px;
+      margin-top: 5px;
+      z-index: 9;
+      position: relative;
+    }
     </style>
     <div id="chartBox" class$="[[chartData.chartCls]]" style$="height:[[chartData.chartHeight]]px">
       <paper-button raised class="resetBtn"  on-click="chartBoxRemove">Delete</paper-button>
-      <resizer-element resize-both element-width="{{chartData.chartWidth}}" element-height="{{chartData.chartHeight}}" ></resizer-element>
+      <paper-toggle-button class="toggleBtn" checked="{{toggle}}">RESIZE</paper-toggle-button>
+
+      <template is="dom-if" if="{{toggle}}">
+        <resizer-element resize-both element-width="{{chartDataResize.chartWidth}}" element-height="{{chartData.chartHeight}}" ></resizer-element>
+      </template>
     </div>
   </template>
   <script>
@@ -144,6 +156,14 @@
             grids:{
               type:Array,
               value:[0,8.33333333,16.66666667,25,33.33333333,41.66666667,50,58.33333333,66.66666667,75,83.33333333,91.66666667,100]
+            },
+            toggle:{
+              type:Boolean,
+              value:false,
+              observer:"getChartObj"
+            },
+            chartDataResize:{
+              type:Object
             }
           }
         }
@@ -182,7 +202,7 @@
           }
         }
         static get observers(){
-          return["onResize(chartData.chartWidth)"]
+          return["onResize(chartDataResize.chartWidth)"]
         }
         constructor(){
           super()
@@ -190,6 +210,11 @@
         connectedCallback(){
           super.connectedCallback()
           this.createChart()
+        }
+        getChartObj(){
+          if(this.toggle){
+            this.set("chartDataResize",this.chartData)
+          }
         }
         createChart(){
           let chart = document.createElement(this.chartData.elem)
@@ -243,7 +268,7 @@
           let gridIdx = this.grids.indexOf(gridValue)
           let resizeWidth = (this.parentNode.offsetWidth*gridValue)/100
           this.set("chartData.chartCls","col-md-"+gridIdx)
-          this.set("chartData.chartWidth",resizeWidth)
+          this.set("chartDataResize.chartWidth",resizeWidth)
           if(this.layoutData){
             let layoutData = this.layoutData.map(item=>{
               if(item.id == this.chartData.id){

@@ -381,7 +381,6 @@
             value: layoutData
           };
         }
-
       }
     }
     connectedCallback(){
@@ -569,7 +568,7 @@
       // width = this.chartWidth?this.chartWidth:width
       // height = this.chartHeight?this.chartHeight:height
 
-      // width = this.isCompsiteChart?(width-margin.xMargin):width
+      width = this.isCompsiteChart?(width-margin.xMargin):width
       height = this.isCompsiteChart?(height-margin.yMargin):height
 
       // width = parseFloat(width +margin.xMargin)
