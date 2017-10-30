@@ -34,11 +34,14 @@
             stroke: #000;
             shape-rendering: crispEdges;
         }
-        paper-button.resetBtn {
+        paper-icon-button.resetBtn {
           font-size: x-small;
           float: right;
           padding: 4px;
           margin-top: 5px;
+          width: 27px;
+          color: #9f9e9e;
+          height: 27px;
         }
         #chartContainer.selected rect {
           fill-opacity: .25;
@@ -48,17 +51,17 @@
           cursor:pointer;
         }
     </style>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+    </template>
+    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+      <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-upload" title="Export filter data">Export filter data</paper-icon-button>
+    </template>
       <chart-input-group  uuid="[[uuid]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
       </chart-input-group>
       <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
-    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
-      <paper-button raised class="resetBtn"  on-click="chartReset">reset</paper-button>
-    </template>
-    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
-      <paper-button raised class="resetBtn"  on-click="exportFilterData">Export filter data</paper-button>
-    </template>
     <div id="chartContainer"></div>
   </template>
   <script>

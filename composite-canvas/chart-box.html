@@ -78,12 +78,18 @@
       border-right:1px solid #f6f6f6;
       border-bottom:1px #f6f6f6 solid;
     }
-    paper-button.resetBtn {
+    paper-icon-button.resetBtn {
       font-size: x-small;
       float: right;
       padding: 4px;
       margin-top: 5px;
       z-index: 9;
+      width: 27px;
+      color: #9f9e9e;
+      height: 27px;
+    }
+    paper-icon-button.resetBtn.active {
+      color:#0180cc;
     }
     #chartBox{
       position: relative;
@@ -102,15 +108,81 @@
     paper-toggle-button.toggleBtn{
       float: right;
       font-size: x-small;
-      margin-right: 10px;
+      margin-right: 5px;
       margin-top: 5px;
       z-index: 9;
       position: relative;
+      cursor: pointer;
+    }
+    paper-toggle-button.toggleBtn.move{
+      margin-left: 5px;
+    }
+    paper-dropdown-menu.positionMenu{
+      width: 50px;
+      float: right;
+    }
+    paper-dropdown-menu.positionMenu paper-listbox{
+      padding: 0;
+    }
+    paper-dropdown-menu.positionMenu paper-item{
+      font-size: x-small;
+    }
+    .positionMenuContainer{
+      float: right;
+      position: relative;
+    }
+    .positionMenuContainer #positionMenu{
+      margin-top: 28px;
+      border: 1px #ccc solid;
+      border-top:none;
+      background-color: #fff;
+    }
+    .positionMenuContainer #positionMenu paper-item{
+      font-size: 9px;
+      min-width: 16px;
+      min-height: 9px;
+      cursor: pointer;
+      padding-left: 7px;
+      padding-right: 7px;
+      border-top: 1px #ccc solid;
+      color:#9f9e9e;
+      line-height: 16px;
+      padding-top: 0;
+      padding-bottom: 0;
     }
     </style>
     <div id="chartBox" class$="[[chartData.chartCls]]" style$="width:[[chartData.chartWidth]]px;height:[[chartData.chartHeight]]px">
-      <paper-button raised class="resetBtn"  on-click="chartBoxRemove">Delete</paper-button>
-      <paper-toggle-button class="toggleBtn" checked="{{toggle}}">RESIZE</paper-toggle-button>
+      <!-- <iron-icon icon="delete"></iron-icon> -->
+      <div class="btnContainer">
+        <paper-icon-button class="resetBtn"  on-click="chartBoxRemove" icon="icons:delete" title="Delete">Delete</paper-icon-button>
+        <paper-icon-button id="resize" class="resetBtn"  on-click="resizeToggle" icon="image:transform" title="Resize">Resize</paper-icon-button>
+        <div class="positionMenuContainer">
+        <paper-icon-button class="resetBtn"  on-click="positionMenu" icon="icons:swap-vert" title="Position">Position</paper-icon-button>
+        <iron-dropdown horizontal-align="left" vertical-align="top" id="positionMenu" allow-outside-scroll>
+          <div slot="dropdown-content">
+            <template is="dom-repeat" items="[[chartIndex]]" >
+              <paper-item on-click="positionUpdate">[[item]]</paper-item>
+            </template>
+
+          </div>
+          <!-- <paper-listbox slot="dropdown-content" class="dropdown-content" selected="[[index]]" >
+            <template is="dom-repeat" items="[[chartIndex]]">
+              <paper-item>[[item]]</paper-item>
+            </template>
+          </paper-listbox> -->
+        </iron-dropdown>
+      </div>
+
+      </div>
+
+      <!-- <paper-toggle-button class="toggleBtn" checked="{{toggle}}">RESIZE</paper-toggle-button> -->
+      <!-- <paper-dropdown-menu id="positionMenu" class="positionMenu" allow-outside-scroll label="Position" on-paper-dropdown-change="positionUpdate">
+        <paper-listbox slot="dropdown-content" class="dropdown-content" selected="[[index]]" >
+          <template is="dom-repeat" items="[[chartIndex]]">
+            <paper-item>[[item]]</paper-item>
+          </template>
+        </paper-listbox>
+      </paper-dropdown-menu> -->
       <template is="dom-if" if="{{toggle}}">
         <resizer-element resize-both element-width="{{chartData.chartWidth}}" element-height="{{chartData.chartHeight}}" mouseup-callback="{{updateCallback}}"></resizer-element>
       </template>
@@ -164,6 +236,17 @@
             updateCallback:{
               type:Number,
               observer:'onResize'
+            },
+            chartIndex:{
+              type:Array,
+              statePath(state){
+                let chartPath = state.charts[this.uuid]
+                let chartIndex = chartPath && chartPath.chartIndex
+                return chartIndex?chartIndex:[]
+              }
+            },
+            index:{
+              type:Number
             }
           }
         }
@@ -198,6 +281,12 @@
                 type: 'CHART_RE_DRAW',
                 value: chartReDraw
               }
+            },
+            chartIndexUpdate(chartIndex){
+              return {
+                type: 'CHART_INDEX_UPDATE',
+                value: chartIndex
+              };
             }
           }
         }
@@ -214,16 +303,24 @@
           let pNode = this.parentNode
           let chartBox = pNode.querySelectorAll("chart-box")
           chartBox.length&&pNode.classList.value.indexOf("compArea")!=-1&&pNode.classList.remove("compArea")
+          this.set("index",this.chartData.index-1)
 
           if(this.chartData.chartCreate){
             chartId = this.uuid+"@_"+this.chartData.elem+"_"+this.getUUID()
             let layoutItem=this.chartData
             delete layoutItem.chartCreate
             layoutItem.id=chartId
+            layoutItem.index=this.chartIndex.length+1
+            this.set("index",layoutItem.index-1)
 
             let layoutData = this.layoutData
             layoutData.push(layoutItem)
             this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
+
+            let chartIndex = this.chartIndex
+            chartIndex.push(layoutItem.index)
+            this.dispatch("chartIndexUpdate",{uuid:this.uuid,chartIndex:chartIndex})
+            // debugger
           }
           // debugger
           chart.set("parentId",this.parentId)
@@ -233,6 +330,14 @@
 
           this.settingstoObj(chartId)
           // debugger
+        }
+        resizeToggle(){
+          this.set("toggle",!this.toggle)
+          if(this.toggle){
+            this.$.resize.classList.value.indexOf("active")==-1&&this.$.resize.classList.add("active")
+          }else{
+            this.$.resize.classList.remove("active")
+          }
         }
         settingstoObj(chartId,resize) {
           let settings = Object.assign({},this.settings)
@@ -284,6 +389,29 @@
           chartBox.length<=1&&pNode.setAttribute("class","compArea")
           this.dispatch("chartBoxDeleted",{uuid:this.chartData.id,deleteTrigger:true})
           this.remove()
+        }
+        positionMenu(){
+          let dialog = this.$.positionMenu
+          dialog.open();
+        }
+        positionUpdate(){
+
+          // let layoutData = this.layoutData
+          // layoutData.push(layoutItem)
+          // this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
+          //
+          // let chartIndex = this.chartIndex
+          // chartIndex.push(layoutItem.index)
+          // this.dispatch("chartIndexUpdate",{uuid:this.uuid,chartIndex:chartIndex})
+          let layoutData = Object.assign({},this.layoutData)
+          let index = this.chartData.index
+          let currentIdx = +event.path[0].textContent
+          let currentIndex = currentIdx-1
+          this.set("chartData.index",currentIdx)
+
+          debugger
+          let dialog = this.$.positionMenu
+          dialog.close()
         }
     }
     customElements.define(chartBox.is,chartBox)

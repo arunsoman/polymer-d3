@@ -4,7 +4,7 @@
 <dom-module id="chart-input-group">
   <template>
     <style>
-    ::host{
+    :host{
       position: relative;
     };
       .input-drag-wrapper{
@@ -51,10 +51,17 @@
       .canvas-resizer{
         position: relative;
       }
+      paper-icon-button.settings{
+        float:right;
+        color: #9f9e9e;
+        width: 36px;
+        height: 36px;
+        margin-top: 1px;
+      }
 
     </style>
 
-    <paper-icon-button icon="icons:settings" on-click="showChartOptions"></paper-icon-button>
+    <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
     <template is="dom-if" if="{{live}}">
       <button on-tap="toggleEdit">Exit live edit</button>
         <paper-radio-group selected="{{live}}" attr-for-selected="name">
