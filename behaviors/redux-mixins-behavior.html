@@ -165,12 +165,18 @@
                 state[action.value.uuid],{
                   chartReDraw:action.value.chartReDraw
                 })})
+
+            case 'COMP_CHART_RE_LOAD':
+              return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
+                state[action.value.uuid],{
+                  compChartReload:action.value.compChartReload
+                })})
+
             case 'CHART_INDEX_UPDATE':
               return  Object.assign({},state,{[action.value.uuid]:Object.assign({},
                 state[action.value.uuid],{
                   chartIndex:action.value.chartIndex
                 })})
-
 
           default:
               return state;

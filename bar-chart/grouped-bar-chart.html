@@ -46,7 +46,7 @@
           <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
         </template>
         <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
-          <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-upload" title="Export filter data">Export filter data</paper-icon-button>
+          <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
         </template>
           <chart-input-group uuid="[[uuid]]">
               <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>

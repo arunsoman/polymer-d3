@@ -5,7 +5,6 @@
       #chartContainer{
         margin:0 auto;
         font: 10px sans-serif;
-        position: relative;
       }
       .axis path,
       .axis line {
@@ -69,13 +68,6 @@
        let arg = {axisIndex}
        let chartProp = this.getChartProperties(arg)
        if(!chartProp)return false
-       if(this.externals[chartProp.itemZ].type!="Number"){
-         let span = document.createElement("span")
-         span.textContent="Difference chart Z-Axis value accept as a Number"
-         span.setAttribute("class","warningMsg")
-         this.parentNode.appendChild(span)
-         return false
-       }
 
        //get chart data once pass axis into the "getChartData" method
        let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)

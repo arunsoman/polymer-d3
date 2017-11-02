@@ -252,15 +252,15 @@
             return layoutData?layoutData:[]
           }
         },
-        deleteTrigger:{
-          type:Boolean,
-          statePath(state){
-            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
-            let deleteTrigger = chartIdChk && chartIdChk.deleteTrigger
-            return deleteTrigger
-          },
-          observer:"chartRemove"
-        },
+        // deleteTrigger:{
+        //   type:Boolean,
+        //   statePath(state){
+        //     let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+        //     let deleteTrigger = chartIdChk && chartIdChk.deleteTrigger
+        //     return deleteTrigger
+        //   },
+        //   observer:"chartRemove"
+        // },
         chartReDraw:{
           type: Boolean,
           statePath(state){
@@ -269,6 +269,9 @@
             return chartReDraw
           },
           observer:"compChartReDraw"
+        },
+        deleteTimer:{
+          type:Number
         }
       }
     }
@@ -357,12 +360,6 @@
             value: isCompsiteChart
           };
         },
-        newItemChk(itemChk){
-          return {
-            type: 'NEW_ITEM_CHK',
-            value: itemChk
-          };
-        },
         currentChartDeleted(currentChartDeleted) {
           return {
             type: 'CURRENT_CHART_DELETED',
@@ -374,6 +371,12 @@
             type: 'UPDATE_LAYOUT_ITEM',
             value: layoutData
           };
+        },
+        compChartReload(compChartReload) {
+          return {
+            type: 'COMP_CHART_RE_LOAD',
+            value: compChartReload
+          }
         }
       }
     }
@@ -387,7 +390,6 @@
     updateCommonChartProp(){
       if(this.uuid&&this.uuid.indexOf("@_")==-1){
         this.dispatch("isCompsiteChart", {uuid:this.uuid,isCompsiteChart:false})
-        this.dispatch("newItemChk",{uuid:this.uuid,newItemChk:false})
       }
     }
     changedStackedAndGroup(){
@@ -557,15 +559,18 @@
       return (dimension * margin)/100;
 
     }
-    chartRemove(){
-      if(this.isCompsiteChart&&this.deleteTrigger){
-        let layoutData = this.layoutData.filter(item=>item.id!=this.uuid)
-        this.remove()
-        this.chartReset()
-        this.dispatch("updateLayoutItem",{uuid:this.compUUID,layoutData:layoutData})
-        this.dispatch("currentChartDeleted", {uuid:this.uuid})
-      }
-    }
+    // chartRemove(){
+    //
+    //
+    //   if(this.isCompsiteChart&&this.deleteTrigger){
+    //     this.chartReset()
+    //     this.dispatch("currentChartDeleted", {uuid:this.uuid})
+    //     this.remove()
+    //     // clearTimeout(this.deleteTimer)
+    //     // this.deleteTimer = setTimeout(()=>{this.dispatch("compChartReload",{uuid:this.compUUID,compChartReload:Date.now()})})
+    //   }
+    //
+    // }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
       eArg.dblClick&&this.chartDoubleClick()

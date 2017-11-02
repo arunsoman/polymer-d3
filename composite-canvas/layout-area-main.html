@@ -1,0 +1,41 @@
+<link rel="import" href="../display-component/base-chart.html">
+<link href="layout-area.html" rel='import'>
+<dom-module id="layout-area-main">
+  <template>
+    <div id="layoutAreaContainer">
+      <layout-area uuid="[[uuid]]" parent-id="[[parentId]]"></layout-area>
+    </div>
+  </template>
+  <script>
+  class layoutAreaMain extends ReduxMixinBehavior(Polymer.Element){
+      static get is(){
+        return "layout-area-main"
+      }
+      static get properties(){
+        return{
+          uuid:{
+            type:String
+          },
+          compChartReload:{
+            type: Boolean,
+            statePath(state){
+              let chartIdChk = state.charts[this.uuid]
+              let compChartReload = chartIdChk && chartIdChk.compChartReload
+              return compChartReload
+            },
+            observer:"updateLayoutArea"
+          }
+        }
+      }
+      updateLayoutArea(){
+        this.$.layoutAreaContainer.querySelector("layout-area").remove()
+        let layoutArea = document.createElement("layout-area")
+        layoutArea.set("uuid",this.uuid)
+        layoutArea.set("parentId",this.parentId)
+        this.$.layoutAreaContainer.appendChild(layoutArea)
+      }
+    }
+    customElements.define(layoutAreaMain.is,layoutAreaMain)
+
+  </script>
+</dom-module>

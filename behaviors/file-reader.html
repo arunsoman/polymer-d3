@@ -16,7 +16,8 @@
             display: none;
         }
         </style>
-        <div class="clickHere" style="padding:1em;">Import csv file</div>
+        <paper-icon-button icon="icons:file-upload" class="clickHere" title="Import csv file"></paper-icon-button>
+        <!-- <div class="clickHere" style="padding:1em;">Import csv file</div> -->
         <input id="fileInput" on-change="_onChange" type="file" accept="{{accept}}" multiple="[[multiple]]" hidden />
     </template>
     <script>

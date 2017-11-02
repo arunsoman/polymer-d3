@@ -40,11 +40,16 @@
 
     </style>
     <div id="layoutArea" class="row compArea" on-drop="drop" on-dragover="allowDrop" on-dragleave="dragLeave">
-      <template is="dom-if" if="[[!newItemChk]]" restamp="true">
-        <template is="dom-repeat" items="[[layoutData]]">
-          <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
+        <!-- <template is="dom-if" if="{{compChartReload}}" restamp="true"> -->
+        <template is="dom-repeat" items="{{layoutData}}" id="domRepeat">
+            <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
         </template>
-      </template>
+        <!-- </template> -->
+        <!-- <dom-repeat items="[[layoutData]]">
+          <template>
+            <chart-box uuid="[[uuid]]" parent-id="[[parentId]]" chart-data="[[item]]"></chart-box>
+          </template>
+        </dom-repeat> -->
     </div>
   </template>
   <script>
@@ -62,28 +67,56 @@
               statePath(state){
                 let chartPath = state.charts[this.uuid]
                 let layoutData = chartPath && chartPath.layoutData
-                return layoutData?layoutData:[]
+                return layoutData
+              }//,
+              //observer:"itemFilter"
+            },
+            chartIndex:{
+              type:Array,
+              statePath(state){
+                let chartPath = state.charts[this.uuid]
+                let chartIndex = chartPath && chartPath.chartIndex
+                return chartIndex?chartIndex:[]
               }
             },
-            newItemChk:{
-              type:Object,
+            compChartReload:{
+              type: Boolean,
               statePath(state){
-                let chartPath = state.charts
-                let newItemChk = chartPath && chartPath.newItemChk
-                return newItemChk
-              }
+                let chartIdChk = state.charts[this.uuid]
+                let compChartReload = chartIdChk && chartIdChk.compChartReload
+                return compChartReload?compChartReload:Date.now()
+              }//,
+              // observer:"itemFilter"
             }
           }
         }
         static get actions() {
           return{
-            newItemChk(itemChk){
+            updateLayoutItem(layoutData){
               return {
-                type: 'NEW_ITEM_CHK',
-                value: itemChk
+                type: 'UPDATE_LAYOUT_ITEM',
+                value: layoutData
+              };
+            },
+            chartIndexUpdate(chartIndex){
+              return {
+                type: 'CHART_INDEX_UPDATE',
+                value: chartIndex
               };
             }
           }
+        }
+        constructor(){
+          super()
+        }
+
+        connectedCallback(){
+          super.connectedCallback()
+        }
+        itemFilter(item){
+          return item
+          // debugger
+          // this.$.domRepeat.render()
         }
         dragLeave(e){
           e.target.classList.remove('drop');
@@ -113,14 +146,29 @@
           chartHeight = chartHeight/2
           chartHeight = chartHeight+(chartHeight/2)
           chartItem.chartHeight = chartHeight
-          chartItem.chartCreate = true
-          chartBox.set("uuid",this.uuid)
-          chartBox.set("parentId",this.parentId)
-          chartBox.set("chartData",chartItem)
-          this.$.layoutArea.appendChild(chartBox)
 
-          this.layoutData.length==1&&this.dispatch("newItemChk",{uuid:this.uuid,newItemChk:true})
+          let chartId = this.uuid+"@_"+chartElem+"_"+this.getUUID()
+          chartItem.id=chartId
+          chartItem.index=this.chartIndex.length+1
+
+          let layoutData = Object.assign([],this.layoutData)
+          layoutData.push(chartItem)
+          this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
+
+          let chartIndex = Object.assign([],this.chartIndex)
+          chartIndex.push(chartItem.index)
+          this.dispatch("chartIndexUpdate",{uuid:this.uuid,chartIndex:chartIndex})
+
         }
+        getUUID(){
+          function uuid() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+              .toString(16)
+              .substring(1);
+          }
+          return uuid() + uuid() + '-' + uuid() + '-' + uuid();
+        }
+
     }
     customElements.define(layoutArea.is,layoutArea)
   </script>
