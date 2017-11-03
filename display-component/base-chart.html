@@ -540,14 +540,9 @@
           left = +settings.margin.value.left,
           margin = {top, right, bottom, left},
           label= settings.legend.values;
-          // compMargin = {top:top*0.1, right: right*0.1, bottom: bottom, left: left*0.1}
-      // margin = this.isCompsiteChart?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
-
-      // width = this.isCompsiteChart?(width-margin.xMargin):width
-      // height = this.isCompsiteChart?(height-margin.xMargin):height
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
@@ -560,18 +555,6 @@
       return dimension + margin;
 
     }
-    // chartRemove(){
-    //
-    //
-    //   if(this.isCompsiteChart&&this.deleteTrigger){
-    //     this.chartReset()
-    //     this.dispatch("currentChartDeleted", {uuid:this.uuid})
-    //     this.remove()
-    //     // clearTimeout(this.deleteTimer)
-    //     // this.deleteTimer = setTimeout(()=>{this.dispatch("compChartReload",{uuid:this.compUUID,compChartReload:Date.now()})})
-    //   }
-    //
-    // }
     compSourcePopulate(itemXYZ,eArg){
       // debugger
       eArg.dblClick&&this.chartDoubleClick()
