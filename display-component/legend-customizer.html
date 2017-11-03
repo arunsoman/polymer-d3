@@ -2,15 +2,12 @@
   <template>
     <style>
     #chartArea {
-      height: 263px;
-      /*height: 150px;*/
-      margin: 2em 0;
-      position: relative;
-      background: #f2f0ee;
-      box-shadow: 0px 0px 22px rgba(0, 0, 0, 0.2) inset;
-      /*resize: both;*/
-      /*overflow: auto;*/
-      width: 500px;
+      position: absolute;
+      left: 0;
+      right: 0;
+      top:0;
+      bottom: 0;
+      border: dotted 2px #d8d0d0;
     }
 
     #legends {
@@ -21,6 +18,9 @@
       color: #c39c19;
       border: solid 1px;
       z-index: 99;
+      cursor: pointer;
+      width: 52px;
+      user-select:none;
     }
 
     #legends iron-icon {
@@ -31,95 +31,13 @@
       cursor: pointer;
     }
 
-    .flex {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 2em;
-    }
-
-    .flex paper-input {
-      flex-grow: 3;
-      display: inline-block;
-      width: 20%;
-    }
-    .resizable{
-    border: solid 1px #bbbab9;
-    overflow: auto;
-    background: rgba(255, 236, 147, 0.32);
-    position: absolute;
-    }
-    .resizable.right{
-      width: 10px;
-      resize: horizontal;
-      right: 0;
-      top:0;
-      bottom: 0;
-      direction: rtl;
-      border-top: 0;
-      border-bottom: 0; 
-      max-width: 80%;
-      min-width: 10px!important;
-    }
-    .resizable.left{
-     width: 10px;
-     resize: horizontal;
-     left: 0;
-     top:0;
-     bottom: 0;
-     border-top: 0;
-     border-bottom: 0;
-     max-width: 80%; 
-     min-width: 10px!important;
-    }
-    .resizable.top{
-     resize: vertical;
-     left: 0;
-     top:0;
-     right: 0;
-     height: 10px;
-     z-index: 9;
-     position: relative;
-    }
-    .resizable.bottom{
-      resize: vertical;
-      left: 0;
-      top: 0;
-      right: 0;
-      height: 10px;
-      position: relative;
-    }
-    .resizable-wrapper{
-      position: relative;
-    }
-    .resizable-wrapper .inner{
-      min-height: 150px;
-      position: relative;
-    }
-    .resizable-wrapper.middle{
-      min-height: 150px;
-    }
-
     </style>
-    <div id="chartArea" on-drop="drop" on-dragover="allowDrop">
-    <resizer-element element-align="left" margin-value="{{margin.left}}"></resizer-element>
-    <resizer-element element-align="top" margin-value="{{margin.top}}"></resizer-element>
-    <resizer-element element-align="right" reverse-horizontal margin-value="{{margin.right}}"></resizer-element>
-    <resizer-element element-align="bottom" reverse-vertical reverse margin-value="{{margin.bottom}}"></resizer-element>
-    <!-- <div class="resizable-wrapper top">
-      <div class="resizable top"></div>
-    </div>
-    <div class="resizable-wrapper middle">
-      <div class="inner">
-        <div class="resizable left" ></div>
-        <div class="resizable right"></div>
-      </div>
-      <div class="resizable bottom"></div>
-    </div> -->
-      <div id="legends" draggable="true" style$="left:[[legendData.position.x]]%;top:[[legendData.position.y]]%;">Legend
+    <div id="chartArea">
+      <div id="legends" style$="left:[[chartSettings.legend.values.position.x]]px;top:[[chartSettings.legend.values.position.y]]px;">Legend
         <iron-icon icon="icons:invert-colors" label="legends" on-click="showColorPicker"></iron-icon>
       </div>
     </div>
-    <paper-dialog id="dialog" modal>
+   <!--  <paper-dialog id="dialog" modal>
       <h2>Label color picker</h2>
       <paper-dialog-scrollable>
         <div class="flex">
@@ -134,7 +52,7 @@
         <paper-button dialog-dismiss on-click="save">Apply</paper-button>
         <paper-button dialog-dismiss>Cancel</paper-button>
       </div>
-    </paper-dialog>
+    </paper-dialog> -->
   </template>
   <script>
   /**
@@ -148,6 +66,10 @@
 
     static get properties() {
       return {
+        chartSettings:{
+          type:Object,
+          notify:true
+        },
         legendData: {
           type: Object
         },
@@ -158,6 +80,10 @@
           type:Object,
           observer:'tansformKeys'
         },
+        mouseupCallback:{
+          type:Number,
+          notify:true
+        },
         margin:{
           type:Object,
           value:{
@@ -167,6 +93,13 @@
             bottom:0
           },
           notify:true
+        },
+        dragPosition: {
+          type:Object,
+          value:{
+            x:0,
+            y:0
+          }
         }
       }
     }
@@ -178,20 +111,24 @@
       this.$.dialog.open();
     }
     allowDrop(ev) {
+      this.set('chartSettings.legend.values.position.x',ev.offsetX-26);
+      this.set('chartSettings.legend.values.position.y',ev.offsetY-9);
+      // console.log(this.dragPosition.x,this.dragPosition.y,":",ev.);
       ev.preventDefault();
     }
 
     drop(e) {
       let getchartWidth = this.$.chartArea.offsetWidth;
       let getchartHeight = this.$.chartArea.offsetHeight;
-      let xpos = ((e.offsetX - 30) / getchartWidth) * 100;
-      let ypos = ((e.offsetY - 12) / getchartHeight) * 100;
-      let position = {
-        x: xpos,
-        y: ypos
-      }
-      this.set('legendData.position', position);
-      this.set('legendSettings', Object.assign({}, this.legendData));
+
+      this.set('chartSettings.legend.values.position',this.dragPosition);
+      this.set('mouseupCallback',Date.now());
+    }
+    move(ev){
+      // console.log(ev.clientX,ev.clientY);
+      this.set('chartSettings.legend.values.position.x',ev.clientX-26);
+      this.set('chartSettings.legend.values.position.y',ev.clientY-99);
+      this.set('mouseupCallback',Date.now());
     }
 
     constructor() {
@@ -199,16 +136,17 @@
     }
     ready(){
       super.ready();
-    }
-    connectedCallback(){
-      // debugger;
-    }
-    getOnTrack(){
-      setTimeout(()=>{
-       debugger; 
-      })
-      console.log('change');
-      debugger;
+      console.log(this.$.legends);
+      this.$.legends.addEventListener('mousedown',(event)=>{
+        this.mousedown = true;
+      });
+      document.body.addEventListener('mouseup',(event)=>{
+        this.mousedown = false;
+      });
+      document.body.addEventListener("mousemove",(evt)=>{
+        this.mousedown && this.move(event)
+      },true);
+
     }
     save(){
       this.set('legendData.nodes',this.keys)

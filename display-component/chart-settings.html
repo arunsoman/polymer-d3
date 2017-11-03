@@ -67,7 +67,7 @@
         <paper-button on-click="resetSettings" class="cancel" dialog-dismiss>Cancel</paper-button>
       </div>
       <div class="flex" style="width: 100%">
-        <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}" style="width: 40%;" margin="{{settings.margin.value}}"></legend-customizer>
+        <!-- <legend-customizer legend-data="[[settings.legend.values]]" legend-settings="{{legend}}" legend-keys="{{chartKeys}}" style="width: 40%;" margin="{{settings.margin.value}}"></legend-customizer> -->
 
         <div class="inputs flex" style="width: 60%;">
           <template is='dom-repeat' items="{{_settings}}">
@@ -195,7 +195,7 @@
       })
     }
     liveEdit(key){
-      this.set('live',{key:true});
+      this.set('live','canvas');
     }
     settingsToArray() {
       // transform object to array with object key value.
