@@ -154,7 +154,7 @@
       padding-bottom: 0;
     }
     </style>
-    <div id="chartBox" class$="[[chartData.chartCls]]" style$="width:[[chartData.chartWidth]]px;height:[[chartData.chartHeight]]px">
+    <div id="chartBox" class$="[[chartData.chartCls]]" style$="width:[[chartData.chartWidth]]px;min-height:[[chartData.chartHeight]]px">
       <div class="btnContainer">
         <paper-icon-button class="resetBtn"  on-click="chartBoxRemove" icon="icons:delete" title="Delete">Delete</paper-icon-button>
         <paper-icon-button id="resize" class="resetBtn"  on-click="resizeToggle" icon="image:transform" title="Resize">Resize</paper-icon-button>
@@ -315,8 +315,18 @@
         }
         settingstoObj(chartId,resize) {
           let settings = Object.assign({},this.settings)
-          settings.width.value=this.chartData.chartWidth?this.chartData.chartWidth:settings.width.value
-          settings.height.value=this.chartData.chartHeight
+          // settings.width.value=this.chartData.chartWidth?this.chartData.chartWidth:settings.width.value
+          // settings.height.value=this.chartData.chartHeight
+          // debugger
+          let margin = settings.margin.value
+          let chartWidth = this.chartData.chartWidth
+          let chartHeight = this.chartData.chartHeight
+          let xMargin = margin.right+margin.left
+          let yMargin = margin.top+margin.bottom
+          let actualWidth = chartWidth-xMargin
+          let actualHeight = chartHeight-yMargin
+          settings.width.value = actualWidth
+          settings.height.value=actualHeight
 
           this.dispatch("updateSettings",{id:chartId,settings:settings})
           resize&&this.dispatch("chartRedraw",{uuid:chartId,chartReDraw:!this.chartReDraw})

@@ -171,8 +171,7 @@
         compSourcePopulate({item,elem,dblClick})
       })
 
-        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+"px",
-          "height":obj.chartProp.height+"px"})
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
 
       }
       getChartData(itemX, itemY){

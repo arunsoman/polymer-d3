@@ -29,6 +29,14 @@
         compUUID:{
           type:String
         },
+        isCompsiteChart:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts
+            let compsiteChart = chartPath && chartPath.isCompsiteChart
+            return compsiteChart
+          }
+        },
         axisKeys:{
           type:String,
           statePath(state){
@@ -66,7 +74,7 @@
             if(chartPath){
               return chartPath.settings;
             }else{
-              let margin = this.isCompsiteChart ? 10 :50; 
+              let margin = this.isCompsiteChart ? 10 :50;
               return {
                 title:{uitype:'text',txt:"Title",value:""},
                 margin:{uitype:'visual',txt:'Margin',value:{top: margin, right: margin, bottom: margin, left: margin}},
@@ -234,14 +242,6 @@
             let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
             let itemXYZ = chartIdChk && chartIdChk.itemXYZ
             return itemXYZ?itemXYZ:{}
-          }
-        },
-        isCompsiteChart:{
-          type:Boolean,
-          statePath(state){
-            let chartPath = state.charts
-            let compsiteChart = chartPath && chartPath.isCompsiteChart
-            return compsiteChart
           }
         },
         layoutData:{
@@ -547,7 +547,7 @@
       margin.yMargin = margin.top + margin.bottom
 
       // width = this.isCompsiteChart?(width-margin.xMargin):width
-      // height = this.isCompsiteChart?(height-margin.yMargin):height
+      // height = this.isCompsiteChart?(height-margin.xMargin):height
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
