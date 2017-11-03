@@ -4,9 +4,9 @@
 <dom-module id="chart-input-group">
   <template>
     <style>
-    :host{
-      position: relative;
-    };
+      :host{
+        position: relative;
+      };
       .input-drag-wrapper{
         padding: 1em;
       }
@@ -48,7 +48,7 @@
       .margin-wrapper{
         position: absolute;
       }
-      .canvas-resizer{
+      .canvas-resizer,.left-wrapper,.legend-drop-target{
         position: relative;
       }
       paper-icon-button.settings{
@@ -58,44 +58,68 @@
         height: 36px;
         margin-top: 1px;
       }
+      .left-wrapper,.right-wrapper{
+        float: left;
+      }
+      .block{
+        position: absolute;
+        /*height: 150px;*/
+      }
+      .block.top{
+        z-index: 9999;
+      }
+      .legend-drag-area{
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+      }
 
     </style>
 
     <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
     <template is="dom-if" if="{{live}}">
       <button on-tap="toggleEdit">Exit live edit</button>
-        <paper-radio-group selected="{{live}}" attr-for-selected="name">
-          <paper-radio-button name="canvas">Canvas</paper-radio-button>
-          <paper-radio-button name="margin">Margin</paper-radio-button>
-          <paper-radio-button name="legend">Legend</paper-radio-button>
-          <paper-radio-button name="xLabel"> X Label</paper-radio-button>
-          <paper-radio-button name="yLabel"> Y Label</paper-radio-button>
-          <paper-radio-button name="zLabel"> Z Label</paper-radio-button>
+      <paper-radio-group selected="{{live}}" attr-for-selected="name">
+        <paper-radio-button name="canvas">Canvas</paper-radio-button>
+        <paper-radio-button name="legend">Legend</paper-radio-button>
+        <paper-radio-button name="label">Label</paper-radio-button>
       </paper-radio-group>
       <template is="dom-if" if="{{eq(live,'canvas')}}">
-        <div class="canvas-resizer" style$="left:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;">
+        <div class="canvas-resizer">
+          <div class="block top" style="width:[[aggregateWidthMargin]]px;height:[[newSettings.margin.value.top]]px">
+            <resizer-element element-align="top" ht="[[newSettings.margin.value.top]]" margin-value="{{newSettings.margin.value.top}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+          </div>
+          <div class="block left" style$="width:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;height: [[newSettings.height.value]]px;" ht="[[newSettings.height.value]]">
+            <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.left]]"></resizer-element>
+          </div>
+          <div class="block main" style$="width:[[newSettings.width.value]]px;left:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;">
             <resizer-element resize-both show-info element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+          </div>
+          <div class="block right" style$="width:[[newSettings.margin.value.right]]px; left:[[aggregateWidth]]px;top:[[newSettings.margin.value.top]]px; height: [[newSettings.height.value]]px;">
+            <resizer-element element-align="left" margin-value="{{newSettings.margin.value.right}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.right]]"></resizer-element>
+          </div>
+          <div class="block bottom" style$="top:[[aggregateHeight]]px; height: [[newSettings.margin.value.bottom]]px; width: [[aggregateWidthMargin]]px">
+            <resizer-element element-align="top" margin-value="{{newSettings.margin.value.bottom}}" mouseup-callback="{{updateCallback}}" ht="[[newSettings.margin.value.bottom]]"></resizer-element>
+          </div>
+
         </div>
       </template>
-      <template is="dom-if" if="{{eq(live,'margin')}}">
-      <div class="margin-wrapper" style$="width:[[newSettings.width.value]]px; height: [[newSettings.height.value]]px; ">
-        <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}"></resizer-element>
-        <resizer-element element-align="top" margin-value="{{newSettings.margin.value.top}}"></resizer-element>
-        <resizer-element element-align="right" margin-value="{{newSettings.margin.value.right}}"></resizer-element>
-        <resizer-element element-align="bottom" margin-value="{{newSettings.margin.value.bottom}}"></resizer-element>
-      </div>
-
-      </template>
       <template is="dom-if" if="{{eq(live,'legend')}}">
-        <div class="legend-drop-target">Legend position tracker</div>
+        <div class="legend-drop-target" >
+          <!-- <div class="legend-drag-area" style$="width:[[aggregateWidthMargin]]px; height: [[aggregateHeightMargin]]px;"> -->
+            <legend-customizer chart-settings="{{newSettings}}" mouseup-callback="{{updateCallback}}"></legend-customizer>
+          <!-- </div> -->
+        </div>
       </template>
     </template>
     <paper-dialog id="chartSelectorModal" with-backdrop>
 
-    <paper-tabs selected="{{selected}}" no-bar>
-      <paper-tab>Chart Source</paper-tab>
-      <paper-tab>Edit</paper-tab>
-    </paper-tabs>
+      <paper-tabs selected="{{selected}}" no-bar>
+        <paper-tab>Chart Source</paper-tab>
+        <paper-tab>Edit</paper-tab>
+      </paper-tabs>
       <iron-pages selected="{{selected}}">
         <div>
          <div id="chartSelector">
@@ -112,7 +136,7 @@
       </div>
 
       <div>
-          <chart-settings uuid="[[uuid]]" live="{{live}}"></chart-settings>
+        <chart-settings uuid="[[uuid]]" live="{{live}}"></chart-settings>
       </div>
     </iron-pages>
   </paper-dialog>
@@ -163,13 +187,26 @@
           type:Number,
           observer:'applySettings'
         },
+        aggregateWidth:{
+          type:Number
+        },
+        aggregateHeight:{
+          type:Number
+        },
+        aggregateWidthMargin:{
+          type:Number
+        },
+        aggregateHeightMargin:{
+          type:Number
+        },
         settings:{
           type:Object,
           statePath(state){
             if(this.uuid && state.charts[this.uuid]){
               return state.charts[this.uuid].settings
             }
-          }
+          },
+          observer:'aggregate'
         }
       }
     }
@@ -193,14 +230,29 @@
       return object == args
     }
     applySettings(){
-      let newSettings = Object.assign({},this.newSettings);
+      // this.aggregate();
+      
       this.dispatch({
         type: 'UPDATE_SETTINGS',
         value: {
           id: this.uuid,
-          settings: newSettings
+          settings: this.newSettings
         }
       })
+    }
+    aggregate(obj){
+      this.set('newSettings',Object.assign({},obj));
+      if(!this.newSettings.legend.values.position.x){
+        this.set('newSettings.legend.values.position.x',this.newSettings.width.value*0.8);
+      }
+      if(!this.newSettings.legend.values.position.y){
+        this.set('newSettings.legend.values.position.y',10);
+      }
+
+      this.set('aggregateWidth',this.newSettings.margin.value.left + this.newSettings.width.value);
+      this.set('aggregateHeight',this.newSettings.margin.value.top + this.newSettings.height.value);
+      this.set('aggregateWidthMargin',this.newSettings.margin.value.left+this.newSettings.margin.value.right + this.newSettings.width.value);
+      this.set('aggregateHeightMargin',this.newSettings.margin.value.top+ this.newSettings.margin.value.bottom + this.newSettings.height.value);
     }
     eq(data,val){
       return data == val;

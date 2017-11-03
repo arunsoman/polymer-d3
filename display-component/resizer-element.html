@@ -8,23 +8,25 @@
       }
       .resizable.resize-true{
         background: transparent;
+        cursor: move;
       }
       .resizable.right{
         width: 10px;
         right: 0;
         top:0;
         bottom: 0;
-        height: 263px!important;
-        border-left: solid 1px #bbbab9;
+        height: 100%!important;
+        /*border-left: solid 1px #bbbab9;*/
       }
       .resizable.left{
        width: 10px;
        left: 0;
        top:0;
        bottom: 0;
-       height: 263px!important;
+       height: 100%!important;
        z-index: 9;
-       border-right: solid 1px #bbbab9;
+       cursor:e-resize;
+       /*border-right: solid 1px #bbbab9;*/
      }
      .resizable.top{
        left: 0;
@@ -32,14 +34,15 @@
        right: 0;
        width: 100%!important;
        transform: rotateX(180deg);
-       border-top: solid 1px #bbbab9;
+       cursor:s-resize;
+       /*border-top: solid 1px #bbbab9;*/
      }
      .resizable.bottom{
       left: 0;
       bottom: 0;
       right: 0;
       width: 100%!important;
-      border-top: solid 1px #bbbab9;
+      /*border-top: solid 1px #bbbab9;*/
     }
     .count-label{
       user-select:none;
@@ -93,7 +96,7 @@
       position: absolute;
       left: 0;
       right: 0;
-      top: -10px;
+      top: 50%;
       border-bottom: dotted 1px #ccc;
       text-align: center;
     }
@@ -104,24 +107,6 @@
       padding: 0 10px;
       margin-left: -31px;
     }
-    .width-info:after {
-      content: "";
-      position: absolute;
-      right: 1px;
-      top: 0;
-      height: 8px;
-      background: #d8d2d2;
-      width: 1px;
-    }
-    .width-info:before {
-      content: "";
-      position: absolute;
-      left: 1px;
-      top: 0;
-      height: 8px;
-      background: #d8d2d2;
-      width: 1px;
-    }
     .info{
       user-select:none;
     }
@@ -130,18 +115,10 @@
     }
     .height-info {
       position: absolute;
-      right: -40px;
+      right: 50%;
       top: 0;
       bottom: 0;
       border-left: dotted 1px #ccc;
-    }
-    .height-info:before {
-      content: "";
-      position: absolute;
-      right: 0;
-      background: #d8d2d2;
-      width: 40px;
-      height: 1px;
     }
     .height-info span {
       top: 42%;
@@ -149,15 +126,6 @@
       left: -18px;
       min-width: 50px;
       padding: 10px 0;
-    }
-    .height-info:after {
-      content: "";
-      position: absolute;
-      right: 0;
-      background: #d8d2d2;
-      width: 40px;
-      height: 1px;
-      bottom: 0;
     }
     .height-info span{
       margin-top: 30%;
@@ -182,19 +150,19 @@
     <div id="resizeHandler"></div>
     <template is="dom-if" if="[[resizeBoth]]">
       <template is="dom-if" if="[[showInfo]]">
-        <div class="width-info info"> <span><small><i>[[wd]] px</i></small></span></div>
-        <div class="height-info info"> <span><small><i>[[ht]] px</i></small></span></div>
+        <div class="width-info info"></div>
+        <div class="height-info info"> <span><small><i>[[wd]] px * [[ht]] px</i></small></span></div>
       </template>
     </template>
     <template is="dom-if" if="[[!resizeBoth]]">
-      <div id="rsz">
+      <!-- <div id="rsz">
         <template is="dom-if" if="[[inputVal]]">
           <div class="count-label"><paper-input label="Margin Left" type="number" value="[[marginValue]]"></paper-input></div>
         </template>
         <template is="dom-if" if="[[!inputVal]]">
           <div class="count-label">[[marginRound]] %</div>
         </template>
-      </div>
+      </div> -->
     </template>
 
   </div>

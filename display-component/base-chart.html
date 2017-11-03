@@ -68,13 +68,13 @@
             }else{
               return {
                 title:{uitype:'text',txt:"Title",value:""},
-                margin:{uitype:'visual',txt:'Margin',value:{top: 1, right: 1, bottom: 1, left: 1}},
-                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:85,y:5}}},
+                margin:{uitype:'visual',txt:'Margin',value:{top: 50, right: 50, bottom: 50, left: 50}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:undefined,y:10}}},
                 xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
                 yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
                 zLabel:{uitype:'range',txt:"Z Axis label transform (degree)",value:0},
-                width:{uitype:'number',txt:"Chart width", value:"960"},
-                height:{uitype:'number',txt:"Chart Height", value:"500"},
+                width:{uitype:'number',txt:"Chart width", value:960},
+                height:{uitype:'number',txt:"Chart Height", value:500},
                 stacked:{uitype:'boolean',value:false,txt:"Stacked Chart"},
                 group:{uitype:'boolean',value:false, txt:"Group Chart"}
               }
@@ -485,7 +485,7 @@
         .attr("data-legend-color",(d,i)=>{return this.colorFill(obj.obj,i);})
       obj.container.append("g")
           .attr("class","legend")
-          .attr("transform","translate("+((obj.obj.chartProp.width+obj.obj.chartProp.margin.xMargin)*obj.obj.chartProp.label.position.x)/100+","+(obj.obj.chartProp.height*obj.obj.chartProp.label.position.y)/100+")")
+          .attr("transform","translate("+(obj.obj.chartProp.label.position.x || ((obj.obj.chartProp.width+obj.obj.chartProp.margin.left)*0.8))+","+(obj.obj.chartProp.label.position.y || obj.obj.chartProp.margin.top)+")")
           .call(d3.legend);
 
       // add tooltip if segments are provided
@@ -533,11 +533,11 @@
       let settings = this.settings
       let width = +settings.width.value,
           height = +settings.height.value,
-          mTop= +settings.margin.value.top,
-          mRight = +settings.margin.value.right,
-          mBottom = +settings.margin.value.bottom,
-          mLeft = +settings.margin.value.left,
-          margin = {top:this.calculateMargin(height,mTop), right: this.calculateMargin(width,mRight), bottom: this.calculateMargin(height,mBottom), left: this.calculateMargin(width,mLeft)},
+          top= +settings.margin.value.top,
+          right = +settings.margin.value.right,
+          bottom = +settings.margin.value.bottom,
+          left = +settings.margin.value.left,
+          margin = {top, right, bottom, left},
           label= settings.legend.values,
           compMargin = {top:this.calculateMargin(height,.1), right: this.calculateMargin(width,3), bottom: this.calculateMargin(height,20), left: this.calculateMargin(width,7)}
       margin = this.isCompsiteChart?compMargin:margin
@@ -556,7 +556,7 @@
       return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis,xLabel,yLabel,zLabel}
     }
     calculateMargin(dimension,margin){
-      return (dimension * margin)/100;
+      return dimension + margin;
 
     }
     // chartRemove(){
