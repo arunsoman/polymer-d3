@@ -66,9 +66,10 @@
             if(chartPath){
               return chartPath.settings;
             }else{
+              let margin = this.isCompsiteChart ? 10 :50; 
               return {
                 title:{uitype:'text',txt:"Title",value:""},
-                margin:{uitype:'visual',txt:'Margin',value:{top: 50, right: 50, bottom: 50, left: 50}},
+                margin:{uitype:'visual',txt:'Margin',value:{top: margin, right: margin, bottom: margin, left: margin}},
                 legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:undefined,y:10}}},
                 xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
                 yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
@@ -538,15 +539,15 @@
           bottom = +settings.margin.value.bottom,
           left = +settings.margin.value.left,
           margin = {top, right, bottom, left},
-          label= settings.legend.values,
-          compMargin = {top:this.calculateMargin(height,.1), right: this.calculateMargin(width,3), bottom: this.calculateMargin(height,20), left: this.calculateMargin(width,7)}
-      margin = this.isCompsiteChart?compMargin:margin
+          label= settings.legend.values;
+          // compMargin = {top:top*0.1, right: right*0.1, bottom: bottom, left: left*0.1}
+      // margin = this.isCompsiteChart?compMargin:margin
 
       margin.xMargin = margin.left + margin.right
       margin.yMargin = margin.top + margin.bottom
 
-      width = this.isCompsiteChart?(width-margin.xMargin):width
-      height = this.isCompsiteChart?(height-margin.yMargin):height
+      // width = this.isCompsiteChart?(width-margin.xMargin):width
+      // height = this.isCompsiteChart?(height-margin.yMargin):height
 
       let axis ={itemX,itemY,itemZ}
       let color = d3.scale.category20();
