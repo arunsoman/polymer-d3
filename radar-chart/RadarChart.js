@@ -23,6 +23,8 @@ chart.radarChart = function(parentG, chartData, options){
   optionsKeys.forEach(key=>{
     return cfg[key] = options[key]
   })
+  cfg.TranslateX= cfg.ExtraWidthX
+  cfg.TranslateY = cfg.ExtraHeightY
   cfg.maxValue = Math.max(cfg.maxValue, d3.max(chartData, function(d){return d3.max(d.map(function(o){return o.value;}))}));
   let allAxis =[]
   chartData.map(function(d){return d.map(item=>{return allAxis.push(item.axis)})})
