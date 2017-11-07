@@ -60,17 +60,15 @@
         let min = Infinity,
             max = -Infinity
         let chartData = this.getChartData(chartProp.itemX, chartProp.itemY)
-        let wordData = d3.nest().key(d => d.text).entries(chartData);
 
-        let minMax =[]
-        wordData.map((item,idx)=>{
-          minMax[idx]=[item.key,item.values.map(word=>word.size)]
-        })
-        min = this.findMin(minMax)
-        max = this.findMax(minMax)
-        let colors = ["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#222"]
-        let color = d3.scale.linear()
-            .domain([min,max])
+        let sizeArray = []
+        chartData.forEach(item=>sizeArray.push(item.size))
+        sizeArray = sizeArray.filter((item, pos)=>sizeArray.indexOf(item) == pos)
+        sizeArray.sort(function(a, b){return a-b})
+
+        let colors = ["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#565656"]
+        let color = d3.scale.threshold()
+            .domain(sizeArray)
             .range(colors);
 
         d3.layout.cloud().size([chartProp.width, chartProp.height])
@@ -138,14 +136,6 @@
         })
         let source  = sourcemap.map(items=>{return {text:Object.keys(items)[0],size:items[Object.keys(items)[0]]}})
         return source
-    }
-    // find maximum in an array of arrays
-    findMax(arr) {
-      return d3.max(arr, innerArray => d3.max(innerArray[1]));
-    }
-    // find minimum in an array of arrays
-    findMin(arr) {
-      return d3.min(arr, innerArray => d3.min(innerArray[1]));
     }
 
     }
