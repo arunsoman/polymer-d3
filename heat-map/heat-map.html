@@ -159,7 +159,7 @@
       let yAxisHeight = clientRect.height
 
         parentG.append("g")
-              .attr("transform", "translate(0," + (yAxisHeight)+ ")")
+              .attr("transform", "translate(0," + yAxisHeight+ ")")
               .attr("class", "x axis")
               .call(obj.xAxis)
               .selectAll('text')
