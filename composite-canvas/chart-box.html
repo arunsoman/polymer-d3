@@ -367,7 +367,7 @@
             })
             this.dispatch("updateLayoutItem",{uuid:this.uuid,layoutData:layoutData})
           }
-          this.chartData.id&&this.settings&&this.settingstoObj(this.chartData.id,true)
+          this.chartData.id&&this.settings/*&&this.settings.fitToGrid.value*/&&this.settingstoObj(this.chartData.id,true)
         }
         chartBoxRemove(){
           let pNode = this.parentNode
