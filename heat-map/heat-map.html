@@ -94,7 +94,7 @@
             .tickFormat(function (d) {
                 return d;
             })
-            .orient("top");
+            .orient("bottom");
         let yScale = d3.scale.ordinal()
           .domain(y_elements)
           .rangeBands([0, y_elements.length * itemSize]);
@@ -149,18 +149,24 @@
                     // .append("title")
                     // .text(d=>"Value: "+d.value)
         parentG.append("g")
+              .attr("id", "yAxis")
               .attr("class", "y axis")
               .call(obj.yAxis)
               .selectAll('text')
               .attr('font-weight', 'normal');
+      let yAxis = this.$.chartContainer.querySelector("#yAxis")
+      let clientRect = yAxis.getBoundingClientRect()
+      let yAxisHeight = clientRect.height
 
         parentG.append("g")
+              .attr("transform", "translate(0," + (yAxisHeight)+ ")")
               .attr("class", "x axis")
               .call(obj.xAxis)
               .selectAll('text')
               .attr({'font-weight':'normal',"dx":".8em","dy":".5em"})
               .style("text-anchor", "start")
-              .attr("transform", d=>"rotate(-65)");
+              .attr("transform", d=>"rotate(65)")
+
 
       // this.isCompsiteChart&&cells.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
       let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
