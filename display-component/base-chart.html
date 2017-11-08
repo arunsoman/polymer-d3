@@ -38,8 +38,7 @@
           }
         },
         chartVisible:{
-          type:Object,
-          value:{}
+          type:Object
         },
         axisKeys:{
           type:String,
@@ -89,6 +88,7 @@
                 width:{uitype:'number',txt:"Chart width", value:960},
                 height:{uitype:'number',txt:"Chart Height", value:500},
                 stacked:{uitype:'boolean',value:false,txt:"Stacked Chart"},
+                fitToGrid:{uitype:'boolean',value:true,txt:"Fit To Grid"},
                 group:{uitype:'boolean',value:false, txt:"Group Chart"}
               }
             }
@@ -442,6 +442,7 @@
       if(this.uuid&&this.isCompsiteChart){
       }else{
         this.set("uuid",this.parentId+'@'+this.tagName)
+        this.set('chartVisible.show',false);
         this.set('chartVisible.icon',this.icon);
       }
     }
