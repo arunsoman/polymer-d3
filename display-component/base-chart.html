@@ -38,7 +38,10 @@
           }
         },
         chartVisible:{
-          type:Object
+          type:Object,
+          value:{
+            show:false
+          }
         },
         axisKeys:{
           type:String,
@@ -81,7 +84,7 @@
               return {
                 title:{uitype:'text',txt:"Title",value:""},
                 margin:{uitype:'visual',txt:'Margin',value:{top: margin, right: margin, bottom: margin, left: margin}},
-                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:undefined,y:10}}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:undefined,y:50}}},
                 xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
                 yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
                 zLabel:{uitype:'range',txt:"Z Axis label transform (degree)",value:0},
