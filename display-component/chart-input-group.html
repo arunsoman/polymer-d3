@@ -4,6 +4,23 @@
 <dom-module id="chart-input-group">
   <template>
     <style>
+      .placeholder{
+        --iron-icon-height: 10em;
+        --iron-icon-width: 10em;
+        opacity: 0.1;
+        margin: 0 auto;
+        display: inherit;
+      }
+      .placeholder-wrapper {
+        padding: 6em;
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .chart-description{
+        text-align: center;
+        color: #b9b6b6;
+      }
+
       :host{
         position: relative;
       };
@@ -77,8 +94,18 @@
       }
 
     </style>
+    <template is="dom-if" if="{{!chartVisible.show}}">
+      <div class="placeholder-wrapper" on-click="showChartOptions">
+        <iron-icon class="placeholder" icon="[[chartVisible.icon]]"></iron-icon>
+        <p class="chart-description">Source is required to show charts. Let's add chart by tap this area</p>
+      </div>
+    </template>
+    <template is="dom-if" if="{{chartVisible.show}}">
+      <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
+    </template>
 
-    <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
+
+
     <template is="dom-if" if="{{live}}">
       <button on-tap="toggleEdit">Exit live edit</button>
       <paper-radio-group selected="{{live}}" attr-for-selected="name">
@@ -109,7 +136,7 @@
       <template is="dom-if" if="{{eq(live,'legend')}}">
         <div class="legend-drop-target" >
           <!-- <div class="legend-drag-area" style$="width:[[aggregateWidthMargin]]px; height: [[aggregateHeightMargin]]px;"> -->
-            <legend-customizer chart-settings="{{newSettings}}" mouseup-callback="{{updateCallback}}"></legend-customizer>
+          <legend-customizer chart-settings="{{newSettings}}" mouseup-callback="{{updateCallback}}"></legend-customizer>
           <!-- </div> -->
         </div>
       </template>
@@ -169,6 +196,10 @@
           type:Boolean,
           value:false,
           observer:'liveEdit'
+        },
+        chartVisible:{
+          type:Object,
+          value:{}
         },
         selected:{
           type:Number,
@@ -273,6 +304,7 @@
 
     init(){
       this.set('paragraphId',this.uuid.split('@')[0]);
+      this.set('chartIcon',this.uuid.split('@')[1].toLowerCase());
     }
     constructor() {
       super();

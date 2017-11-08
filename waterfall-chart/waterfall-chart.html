@@ -57,7 +57,7 @@
     <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
       <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
     </template>
-      <chart-input-group  uuid="[[uuid]]">
+      <chart-input-group  uuid="[[uuid]]" chart-visible="[[chartVisible]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
         <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
       </chart-input-group>

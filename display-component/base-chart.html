@@ -37,6 +37,10 @@
             return compsiteChart
           }
         },
+        chartVisible:{
+          type:Object,
+          value:{}
+        },
         axisKeys:{
           type:String,
           statePath(state){
@@ -439,6 +443,7 @@
       }else{
         this.set("uuid",this.parentId+'@'+this.tagName)
       }
+      this.set('chartVisible.icon',this.icon);
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){
@@ -501,8 +506,10 @@
       let stacked = this.stacked,
           group = this.group
       //"inputCheck" for avoid error from chart
-      let axisIndex = stacked||group?3:obj.axisIndex
+      let axisIndex = stacked||group?3:obj.axisIndex;
+      this.set('chartVisible.show',false);
       if(!this.hasInputs(axisIndex))return false
+      this.set('chartVisible.show',true);
       let body = document.getElementsByTagName("body")
       if(this.isCompsiteChart&&(+this.settings.width.value/body[0].offsetWidth)*100<=16.66666667){
         let span = document.createElement("span")
