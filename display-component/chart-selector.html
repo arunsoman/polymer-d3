@@ -42,6 +42,7 @@
           on-tap="notifyTap"
           draggable="[[isCompsiteChart]]"
           data-elem$ ="[[item.element]]"
+          data-icon$ ="[[item.icon]]"
         ></paper-icon-button>
       </paper-tab>
     </template>
@@ -124,6 +125,7 @@
       if(!e.path[0].dataset.elem || chartChk!=-1) return;
       e.dataTransfer.effectAllowed = "move";
       e.dataTransfer.setData("chartElem",e.path[0].dataset.elem);
+      e.dataTransfer.setData("chartIcon",e.path[0].dataset.icon);
     }
   }
   window.customElements.define(chartSelector.is,chartSelector);

@@ -300,6 +300,9 @@
           chart.set("parentId",this.parentId)
           chart.set("uuid",chartId)
           chart.set("compUUID",this.uuid)
+          chart.chartVisible={};
+          chart.chartVisible.show=false;
+          chart.chartVisible.icon=this.chartData.icon;
 
           this.$.chartBox.appendChild(chart)
 

@@ -442,8 +442,8 @@
       if(this.uuid&&this.isCompsiteChart){
       }else{
         this.set("uuid",this.parentId+'@'+this.tagName)
+        this.set('chartVisible.icon',this.icon);
       }
-      this.set('chartVisible.icon',this.icon);
     }
     // add keys and colors to chartstore as keys
     chartKeys(data,key){

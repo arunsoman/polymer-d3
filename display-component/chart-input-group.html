@@ -94,13 +94,13 @@
       }
 
     </style>
-    <template is="dom-if" if="{{!chartVisible.show}}">
+    <template is="dom-if" if="[[!chartVisible.show]]">
       <div class="placeholder-wrapper" on-click="showChartOptions">
         <iron-icon class="placeholder" icon="[[chartVisible.icon]]"></iron-icon>
         <p class="chart-description">Source is required to show charts. Let's add chart by tap this area</p>
       </div>
     </template>
-    <template is="dom-if" if="{{chartVisible.show}}">
+    <template is="dom-if" if="[[chartVisible.show]]">
       <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
     </template>
 
@@ -196,10 +196,6 @@
           type:Boolean,
           value:false,
           observer:'liveEdit'
-        },
-        chartVisible:{
-          type:Object,
-          value:{}
         },
         selected:{
           type:Number,
@@ -301,10 +297,8 @@
     showChartOptions(){
       this.$.chartSelectorModal.open();
     }
-
     init(){
       this.set('paragraphId',this.uuid.split('@')[0]);
-      this.set('chartIcon',this.uuid.split('@')[1].toLowerCase());
     }
     constructor() {
       super();

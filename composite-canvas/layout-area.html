@@ -128,18 +128,21 @@
         drop(e){
           e.preventDefault();
           let chartElem = e.dataTransfer.getData('chartElem');
+          let chartIcon = e.dataTransfer.getData('chartIcon');
           if(chartElem){
             e.target.classList.remove('drop');
             e.target.classList.remove('compArea');
-            this.createChartBox(chartElem)
+            this.createChartBox(chartElem,chartIcon);
             e.dataTransfer.clearData('chartElem');
+            e.dataTransfer.clearData('chartIcon');
           }
         }
-        createChartBox(chartElem){
+        createChartBox(chartElem,Icon){
           let chartBox = document.createElement("chart-box")
           let chartItem={}
           chartItem.chartCls="col-md-6"
           chartItem.elem=chartElem
+          chartItem.icon=Icon;
           chartItem.chartWidth = ((this.$.layoutArea.offsetWidth* 50)/100)-22
           let chartHeight = this.$.layoutArea.offsetHeight
           chartHeight = this.$.layoutArea.offsetHeight<=554?chartHeight:554
