@@ -38,6 +38,21 @@
     fill-opacity: 1;
     cursor:pointer;
   }
+  .toolTip {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      position: absolute;
+      display: none;
+      width: auto;
+      height: auto;
+      background: none repeat scroll 0 0 white;
+      border: 0 none;
+      border-radius: 8px 8px 8px 8px;
+      box-shadow: -3px 3px 15px #888888;
+      color: black;
+      font: 12px sans-serif;
+      padding: 5px;
+      text-align: center;
+  }
   </style>
   <template is="dom-if" if="[[compfilterChk]]" restamp="true">
     <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
@@ -123,13 +138,13 @@
           .attr("width", width)
           .attr("height", height).append("g");
 
-        let txt = this.externals[this.inputs[this.x].selectedValue[0]]["key"]
+        // let txt = this.externals[this.inputs[this.x].selectedValue[0]]["key"]
 
-        parentG.append("text")
-        .attr("dy", ".35em")
-        .attr("text-anchor", "middle")
-        .attr("transform", "translate("+(width/2)+","+(height/2)+")")
-        .text(txt)
+        // parentG.append("text")
+        // .attr("dy", ".35em")
+        // .attr("text-anchor", "middle")
+        // .attr("transform", "translate("+(width/2)+","+(height/2)+")")
+        // .text(txt)
 
         let g = parentG.selectAll('.arc')
           .data(d => obj.pie(d.values))
@@ -139,12 +154,18 @@
             this.filterKeys.length && this.filterKeys.indexOf(d.data.item)!=-1&&(classes+=" selected")
             return classes
           }.bind(this))
+          .attr("data-value", function(d,i) {return d.data.value})
+          .attr("data-key", function(d,i) {return d.data.item});
 
         let segments = g.append('path')
           .attr('d', obj.arc)
           .attr('class', 'pie-slice');
 
         segments.attr('transform', 'translate(' + width / 2 + ',' + height / 2 + ')');
+
+        // append div for toolTip
+        let tlpObj={elem:g,tplY:60}
+        this.chartToolTip(tlpObj)
 
         // let legend = parentG.append("g")
         //   .attr("class","legend")

@@ -34,20 +34,40 @@
       color: #9f9e9e;
       height: 27px;
     }
-    #chartContainer.selected g.area-chart,
-    #chartContainer.selected g.area-chart .dot {
-      fill-opacity: .25;
+    g.area-chart{
+      position:absolute;
+      z-index:-1;
     }
-    #chartContainer.selected g.area-chart.xAxis {
-      fill-opacity: 1;
-    }
-    #chartContainer.selected g.area-chart.xAxis .dot {
+    #chartContainer.selected g.area-chart{
       fill-opacity: .25;
     }
     #chartContainer.selected g.selected,
     #chartContainer.selected g.area-chart.xAxis .dot.selected {
       fill-opacity: 1;
       cursor:pointer;
+    }
+    .toolTip {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 12px sans-serif;
+        padding: 5px;
+        text-align: center;
+    }
+    .dot{
+      opacity:0;
+      position:absolute;
+    }
+    .dot:hover{
+      opacity:1;
+      z-index: 999;
     }
     </style>
       <template is="dom-if" if="[[compfilterChk]]" restamp="true">
@@ -159,7 +179,8 @@
           chartProp,
           stacked,
           itemZChk,
-          circleChk
+          circleChk,
+          source
         }
       }
       _paint(obj) {
@@ -202,25 +223,26 @@
 
         }
         // this.isCompsiteChart&&chartSvg.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
-        let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
-        this.isCompsiteChart&&!obj.circleChk && chartSvg.on("click",function(e){
-          let elem = this, item = e.name,zAxis=true
-          compSourcePopulate({item,elem,zAxis})
-        })
-        this.isCompsiteChart&&!obj.circleChk && chartSvg.on("dblclick",function(e){
-          let elem = this, item = e.name, zAxis=true, dblClick=true
-          compSourcePopulate({item,elem,zAxis,dblClick})
-        })
+        // let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+        // this.isCompsiteChart&&!obj.circleChk && chartSvg.on("click",function(e){
+        //   let elem = this, item = e.name,zAxis=true
+        //   compSourcePopulate({item,elem,zAxis})
+        // })
+        // this.isCompsiteChart&&!obj.circleChk && chartSvg.on("dblclick",function(e){
+        //   let elem = this, item = e.name, zAxis=true, dblClick=true
+        //   compSourcePopulate({item,elem,zAxis,dblClick})
+        // })
 
         // for adding dots
-        let circle = obj.circleChk && chartSvg.selectAll(".dot")
+        let circle = chartSvg.selectAll(".dot")
           .data((d)=>d.values)
           .enter()
           .append("circle")
-          .attr("r", 4.5)
+          .attr("r", 5.4)
           .attr("cx", (d,i)=>obj.x(d.item))
-          .attr("cy", d=>obj.y(d.y))
-          .attr("fill", d=>obj.chartProp.color(d.item))
+          .attr("cy", d=>obj.y((d.y0+d.y)-1))
+          .attr("fill","#010e6b")
+          // .attr("fill", d=>obj.chartProp.color(d.item))
           .attr("class",function(d){
             let classes = "dot"
             this.filterKeys.length && this.filterKeys.indexOf(d.item)!=-1&&(classes+=" selected")
@@ -230,8 +252,12 @@
             let pCls = this.parentElement.getAttribute("class")
             pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
             this.parentElement.setAttribute("class",pCls)
-          });
-          if(this.isCompsiteChart&& obj.circleChk){
+          })
+          .attr("data-value", function(d,i) {return d.y==0?d.y0:d.y})
+          .attr("data-key", function(d,i) {return d.item});
+
+          let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+          if(this.isCompsiteChart){
             circle.on("click",function(e){
             let elem = this, item = e.item
             let pCls = this.parentElement.getAttribute("class")
@@ -246,7 +272,17 @@
             this.parentElement.setAttribute("class",pCls)
             compSourcePopulate({item,elem,dblClick})
           })
+          !obj.circleChk && chartSvg.on("click",function(e){
+            let elem = this, item = e.name,zAxis=true
+            compSourcePopulate({item,elem,zAxis})
+          })
+          !obj.circleChk && chartSvg.on("dblclick",function(e){
+            let elem = this, item = e.name, zAxis=true, dblClick=true
+            compSourcePopulate({item,elem,zAxis,dblClick})
+          })
         }
+        let tlpObj={elem:circle,tplY:60}
+        this.chartToolTip(tlpObj)
 
         parentG.append("g")
             .attr("class", "x axis")
@@ -260,6 +296,11 @@
               .attr("y", 6)
               .attr("dy", ".71em")
               .style("text-anchor", "end")
+
+        // append div for toolTip
+        // debugger
+        // let tlpObj={elem:chartSvg,xKey:"data",yKey:"data"}
+        // this.chartToolTip(tlpObj)
         // this.addLegend({
         //     obj,
         //     container:parentG,

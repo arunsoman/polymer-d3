@@ -499,9 +499,9 @@
           .call(d3.legend);
 
       // add tooltip if segments are provided
-      if(obj.segments){
-        this.addToolTip(obj);
-      }
+      // if(obj.segments){
+      //   this.addToolTip(obj);
+      // }
 
     }
     getChartProperties(obj){
@@ -616,9 +616,9 @@
       propData.itemXYZ = itemXYZ
       filterKeys.length?this.reduxUpdateSrc(propData):this.chartReset()
 
-      let body = document.getElementsByTagName("body")
-      let d3Tip = body[0].querySelectorAll(".d3-tip")
-      d3Tip.length && d3Tip.forEach(item=>item.remove())
+      // let body = document.getElementsByTagName("body")
+      // let d3Tip = body[0].querySelectorAll(".d3-tip")
+      // d3Tip.length && d3Tip.forEach(item=>item.remove())
     }
     reduxUpdateSrc(propData){
       this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
@@ -694,6 +694,46 @@
     }
     getExternalsKey(axis){
       return this.externals.filter(ext=>ext.value==axis)[0].key
+    }
+    chartToolTip(tlpObj){
+      let element= tlpObj.elem
+      // let xKey = tlpObj.xKey
+      // let yKey = tlpObj.yKey
+      // let grpStack = tlpObj.grpStack
+      let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
+      // let offsetXY = this.isCompsiteChart?10:50
+      let offsetX = this.isCompsiteChart?0:-20
+      let offsetY = tlpObj.tplY?tlpObj.tplY:10
+      offsetY = this.isCompsiteChart?tlpObj.tplY+5:tlpObj.tplY
+      // debugger
+      element.on("mousemove", function(d,i){
+        // debugger
+            // let gsKey,gsValue
+            // if(grpStack){
+              let dX = this.dataset.key
+              let dY = this.dataset.value
+              offsetY = this.dataset.index?tlpObj.tplY*+this.dataset.index:offsetY
+            // }
+            // let areaY = yKey=="y"&&d[yKey]==0?d[yKey+0]:d[yKey]
+            // let yValue = areaY?areaY:d[yKey]
+            // let dX = xKey=="data"?d[xKey].item:d[xKey]
+            // let dY = yKey=="data"?d[yKey].value:yValue
+            // dX = grpStack?gsKey:dX
+            // dY = grpStack?gsValue:dY
+            // debugger
+            div.style("left", (d3.event.offsetX-offsetX)+"px");
+            div.style("top", (d3.event.offsetY+offsetY)+"px");
+            div.style("display", "inline-block");
+
+            // debugger
+            // let tTxt = tlpObj.grpStack?d:(dX)+"<br>"+(dY)
+            let tTxt = (dX)+"<br>"+(dY)
+            tTxt = tlpObj.tlpLabels?tlpObj.tlpLabels[i]+", "+dY:tTxt
+            div.html(tTxt);
+        });
+      element.on("mouseout", function(d){
+            div.style("display", "none");
+        });
     }
   }
   customElements.define(baseChart.is,baseChart)

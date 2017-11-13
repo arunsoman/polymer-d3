@@ -42,6 +42,7 @@ chart.radarChart = function(parentG, chartData, options){
 			.attr("transform", "translate(" + cfg.TranslateX + "," + cfg.TranslateY + ")");
 
 	let tooltip;
+  let toolTipDiv;
 
   //Circular segments
 	for(var j=0; j<cfg.levels-1; j++){
@@ -146,6 +147,7 @@ chart.radarChart = function(parentG, chartData, options){
 								 .transition(200)
 								 .style("fill-opacity", .7);
 							  })
+
 			 .on('mouseout', function(){
 								svg.selectAll("polygon")
 								 .transition(200)
@@ -173,13 +175,16 @@ chart.radarChart = function(parentG, chartData, options){
      		.on('mouseover', function (d){
      					newX =  parseFloat(d3.select(this).attr('cx')) - 10;
      					newY =  parseFloat(d3.select(this).attr('cy')) - 5;
-
-     					tooltip
-     						.attr('x', newX)
-     						.attr('y', newY)
-     						.text(Format(d.value))
-     						.transition(200)
-     						.style('opacity', 1);
+              toolTipDiv.style("left", d3.event.offsetX+"px");
+              toolTipDiv.style("top", d3.event.offsetY+"px");
+              toolTipDiv.style("display", "inline-block");
+              toolTipDiv.html(Format(d.value)+"<br/>"+Math.max(d.value, 0)).transition(200).style('opacity', 1)
+     				// 	tooltip
+     				// 		.attr('x', newX)
+     				// 		.attr('y', newY)
+     				// 		.text(Format(d.value))
+     				// 		.transition(200)
+     				// 		.style('opacity', 1);
 
      					z = "polygon."+d3.select(this).attr("class");
      					svg.selectAll("polygon")
@@ -190,15 +195,16 @@ chart.radarChart = function(parentG, chartData, options){
      						.style("fill-opacity", .7);
      				  })
      		.on('mouseout', function(){
-     					tooltip
-     						.transition(200)
-     						.style('opacity', 0);
+     				// 	tooltip
+     				// 		.transition(200)
+     				// 		.style('opacity', 0);
      					svg.selectAll("polygon")
      						.transition(200)
      						.style("fill-opacity", cfg.opacityArea);
+                toolTipDiv.transition(200).style({"display":"none",'opacity': 0});
      		})
-     		.append("svg:title")
-     		.text(function(j){return Math.max(j.value, 0)});
+     	// 	.append("svg:title")
+     	// 	.text(function(j){return Math.max(j.value, 0)});
 	  series++;
 
     options.compChartChk && polygon.on("click",function(){
@@ -216,4 +222,5 @@ chart.radarChart = function(parentG, chartData, options){
       			   .style('opacity', 0)
       			   .style('font-family', 'sans-serif')
       			   .style('font-size', '13px');
+toolTipDiv = d3.select(options.chartScope.$.chartContainer).append("div").attr("class", "toolTip");
 }

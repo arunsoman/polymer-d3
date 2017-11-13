@@ -29,6 +29,21 @@
         padding: 4px;
         margin-top: 5px;
       }
+      .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
     </style>
       <chart-input-group  uuid="[[uuid]]" chart-visible="[[chartVisible]]">
         <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
@@ -81,7 +96,7 @@
 
         sankey.nodes(chartData.nodes)
               .links(chartData.links)
-              .layout(32);
+              .layout(chartData.length);
 
         return {
           sankey,
@@ -110,10 +125,12 @@
                     .style("stroke-width", function(d) { return Math.max(1, d.dy); })
                         .sort(function(a, b) { return b.dy - a.dy; });
         // add the link titles
-        link.append("title")
-              .text(function(d) {
-            	return d.source.name + " → " +
-                      d.target.name + "\n" + obj.format(d.value); });
+        // link.append("title")
+        //       .text(function(d) {
+        //     	return d.source.name + " → " +
+        //               d.target.name + "\n" + obj.format(d.value); });
+        link.attr("data-value", function(d,i) {return obj.format(d.value)})
+          .attr("data-key", function(d,i) {return  d.source.name + " → " +d.target.name});
 
         // add in the nodes
         let node = parentG.append("g").selectAll(".node")
@@ -128,13 +145,15 @@
                     .on("drag", dragmove));
 
           // add the rectangles for the nodes
-            node.append("rect")
+            let rect = node.append("rect")
               .attr("height", function(d) { return d.dy; })
               .attr("width", obj.sankey.nodeWidth())
               .style("fill", function(d) {return d.color = obj.chartProp.color(d.name.replace(/ .*/, "")); })
               .style("stroke", function(d) {return d3.rgb(d.color).darker(2); })
-              .append("title")
-                .text(function(d) {return d.name + "\n" + obj.format(d.value); });
+              .attr("data-value", function(d,i) {return obj.format(d.value)})
+              .attr("data-key", function(d,i) {return  d.name});
+              // .append("title")
+              // .text(function(d) {return d.name + "\n" + obj.format(d.value); });
 
         // add in the title for the nodes
         node.append("text")
@@ -151,6 +170,12 @@
         // this.isCompsiteChart&&this.compChartObjs&&
         // node.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         // rect.on("click", function(){debugger})
+
+        // append div for toolTip
+    		let tlpObj={elem:link,tplY:60}
+    		this.chartToolTip(tlpObj)
+        let tlpObj1={elem:rect,tplY:60}
+        this.chartToolTip(tlpObj1)
 
         d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
         // the function for moving the nodes

@@ -45,6 +45,21 @@
         fill-opacity: 1;
         cursor:pointer;
       }
+      .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
     </style>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
@@ -129,13 +144,16 @@
                         .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
         //Draw histogram
         let bar = parentG.selectAll(".bar")
-                        .data(obj.chartData)
-                        .enter().append("g")
-                        .attr("class",function(d){
-                          let classes = "bar"
-                          this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
-                          return classes
-                        }.bind(this))
+            .data(obj.chartData)
+            .enter().append("g")
+            .attr("class",function(d){
+              let classes = "bar"
+              this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
+              return classes
+            }.bind(this))
+            .attr("data-value", function(d,i) {return d.value})
+            .attr("data-key", function(d,i) {return d.xKey});
+
         bar.append("rect")
             .attr("x", d=>obj.xScale(d[obj.xKey]))
             .attr("width", obj.xScale.rangeBand())
@@ -177,6 +195,10 @@
             .attr("dy", "-.71em")
             .style("text-anchor", "end")
             .text("Cumulative %");
+
+        // append div for toolTip
+        let tlpObj={elem:bar,tplY:70}
+        this.chartToolTip(tlpObj)
 
         // this.isCompsiteChart&&bar.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
         let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)

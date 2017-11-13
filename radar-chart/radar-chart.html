@@ -22,6 +22,21 @@
         fill-opacity: .5!important;
         cursor:pointer;
       }
+      .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
     </style>
     <template is="dom-if" if="[[compfilterChk]]" restamp="true">
       <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
@@ -65,6 +80,7 @@
         let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ, chartProp.parseDate)
         let chartData = source.data
         let KeyMap = source.KeyMap
+        
 
         //Options for the Radar chart, other than default
         let options = {
@@ -78,7 +94,8 @@
           KeyMap:KeyMap,
           compSourcePopulate:this.compSourcePopulate.bind(this,chartProp.axis),
           compChartChk:this.isCompsiteChart,
-          filterKeys:this.filterKeys
+          filterKeys:this.filterKeys,
+          chartScope:this
         }
 
         return {
