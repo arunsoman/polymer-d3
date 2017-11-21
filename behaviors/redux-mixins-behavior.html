@@ -49,7 +49,7 @@
                 settings: action.value.settings
               }
               )})
-          case 'UPDATE_PRIVATE_NODE':
+          case 'UPDATE_CHART_LEGENDS':
               return Object.assign({},state,{
               [action.value.id]:Object.assign({},state[action.value.id],{
                 chartkeys: Object.assign({},state[action.value.id].nodes,action.value.nodes)
@@ -177,6 +177,8 @@
                 state[action.value.uuid],{
                   chartIndex:action.value.chartIndex
                 })})
+            case 'UPDATE_LEGEND':
+              debugger;
 
           default:
               return state;

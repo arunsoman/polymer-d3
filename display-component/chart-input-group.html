@@ -65,7 +65,7 @@
       .margin-wrapper{
         position: absolute;
       }
-      .canvas-resizer,.left-wrapper,.legend-drop-target{
+      .canvas-resizer,.left-wrapper{
         position: relative;
       }
       paper-icon-button.settings{
@@ -92,7 +92,23 @@
         top: 0;
         bottom: 0;
       }
-
+      .live-edit-wrapper{
+        background: #27b7da;
+        color: #fff;
+        --paper-radio-button-label-color:#fff;
+        --paper-radio-button-checked-ink-color:#fff;
+        --paper-radio-button-checked-color:#fff;
+      }
+      .axis-label{
+        display: inline-block; 
+        float: left; 
+        margin-top: 20px;
+        color: #000;
+      }
+      .legend-drop-target{
+        position: absolute;
+      }
+      
     </style>
     <template is="dom-if" if="[[!chartVisible.show]]">
       <div class="placeholder-wrapper" on-click="showChartOptions">
@@ -101,45 +117,72 @@
       </div>
     </template>
     <template is="dom-if" if="[[chartVisible.show]]">
-      <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button>
+    <paper-menu-button>
+    <paper-icon-button icon="menu" horizontal-align="right" slot="dropdown-trigger" alt="menu"></paper-icon-button>
+    <paper-listbox slot="dropdown-content">
+      <paper-item on-click="showChartOptions">Add Source</paper-item>
+      <paper-item>Edit</paper-item>
+    </paper-listbox>
+  </paper-menu-button>
+      <!-- <paper-icon-button icon="icons:settings" on-click="showChartOptions" class="settings"></paper-icon-button> -->
     </template>
 
 
 
     <template is="dom-if" if="{{live}}">
-      <button on-tap="toggleEdit">Exit live edit</button>
-      <paper-radio-group selected="{{live}}" attr-for-selected="name">
-        <paper-radio-button name="canvas">Canvas</paper-radio-button>
-        <paper-radio-button name="legend">Legend</paper-radio-button>
-        <paper-radio-button name="label">Label</paper-radio-button>
-      </paper-radio-group>
-      <template is="dom-if" if="{{eq(live,'canvas')}}">
-        <div class="canvas-resizer">
-          <div class="block top" style="width:[[aggregateWidthMargin]]px;height:[[newSettings.margin.value.top]]px">
-            <resizer-element element-align="top" ht="[[newSettings.margin.value.top]]" margin-value="{{newSettings.margin.value.top}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+      <div class="live-edit-wrapper">
+
+
+        <button on-tap="toggleEdit">Exit live edit</button>
+        <paper-radio-group selected="{{live}}" attr-for-selected="name">
+          <paper-radio-button name="canvas">Canvas</paper-radio-button>
+          <paper-radio-button name="legend">Legend</paper-radio-button>
+          <paper-radio-button name="label">Label</paper-radio-button>
+        </paper-radio-group>
+        <template is="dom-if" if="{{eq(live,'canvas')}}">
+          <div class="canvas-resizer">
+            <div class="block top" style="width:[[aggregateWidthMargin]]px;height:[[newSettings.margin.value.top]]px">
+              <resizer-element element-align="top" ht="[[newSettings.margin.value.top]]" margin-value="{{newSettings.margin.value.top}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+            </div>
+            <div class="block left" style$="width:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;height: [[newSettings.height.value]]px;" ht="[[newSettings.height.value]]">
+              <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.left]]"></resizer-element>
+            </div>
+            <div class="block main" style$="width:[[newSettings.width.value]]px;left:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;">
+              <resizer-element resize-both show-info element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" mouseup-callback="{{updateCallback}}"></resizer-element>
+            </div>
+            <div class="block right" style$="width:[[newSettings.margin.value.right]]px; left:[[aggregateWidth]]px;top:[[newSettings.margin.value.top]]px; height: [[newSettings.height.value]]px;">
+              <resizer-element element-align="left" margin-value="{{newSettings.margin.value.right}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.right]]"></resizer-element>
+            </div>
+            <div class="block bottom" style$="top:[[aggregateHeight]]px; height: [[newSettings.margin.value.bottom]]px; width: [[aggregateWidthMargin]]px">
+              <resizer-element element-align="top" margin-value="{{newSettings.margin.value.bottom}}" mouseup-callback="{{updateCallback}}" ht="[[newSettings.margin.value.bottom]]"></resizer-element>
+            </div>
+
           </div>
-          <div class="block left" style$="width:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;height: [[newSettings.height.value]]px;" ht="[[newSettings.height.value]]">
-            <resizer-element element-align="left" margin-value="{{newSettings.margin.value.left}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.left]]"></resizer-element>
+        </template>
+        <template is="dom-if" if="{{eq(live,'legend')}}">
+          <div class="legend-drop-target" style$="width:[[aggregateWidthMargin]]px; height: [[aggregateHeightMargin]]px;" >
+            <legend-customizer chart-settings="{{newSettings}}" mouseup-callback="{{updateCallback}}"></legend-customizer>
           </div>
-          <div class="block main" style$="width:[[newSettings.width.value]]px;left:[[newSettings.margin.value.left]]px; top:[[newSettings.margin.value.top]]px;">
-            <resizer-element resize-both show-info element-width="{{newSettings.width.value}}" element-height="{{newSettings.height.value}}" mouseup-callback="{{updateCallback}}"></resizer-element>
-          </div>
-          <div class="block right" style$="width:[[newSettings.margin.value.right]]px; left:[[aggregateWidth]]px;top:[[newSettings.margin.value.top]]px; height: [[newSettings.height.value]]px;">
-            <resizer-element element-align="left" margin-value="{{newSettings.margin.value.right}}" mouseup-callback="{{updateCallback}}" wd="[[newSettings.margin.value.right]]"></resizer-element>
-          </div>
-          <div class="block bottom" style$="top:[[aggregateHeight]]px; height: [[newSettings.margin.value.bottom]]px; width: [[aggregateWidthMargin]]px">
-            <resizer-element element-align="top" margin-value="{{newSettings.margin.value.bottom}}" mouseup-callback="{{updateCallback}}" ht="[[newSettings.margin.value.bottom]]"></resizer-element>
+        </template>
+        <template is="dom-if" if="{{eq(live,'label')}}">
+          <div class="item">
+            <div class="axis-label">X</div>
+            <paper-slider style="float: left;" class="red" value="{{dragSettings.xLabel.value}}" max="360" editable></paper-slider>
           </div>
 
-        </div>
-      </template>
-      <template is="dom-if" if="{{eq(live,'legend')}}">
-        <div class="legend-drop-target" >
-          <!-- <div class="legend-drag-area" style$="width:[[aggregateWidthMargin]]px; height: [[aggregateHeightMargin]]px;"> -->
-          <legend-customizer chart-settings="{{newSettings}}" mouseup-callback="{{updateCallback}}"></legend-customizer>
-          <!-- </div> -->
-        </div>
-      </template>
+          <div class="item">
+            <div class="axis-label">Y</div>
+            <paper-slider style="float: left;" class="red" value="{{dragSettings.yLabel.value}}" max="360" editable></paper-slider>
+          </div>
+
+          <div class="item">
+            <div class="axis-label">Z</div>
+            <paper-slider style="float: left;" class="red" value="{{dragSettings.zLabel.value}}" max="360" editable></paper-slider>
+          </div>
+
+
+        </template>
+      </div>
     </template>
     <paper-dialog id="chartSelectorModal" with-backdrop>
 
@@ -226,6 +269,9 @@
         aggregateHeightMargin:{
           type:Number
         },
+        dragSettings:{
+          type:Object
+        },
         settings:{
           type:Object,
           statePath(state){
@@ -253,8 +299,17 @@
         }
       }
     }
+    static get observers(){
+      return ['applyDragSettings(dragSettings.*)']
+    }
     eq(object, args) {
       return object == args
+    }
+    applyDragSettings(ev){
+      if(Object.keys(this.dragSettings).length > 0){
+        this.newSettings = Object.assign({},this.dragSettings);
+        this.applySettings();
+      }
     }
     applySettings(){
       // this.aggregate();
@@ -290,6 +345,7 @@
     liveEdit(){
       this.$.chartSelectorModal.close();
       this.newSettings = Object.assign({},this.settings);
+      this.dragSettings = Object.assign({},this.settings);
     }
     tabChange(){
       this.$.chartSelectorModal.notifyResize();

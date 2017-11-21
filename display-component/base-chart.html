@@ -462,7 +462,7 @@
           legendNodes = data.map(items=>{return {key:items[key],color:color(items[key])}});
         }
       // }
-      this.dispatch({type:'UPDATE_PRIVATE_NODE',value:{id:this.uuid,nodes:legendNodes}});
+      this.dispatch({type:'UPDATE_CHART_LEGENDS',value:{id:this.uuid,nodes:legendNodes}});
     }
     // to fill color for svg and legends
     colorFill(item,i){

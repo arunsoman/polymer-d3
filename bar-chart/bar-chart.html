@@ -119,24 +119,7 @@
         .attr("height", obj.chartProp.height)
         .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
 
-        svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + obj.chartProp.height + ")")
-        .call(obj.axis.position.x)
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", "-.55em")
-        .attr("transform", "rotate("+(obj.chartProp.xLabel || -90 )+")")
-        svg.append("g")
-        .attr("class", "y axis")
-        .call(obj.axis.position.y)
-        .append("text")
-        .attr("transform", "rotate("+(obj.chartProp.yLabel || -90)+")")
-        .attr("y", 10)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text("Value ($)");
+        
 
       let segments = svg.selectAll("bar")
         .data(obj.chartData)
@@ -169,6 +152,24 @@
         key: 'item',
         segments
       });
+      svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + obj.chartProp.height + ")")
+        .call(obj.axis.position.x)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.55em")
+        .attr("transform", "rotate("+(obj.chartProp.xLabel || -90 )+")")
+        svg.append("g")
+        .attr("class", "y axis")
+        .call(obj.axis.position.y)
+        .append("text")
+        .attr("transform", "rotate("+(obj.chartProp.yLabel || -90)+")")
+        .attr("y", 10)
+        .attr("dy", ".71em")
+        .style("text-anchor", "end")
+        .text("Value ($)");
       let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
       this.isCompsiteChart&&segments.on("click",function(e){
         let elem = this, item = e.item

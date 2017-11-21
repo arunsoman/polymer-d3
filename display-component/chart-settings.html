@@ -76,24 +76,24 @@
 
                 </div>
               </template>
-              <template is="dom-if" if="{{eq(item.value.uitype,'text')}}">
+             <!--  <template is="dom-if" if="{{eq(item.value.uitype,'text')}}">
                 <div class="item">
                   <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
                 </div>
-              </template>
-              <template is="dom-if" if="{{eq(item.value.uitype,'number')}}">
+              </template> -->
+              <!-- <template is="dom-if" if="{{eq(item.value.uitype,'number')}}">
                 <div class="item">
                   <paper-input label="[[item.value.txt]]" type='[[item.value.uitype]]' value='{{item.value.value}}'></paper-input>
                 </div>
-              </template>
-              <template is="dom-if" if="{{eq(item.value.uitype,'range')}}">
+              </template> -->
+              <!-- <template is="dom-if" if="{{eq(item.value.uitype,'range')}}">
                 <div class="item">
                   <div>[[item.value.txt]]</div>
                   <div style$="transform: rotateZ({{item.value.value}}deg); transform-origin: center; display: inline-block; float: left; margin-top: 20px;" class="animate">Label</div>
                   <paper-slider style="float: left;" class="red" value="{{item.value.value}}" max="360" editable></paper-slider>
                   
                 </div>
-              </template>
+              </template> -->
               <template is="dom-if" if="{{eq(item.value.uitype,'boolean')}}">
                 <div class="item">
                   <paper-checkbox checked="{{item.value.value}}">[[item.value.txt]]</paper-checkbox>
