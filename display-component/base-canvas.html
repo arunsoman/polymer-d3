@@ -1,0 +1,38 @@
+<link rel="import" href="chart-input.html">
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<dom-module id="base-canvas">
+<template>
+
+</template>
+<script>
+  class baseCanvas extends ReduxMixinBehavior(Polymer.Element){
+    static get is(){ return 'base-canvas'}
+
+    static get properties(){
+      return{
+        redraw:{
+          type:Boolean,
+          selectPath:'redraw'
+        },
+        externals:[],
+        source:[],
+        charts:{
+          statePath:'charts'
+        }
+      }
+    }
+    static get observors(){
+      return ['redrawChange(redraw)']
+    }
+    redrawChange(){
+
+    }
+    constructor(){
+      super();
+    }
+
+  }
+  customElements.define(baseCanvas.is,baseCanvas)
+
+</script>
+</dom-module>

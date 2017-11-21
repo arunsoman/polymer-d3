@@ -1,0 +1,143 @@
+<link rel="import" href="../display-component/base-chart.html">
+<dom-module id="word-cloud">
+  <template>
+    <style>
+      #chartContainer{
+        margin:0 auto;
+      }
+      paper-icon-button.resetBtn {
+        font-size: x-small;
+        float: right;
+        padding: 4px;
+        margin-top: 5px;
+        width: 27px;
+        color: #9f9e9e;
+        height: 27px;
+      }
+      #chartContainer.selected text.txt {
+        fill-opacity: .25;
+      }
+      #chartContainer.selected text.txt.selected {
+        fill-opacity: 1;
+        cursor:pointer;
+      }
+    </style>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+    </template>
+    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+      <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
+    </template>
+    <chart-input-group uuid="[[uuid]]" chart-visible="{{chartVisible}}">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <div id="chartContainer"></div>
+  </template>
+  <script>
+    class wordCloud extends baseChart {
+      static get is(){
+        return "word-cloud"
+      }
+      static get properties(){
+        return{
+          words:{
+            type:Array
+          }
+        }
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        let axisIndex = 2
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
+
+        //get chart data once pass "x and y" into the "getChartData" method
+        let chartData = this.getChartData(chartProp.itemX, chartProp.itemY)
+
+        let sizeArray = []
+        chartData.forEach(item=>sizeArray.push(item.size))
+        sizeArray = sizeArray.filter((item, pos)=>sizeArray.indexOf(item) == pos)
+        sizeArray.sort(function(a, b){return a-b})
+
+        let colors = ["#ddd", "#ccc", "#bbb", "#aaa", "#999", "#888", "#777", "#666", "#555", "#444", "#333", "#565656"]
+        let color = d3.scale.threshold()
+            .domain(sizeArray)
+            .range(colors);
+
+        d3.layout.cloud().size([chartProp.width, chartProp.height])
+            .words(chartData)
+            .rotate(0)
+            .fontSize(function(d) { return d.size; })
+            .on("end", this.drawWord.bind(this))
+            .start();
+
+        return {
+          chart,
+          chartData,
+          color,
+          chartProp
+        }
+    }
+    _paint(obj) {
+      this.clear()
+      if (!obj) return false
+      let translateWidth = this.isCompsiteChart?obj.chartProp.width/3:obj.chartProp.width/2.66
+      let parentG = d3.select(this.$.chartContainer).append("svg")
+          .attr("width", obj.chartProp.width+obj.chartProp.margin.xMargin)
+          .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin+90)
+          .attr("class", "wordcloud")
+
+      let group = parentG
+          .append("g")
+          .attr("transform", "translate(" + translateWidth + "," + obj.chartProp.height/1.75 + ")")
+          .selectAll("text")
+          .data(this.words)
+          .enter()
+      let txt = group
+          .append("text")
+          .style("font-size", function(d) { return d.size + "px"; })
+          .style("fill", function(d, i) { return obj.color(i); })
+          .attr("transform", function(d) {
+              return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+          })
+          .attr("class",function(d){
+            let classes = "txt"
+            this.filterKeys.length && this.filterKeys.indexOf(d.text)!=-1&&(classes+=" selected")
+            return classes
+          }.bind(this))
+          .text(function(d) { return d.text; })
+
+      let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+      this.isCompsiteChart&&txt.on("click",function(e){
+        let elem = this, item = e.text
+        compSourcePopulate({item,elem})
+      })
+      this.isCompsiteChart&&txt.on("dblclick",function(e){
+        let elem = this, txtGroup = e.text, dblClick=true
+        compSourcePopulate({item,elem,dblClick})
+      })
+
+      d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+obj.chartProp.margin.xMargin+"px"})
+    }
+    drawWord(words){
+      this.set("words",words)
+    }
+    // populate chart data
+    getChartData(itemX, itemY){
+        let sourcemap = this.source.map(row=>{
+          return{[row[itemX]]:row[itemY]}
+        })
+        let source  = sourcemap.map(items=>{return {text:Object.keys(items)[0],size:items[Object.keys(items)[0]]}})
+        return source
+    }
+
+    }
+    customElements.define(wordCloud.is, wordCloud)
+  </script>
+  <script src="word-cloud.js"></script>
+</dom-module>

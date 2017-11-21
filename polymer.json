@@ -1,0 +1,16 @@
+{
+  "entrypoint": "index.html",
+  "shell": "polymer-d3-imports.html",
+  "fragments": [
+    "polymer-d3.html"
+  ],
+  "sources": [
+    "src/**/*",
+    "images/**/*",
+    "bower.json",
+    "data.js"
+  ],
+  "includeDependencies": [
+    "bower_components/webcomponentsjs/webcomponents-lite.min.js"
+  ]
+}

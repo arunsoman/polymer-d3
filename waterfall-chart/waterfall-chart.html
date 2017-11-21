@@ -1,0 +1,247 @@
+<link rel="import" href="../display-component/base-chart.html">
+<dom-module id="waterfall-chart">
+  <template>
+    <style>
+      #chartContainer{
+        margin:0 auto;
+        font: 10px sans-serif;
+        position: relative;
+      }
+      .rect {
+            border: solid 1px #ccc;
+            font: 10px sans-serif;
+            shape-rendering: crispEdges;
+        }
+
+        rect.positive {
+            fill: rgb(8, 37, 131);
+        }
+
+        rect.negative {
+            fill: rgb(255, 0, 0);
+        }
+
+        .trend-line {
+            fill: none;
+            stroke: rgb(0, 138, 0);
+            stroke-width: 1.5px;
+            stroke-dasharray: 10, 10;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        paper-icon-button.resetBtn {
+          font-size: x-small;
+          float: right;
+          padding: 4px;
+          margin-top: 5px;
+          width: 27px;
+          color: #9f9e9e;
+          height: 27px;
+        }
+        #chartContainer.selected rect {
+          fill-opacity: .25;
+        }
+        #chartContainer.selected rect.selected {
+          fill-opacity: 1;
+          cursor:pointer;
+        }
+        .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
+    </style>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+    </template>
+    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+      <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
+    </template>
+      <chart-input-group  uuid="[[uuid]]" chart-visible="[[chartVisible]]">
+        <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+      </chart-input-group>
+      <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
+    <div id="chartContainer"></div>
+  </template>
+  <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
+    class waterfallChart extends baseChart{
+      static get is(){
+        return "waterfall-chart"
+      }
+      static get properties(){
+        return{}
+      }
+      redraw() {
+        this.draw(this._paint(this._compute()));
+      }
+      _compute() {
+        //assign axisIndex value
+        let axisIndex = 2
+        //"chartProp" define for chart axis and properties
+        let arg = {axisIndex}
+        let chartProp = this.getChartProperties(arg)
+        if(!chartProp)return false
+
+        //get chart data once pass axis into the "getChartData" method
+        let source = this.getChartData(chartProp.itemX, chartProp.itemY)
+        let chartData = source.data
+        let srcLength = source.dataLength
+        let xDelta = chartProp.width / srcLength
+        chartProp.height = chartProp.height+20
+        chartProp.margin.xAxisMrgn = 35
+
+        // define y scale
+        let yScale = d3.scale.linear()
+        //define x and y
+        let x = d3.scale.ordinal()
+                  .rangeRoundBands([0, chartProp.width], 0.05)
+                  .domain(source.sourcemap),
+            y = d3.scale.linear().range([chartProp.height, 0])
+        //define x and y axis
+        let xAxis = d3.svg.axis()
+                      .scale(x)
+                      .orient("bottom"),
+            yAxis = d3.svg.axis()
+                      .scale(y)
+                      .ticks(4)
+                      .orient("left")
+
+        // Calculate scale of the y-axis for drawing waterfall bars
+        let min = source.min, max = source.max
+        y.domain([min, max]);
+        yScale.domain([min, max]).range([0, chartProp.height]);
+
+        //// Trend line
+        let line = d3.svg.line()
+            .x((d, i)=>(i * xDelta + xDelta * .5 + chartProp.margin.xMargin / 2))
+            .y(d=>(d.value < 0) ? chartProp.height - yScale(d.cumulativeSum - d.value) : chartProp.height - yScale(d.cumulativeSum));
+
+        return {
+          xDelta,
+          yScale,
+          xAxis,
+          yAxis,
+          line,
+          chartData,
+          chartProp
+        }
+      }
+      _paint(obj) {
+        this.clear()
+        if (!obj) return false
+        //Draw Waterfall chart and append the svg canvas to the page
+        let parentG = d3.select(this.$.chartContainer).append("svg")
+            .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+            .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
+            .append("g")
+            .attr("transform", "translate(" + obj.chartProp.margin.xMargin + "," + (obj.chartProp.margin.yMargin-20) + ")");
+
+        // Calculate and add rectangles to the chart
+        let rect = parentG.selectAll("rect")
+            .data(obj.chartData)
+            .enter()
+            .append("rect")
+            .attr("class",function(d){
+              let classes = (d.value < 0) ? "negative" : "positive"
+              this.filterKeys.length && this.filterKeys.indexOf(d.xKey)!=-1&&(classes+=" selected")
+              return classes
+            }.bind(this))
+            .attr("x", (d, i)=>(i * obj.xDelta + obj.chartProp.margin.xAxisMrgn))
+            .attr("y", (d, i)=>(d.value < 0) ? obj.chartProp.height - obj.yScale(d.cumulativeSum - d.value) : obj.chartProp.height - obj.yScale(d.cumulativeSum))
+            .attr("width", d=>obj.xDelta)
+            .attr("height", d=>obj.yScale(Math.abs(d.value)))
+            .attr("data-value", function(d,i) {return d.value})
+            .attr("data-key", function(d,i) {return d.xKey})
+            //.style("fill", d=>obj.color(d.value))
+
+          // Add labels to the rectangles
+          let barLabels = parentG.append("g")
+              .selectAll('text')
+              .data(obj.chartData)
+              .enter()
+              .append("text")
+              .attr("x", (d, i)=>(i * obj.xDelta + obj.xDelta * .5 + obj.chartProp.margin.xMargin / 2))
+              .attr("y", (d, i)=>(d.value < 0) ? obj.chartProp.height - obj.yScale(d.cumulativeSum) + 25 : obj.chartProp.height - obj.yScale(d.cumulativeSum))
+              .attr('dy', -5)
+              .text(d=>d.cumulativeSum.toFixed(2));
+          /// Draw x- and y- axis lines
+          parentG.append("g")
+              .attr("class", "axis")
+              .attr("transform", "translate(" + obj.chartProp.margin.xAxisMrgn + "," + obj.chartProp.height + ")")
+              .call(obj.xAxis);
+
+          parentG.append("g")
+              .attr("class", "axis")
+              .call(obj.yAxis);
+
+          parentG.append("path")
+              .datum(obj.chartData)
+              .attr("class", "trend-line")
+              .attr("d", obj.line);
+
+        // append div for toolTip
+    		let tlpObj={elem:rect,tplY:20}
+    		this.chartToolTip(tlpObj)
+
+        // this.isCompsiteChart&& rect.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+        let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+        this.isCompsiteChart&&rect.on("click",function(e){
+          let elem = this, item = e.xKey
+          compSourcePopulate({item,elem})
+        })
+        this.isCompsiteChart&&rect.on("dblclick",function(e){
+          let elem = this, item = e.xKey, dblClick=true
+          compSourcePopulate({item,elem,dblClick})
+        })
+        d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+      }
+      // populate chart data
+      getChartData(itemX, itemY){
+        let sourceData = this.source.reduce((old,newVal)=>{
+          old[newVal[itemX]]=(old[newVal[itemX]]||0)+(+newVal[itemY])
+          return old
+        },{})
+        let parseDate = d3.time.format('%Y-%m-%d').parse;
+        let source  = Object.keys(sourceData).map(item=>{
+          let dateV = item.indexOf("GMT")!=-1 ?item:parseDate(String(item).split(" ")[0])
+          // let dateChk = parseDate(dateV)
+          let itemSet = dateV?dateV:item
+          return {xKey:itemSet,yKey:sourceData[item]}
+        })
+
+        let max = 0, min = 0, cumSum = 0;
+        let data =[]
+        source.forEach(function (d) {
+            cumSum += d.yKey;
+            cumSum < min && (min = cumSum)
+            cumSum > max && (max = cumSum)
+            data.push({value: d.yKey, cumulativeSum: cumSum,xKey:d.xKey});
+        });
+        let dataLength = source.length
+        let sourcemap = source.map(d=>d.xKey)
+        return {data, dataLength, sourcemap, max, min}
+      }
+    }
+    customElements.define(waterfallChart.is, waterfallChart)
+  </script>
+</dom-module>

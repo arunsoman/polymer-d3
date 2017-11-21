@@ -1,66 +1,59 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <link rel="import" href="polymer-d3-imports-internal.html">
-    <link rel="stylesheet" href="index.css">
+<!DOCTYPE html><html><head>
+    <script src="../webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="../polymer/polymer.html">
+    <link href="polymer-d3.html" rel="import">
+    <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
     <link href="bullet-chart/bullet-chart.html" rel="import">
     <link href="difference-chart/difference-chart.html" rel="import">
     -->
+    <style>
+    body{
+      /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    }
+    .d3-tip{
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-size: small;
+    }
+    </style>
   </head>
   <body>
-    <polymer-d3></polymer-d3>
-    <!-- <polymerd3-table></polymerd3-table> -->
+
+    <!-- <box-plot>
+      <chart-input-group slot="chart-input-group">
+        <chart-input slot="chart-input" axis="x" label="x-axis"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="y-axis"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+      </chart-input-group>
+    </box-plot> -->
+
+
+<!-- <pie-chart></pie-chart>
+<box-plot></box-plot>
+<bullet-chart></bullet-chart>
+<calendar-chart></calendar-chart>
+<area-chart></area-chart> -->
+
+
+
+
+
+    <!-- <script src="data.js"></script> -->
+    <polymer-d3 import-file></polymer-d3>
     <script type="text/javascript">
-      var pd3 = document.querySelector('polymer-d3');
-      // var table = document.querySelector('polymerd3-table');
-      var externals = [{
-        key: 'state',
-        type: 'String',
-        value: 0
-      }, {
-        key: 'l1',
-        type: 'Number',
-        value: 1
-      }, {
-        key: 'l2',
-        type: 'Number',
-        value: 2
-      }, {
-        key: 'l3',
-        type: 'Number',
-        value: 3
-      }, {
-        key: 'l4',
-        type: 'Number',
-        value: 4
-      }, {
-        key: 'l5',
-        type: 'Number',
-        value: 5
-      }, {
-        key: 'l6',
-        type: 'Number',
-        value: 6
-      }]
-      d3.csv("data/bar-data.csv", function(error, csv) {
-        var data = csv.map(function(row) {
-          return [
-            row.state, Number(row.l1), Number(row.l2),
-            Number(row.l3), Number(row.l4), Number(row.l5),
-            Number(row.l6)
-          ];
-        });
-        console.log(data);
-        var config = {
-          source: data,
-          externals: externals,
-          mode: 'create'
+      addEventListener('WebComponentsReady', function() {
+        Polymer.dom(this.root).querySelector('polymer-d3').paragraphId = guid();
+      })
+      function guid() {
+        function s4() {
+          return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
         }
-        pd3.bootstrapCharts(config);
-        // table.source = data;
-        // table.externals = externals;
-      });
+        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+          s4() + '-' + s4() + s4() + s4();
+      }
     </script>
-  </body>
-</html>
+
+
+</body></html>

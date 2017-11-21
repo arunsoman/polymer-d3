@@ -1,0 +1,38 @@
+<link rel="import" href="../bower_components/polymer-redux/polymer-redux.html">
+<script src="../node_modules/redux/dist/redux.js"></script>
+
+<script>
+
+  const initialState = {chartObj:{
+    externals:[],
+    source:[],
+    charts:[
+      {type:"boxPlot",settings:{},inputs:[]},
+      {type:"pieChart",settings:{},inputs:[]}
+    ]
+  }}
+  const store = Redux.createStore(appReducer)
+  ReduxMixin = PolymerRedux(store)
+
+  const appReducer = (state, action)=>{
+      state = state || initialState
+      let chartObj =
+      {
+          charts: chartReducer(state.charts, action)
+      }
+      return {chartObj: chartObj}
+  }
+
+  const chartReducer = (state, action) =>{
+      switch (action.type) {
+          case 'ADD_CHART':
+              return [...state, action.value]
+          case 'UPDATE_CHART':
+              return [...state, action.value]
+          default:
+              return state;
+      }
+  }
+
+
+</script>

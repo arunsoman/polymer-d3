@@ -1,0 +1,742 @@
+<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+
+<dom-module id="base-chart">
+<template >
+  <h3>[[title]] </h3>
+</template>
+<script>
+
+  class baseChart extends Polymer.mixinBehaviors(
+    [PolymerD3.toolTipBehavior],ReduxMixinBehavior(Polymer.Element)
+    ){
+    static get is(){ return 'base-chart'}
+
+    static get properties(){
+      return{
+        redrawChk:{
+          type:Boolean
+        },
+        sufficiantInputs:{
+          type:Boolean,
+          value:false
+        },
+        uuid:{
+          type:String
+        },
+        parentId:{
+          type:String
+        },
+        compUUID:{
+          type:String
+        },
+        isCompsiteChart:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts
+            let compsiteChart = chartPath && chartPath.isCompsiteChart
+            return compsiteChart
+          }
+        },
+        chartVisible:{
+          type:Object,
+          value:{
+            show:false
+          }
+        },
+        axisKeys:{
+          type:String,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
+            let keys = keyChk && Object.keys(chartPath.inputs)
+            return keys
+          }
+        },
+        inputs:{
+          type:Array,
+          observer:'_chartDraw',
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let keyChk = chartPath && chartPath.inputs&&Object.keys(chartPath.inputs).length
+            let inputData = keyChk ? chartPath.inputs:{}
+            return inputData
+          },
+          readOnly:true
+        },
+        // x:{
+        //   type:String
+        // },
+        // y:{
+        //   type:String
+        // },
+        // z:{
+        //   type:String
+        // },
+        settings:{
+          type:Object,
+          observer:'_chartDraw',
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            if(chartPath){
+              return chartPath.settings;
+            }else{
+              let margin = this.isCompsiteChart ? 10 :50;
+              return {
+                title:{uitype:'text',txt:"Title",value:""},
+                margin:{uitype:'visual',txt:'Margin',value:{top: margin, right: margin, bottom: margin, left: margin}},
+                legend:{uitype:'popup',txt:"Legend Settings",values:{nodes:[],position:{x:undefined,y:50}}},
+                xLabel:{uitype:'range',txt:"X Axis label transform (degree)",value:0},
+                yLabel:{uitype:'range',txt:"Y Axis label transform (degree)",value:0},
+                zLabel:{uitype:'range',txt:"Z Axis label transform (degree)",value:0},
+                width:{uitype:'number',txt:"Chart width", value:960},
+                height:{uitype:'number',txt:"Chart Height", value:500},
+                stacked:{uitype:'boolean',value:false,txt:"Stacked Chart"},
+                fitToGrid:{uitype:'boolean',value:true,txt:"Fit To Grid"},
+                group:{uitype:'boolean',value:false, txt:"Group Chart"}
+              }
+            }
+          }
+
+        },
+        externals:{
+          type:Array,
+          statePath(state){
+            return state.data[this.parentId].externals
+          }
+        },
+        refSource:{
+          type:Array,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.uuid
+            let chartPath = state.charts[chartId]
+            let refSource =  chartPath && chartPath.refrenceSrc
+            return refSource?refSource:[]
+          }
+        },
+        source:{
+          type:Array,
+          statePath(state){
+            let refIdIdxChk = this.isCompsiteChart && this.filterIdx>=0 && this.refIds.length
+            let refId = refIdIdxChk&& this.refIds[this.filterIdx]
+            refId = refId?refId:this.isCompsiteChart &&this.refIds&&this.refIds.length&&this.refIds.slice(-1).pop()
+            let source = refId&&state.charts[refId]&&state.charts[refId].refrenceSrc
+            source = source?source:state.data[this.parentId].source
+            return source
+          }
+        },
+        stacked:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            let stacked = objAssignChk&&chartPath.settings.stacked.value
+            return stacked
+          },
+          observer:"changedStackedAndGroup"
+        },
+        group:{
+          type:Boolean,
+          statePath(state){
+            let chartPath = state.charts[this.uuid]
+            let objAssignChk = (chartPath && chartPath.settings)
+            let group = objAssignChk&&chartPath.settings.group.value
+            return group
+          },
+          observer:"changedStackedAndGroup"
+        },
+        compChartUUIDChk:{
+          type:Boolean,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let compChartUUIDChk = chartPath && chartPath.compChartUUIDChk
+            return compChartUUIDChk
+          }
+        },
+        filterIdxGbl:{
+          type:Number,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let filterIdxGbl = chartPath&&chartPath.filterIdxGbl
+            return filterIdxGbl?filterIdxGbl:0
+          }
+        },
+        refIds:{
+          type:Array,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let refIds =  chartPath && chartPath.refIds
+            return refIds?refIds:[]
+          }
+        },
+        filterIdx:{
+          type:Number,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterIdx = chartIdChk && chartIdChk.filterIdx
+            return filterIdx>=0?filterIdx:-1
+          }
+        },
+        compfilterChk:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let compfilterChk = chartIdChk && chartIdChk.compfilterChk
+            return compfilterChk
+          },
+          observer:"filterCheckSelected"
+        },
+        compfilterGblChk:{
+          type:Boolean,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.compUUID!=""
+            chartId = chartId?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let compfilterGblChk = chartPath && chartPath.compfilterGblChk
+            return compfilterGblChk
+          },
+          observer:"filterSrcLoad"
+        },
+        filterKeys:{
+          type:Array,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterKeys = chartIdChk && chartIdChk.filterKeys
+            return filterKeys?filterKeys:[]
+          }
+        },
+        chartTimer:{
+          type:Number
+        },
+        srcLoadTimer:{
+          type:Number
+        },
+        filterCheckTimer:{
+          type:Number
+        },
+        dblClick:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let dblClick = chartIdChk && chartIdChk.dblClick
+            return dblClick?dblClick:false
+          }
+        },
+        filterReload:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let filterReload = chartIdChk && chartIdChk.filterReload
+            return filterReload?filterReload:false
+          }
+        },
+        lastFilterActivated:{
+          type:Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let lastFilterActivated = chartIdChk && chartIdChk.lastFilterActivated
+            return lastFilterActivated?lastFilterActivated:false
+          }
+        },
+        itemXYZ:{
+          type:Object,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let itemXYZ = chartIdChk && chartIdChk.itemXYZ
+            return itemXYZ?itemXYZ:{}
+          }
+        },
+        layoutData:{
+          type:Array,
+          statePath(state){
+            let chartId = this.isCompsiteChart && this.compUUID?this.compUUID:this.uuid
+            let chartPath = state.charts[chartId]
+            let layoutData = chartPath && chartPath.layoutData
+            return layoutData?layoutData:[]
+          }
+        },
+        // deleteTrigger:{
+        //   type:Boolean,
+        //   statePath(state){
+        //     let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+        //     let deleteTrigger = chartIdChk && chartIdChk.deleteTrigger
+        //     return deleteTrigger
+        //   },
+        //   observer:"chartRemove"
+        // },
+        chartReDraw:{
+          type: Boolean,
+          statePath(state){
+            let chartIdChk = this.isCompsiteChart && state.charts[this.uuid]
+            let chartReDraw = chartIdChk && chartIdChk.chartReDraw
+            return chartReDraw
+          },
+          observer:"compChartReDraw"
+        },
+        deleteTimer:{
+          type:Number
+        }
+      }
+    }
+    constructor(){
+      super();//baseChart
+    }
+    static get actions() {
+      return {
+        updateChart(chartProperies) {
+          return {
+            type: 'UPDATE_CHART',
+            value: chartProperies
+          };
+        },
+        addRefrenceSrc(addRefrenceSrc) {
+          return {
+            type: 'ADD_COMP_REFRENCE_SRC',
+            value: addRefrenceSrc
+          }
+        },
+        filterIdxGbl(filterIdxGbl) {
+          return {
+            type: 'ADD_FILTER_IDX_GBL',
+            value: filterIdxGbl
+          }
+        },
+        addRefrenceIds(refIds) {
+          return {
+            type: 'ADD_REFRENCE_IDS_GBL',
+            value: refIds
+          }
+        },
+        addfilterIdx(filterIdx) {
+          return {
+            type: 'ADD_FILTER_IDX',
+            value: filterIdx
+          }
+        },
+        compfilterGblChk(compfilterGblChk) {
+          return {
+            type: 'COMP_FILTER_GBL_CHK',
+            value: compfilterGblChk
+          }
+        },
+        compfilterChk(compfilterChk) {
+          return {
+            type: 'COMP_FILTER_CHK',
+            value: compfilterChk
+          }
+        },
+        compFilterKeys(filterKeys) {
+          return {
+            type: 'COMP_FILTER_KEYS',
+            value: filterKeys
+          }
+        },
+        compDblClick(dblClick) {
+          return {
+            type: 'COMP_FILTER_DBL_CLICK',
+            value: dblClick
+          }
+        },compFilterReload(filterReload) {
+          return {
+            type: 'COMP_FILTER_RELOAD',
+            value: filterReload
+          }
+        },compLastFilterActivated(lastFilterActivated) {
+          return {
+            type: 'COMP_FILTER_LAST_ACTIVATED',
+            value: lastFilterActivated
+          }
+        },compAxisXYZ(itemXYZ) {
+          return {
+            type: 'COMP_AXIS_XYZ',
+            value: itemXYZ
+          }
+        },exportFilterData(exportFilterData) {
+          return {
+            type: 'EXPORT_FILTER_DATA',
+            value: exportFilterData
+          }
+        },
+        isCompsiteChart(isCompsiteChart) {
+          return {
+            type: 'IS_COMPOSITE_CHART',
+            value: isCompsiteChart
+          };
+        },
+        currentChartDeleted(currentChartDeleted) {
+          return {
+            type: 'CURRENT_CHART_DELETED',
+            value: currentChartDeleted
+          }
+        },
+        updateLayoutItem(layoutData){
+          return {
+            type: 'UPDATE_LAYOUT_ITEM',
+            value: layoutData
+          };
+        },
+        compChartReload(compChartReload) {
+          return {
+            type: 'COMP_CHART_RE_LOAD',
+            value: compChartReload
+          }
+        }
+      }
+    }
+    connectedCallback(){
+      super.connectedCallback();
+      this.initializeChart();
+      let updateChartData = {id:this.uuid,settings:this.settings,inputs:this.inputs}
+      this.dispatch("updateChart",updateChartData);
+      this.updateCommonChartProp()
+    }
+    updateCommonChartProp(){
+      if(this.uuid&&this.uuid.indexOf("@_")==-1){
+        this.dispatch("isCompsiteChart", {uuid:this.uuid,isCompsiteChart:false})
+      }
+    }
+    changedStackedAndGroup(){
+      if(!this.isCompsiteChart){this._chartDraw()}
+    }
+    compChartReDraw(){
+      if(this.isCompsiteChart){this._chartDraw()}
+    }
+    filterCheckSelected(){
+      clearTimeout(this.filterCheckTimer)
+      this.filterCheckTimer = setTimeout(()=>{!this.compfilterChk&&this.$.chartContainer&&this.$.chartContainer.setAttribute("class","")})
+    }
+    filterSrcLoad(){
+      if(this.isCompsiteChart){
+        // return this.refIds.length>0
+        // debugger
+        clearTimeout(this.srcLoadTimer)
+        this.srcLoadTimer = setTimeout(()=>{
+          (this.refIds.length && this.refIds.indexOf(this.id)==-1 || this.filterReload || this.dblClick)&& this._chartDraw()
+        })
+      }
+    }
+    _chartDraw(){
+      clearTimeout(this.chartTimer)
+      this.chartTimer = setTimeout(()=>{
+        if(this.inputs && Object.keys(this.inputs).length!=0){
+          //chart axis dre set here, the axis key's defined in "chart-input" module
+          this.axisKeys.forEach(axis=>{this.set(axis,axis)})
+          this.redraw()
+        }
+      })
+    }
+
+    draw(paint){
+      //this.debounce(arg,interval)
+        this.debouncer(paint,2000)
+    }
+    debouncer(arg,interval){
+        return Polymer.Debouncer.debounce(this.debouncer,
+          Polymer.Async.timeOut.after(interval), ()=>arg);
+    }
+
+    initializeChart(){
+
+      if(this.uuid&&this.isCompsiteChart){
+      }else{
+        this.set("uuid",this.parentId+'@'+this.tagName)
+        this.set('chartVisible.show',false);
+        this.set('chartVisible.icon',this.icon);
+      }
+    }
+    // add keys and colors to chartstore as keys
+    chartKeys(data,key){
+      let color = d3.scale.category20c();
+      let legendNodes = this.settings.legend.values.nodes;
+      // if(legendNodes.length < 1){
+        // check whether key is present else show y axis values as label
+        if(key==undefined){
+          let axisLabel = this.inputs[this.y].selectedObjs[0].key;
+          legendNodes = [{key:axisLabel,color:color(axisLabel)}];
+        }else{
+          legendNodes = data.map(items=>{return {key:items[key],color:color(items[key])}});
+        }
+      // }
+      this.dispatch({type:'UPDATE_CHART_LEGENDS',value:{id:this.uuid,nodes:legendNodes}});
+    }
+    // to fill color for svg and legends
+    colorFill(item,i){
+      return item.chartProp.label.nodes[i] ? item.chartProp.label.nodes[i].color : this.color(i);
+    }
+    clear(){
+      d3.select(this.$.chartContainer).html("");
+    }
+    // check input contains 2 or more axis.
+    // if axis value is less than 2 or empty
+    // do not need to compute chart values.
+    hasInputs(index){
+      let inputCheck = Object.keys(this.inputs).length >= index
+      inputCheck && this.clear()
+      return inputCheck;
+    }
+    addToolTip(obj){
+      this.attachToolTip(obj.container,obj.segments,obj.selector,d=>{
+        return `<span><strong>${d.item||d.data.item}</strong><br/>${d.value||d.data.value}<span>`;
+      })
+    }
+
+    addLegend(obj){
+      this.set('color',d3.scale.category20c());
+      obj.container.selectAll(obj.selector)
+        .style("fill", (d,i)=>{
+          return this.colorFill(obj.obj,i);
+        })
+        .attr("data-legend",(d,i)=>(d[obj.key] || (d.data && d.data[obj.key]))|| (obj.obj.keys && obj.obj.keys[i]) ||this.inputs[this.y].selectedObjs[0].key)
+        .attr("data-legend-color",(d,i)=>{return this.colorFill(obj.obj,i);})
+      obj.container.append("g")
+          .attr("class","legend")
+          .attr("transform","translate("+(obj.obj.chartProp.label.position.x || ((obj.obj.chartProp.width+obj.obj.chartProp.margin.left)*0.8))+","+(obj.obj.chartProp.label.position.y || obj.obj.chartProp.margin.top)+")")
+          .call(d3.legend);
+
+      // add tooltip if segments are provided
+      // if(obj.segments){
+      //   this.addToolTip(obj);
+      // }
+
+    }
+    getChartProperties(obj){
+
+      //assign stacked and group value
+      let stacked = this.stacked,
+          group = this.group
+      //"inputCheck" for avoid error from chart
+      let axisIndex = stacked||group?3:obj.axisIndex;
+      this.set('chartVisible.show',false);
+      if(!this.hasInputs(axisIndex))return false
+      this.set('chartVisible.show',true);
+      let body = document.getElementsByTagName("body")
+      if(this.isCompsiteChart&&(+this.settings.width.value/body[0].offsetWidth)*100<=16.66666667){
+        let span = document.createElement("span")
+        span.textContent="Need more width for visible a chart"
+        span.id="warningMsg"
+        span.setAttribute("class","warningMsg chartMsg")
+        !this.nextSibling && this.parentNode.appendChild(span)
+        return false
+      }else{
+        this.nextSibling && this.nextSibling.remove()
+      }
+
+      let contCls = this.$.chartContainer.getAttribute("class")
+      contCls = contCls != null ?contCls:" selected"
+      this.compfilterChk&&this.$.chartContainer.setAttribute("class",contCls)
+
+      let axisYKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("y")==-1
+      let axisXKeyRemoveChk = this.axisKeys.length&&this.axisKeys.indexOf("x")==-1
+      if(axisYKeyRemoveChk||axisXKeyRemoveChk)return false
+
+      //axis are mentioned in the chart-input module
+      let itemX,itemY,itemZ
+      //axis inputs selectedValue assigin
+      itemX = this.inputs[this.x].selectedValue[0]
+      itemY = this.inputs[this.y].selectedValue[0]
+      this.inputs[this.z]&&(itemZ = this.inputs[this.z].selectedValue[0])
+      group || stacked && itemZ
+      let parseDate = d3.time.format('%Y-%m-%d').parse;
+      let settings = this.settings
+      let width = +settings.width.value,
+          height = +settings.height.value,
+          top= +settings.margin.value.top,
+          right = +settings.margin.value.right,
+          bottom = +settings.margin.value.bottom,
+          left = +settings.margin.value.left,
+          margin = {top, right, bottom, left},
+          label= settings.legend.values;
+
+      margin.xMargin = margin.left + margin.right
+      margin.yMargin = margin.top + margin.bottom
+
+      let axis ={itemX,itemY,itemZ}
+      let color = d3.scale.category20();
+      let xLabel = settings.xLabel.value;
+      let yLabel = settings.yLabel.value;
+      let zLabel = settings.zLabel.value;
+      return{itemX,itemY,itemZ,parseDate,width,height,margin,label,color,stacked,group,settings,axis,xLabel,yLabel,zLabel}
+    }
+    calculateMargin(dimension,margin){
+      return dimension + margin;
+
+    }
+    compSourcePopulate(itemXYZ,eArg){
+      // debugger
+      eArg.dblClick&&this.chartDoubleClick()
+      let axis = eArg.zAxis?itemXYZ.itemZ:itemXYZ.itemX
+      axis = eArg.xVlaue?itemXYZ.itemX:axis
+      let propData = {}
+      let elemClass =eArg.elem.getAttribute("class")
+      elemClass = elemClass!=null?elemClass:""
+      let refIds = this.refIds, compfilterKeys = this.filterKeys
+      let filterIdx = this.filterIdx
+      !eArg.dblClick&&this.dblClick&&this.dispatch("compDblClick", {uuid:this.uuid,dblClick:false})
+      if(compfilterKeys.indexOf(eArg.item)==-1) {
+        compfilterKeys.push(eArg.item)
+        elemClass.indexOf("selected") ==-1&&(elemClass = elemClass+" selected")
+      }else {
+        let findIndex = compfilterKeys.findIndex(e=>e==eArg.item)
+        compfilterKeys.splice(findIndex,1)
+        elemClass = elemClass.replace(" selected","")
+      }
+
+      let contSlctdCls = compfilterKeys.length?"selected":""
+      this.$.chartContainer.setAttribute("class",contSlctdCls)
+
+      propData.filterKeys=compfilterKeys
+      eArg.elem.setAttribute("class",elemClass)
+
+      let filterKeys = compfilterKeys.filter((item, pos)=>compfilterKeys.indexOf(item) == pos)
+      let filterSrc = []
+      filterKeys.length?filterKeys.map(filterKey=>filterSrc = filterSrc.concat(this.source.filter(items => items[axis] == filterKey)))
+        : (filterSrc = filterSrc.concat(this.source))
+      propData.filterSrc = filterSrc
+      let compfilterGblChk = !this.compfilterGblChk
+      propData.compfilterGblChk = compfilterGblChk
+      let filterIdxGbl = this.filterIdxGbl
+      refIds.indexOf(this.compUUID)==-1 && refIds.push(this.compUUID)
+      if(refIds.indexOf(this.uuid)==-1){
+        refIds.push(this.uuid)
+        filterIdxGbl = filterIdxGbl+1
+        filterIdx = filterIdx+filterIdxGbl
+        this.set("compfilterChk",true)
+      }
+      this.set("dblClick",false)
+      let compfilterChk = filterKeys.length?true:false
+      propData.compfilterChk = compfilterChk
+      propData.refIds = refIds
+      propData.filterIdx = filterIdx
+      propData.filterIdxGbl = filterIdxGbl
+      propData.itemXYZ = itemXYZ
+      filterKeys.length?this.reduxUpdateSrc(propData):this.chartReset()
+
+      // let body = document.getElementsByTagName("body")
+      // let d3Tip = body[0].querySelectorAll(".d3-tip")
+      // d3Tip.length && d3Tip.forEach(item=>item.remove())
+    }
+    reduxUpdateSrc(propData){
+      this.dispatch("addfilterIdx", {uuid:this.uuid,filterIdx:propData.filterIdx})
+      this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:propData.filterSrc})
+      this.dispatch("compfilterChk", {uuid:this.uuid,compfilterChk:propData.compfilterChk})
+      this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:propData.filterKeys})
+      this.dispatch("compFilterReload", {uuid:this.uuid,filterReload:false})
+      this.dispatch("compLastFilterActivated", {uuid:this.uuid,lastFilterActivated:propData.filterKeys.length})
+      this.dispatch("compAxisXYZ", {uuid:this.uuid,itemXYZ:propData.itemXYZ})
+
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:propData.compfilterGblChk})
+      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:propData.refIds})
+      this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:propData.filterIdxGbl})
+      let concatRefIds = []
+      concatRefIds = concatRefIds.concat(propData.refIds)
+      if(concatRefIds.length){
+        concatRefIds.shift()
+        concatRefIds.forEach(itemId=>itemId!=this.uuid && this.dispatch("compLastFilterActivated", {uuid:itemId,lastFilterActivated:false}))
+      }
+      let refIds = []
+      refIds = refIds.concat(propData.refIds)
+      if(refIds.length>=3){
+        let spliceIds = refIds.splice(propData.filterIdx+1)
+        spliceIds.shift()
+        spliceIds.length&&spliceIds.forEach(itemId=>this.dispatch("compFilterReload", {uuid:itemId,filterReload:true}))
+      }
+    }
+    chartReset(){
+      let refIds = this.refIds
+      let filterIdx = this.filterIdx
+      let spliceIds = refIds.splice(filterIdx+1)
+      let filterIdxGbl = refIds.length==0?0:refIds.length==2?1:filterIdx
+      let concatRefIds = []
+      concatRefIds = concatRefIds.concat(refIds)
+      let lastFltrActvdId = concatRefIds.length>1&&concatRefIds.pop()
+
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:!this.compfilterGblChk})
+      this.dispatch("addRefrenceIds", {uuid:this.compUUID,refIds:refIds})
+      this.dispatch("filterIdxGbl", {uuid:this.compUUID,filterIdxGbl:filterIdxGbl})
+      lastFltrActvdId&&this.dispatch("compLastFilterActivated", {uuid:lastFltrActvdId,lastFilterActivated:true})
+      spliceIds.forEach(itemId=>{
+        this.dispatch("addfilterIdx", {uuid:itemId,filterIdx:-1})
+        this.dispatch("compfilterChk", {uuid:itemId,compfilterChk:false})
+        this.dispatch("addRefrenceSrc", {uuid:itemId,refrenceSrc:[]})
+        this.dispatch("compFilterKeys", {uuid:itemId,filterKeys:[]})
+        this.dispatch("compLastFilterActivated", {uuid:itemId,lastFilterActivated:false})
+        this.dispatch("compAxisXYZ", {uuid:itemId,itemXYZ:{}})
+      })
+
+    }
+    chartDoubleClick(){
+      this.dispatch("addRefrenceSrc", {uuid:this.uuid,refrenceSrc:[]})
+      this.dispatch("compFilterKeys", {uuid:this.uuid,filterKeys:[]})
+      this.dispatch("compDblClick", {uuid:this.uuid,dblClick:true})
+      this.dispatch("compfilterGblChk", {uuid:this.compUUID,compfilterGblChk:!this.compfilterGblChk})
+    }
+    exportFilterData(){
+      let exportFilterData,
+          itemXYZ = this.itemXYZ,
+          itemX = itemXYZ.itemX,
+          itemY = itemXYZ.itemY,
+          itemZ = itemXYZ.itemZ,
+          extKeyX = this.getExternalsKey(itemX),
+          extKeyY = this.getExternalsKey(itemY),
+          extKeyZ = itemZ!=undefined&&itemZ!=-1&&this.getExternalsKey(itemZ)
+
+      exportFilterData  = this.refSource.map(items=>{
+        let item = {[extKeyX]:items[itemX],[extKeyY]:items[itemY]}
+        item = itemZ!=undefined&&itemZ!=-1?Object.assign(item,{[extKeyZ]:items[itemZ]}):item
+        return item
+      })
+      this.dispatch("exportFilterData", {id:this.parentId,exportFilterData:exportFilterData})
+    }
+    getExternalsKey(axis){
+      return this.externals.filter(ext=>ext.value==axis)[0].key
+    }
+    chartToolTip(tlpObj){
+      let element= tlpObj.elem
+      // let xKey = tlpObj.xKey
+      // let yKey = tlpObj.yKey
+      // let grpStack = tlpObj.grpStack
+      let div = d3.select(this.$.chartContainer).append("div").attr("class", "toolTip");
+      // let offsetXY = this.isCompsiteChart?10:50
+      let offsetX = this.isCompsiteChart?0:-20
+      let offsetY = tlpObj.tplY?tlpObj.tplY:10
+      offsetY = this.isCompsiteChart?tlpObj.tplY+5:tlpObj.tplY
+      // debugger
+      element.on("mousemove", function(d,i){
+        // debugger
+            // let gsKey,gsValue
+            // if(grpStack){
+              let dX = this.dataset.key
+              let dY = this.dataset.value
+              offsetY = this.dataset.index?tlpObj.tplY*+this.dataset.index:offsetY
+            // }
+            // let areaY = yKey=="y"&&d[yKey]==0?d[yKey+0]:d[yKey]
+            // let yValue = areaY?areaY:d[yKey]
+            // let dX = xKey=="data"?d[xKey].item:d[xKey]
+            // let dY = yKey=="data"?d[yKey].value:yValue
+            // dX = grpStack?gsKey:dX
+            // dY = grpStack?gsValue:dY
+            // debugger
+            div.style("left", (d3.event.offsetX-offsetX)+"px");
+            div.style("top", (d3.event.offsetY+offsetY)+"px");
+            div.style("display", "inline-block");
+
+            // debugger
+            // let tTxt = tlpObj.grpStack?d:(dX)+"<br>"+(dY)
+            let tTxt = (dX)+"<br>"+(dY)
+            tTxt = tlpObj.tlpLabels?tlpObj.tlpLabels[i]+", "+dY:tTxt
+            div.html(tTxt);
+        });
+      element.on("mouseout", function(d){
+            div.style("display", "none");
+        });
+    }
+  }
+  customElements.define(baseChart.is,baseChart)
+
+</script>
+</dom-module>

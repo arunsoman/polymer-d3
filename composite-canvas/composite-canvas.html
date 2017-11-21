@@ -1,23 +1,42 @@
-<link rel="import" href="helpers/crossfilter-frontend/crossfilter-frontend.html">
-<link rel="import" href="helpers/crossfilter-backend/crossfilter-backend.html">
-
-<link rel="stylesheet" type="text/css" href="composite-canvas-global.css">
+<link rel="import" href="../display-component/base-chart.html">
+<link href="layout-area-main.html" rel='import'>
 <dom-module id="composite-canvas">
   <template>
     <style>
-      :host {
-        display: block;
-      }
     </style>
-
-    <crossfilter-frontend id="cf-fe"></crossfilter-frontend>
-    <crossfilter-backend crossfilter-external="[[crossfilterExternal]]" id="cf-be"></crossfilter-backend>
-    <!-- <zeppelin-cacher crossfilter-api="/url" threshold="1000"></zeppelin-cacher> -->
-    <h2>Composite Canvas</h2>
-    <paper-button on-tap="remTwoRows">Reset All</paper-button>
-    <box-plot externals="{{externals}}"></box-plot>
-    <bar-chart externals="{{externals}}"></bar-chart>
-    <radar-chart externals="{{externals}}"></radar-chart>
+    <layout-area-main uuid="[[uuid]]" parent-id="[[parentId]]"></layout-area-main>
   </template>
-  <script src="composite-canvas.js"></script>
+  <script>
+    /**
+    * @polymer
+    * @extends HTMLElement
+    */
+    class compositeCanvas extends baseChart{
+      static get is(){
+        return "composite-canvas"
+      }
+      static get properties(){
+        return{
+          isCompsiteChart:{
+            type:Boolean,
+            statePath(state){
+              let chartPath = state.charts
+              let isCompsiteChart = chartPath && chartPath.isCompsiteChart
+              return isCompsiteChart
+            }
+          }
+        }
+      }
+      static get actions() {
+        return {
+
+        }
+      }
+      connectedCallback(){
+        super.connectedCallback()
+        this.dispatch("isCompsiteChart", {uuid:this.uuid,isCompsiteChart:true})
+      }
+    }
+    customElements.define(compositeCanvas.is,compositeCanvas)
+  </script>
 </dom-module>

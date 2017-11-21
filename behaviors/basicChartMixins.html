@@ -1,0 +1,100 @@
+<link rel="import" href="../../polymer/polymer-element.html">
+<script>
+
+const basicChartMixin = function(superClass){
+  return class extends superClass{
+    static get properties(){
+      return {
+        title: {
+          type: String
+        },
+        inputs: {
+          notify: true,
+          type: Array,
+          value: () => {
+            return [];
+          }
+        },
+        settings: {
+          notify: true,
+          type: Object,
+          value: () => {
+            return [];
+          }
+        },
+        chartType: {
+          type: Object,
+          value: () => {
+            return [];
+          }
+        },
+        hideSettings: {
+          type: Boolean,
+          value: true
+        },
+        source: {
+          type: Array,
+          value: []
+        },
+        external: {
+          type: Array,
+          value: []
+        },
+        chart: {
+          type: Object,
+          value: {}
+        },
+        dataMutated: {
+          type: Boolean,
+          value: false
+        },
+        isStacked: {
+          type: Boolean,
+          value: true
+        },
+        configurator: {
+          type: Object,
+          value: function() {
+            return {};
+          }
+        }
+      }
+    }
+    constructor(){
+      super()
+    }
+    chartInput(elem){
+      return{
+        input: elem.input||"",
+        txt: elem.txt||"",
+        selectedValue: elem.selectedValue||[],
+        scaleType: elem.scaleType||"",
+        format: elem.format||"",
+        selectedObjs: elem.selectedObjs||[],
+        uitype: elem.uitype||'single-value',
+        displayName: elem.displayName || 'coloumn',
+        maxSelectableValues: elem.maxSelectableValues||-1
+      }
+    }
+    basicSettings(settings){
+      return settings
+    }
+    basicChartType(chartType){
+      return chartType
+    }
+    basicSource(source){
+      return source
+    }
+    basicSource(external){
+      return external
+    }
+    basicChart(chart){
+      return chart
+    }
+    basicConfigurator(configurator){
+      return configurator
+    }
+
+  }
+}
+</script>

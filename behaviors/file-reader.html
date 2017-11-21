@@ -1,0 +1,200 @@
+<link href="redux-mixins-behavior.html" rel='import'>
+<dom-module id="file-reader">
+    <template>
+        <style>
+         :host {
+            display: block;
+            background: #27b7da;
+            cursor: pointer;
+            color: #fff;
+            /*padding: 2em 0.5em;*/
+            /*border-radius: .5em;*/
+            /*position: relative;*/
+        }
+
+        [hidden] {
+            display: none;
+        }
+        </style>
+        <paper-icon-button icon="icons:file-upload" class="clickHere" title="Import csv file"></paper-icon-button>
+        <!-- <div class="clickHere" style="padding:1em;">Import csv file</div> -->
+        <input id="fileInput" on-change="_onChange" type="file" accept="{{accept}}" multiple="[[multiple]]" hidden />
+    </template>
+    <script>
+    class fileReaderElem extends ReduxMixinBehavior(Polymer.Element) {
+        static get is() { return 'file-reader' }
+        static get properties() {
+            return {
+                accept: {
+                    type: String,
+                    value: null,
+                },
+                readAs: {
+                    type: String,
+                    value: "text"
+                },
+                multiple: {
+                    type: Boolean,
+                    value: false
+                },
+                outputData: {
+                    observer: 'addtoStore'
+                },
+                activateTabs:{
+                    notify:true
+                }
+            }
+        }
+        static get actions() {
+            return {
+                updateExternal(externals) {
+                    return {
+                        type: 'UPDATE_EXTERNALS',
+                        value: externals
+                    };
+                },
+                updateSource(source) {
+                    return {
+                        type: 'UPDATE_SOURCE',
+                        value: source
+                    };
+                }
+            }
+        }
+        addtoStore(e) {
+            let data = this.transformData(e);
+            this.dispatch('updateSource', {id:this.paragraphId,source:data.source});
+            this.dispatch('updateExternal', {id:this.paragraphId,externals:data.externals});
+            this.activateTabs = true;
+        }
+        transformData(e) {
+            var me = this;
+            let sourceObj = {
+                source: [],
+                externals: []
+            }
+            // debugger;
+            /*
+            replace comma to hex value to avoid split using ','
+            */
+            var data = e.replace(/(".*)(,)(.*?")/g,'$1ˏ$3');
+            var headerObj = [];
+            var lines = data.split('\n');
+            var result = [];
+            var headers = lines[0].split(',');
+            var firstRow = lines[1].split(',');
+
+            headers.forEach(function(el, key) {
+                var type = me.getDataType(firstRow[key]);
+                headerObj.push({
+                    key: headers[key],
+                    value: key,
+                    type: type
+                });
+            });
+
+            // me.set('externals', headerObj);
+
+            // this.dispatch({type:'SET_EXTERNAL',payload:{id:this.paragraphId,externals:headerObj}});
+
+            // lines.length - 1 is used because, last row is always just a '\n' with no data
+            for (var i = 1; i < lines.length - 1; i++) {
+                var obj = [];
+                var currentline = lines[i].split(',');
+                for (var j = 0; j < headers.length; j++) {
+                    var converted = me.convertData(currentline[j], headerObj[j].type);
+                    obj.push(converted);
+                }
+
+                result.push(obj);
+            }
+            sourceObj.externals = headerObj;
+            sourceObj.source = result;
+            return sourceObj;
+            // this.set('source',sourceObj);
+        }
+        convertData(data, type) {
+            var result;
+            switch (type) {
+                case 'Number':
+                    result = parseFloat(data);
+                    break;
+                case 'Date':
+                    result = new Date(data);
+                    break;
+                default:
+                    result = data;
+            }
+            return result;
+        }
+        getDataType(data) {
+            var result = '';
+            if (data.match(/^\d*\.?\d*$/g)) {
+                result = 'Number';
+            } else if (Date.parse(data)) {
+                result = 'Date';
+            } else {
+                result = 'String';
+            }
+            return result;
+        }
+        constructor() {
+            super();
+        }
+        connectedCallback() {
+            this.addEventListener('click', e => this._onTap(e));
+        }
+        _onTap(evt) {
+            // console.log("[file-reader] _onTap", evt.target.localName);
+            // console.dir(evt)
+            // if it's the event on the light dom, I launch another on the file-reader
+            // (if I didn't tested it, it would loop...)
+            // if (evt.target.localName != "file-reader" && evt.target.id != "fileInput") {
+            // Inspired by https://github.com/winhowes/file-upload/
+            var elem = this.$.fileInput;
+            if (elem && document.createEvent) { // sanity check
+                var evt = document.createEvent('MouseEvents');
+                evt.initEvent('click', true, false);
+                // console.log("[file-reader] _onTap - dispatch");
+                elem.dispatchEvent(evt);
+            }
+            // }
+        }
+        _onChange(evt) {
+            if (!this.$.fileInput.files) {
+                return;
+            }
+            // console.debug("[file-reader] _onChange", this.$.fileInput.files);
+
+            var file, i, n = this.$.fileInput.files.length;
+            for (i = 0; i < n; i++) {
+                file = this.$.fileInput.files[i];
+                // console.debug("[file-reader] _onChange",file);
+                var reader = new FileReader();
+                var context = this;
+                reader.onload = function(event) {
+                    // The file's text will be printed here
+                    // console.debug("[file-reader] _onChange", event.target.result);
+                    context.set('outputData', event.target.result)
+                    // context.fire('file-read', event.target.result);
+                };
+                switch (this.readAs) {
+                    case "binary":
+                        reader.readAsBinaryString(file);
+                        break;
+                    case "ArrayBuffer":
+                        reader.readAsArrayBuffer(file);
+                        break;
+                    case "dataURL":
+                        reader.readAsDataURL(file);
+                        break;
+                    case "text":
+                    default:
+                        reader.readAsText(file);
+                };
+            }
+        }
+    }
+    window.customElements.define(fileReaderElem.is, fileReaderElem);
+    </script>
+</dom-module>

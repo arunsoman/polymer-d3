@@ -1,0 +1,22 @@
+<dom-module id="poly-chart">
+    <script>
+        class polyChart extends Polymer.Element {
+            constructor() {super();}
+            static get is() {return'poly-chart';}
+
+            static get properties() {
+                return {
+                    dtime: 500,
+                    hideSettings: true,
+                    source: Array,
+                    external: Array,
+                    chart: Object,
+                    dataMutated: false,                };
+            }
+            draw(compute, paint) {
+                this.debounce('charting-debounce',
+                    [compute, paint], this.dtime);
+            }
+        }
+    </script>
+</dom-module>

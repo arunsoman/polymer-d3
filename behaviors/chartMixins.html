@@ -1,0 +1,55 @@
+<script>
+/**
+* @polymer
+* @extends HTMLElement
+*/
+const chartMixin = function(superClass){
+  return class extends superClass{
+    static get properties(){
+      return {
+        inputs: {
+          type: Array,
+          value: () => {
+            return [];
+          }
+        },
+        settings: {
+          type: Object,
+          value: () => {
+            return {
+              width:"",
+              height:"",
+              legend:{
+                position:"",
+                color:""
+              },
+              transform:[]
+            };
+          }
+        },
+        chartType: {
+          type: String
+        }
+      }
+    }
+    constructor(){
+      super()
+    }
+    chartInput(elem){
+      this.push("inputs",{
+        axis: elem.axis||"",
+        label: elem.label||"",
+        selectedObjs: elem.selectedObjs||[],
+        max: elem.max||-1
+      })
+    }
+    getProperties(chartType){
+      return{
+        inputs:this.inputs,
+        settings:this.settings,
+        chartType:chartType
+      }
+    }
+  }
+}
+</script>

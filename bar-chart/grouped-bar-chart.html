@@ -1,0 +1,234 @@
+<dom-module id="grouped-bar-chart">
+    <template>
+        <style>
+        #chartContainer {
+            margin: 0 auto;
+            font: 10px sans-serif;
+        }
+
+        .legend-items text {
+            fill: black
+        }
+
+        .legend-items circle {
+            cursor: pointer;
+        }
+
+        .legend {
+            fill: transparent;
+            font-size: 12px;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000;
+            shape-rendering: crispEdges;
+        }
+        paper-icon-button.resetBtn {
+          font-size: x-small;
+          float: right;
+          padding: 4px;
+          margin-top: 5px;
+          width: 27px;
+          color: #9f9e9e;
+          height: 27px;
+        }
+        #chartContainer.selected g {
+          fill-opacity: .25;
+        }
+        #chartContainer.selected g.selected {
+          fill-opacity: 1;
+          cursor:pointer;
+        }
+        .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
+        </style>
+        <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+          <paper-icon-button class="resetBtn"  on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+        </template>
+        <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+          <paper-icon-button raised class="resetBtn"  on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
+        </template>
+          <chart-input-group uuid="[[uuid]]" chart-visible="[[chartVisible]]">
+              <chart-input slot="chart-input" axis="x" label="X axis"></chart-input>
+              <chart-input slot="chart-input" axis="y" label="Y axis" accept="number,date"></chart-input>
+              <chart-input slot="chart-input" axis="z" label="Group by"></chart-input>
+          </chart-input-group>
+          <!-- <chart-settings uuid="[[uuid]]"></chart-settings> -->
+        <div id="chartContainer"></div>
+    </template>
+    <script>
+    /**
+* @polymer
+* @extends HTMLElement
+*/
+    class groupedbarChart extends barChart {
+        static get is() {
+            return 'grouped-bar-chart'
+        }
+        static get properties() {
+            return {}
+        }
+        redraw() {
+            this.draw(this._paint(this._compute()));
+        }
+        _compute() {
+          let axisIndex=3
+          let arg = {axisIndex}
+          let chartProp = this.getChartProperties(arg)
+          if(!chartProp)return false
+
+            let samples = 50;
+            let series = 10;
+
+            let chartData = this.transformSource(chartProp.itemX, chartProp.itemY, chartProp.itemZ);
+
+            let axis = {
+                scale: {},
+                position: {}
+            }
+
+            axis.scale.x0 = d3.scale.ordinal().rangeRoundBands([0, chartProp.width], 0.1);
+            axis.scale.x = d3.scale.ordinal().rangeRoundBands(0.05);
+            axis.scale.y = d3.scale.linear().range([chartProp.height, 0]);
+            axis.scale.z = d3.scale.category10();
+            let keys = chartData.map(items => items.key);
+            let xKeys = this.getKeys(chartProp.itemX);
+
+            axis.scale.x0.domain(keys);
+            axis.scale.x.domain(xKeys).rangeRoundBands([0, axis.scale.x0.rangeBand()]);
+            axis.scale.y.domain([0, d3.max(chartData, d => {
+                return d3.max(Object.keys(d.value).map(item => d.value[item]))
+            })]).nice();
+
+            axis.position.x = d3.svg.axis().scale(axis.scale.x0).orient("bottom");
+            axis.position.y = d3.svg.axis().scale(axis.scale.y).orient("left");
+
+            return {
+                axis,
+                chartData,
+                keys,
+                chartProp
+            }
+
+        }
+        _paint(obj) {
+            this.clear();
+            if (!obj) return false;
+
+            let selector = d3.select(this.$.chartContainer)
+                .append("svg")
+                .attr("width", obj.chartProp.width + obj.chartProp.margin.xMargin)
+                .attr("height", obj.chartProp.height + obj.chartProp.margin.yMargin)
+
+            let svg = selector.append("g")
+                .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+
+
+
+                let group =   svg.selectAll("g")
+                .data(obj.chartData)
+                .enter().append("g")
+                .attr("class",function(d){
+                  let classes = "group"
+                  this.filterKeys.length && this.filterKeys.indexOf(d.key)!=-1&&(classes+=" selected")
+                  return classes
+                }.bind(this))
+                .attr("transform", function(d, i) {
+                    return "translate(" + obj.axis.scale.x0(obj.keys[i]) + ",0)";
+                })
+
+                let rect = group.selectAll("rect")
+                .data(d => Object.keys(d.value).map(item => { return { key: item, value: d.value[item] } }))
+                .enter().append("rect")
+                .attr("x", function(d) { return obj.axis.scale.x(d.key); })
+                .attr("y", function(d) { return obj.axis.scale.y(d.value); })
+                .attr("width", obj.axis.scale.x.rangeBand())
+                .attr("height", function(d) { return obj.chartProp.height - obj.axis.scale.y(d.value); })
+                .attr("fill", function(d) { return obj.axis.scale.z(d.value); })
+                .attr("data-value", function(d,i) {return d.value})
+                .attr("data-key", function(d,i) {return d.key});
+
+            svg.append("g")
+                .attr("class", "y axis")
+                .call(obj.axis.position.y)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 10)
+                .attr("dy", ".71em")
+                .style("text-anchor", "start");
+            svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + obj.chartProp.height + ")")
+                .call(obj.axis.position.x)
+                .selectAll("text")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", "-.55em")
+                .attr("transform", "rotate(-90)")
+
+            // this.isCompsiteChart&&group.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+            let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+            this.isCompsiteChart&&rect.on("click",function(e){
+              let elem = this, item = e.key,zAxis=true
+              compSourcePopulate({item,elem,zAxis})
+            })
+            this.isCompsiteChart&&rect.on("dblclick",function(e){
+              let elem = this, item = e.key,zAxis=true,dblClick=true
+              compSourcePopulate({item,elem,zAxis,dblClick})
+            })
+            // append div for toolTip
+            let tlpObj={elem:rect,tplY:60}
+            this.chartToolTip(tlpObj)
+
+            d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+
+            // this.addLegend({
+            //   obj,
+            //   container:svg,
+            //   selector:'.layer',
+            //   node:obj.keys.map(items=>{return {item:items}}),
+            //   key: 'item'
+            // });
+
+        }
+
+        getKeys(itemX) {
+            return Object.keys(this.source.map(items => items[itemX]).reduce((a, b) => { a[b] = true; return a }, {}));
+        }
+
+        // transform data to render chart in grouped format
+        transformSource(itemX, itemY, itemZ) {
+            let keys = this.getKeys(itemZ);
+            return keys.map(key => {
+                return {
+                    key,
+                    value: this.source.filter(items => items[itemZ] == key).reduce((prev,next)=>{
+                           if(prev[next[itemX]]!=0){
+                                prev[next[itemX]]= prev[next[itemX]] + next[itemY];
+                            }else{
+                                prev[next[itemX]]=next[itemY];
+                           }
+                        return prev
+                        },this.source.reduce((prev,next)=>{prev[next[itemX]]=0;return prev},{}))
+                }
+            })
+        }
+    }
+    window.customElements.define(groupedbarChart.is, groupedbarChart);
+    </script>
+</dom-module>

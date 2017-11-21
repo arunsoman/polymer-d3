@@ -1,55 +1,64 @@
-<!-- Contains a list of elements to be imported into polymer-d3 -->
-<!-- To be used when polymer-d3 is used as a bower dependency in other projects -->
-
+<!-- Contains a list of elements to be imported into polymer-d3 while testing-->
+<!-- Don't use with external elements -->
 <!-- External dependencies -->
 <script src='../d3/d3.min.js'></script>
- <!-- Tweaked d3.tip -->
- <script src='d3.tip.js'></script>
 <!-- <script src='../d3-tip/index.js'></script> -->
+<script src='d3.tip.js'></script> -->
 <script src="d3-time.v1.min.js"></script>
 <script src="d3.legend.js"></script>
 <link href="../polymer/polymer.html" rel="import">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../iron-icons/image-icons.html">
+<link rel="import" href="../iron-icons/communication-icons.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-dialog/paper-dialog.html">
+<link rel="import" href="../paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../polymer-color-picker/polymer-color-picker.html">
-<link rel="import" href="../paper-menu/paper-menu.html">
-<link rel="import" href="../polymer-sortablejs/polymer-sortablejs.html">
-<link rel="import" href="../paper-color-pallete/paper-color-pallete.html">
+<link rel="import" href="../paper-tabs/paper-tabs.html">
+<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../iron-dropdown/iron-dropdown.html">
+<link rel="import" href="../polymer-redux/polymer-redux.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../paper-slider/paper-slider.html">
-<link rel="import" href="../paper-color-picker/paper-color-input.html">
-<link rel="import" href="../iron-ajax/iron-ajax.html">
-<script type="text/javascript" src="../crossfilter/crossfilter.js"></script>
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../paper-dropdown-menu/paper-dropdown-menu.html">
+<script src="../redux/index.js"></script>
+<!-- <script type="text/javascript" src="../crossfilter/crossfilter.js"></script> -->
 
 <!-- Internal dependencies -->
 <script src="namespace.js"></script>
-<link href="polymer-d3.html" rel="import">
-<link href="display-component/display-component.html" rel="import">
-<link href="display-component/legends-component.html" rel="import">
+<link rel="import" href="display-component/chart-holder.html" />
 <link href="behaviors/colorpicker-behavior.html" rel="import">
+<link href="display-component/chart-settings.html" rel="import">
 <link href="behaviors/chart-behavior.html" rel="import">
+<link href="behaviors/file-reader.html" rel="import">
 <link href="bar-chart/bar-chart.html" rel="import">
+<link href="bar-chart/stacked-bar-chart.html" rel="import">
+<link href="bar-chart/grouped-bar-chart.html" rel="import">
 <link href="area-chart/area-chart.html" rel="import">
 <link href="pie-chart/pie-chart.html" rel="import">
-<link href="parallel-coordinate/parallel-coordinate.html" rel="import">
-<link href="bullet-chart/bullet-chart.html" rel="import">
-<link href="sankey-chart/sankey-chart.html" rel="import">
 <link href="radar-chart/radar-chart.html" rel="import">
+<link href="bullet-chart/bullet-chart.html" rel="import">
 <link href="box-plot/box-plot.html" rel="import">
+<link href="sankey-chart/sankey-chart.html" rel="import">
 <link href="calendar-chart/calendar-chart.html" rel="import">
 <link href="scatter-plot/scatter-plot.html" rel='import'>
 <link href="heat-map/heat-map.html" rel='import'>
-<link href="multi-line/multi-line.html" rel='import'>
 <link href="chart-icons.html" rel='import'>
-<link href="chart-customizer/chart-customizer.html" rel='import'>
 <link href="pareto-chart/pareto-chart.html" rel='import'>
-<link href="stacked-composite-chart/stacked-composite-chart.html" rel='import'>
-<link href="grouped-composite-chart/grouped-composite-chart.html" rel='import'>
 <link href="horizontal-chart/horizontal-chart.html" rel='import'>
 <link href="polymerd3-table/polymerd3-table.html" rel='import'>
 <link href="composite-canvas/composite-canvas.html" rel='import'>
+<link href="waterfall-chart/waterfall-chart.html" rel='import'>
+<link href="difference-chart/difference-chart.html" rel='import'>
+<link href="word-cloud/word-cloud.html" rel='import'>
+
+<link href="display-component/chart-input-group.html" rel='import'>
