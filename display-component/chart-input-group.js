@@ -1,8 +1,8 @@
 import './chart-input.js';
 import './drag-element.js';
 import '../behaviors/redux-mixins-behavior.js';
-
-class chartInputGroup extends ReduxMixinBehavior(Polymer.Element) {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
+class chartInputGroup extends ReduxMixinBehavior(Element) {
   static get template() {
     return `
     <style>

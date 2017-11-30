@@ -1,6 +1,8 @@
 import '../behaviors/redux-mixins-behavior.js';
 import './chart-box.js';
-class layoutArea extends ReduxMixinBehavior(Polymer.Element){
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
+
+class layoutArea extends ReduxMixinBehavior(Element){
   static get template() {
     return `
     <style>

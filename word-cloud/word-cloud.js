@@ -1,5 +1,6 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './word-cloud.js';
+
 class wordCloud extends baseChart {
   static get template() {
     return `

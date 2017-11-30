@@ -1,8 +1,6 @@
-/**
-* @polymer
-* @extends HTMLElement
-*/
-class legendCustomizer extends Polymer.Element {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class legendCustomizer extends Element {
   static get template() {
     return `
     <style>

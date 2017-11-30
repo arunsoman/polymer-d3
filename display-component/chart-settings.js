@@ -1,7 +1,9 @@
 import '../behaviors/redux-mixins-behavior.js';
 import './legend-customizer.js';
 import './resizer-element.js';
-class chartSettings extends ReduxMixinBehavior(Polymer.Element) {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class chartSettings extends ReduxMixinBehavior(Element) {
   static get template() {
     return `
     <style>

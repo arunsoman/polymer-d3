@@ -1,9 +1,9 @@
-import './bar-chart.js';
+import {barChart} from './bar-chart.js';
 /**
 * @polymer
 * @extends HTMLElement
 */
-class stackedbarChart extends barChart {
+export class stackedbarChart extends barChart {
   static get template() {
     return `
   <style>

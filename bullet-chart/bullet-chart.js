@@ -1,9 +1,6 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './bullet.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
+
 class bulletChart extends baseChart{
   static get template() {
     return `

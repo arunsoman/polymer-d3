@@ -1,9 +1,6 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './RadarChart.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
+
 class radarChart extends baseChart{
   static get template() {
     return `

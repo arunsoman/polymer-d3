@@ -1,8 +1,5 @@
-import '../display-component/base-chart.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
+import {baseChart} from '../display-component/base-chart.js';
+
 class heatMap extends baseChart{
   static get template() {
     return `

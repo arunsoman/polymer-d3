@@ -1,8 +1,7 @@
 import '../behaviors/redux-mixins-behavior.js';
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
 
-class baseChart extends Polymer.mixinBehaviors(
-  [PolymerD3.toolTipBehavior],ReduxMixinBehavior(Polymer.Element)
-  ){
+export class baseChart extends ReduxMixinBehavior(Element){
   static get template() {
     return `
   <h3>[[title]] </h3>

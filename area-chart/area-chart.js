@@ -1,4 +1,5 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
+
 class areaChart extends baseChart{
   static get template() {
     return `

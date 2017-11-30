@@ -1,6 +1,8 @@
 <!DOCTYPE html><html><head>
-    <script src="../webcomponentsjs/webcomponents-loader.js"></script>
-    <link rel="import" href="../polymer/polymer.html">
+    <script src="../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <!-- <link rel="import" href="../polymer/polymer.html"> -->
+    <script src="../redux/dist/redux.min.js"></script>
+    <script src="../polymer-redux/lib/index.js"></script>
     <script type="module" src="./polymer-d3.js"></script>
     <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
@@ -40,7 +42,7 @@
 
     <!-- <script src="data.js"></script> -->
     <polymer-d3 import-file></polymer-d3>
-    <script type="module">
+    <!-- <script type="module">
 import './polymer-d3.js';
 Polymer.dom(this.root).querySelector('polymer-d3').paragraphId = guid();
 function guid() {
@@ -52,7 +54,7 @@ function guid() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
     s4() + '-' + s4() + s4() + s4();
 }
-</script>
+</script> -->
 
 
 </body></html>

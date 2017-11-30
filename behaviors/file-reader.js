@@ -1,5 +1,6 @@
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
 import './redux-mixins-behavior.js';
-class fileReaderElem extends ReduxMixinBehavior(Polymer.Element) {
+class fileReaderElem extends ReduxMixinBehavior(Element) {
   static get template() {
     return `
         <style>

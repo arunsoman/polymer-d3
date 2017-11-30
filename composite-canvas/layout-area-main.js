@@ -1,6 +1,8 @@
 import '../display-component/base-chart.js';
 import './layout-area.js';
-class layoutAreaMain extends ReduxMixinBehavior(Polymer.Element){
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
+
+class layoutAreaMain extends ReduxMixinBehavior(Element){
   static get template() {
     return `
     <div id="layoutAreaContainer">

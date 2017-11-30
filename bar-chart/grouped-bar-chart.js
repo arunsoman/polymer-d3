@@ -1,7 +1,5 @@
-/**
-* @polymer
-* @extends HTMLElement
-*/
+import {barChart} from './bar-chart.js';
+
 class groupedbarChart extends barChart {
   static get template() {
     return `

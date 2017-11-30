@@ -1,6 +1,7 @@
 import '../behaviors/redux-mixins-behavior.js';
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
 
-class ChartInput extends ReduxMixinBehavior(Polymer.Element){
+class ChartInput extends ReduxMixinBehavior(Element){
   static get template() {
     return `
 <style>

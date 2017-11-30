@@ -1,6 +1,8 @@
 import './polymer-d3-imports.js';
 import './behaviors/redux-mixins-behavior.js';
-class polymerD3 extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
+import {Element} from "./node_modules/@polymer/polymer/polymer-element.js";
+
+class polymerD3 extends ReduxMixinBehavior(Element) {
   static get template() {
     return `
 <style>

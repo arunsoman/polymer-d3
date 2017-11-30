@@ -1,8 +1,6 @@
-/**
-* @polymer
-* @extends HTMLElement
-*/
-class resizerElement extends Polymer.Element {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class resizerElement extends Element {
   static get template() {
     return `
     <style>

@@ -1,5 +1,5 @@
 import './display-component/chart-holder.js';
-import './behaviors/colorpicker-behavior.js';
+// import './behaviors/colorpicker-behavior.js';
 import './display-component/chart-settings.js';
 import './behaviors/chart-behavior.js';
 import './behaviors/file-reader.js';
@@ -24,7 +24,8 @@ import './waterfall-chart/waterfall-chart.js';
 import './difference-chart/difference-chart.js';
 import './word-cloud/word-cloud.js';
 import './display-component/chart-input-group.js';
-import './d3.tip.js';
-import './d3-time.v1.min.js';
-import './d3.legend.js';
+// import './node_modules/d3-tip/index.js';
+// import './d3-time.v1.min.js';
+// import './node_modules/d3-legend/d3.legend.js';
+import './node_modules/d3/d3.min.js';
 import './namespace.js';

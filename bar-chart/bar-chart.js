@@ -1,9 +1,6 @@
-import '../display-component/base-chart.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
-class barChart extends baseChart {
+import {baseChart} from '../display-component/base-chart.js';
+
+export class barChart extends baseChart {
   static get template() {
     return `
   <style>

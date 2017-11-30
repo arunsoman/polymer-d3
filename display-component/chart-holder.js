@@ -1,10 +1,8 @@
 import './chart-selector.js';
 import '../behaviors/redux-mixins-behavior.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
-class chartHolder extends Polymer.mixinBehaviors([],ReduxMixinBehavior(Polymer.Element)) {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class chartHolder extends ReduxMixinBehavior(Element) {
   static get template() {
     return `
   <template is="dom-if" if="{{settingsVisible}}">

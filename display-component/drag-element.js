@@ -1,8 +1,6 @@
-/**
-* @polymer
-* @extends HTMLElement
-*/
-class dragElement extends Polymer.Element {
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class dragElement extends Element {
   static get template() {
     return `
   <style>

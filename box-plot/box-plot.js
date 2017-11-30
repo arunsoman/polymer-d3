@@ -1,9 +1,6 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './box.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
+
 class boxPlot extends baseChart {
   static get template() {
     return `

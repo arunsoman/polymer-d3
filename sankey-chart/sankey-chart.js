@@ -1,4 +1,4 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './sankey.js';
 /**
 * @polymer

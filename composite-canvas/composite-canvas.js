@@ -1,9 +1,6 @@
-import '../display-component/base-chart.js';
+import {baseChart} from '../display-component/base-chart.js';
 import './layout-area-main.js';
-/**
-* @polymer
-* @extends HTMLElement
-*/
+
 class compositeCanvas extends baseChart{
   static get template() {
     return `

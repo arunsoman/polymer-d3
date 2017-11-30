@@ -1,5 +1,7 @@
 import '../behaviors/redux-mixins-behavior.js';
-class polymerd3Table extends ReduxMixinBehavior(Polymer.Element){
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class polymerd3Table extends ReduxMixinBehavior(Element){
   static get template() {
     return `
     <style>

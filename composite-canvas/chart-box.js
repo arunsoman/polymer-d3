@@ -1,6 +1,8 @@
 import '../behaviors/redux-mixins-behavior.js';
 import '../display-component/resizer-element.js';
-class chartBox extends ReduxMixinBehavior(Polymer.Element){
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
+
+class chartBox extends ReduxMixinBehavior(Element){
   static get template() {
     return `
     <style>
