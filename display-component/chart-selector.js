@@ -1,0 +1,124 @@
+import '../behaviors/redux-mixins-behavior.js';
+/**
+* @polymer
+* @extends HTMLElement
+*/
+class chartSelector extends ReduxMixinBehavior(Polymer.Element){
+  static get template() {
+    return `
+    <style>
+      :host {
+        display: block;
+        background: #f9f9f9;
+        position: relative;
+        /*border: solid 1px #e4e4e4;*/
+        margin: 0 0;
+        border-left: 0;
+        border-right: 0;
+        box-shadow: inset 0px -1px 20px 6px rgba(0, 0, 0, 0.02);
+        /*height: 37px;*/
+        overflow: hidden;
+      }
+      paper-icon-button {
+        box-sizing: content-box !important;
+        color: #27b7da;
+        height: 34px;
+        width: 34px;
+      }
+      paper-tab[disabled]{
+        opacity: 0.2;
+      }
+
+      paper-tabs{
+        --paper-tabs-selection-bar-color: #27b7da;
+      }
+    </style>
+    <paper-tabs selected="0" scrollable="">
+    <template is="dom-if" if="[[fileImport]]">
+        <paper-tab>
+          <file-reader read-as="text" accept=".csv" paragraph-id="[[paragraphId]]" activate-tabs="{{activateTabs}}"></file-reader>
+        </paper-tab>
+    </template>
+    <template is="dom-repeat" items="{{charts}}" restamp="">
+      <paper-tab disabled="{{!activateTabs}}">
+        <paper-icon-button icon="[[item.icon]]" title="[[item.label]]" on-tap="notifyTap" draggable="[[isCompsiteChart]]" data-elem\$="[[item.element]]" data-icon\$="[[item.icon]]"></paper-icon-button>
+      </paper-tab>
+    </template>
+    </paper-tabs>
+`;
+  }
+
+  static get is(){return 'chart-selector'}
+  static get properties(){
+    return{
+      activateTabs:{
+        type:Boolean,
+        value:true
+      },
+      charts: {
+        type: Array,
+        notify:true,
+        value: () => { return [];}
+      },
+      selectedBtn: {
+        type: Object,
+        value: () => { return {};}
+      },
+      selected: {
+        type: Object,
+        value: () => { return {};},
+        notify: true
+      },
+      activateImport:{
+        type:Boolean,
+        value:false
+      },
+      fileImport:{
+        type:Array,
+        statePath:'commonsettings.commonsettings.importFile',
+        observer:'fileImported'
+      },
+      isCompsiteChart:{
+        type:Boolean,
+        statePath(state){
+          let chartPath = state.charts
+          let compsiteChart = chartPath && chartPath.isCompsiteChart
+          return compsiteChart
+        }
+      }
+    }
+  }
+  checkTabActive(){
+    console.log(this.fileImport ? !this.activateTabs : !this.activateTabs);
+    return this.fileImport ? !this.activateTabs : !this.activateTabs;
+  }
+  fileImported(e){
+    if(!this.activateImport){
+      e = false;
+      this.fileImport = false;
+    }
+    this.set('activateTabs',!e);
+  }
+  connectedCallback(){
+    this.addEventListener("dragstart",this.draggable.bind(this))
+    super.connectedCallback();
+    this.set('selected', {
+          callBack:"initTable",
+          element:"polymerd3-table",
+          icon:"chart:table-icon",
+          label:"Table"
+        });
+  }
+  notifyTap(e) {
+    this.set('selected',e.model.item);
+  }
+  draggable(e){
+    let charts=["composite-canvas","polymerd3-table"]
+    let chartChk = charts.indexOf(e.path[0].dataset.elem)
+    if(!e.path[0].dataset.elem || chartChk!=-1) return;
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("chartElem",e.path[0].dataset.elem);
+    e.dataTransfer.setData("chartIcon",e.path[0].dataset.icon);
+  }
+}
+window.customElements.define(chartSelector.is,chartSelector);

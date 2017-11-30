@@ -1,0 +1,207 @@
+import '../display-component/base-chart.js';
+/**
+* @polymer
+* @extends HTMLElement
+*/
+class barChart extends baseChart {
+  static get template() {
+    return `
+  <style>
+    #chartContainer{
+      /*margin:0 auto;*/
+      font: 10px sans-serif;
+    }
+    .legend-items text{
+      fill:black
+    }
+    .legend{
+      fill:transparent;
+      font-size: 12px;
+    }
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+      }
+      paper-icon-button.resetBtn {
+        font-size: x-small;
+        float: right;
+        padding: 4px;
+        margin-top: 5px;
+        width: 27px;
+        color: #9f9e9e;
+        height: 27px;
+      }
+      #chartContainer.selected rect {
+        fill-opacity: .25;
+      }
+      #chartContainer.selected rect.selected {
+        fill-opacity: 1;
+        cursor:pointer;
+      }
+      .toolTip {
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+          position: absolute;
+          display: none;
+          width: auto;
+          height: auto;
+          background: none repeat scroll 0 0 white;
+          border: 0 none;
+          border-radius: 8px 8px 8px 8px;
+          box-shadow: -3px 3px 15px #888888;
+          color: black;
+          font: 12px sans-serif;
+          padding: 5px;
+          text-align: center;
+      }
+  </style>
+    <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+      <paper-icon-button class="resetBtn" on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+    </template>
+    <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+      <paper-icon-button raised="" class="resetBtn" on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
+    </template>
+    <chart-input-group uuid="[[uuid]]" chart-visible="[[chartVisible]]">
+      <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+      <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+    </chart-input-group>
+    <div id="chartContainer"></div>
+`;
+  }
+
+  static get is() {
+    return 'bar-chart'
+  }
+  static get properties() {
+    return {}
+  }
+  redraw() {
+    this.draw(this._paint(this._compute()));
+  }
+  _compute() {
+    let axisIndex = 2
+    let arg = {axisIndex}
+    let chartProp = this.getChartProperties(arg)
+    if(!chartProp)return false
+
+    let chartData = this.getChartData(chartProp.itemX, chartProp.itemY);
+
+    let axis = {
+      scale: {},
+      position: {}
+    }
+    axis.scale.x = d3.scale.ordinal().rangeRoundBands([0, chartProp.width], .05);
+    axis.scale.y = d3.scale.linear().range([chartProp.height, 0]);
+    axis.scale.x.domain(chartData.map(items => items.item))
+    axis.scale.y.domain([0, d3.max(chartData, items => items.value)])
+
+    axis.position.x = d3.svg.axis().scale(axis.scale.x).orient("bottom");
+    axis.position.y = d3.svg.axis().scale(axis.scale.y).orient("left").ticks(10);
+
+    return {
+      axis,
+      chartData,
+      chartProp
+    }
+
+  }
+  _paint(obj) {
+    this.clear();
+    if(!obj) return false;
+
+    let selector = d3.select(this.$.chartContainer)
+      .append("svg")
+      .attr("width", obj.chartProp.width+obj.chartProp.margin.xMargin)
+      .attr("height", obj.chartProp.height+obj.chartProp.margin.yMargin)
+
+    let svg = selector.append("g")
+      .attr("width",obj.chartProp.width)
+      .attr("height", obj.chartProp.height)
+      .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+
+      
+
+    let segments = svg.selectAll("bar")
+      .data(obj.chartData)
+      .enter().append("rect")
+      .attr("class",function(d){
+        let classes = "bar"
+        this.filterKeys.length && this.filterKeys.indexOf(d.item)!=-1&&(classes+=" selected")
+        return classes
+      }.bind(this))
+      .style("fill", "steelblue")
+      .attr("x", function(d) {
+        return obj.axis.scale.x(d.item);
+      })
+      .attr("width", obj.axis.scale.x.rangeBand())
+      .attr("y", function(d) {
+        return obj.axis.scale.y(d.value);
+      })
+      .attr("height", function(d) {
+        return obj.chartProp.height - obj.axis.scale.y(d.value);
+      })
+      .attr("data-value", function(d,i) {return d.value})
+      .attr("data-key", function(d,i) {return d.item});
+
+
+    this.addLegend({
+      obj,
+      container:selector,
+      selector:'rect.bar',
+      node:obj.chartData,
+      key: 'item',
+      segments
+    });
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + obj.chartProp.height + ")")
+      .call(obj.axis.position.x)
+      .selectAll("text")
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.55em")
+      .attr("transform", "rotate("+(obj.chartProp.xLabel || -90 )+")")
+      svg.append("g")
+      .attr("class", "y axis")
+      .call(obj.axis.position.y)
+      .append("text")
+      .attr("transform", "rotate("+(obj.chartProp.yLabel || -90)+")")
+      .attr("y", 10)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Value ($)");
+    let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+    this.isCompsiteChart&&segments.on("click",function(e){
+      let elem = this, item = e.item
+      compSourcePopulate({item,elem})
+    })
+    this.isCompsiteChart&&segments.on("dblclick",function(e){
+      let elem = this, item = e.item, dblClick=true
+      compSourcePopulate({item,elem,dblClick})
+    })
+
+    // append div for toolTip
+    let tlpObj={elem:segments,tplY:60}
+    this.chartToolTip(tlpObj)
+
+    // debugger;
+    // this.attachToolTip(parentG, segments, 'pie-slice', htmlCallback);
+    d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+  }
+  getChartData(itemX, itemY) {
+    let sourcemap =
+      this.source.reduce((old, newVal) => {
+        old[newVal[itemX]] = (old[newVal[itemX]] || 0) + newVal[itemY]
+        return old
+      }, {})
+    let source = Object.keys(sourcemap).map(item => {
+      return {
+        item,
+        value: sourcemap[item]
+      }
+    })
+    return source
+  }
+}
+window.customElements.define(barChart.is, barChart);

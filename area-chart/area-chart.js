@@ -1,0 +1,359 @@
+import '../display-component/base-chart.js';
+class areaChart extends baseChart{
+  static get template() {
+    return `
+    <style>
+    .axis path,
+    .axis line {
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
+    }
+    /*.x.axis path {
+    display: none;
+    }*/
+    .area {
+    fill: steelblue;
+    }
+    #chartContainer{
+      margin:0 auto;
+      font: 10px sans-serif;
+    }
+    .legend-items text{
+      fill:black
+    }
+    .legend{
+      fill:transparent;
+      font-size: 12px;
+    }
+    paper-icon-button.resetBtn {
+      font-size: x-small;
+      float: right;
+      padding: 4px;
+      margin-top: 5px;
+      width: 27px;
+      color: #9f9e9e;
+      height: 27px;
+    }
+    g.area-chart{
+      position:absolute;
+      z-index:-1;
+    }
+    #chartContainer.selected g.area-chart{
+      fill-opacity: .25;
+    }
+    #chartContainer.selected g.selected,
+    #chartContainer.selected g.area-chart.xAxis .dot.selected {
+      fill-opacity: 1;
+      cursor:pointer;
+    }
+    .toolTip {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        position: absolute;
+        display: none;
+        width: auto;
+        height: auto;
+        background: none repeat scroll 0 0 white;
+        border: 0 none;
+        border-radius: 8px 8px 8px 8px;
+        box-shadow: -3px 3px 15px #888888;
+        color: black;
+        font: 12px sans-serif;
+        padding: 5px;
+        text-align: center;
+    }
+    .dot{
+      opacity:0;
+      position:absolute;
+    }
+    .dot:hover{
+      opacity:1;
+      z-index: 999;
+    }
+    </style>
+      <template is="dom-if" if="[[compfilterChk]]" restamp="true">
+        <paper-icon-button class="resetBtn" on-click="chartReset" icon="communication:clear-all" title="Reset">reset</paper-icon-button>
+      </template>
+      <template is="dom-if" if="[[lastFilterActivated]]" restamp="true">
+        <paper-icon-button raised="" class="resetBtn" on-click="exportFilterData" icon="icons:file-download" title="Export filter data">Export filter data</paper-icon-button>
+      </template>
+      <chart-input-group uuid="[[uuid]]" chart-visible="[[chartVisible]]">
+        <chart-input slot="chart-input" axis="x" label="Key"></chart-input>
+        <chart-input slot="chart-input" axis="y" label="Value" accept="number"></chart-input>
+        <chart-input slot="chart-input" axis="z" label="z-axis"></chart-input>
+      </chart-input-group>
+    <div id="chartContainer"></div>
+`;
+  }
+
+  static get is(){
+    return "area-chart"
+  }
+  static get properties(){
+    return{
+
+    }
+  }
+  redraw() {
+    this.draw(this._paint(this._compute()));
+  }
+  _compute() {
+    //Here checks the axis availability for avoid error from chart
+    let axisKeys = this.axisKeys&&this.axisKeys.sort().join(",")
+    let chkXY = axisKeys == "x,y"
+    let chkXYZ = axisKeys == "x,y,z"
+    let axisIndex = chkXY?2:4
+    axisIndex = chkXYZ?3:axisIndex
+    //"chartProp" define for chart axis and properties
+    let arg = {axisIndex}
+    let chartProp = this.getChartProperties(arg)
+    if(!chartProp)return false
+    //assign stacked value
+    let stacked = chartProp.stacked
+
+    //get chart data once pass "x and y" into the "getChartData" method
+    let itemZChk = !stacked&&chartProp.itemZ
+    itemZChk = !itemZChk?true:itemZChk
+    let circleChk = !chartProp.itemZ?true:false
+
+    let source = this.getChartData(chartProp.itemX, chartProp.itemY,chartProp.itemZ,stacked,itemZChk,chartProp.parseDate)
+    let chartData,
+        itemVal = source.itemVal
+    if(stacked || itemZChk){
+      chartProp.color.domain(source.names);
+      let stack = d3.layout.stack().values(function(d) { return d.values});
+      chartData = stack(chartProp.color.domain().map((name)=> {
+            return {
+              name: name,
+              values: source.data.map((d)=> {
+                return {item: d.item, y: d[name] * 1};
+              })
+            };
+          }));
+    }else{
+      chartData = source.map((item,i)=>{
+        itemVal = item["item"].indexOf("GMT")!=-1 ?item["item"]:chartProp.parseDate(item["item"].split(" ")[0])
+        let itemSet = itemVal?itemVal:item["item"]
+        return{"value":item.value,"item":itemSet}
+      })
+    }
+    let srcData = stacked || itemZChk?source.data:chartData
+
+    let dateX = d3.time.scale().range([0, chartProp.width]);
+    let stringX = d3.scale.ordinal().range([0, chartProp.width]);
+
+    let x = itemVal?dateX:stringX
+    let y = d3.scale.linear().range([chartProp.height, 0]);
+    let xAxis = d3.svg.axis()
+        .scale(x).orient("bottom");
+    let yAxis = d3.svg.axis()
+        .scale(y).orient("left");
+
+    // Define area chart and set chart values and item
+    let areaChart = d3.svg.area()
+        .x((d)=>x(d.item))
+        .y0((d)=>(stacked || itemZChk)?y(d.y0):chartProp.height)
+        .y1((d)=>(stacked || itemZChk)?y(d.y0 + d.y):y(d.value));
+
+    // Set domains for X axes
+    if(itemVal){
+      x.domain(d3.extent(srcData, function(d) { return d.item; }));
+    }else{
+      x.domain(srcData.map(d=> d.item))
+      .rangeRoundBands([0 , chartProp.width]);
+    }
+    // Find the value of the item with highest total value
+    let maxItemVal = d3.max(srcData, function(d){
+      let vals = (stacked || itemZChk)&& d3.keys(d).map(function(key){ return key !== "item" ? d[key] : 0 })
+      return (stacked || itemZChk)?d3.sum(vals):d.value;
+    });
+    // Set domains for Y axes
+    y.domain([0, maxItemVal]);
+
+    return {
+      x,
+      y,
+      xAxis,
+      yAxis,
+      areaChart,
+      chartData,
+      chartProp,
+      stacked,
+      itemZChk,
+      circleChk,
+      source
+    }
+  }
+  _paint(obj) {
+    this.clear()
+    if (!obj) return false
+    let parentG = d3.select(this.$.chartContainer).append("svg")
+        .attr({"width": obj.chartProp.width + obj.chartProp.margin.xMargin,
+                "height": obj.chartProp.height + obj.chartProp.margin.yMargin+40
+        })
+        .append("g")
+          .attr("transform", "translate(" + obj.chartProp.margin.left + "," + obj.chartProp.margin.top + ")");
+      let chartSvg
+    if(obj.stacked || obj.itemZChk){
+      chartSvg = parentG.selectAll("area-chart").data(obj.chartData)
+        .enter().append("g")
+        .attr("class",function(d){
+          let classes = "area-chart"
+          this.filterKeys.length && this.filterKeys.indexOf(d.name)!=-1&&(classes+=" selected")
+          return classes
+        }.bind(this))
+      chartSvg.append("path")
+          .attr("class", "area")
+          .attr("d", function(d) {return obj.areaChart(d.values); })
+          .style("fill", function(d) { return obj.chartProp.color(d.name); });
+
+      chartSvg.append("text")
+          .datum(function(d) {return {name: d.name, value: d.values[d.values.length - 1]}; })
+          .attr("transform", function(d) { return "translate(" + obj.x(d.value.item) + "," + obj.y(d.value.y0 + d.value.y / 2) + ")"; })
+          .attr("x", -6)
+          .attr("dy", ".35em")
+          .text(function(d) { return d.name; });
+
+    }else{
+      chartSvg = parentG.append("path")
+        .datum(obj.chartData)
+        .attr({"class":"area",
+                "fill": "steelblue"
+              })
+        .attr("d",(d)=>obj.areaChart(d))
+
+    }
+    // this.isCompsiteChart&&chartSvg.on("click",this.compSourcePopulate.bind(this,obj.chartProp.axis))
+    // let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+    // this.isCompsiteChart&&!obj.circleChk && chartSvg.on("click",function(e){
+    //   let elem = this, item = e.name,zAxis=true
+    //   compSourcePopulate({item,elem,zAxis})
+    // })
+    // this.isCompsiteChart&&!obj.circleChk && chartSvg.on("dblclick",function(e){
+    //   let elem = this, item = e.name, zAxis=true, dblClick=true
+    //   compSourcePopulate({item,elem,zAxis,dblClick})
+    // })
+
+    // for adding dots
+    let circle = chartSvg.selectAll(".dot")
+      .data((d)=>d.values)
+      .enter()
+      .append("circle")
+      .attr("r", 5.4)
+      .attr("cx", (d,i)=>obj.x(d.item))
+      .attr("cy", d=>obj.y((d.y0+d.y)-1))
+      .attr("fill","#010e6b")
+      // .attr("fill", d=>obj.chartProp.color(d.item))
+      .attr("class",function(d){
+        let classes = "dot"
+        this.filterKeys.length && this.filterKeys.indexOf(d.item)!=-1&&(classes+=" selected")
+        return classes
+      }.bind(this))
+      .attr("",function(d){
+        let pCls = this.parentElement.getAttribute("class")
+        pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+        this.parentElement.setAttribute("class",pCls)
+      })
+      .attr("data-value", function(d,i) {return d.y==0?d.y0:d.y})
+      .attr("data-key", function(d,i) {return d.item});
+
+      let compSourcePopulate = this.compSourcePopulate.bind(this,obj.chartProp.axis)
+      if(this.isCompsiteChart){
+        circle.on("click",function(e){
+        let elem = this, item = e.item
+        let pCls = this.parentElement.getAttribute("class")
+        pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+        this.parentElement.setAttribute("class",pCls)
+        compSourcePopulate({item,elem})
+      })
+      circle.on("dblclick",function(e){
+        let elem = this, item = e.item, dblClick=true
+        let pCls = this.parentElement.getAttribute("class")
+        pCls = pCls.indexOf("xAxis") ==-1?(pCls+" xAxis"):pCls
+        this.parentElement.setAttribute("class",pCls)
+        compSourcePopulate({item,elem,dblClick})
+      })
+      !obj.circleChk && chartSvg.on("click",function(e){
+        let elem = this, item = e.name,zAxis=true
+        compSourcePopulate({item,elem,zAxis})
+      })
+      !obj.circleChk && chartSvg.on("dblclick",function(e){
+        let elem = this, item = e.name, zAxis=true, dblClick=true
+        compSourcePopulate({item,elem,zAxis,dblClick})
+      })
+    }
+    let tlpObj={elem:circle,tplY:60}
+    this.chartToolTip(tlpObj)
+
+    parentG.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + obj.chartProp.height + ")")
+        .call(obj.xAxis);
+    parentG.append("g")
+        .attr("class", "y axis")
+        .call(obj.yAxis)
+        .append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end")
+
+    // append div for toolTip
+    // debugger
+    // let tlpObj={elem:chartSvg,xKey:"data",yKey:"data"}
+    // this.chartToolTip(tlpObj)
+    // this.addLegend({
+    //     obj,
+    //     container:parentG,
+    //     selector:'.area',
+    //     node:obj.chartData
+    //   });
+    d3.select(this.$.chartContainer).style({"width":obj.chartProp.width+ obj.chartProp.margin.xMargin+"px"})
+  }
+  // populate chart data
+  getChartData(itemX, itemY,itemZ,stacked,itemZChk,formatDate){
+    // let formatDate = d3.time.format("%Y-%m-%d").parse;
+    let names=this.source.map(row=>row[itemZ])
+    let itemVal
+    let sourceData
+    if(stacked || itemZChk){
+      sourceData = this.source.map((items,i)=>{
+        itemVal = String(items[itemX]).indexOf("GMT")!=-1 ?items[itemX]:formatDate(String(items[itemX]).split(" ")[0])
+        let itemSet = itemVal?itemVal:items[itemX]
+        return this.source.reduce((old,newVal)=>{
+          old[newVal[itemZ]]=items[itemZ]==newVal[itemZ] ? items[itemY]:stacked?newVal[itemY]:0;
+          return old},{item:itemSet})
+        })
+    }
+    if(stacked){
+      let data=sourceData
+      return {data,names,itemVal}
+    }else{
+      if(itemZChk){
+        let nameMap = names.filter((item, pos)=>names.indexOf(item) == pos)
+        let obj = {}
+        let data = sourceData.filter((item,i)=>{
+            nameMap.forEach(name=>{
+              if(i==0){
+                obj[name] = item[name]
+              }else{
+                if(item[name] == 0){
+                    item[name] = obj[name]
+                }
+                obj[name] = item[name]
+              }
+            })
+            return item
+          })
+          return {data,names,itemVal}
+      }else{
+        let sourcemap = this.source.map(row=>{
+          return{[row[itemX]]:row[itemY]}
+        })
+        let source  = sourcemap.map(items=>{return {item:Object.keys(items)[0],value:items[Object.keys(items)[0]]}})
+        return source
+      }
+    }
+  }
+}
+customElements.define(areaChart.is,areaChart)

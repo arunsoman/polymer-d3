@@ -1,7 +1,7 @@
 <!DOCTYPE html><html><head>
     <script src="../webcomponentsjs/webcomponents-loader.js"></script>
     <link rel="import" href="../polymer/polymer.html">
-    <link href="polymer-d3.html" rel="import">
+    <script type="module" src="./polymer-d3.js"></script>
     <!-- <link rel="stylesheet" href="index.css"> -->
     <!--
     <link href="bullet-chart/bullet-chart.html" rel="import">
@@ -40,20 +40,19 @@
 
     <!-- <script src="data.js"></script> -->
     <polymer-d3 import-file></polymer-d3>
-    <script type="text/javascript">
-      addEventListener('WebComponentsReady', function() {
-        Polymer.dom(this.root).querySelector('polymer-d3').paragraphId = guid();
-      })
-      function guid() {
-        function s4() {
-          return Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1);
-        }
-        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-          s4() + '-' + s4() + s4() + s4();
-      }
-    </script>
+    <script type="module">
+import './polymer-d3.js';
+Polymer.dom(this.root).querySelector('polymer-d3').paragraphId = guid();
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
+</script>
 
 
 </body></html>

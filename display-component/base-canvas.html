@@ -1,38 +1,39 @@
-<link rel="import" href="chart-input.html">
-<link href="../behaviors/redux-mixins-behavior.html" rel='import'>
+<script type="module" src="./chart-input.js"></script>
+<script type="module" src="../behaviors/redux-mixins-behavior.js"></script>
 <dom-module id="base-canvas">
 <template>
 
 </template>
-<script>
-  class baseCanvas extends ReduxMixinBehavior(Polymer.Element){
-    static get is(){ return 'base-canvas'}
+<script type="module">
+import './chart-input.js';
+import '../behaviors/redux-mixins-behavior.js';
+class baseCanvas extends ReduxMixinBehavior(Polymer.Element){
+  static get is(){ return 'base-canvas'}
 
-    static get properties(){
-      return{
-        redraw:{
-          type:Boolean,
-          selectPath:'redraw'
-        },
-        externals:[],
-        source:[],
-        charts:{
-          statePath:'charts'
-        }
+  static get properties(){
+    return{
+      redraw:{
+        type:Boolean,
+        selectPath:'redraw'
+      },
+      externals:[],
+      source:[],
+      charts:{
+        statePath:'charts'
       }
     }
-    static get observors(){
-      return ['redrawChange(redraw)']
-    }
-    redrawChange(){
-
-    }
-    constructor(){
-      super();
-    }
+  }
+  static get observors(){
+    return ['redrawChange(redraw)']
+  }
+  redrawChange(){
 
   }
-  customElements.define(baseCanvas.is,baseCanvas)
+  constructor(){
+    super();
+  }
 
+}
+customElements.define(baseCanvas.is,baseCanvas)
 </script>
 </dom-module>
