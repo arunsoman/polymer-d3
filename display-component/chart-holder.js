@@ -10,7 +10,7 @@ class chartHolder extends ReduxMixinBehavior(Element) {
       <chart-selector activate-import="[[activateImport]]" charts="[[availableCharts]]" selected="{{selectedChart}}" paragraph-id="[[paragraphId]]"></chart-selector>
     </div>
   </template>
-  <div class="chartHolder"></div>
+  <div class="chartHolder" id="chartHolder"></div>
 `;
   }
 
@@ -115,7 +115,7 @@ class chartHolder extends ReduxMixinBehavior(Element) {
     // Object desctibing selected chart type
     selectedChart: {
       type: Object,
-      value: () => { return {};}
+      value: () => {}
     },
     selectedChartObj: {
       type: Object,
@@ -163,7 +163,7 @@ class chartHolder extends ReduxMixinBehavior(Element) {
     },
     legendSettings: {
       type: Object,
-      value: () => {return {};}
+      value: () => {}
     },
     paragraphId:{
       type:String
@@ -183,8 +183,7 @@ class chartHolder extends ReduxMixinBehavior(Element) {
   }
   static get observers(){
     return[
-    '_selectedChanged(selectedChart)',
-    '_selectedChanged(paragraphId)',
+    '_selectedChanged(selectedChart)'
     ]
   }
 
@@ -194,16 +193,18 @@ class chartHolder extends ReduxMixinBehavior(Element) {
     let getparagraphId = this.uuid?this.uuid.split("@")[0]:this.paragraphId
     if(selectedChart && getparagraphId){
       let elem;
-      this.$$('.chartHolder').innerHTML = ''
-      elem = PolymerD3.utilities.attachElement.call(
-        this,
-        selectedChart.element,
-        '.chartHolder',
-        getparagraphId,
-        selectedChart.icon
-        );
-      this.selectedChartObj = elem;
-      this.selectedChartObj.chartInfo = this.selectedChart;
+      this.$.chartHolder.innerHTML = '';
+      if(selectedChart.element){
+        elem = PolymerD3.utilities.attachElement.call(
+          this,
+          selectedChart.element,
+          '.chartHolder',
+          getparagraphId,
+          selectedChart.icon
+          );
+        this.selectedChartObj = elem;
+        this.selectedChartObj.chartInfo = this.selectedChart;
+      }
     }
   }
 

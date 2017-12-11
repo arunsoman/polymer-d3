@@ -1,5 +1,5 @@
 import '../behaviors/redux-mixins-behavior.js';
-import {Element} from "../node_modules/@polymer/polymer/polymer-element.js"
+import {Element} from "../node_modules/@polymer/polymer/polymer-element.js";
 
 export class baseChart extends ReduxMixinBehavior(Element){
   static get template() {

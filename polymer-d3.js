@@ -1,6 +1,6 @@
-import './polymer-d3-imports.js';
-import './behaviors/redux-mixins-behavior.js';
 import {Element} from "./node_modules/@polymer/polymer/polymer-element.js";
+import './behaviors/redux-mixins-behavior.js';
+import './polymer-d3-imports.js';
 
 class polymerD3 extends ReduxMixinBehavior(Element) {
   static get template() {
@@ -10,7 +10,7 @@ class polymerD3 extends ReduxMixinBehavior(Element) {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   };
 </style>
-  <chart-holder vertical="" settings-visible="" paragraph-id="[[paragraphId]]" activate-import=""></chart-holder>
+  <chart-holder settings-visible paragraph-id="[[paragraphId]]" activate-import></chart-holder>
 `;
   }
 
@@ -19,7 +19,7 @@ class polymerD3 extends ReduxMixinBehavior(Element) {
     return{
       source:{
         type:Object,
-        value:false,
+        value:true,
         observer:'addStore'
       },
       paragraphId:{
@@ -142,10 +142,8 @@ class polymerD3 extends ReduxMixinBehavior(Element) {
   add data to redux store, so that all available chart can subscribe to this data.
   */
   addStore(){
-    if(this.source.source){
-      this.dispatch("updateSource",{id:this.paragraphId,source:this.source.source})
-      this.dispatch("updateExternal",{id:this.paragraphId,externals:this.source.externals})
-    }
+      this.dispatch("updateSource",{id:this.paragraphId,source:this.source.source || []})
+      this.dispatch("updateExternal",{id:this.paragraphId,externals:this.source.externals || []})
   }
   constructor(){
     super();

@@ -73,6 +73,7 @@ class chartSelector extends ReduxMixinBehavior(Element){
       },
       fileImport:{
         type:Array,
+        value:true,
         statePath:'commonsettings.commonsettings.importFile',
         observer:'fileImported'
       },
@@ -86,8 +87,10 @@ class chartSelector extends ReduxMixinBehavior(Element){
       }
     }
   }
+  constructor(){
+    super()
+  }
   checkTabActive(){
-    console.log(this.fileImport ? !this.activateTabs : !this.activateTabs);
     return this.fileImport ? !this.activateTabs : !this.activateTabs;
   }
   fileImported(e){
@@ -99,7 +102,6 @@ class chartSelector extends ReduxMixinBehavior(Element){
   }
   connectedCallback(){
     this.addEventListener("dragstart",this.draggable.bind(this))
-    super.connectedCallback();
     this.set('selected', {
           callBack:"initTable",
           element:"polymerd3-table",

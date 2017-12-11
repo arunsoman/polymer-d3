@@ -29,3 +29,5 @@ import './display-component/chart-input-group.js';
 // import './node_modules/d3-legend/d3.legend.js';
 import './node_modules/d3/d3.min.js';
 import './namespace.js';
+import './node_modules/@polymer/paper-tabs/paper-tabs';
+import './node_modules/@polymer/paper-dialog/paper-dialog';
